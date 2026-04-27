@@ -122,7 +122,12 @@ class MemoryStore:
         self._system_prompt_snapshot: Dict[str, str] = {"memory": "", "user": ""}
 
     def load_from_disk(self):
-        """Load entries from MEMORY.md and USER.md, capture system prompt snapshot."""
+        """Load entries from MEMORY.md and USER.md, capture system prompt snapshot.
+        
+        Enforces char limits at load time — if file exceeds limit, truncates to
+        most recent entries that fit. This prevents external edits or corruption
+        from blowing past the limit.
+        """
         mem_dir = get_memory_dir()
         mem_dir.mkdir(parents=True, exist_ok=True)
 
@@ -132,6 +137,10 @@ class MemoryStore:
         # Deduplicate entries (preserves order, keeps first occurrence)
         self.memory_entries = list(dict.fromkeys(self.memory_entries))
         self.user_entries = list(dict.fromkeys(self.user_entries))
+
+        # Enforce limits at load time — truncate from oldest if over limit
+        self.memory_entries = self._truncate_to_limit(self.memory_entries, self.memory_char_limit)
+        self.user_entries = self._truncate_to_limit(self.user_entries, self.user_char_limit)
 
         # Capture frozen snapshot for system prompt injection
         self._system_prompt_snapshot = {
@@ -218,6 +227,35 @@ class MemoryStore:
         if target == "user":
             return self.user_char_limit
         return self.memory_char_limit
+
+    def _truncate_to_limit(self, entries: List[str], limit: int) -> List[str]:
+        """Truncate entries from the oldest until total fits within limit.
+        
+        Keeps most recent entries (end of list) since they are typically
+        more relevant than older ones.
+        """
+        if not entries:
+            return entries
+        
+        # Work backwards from most recent
+        total = 0
+        keep_from = len(entries)
+        for i in range(len(entries) - 1, -1, -1):
+            entry_size = len(entries[i]) if i == len(entries) - 1 else len(entries[i]) + len(ENTRY_DELIMITER)
+            if total + entry_size > limit:
+                break
+            total += entry_size
+            keep_from = i
+        
+        if keep_from > 0:
+            # Log truncation for visibility
+            truncated_count = keep_from
+            logger.warning(
+                f"Memory truncated {truncated_count} oldest entries to fit {limit} char limit. "
+                f"Kept {len(entries) - truncated_count}/{len(entries)} entries."
+            )
+        
+        return entries[keep_from:]
 
     def add(self, target: str, content: str) -> Dict[str, Any]:
         """Append a new entry. Returns error if it would exceed the char limit."""

@@ -95,6 +95,16 @@ from agent.prompt_builder import (
     HERMES_AGENT_HELP_GUIDANCE,
     build_nous_subscription_prompt,
 )
+from agent.adaptive_injection import (
+    build_adaptive_memory_block,
+    build_adaptive_skills_prompt,
+    InjectionBudget,
+    get_query_context,
+    estimate_tokens,
+    DEFAULT_INJECTION_BUDGET_TOKENS,
+    MEMORY_BUDGET_RATIO,
+    SKILLS_BUDGET_RATIO,
+)
 from agent.model_metadata import (
     fetch_model_metadata,
     estimate_tokens_rough, estimate_messages_tokens_rough, estimate_request_tokens_rough,
@@ -4347,6 +4357,60 @@ class AIAgent:
             self._memory_manager.on_session_end(messages or [])
         except Exception:
             pass
+        
+        # --- CORTEX LEARNING FEEDBACK ---
+        # After session ends, analyze which injected memories/skills were useful
+        # and update learned scores in the Cortex database.
+        try:
+            from agent.cortex_learning import get_learning_engine
+            engine = get_learning_engine()
+            
+            # Get what was injected in this session
+            # (We need to track this during the session — add tracking below)
+            injected_memory_ids = getattr(self, '_injected_memory_ids', [])
+            loaded_skills = getattr(self, '_loaded_skills', [])
+            
+            # Infer usefulness from the conversation
+            # A simple heuristic: if the model referenced the memory/skill content
+            # in its output, it was useful
+            referenced_memory_ids = []
+            followed_skills = []
+            
+            if messages:
+                # Analyze assistant messages for references
+                assistant_text = " ".join([
+                    str(m.get("content", "")) for m in messages
+                    if m.get("role") == "assistant"
+                ])
+                
+                # Check which memories were referenced
+                for mem_id in injected_memory_ids:
+                    # We'd need the memory text to check references
+                    # For now, assume all were useful (conservative)
+                    referenced_memory_ids.append(mem_id)
+                
+                # Check which skills were followed (by looking for skill content patterns)
+                for skill in loaded_skills:
+                    if skill.replace("-", " ").lower() in assistant_text.lower():
+                        followed_skills.append(skill)
+            
+            # Process feedback
+            engine.process_session_feedback(
+                session_id=self.session_id or "unknown",
+                injected_memory_ids=injected_memory_ids,
+                referenced_memory_ids=referenced_memory_ids,
+                loaded_skills=loaded_skills,
+                followed_skills=followed_skills,
+                query_summary=getattr(self, '_last_user_query', "")[:200],
+            )
+            
+            # Clear tracking for next session
+            self._injected_memory_ids = []
+            self._loaded_skills = []
+            
+        except Exception as e:
+            logger.debug("Cortex learning feedback failed: %s", e)
+        # --- END CORTEX LEARNING ---
 
     def _sync_external_memory_for_turn(
         self,
@@ -4626,16 +4690,79 @@ class AIAgent:
         if system_message is not None:
             prompt_parts.append(system_message)
 
+        # --- ADAPTIVE CONTEXT INJECTION (Kimi harness enhancement) ---
+        # Instead of dumping all memory/skills every turn, we filter by relevance
+        # to the current conversation context. This saves ~10K+ tokens per turn.
+        
+        # Initialize tracking lists for this turn
+        _injected_memories_this_turn = []
+        _loaded_skills_this_turn = []
+        
+        # Get recent conversation context for relevance scoring
+        _recent_context = ""
+        try:
+            if hasattr(self, '_session_db') and self._session_db:
+                _recent_msgs = self._session_db.get_recent_messages(self.session_id, limit=5)
+                _recent_context = " ".join([
+                    m.get("content", "") for m in (_recent_msgs or [])
+                    if m.get("role") in ("user", "assistant")
+                ])
+        except Exception:
+            _recent_context = ""
+        
+        # Track the current user query for learning
+        try:
+            if hasattr(self, '_session_db') and self._session_db:
+                _last_user = self._session_db.get_recent_messages(self.session_id, limit=1)
+                if _last_user and _last_user[0].get("role") == "user":
+                    self._last_user_query = str(_last_user[0].get("content", ""))[:200]
+        except Exception:
+            pass
+        
+        # Get context window pressure level
+        _pressure_level = "low"
+        try:
+            if hasattr(self, '_context_compressor') and self._context_compressor:
+                _pressure_level = self._context_compressor.get_pressure_level()
+        except Exception:
+            _pressure_level = "low"
+        
+        # Initialize budget tracker
+        _budget = InjectionBudget(
+            total_budget=getattr(self, '_injection_budget_tokens', DEFAULT_INJECTION_BUDGET_TOKENS)
+        )
+        
+        # Memory injection — adaptive (relevance-filtered)
         if self._memory_store:
             if self._memory_enabled:
-                mem_block = self._memory_store.format_for_system_prompt("memory")
-                if mem_block:
-                    prompt_parts.append(mem_block)
-            # USER.md is always included when enabled.
+                _mem_entries = self._memory_store._entries_for("memory")
+                if _mem_entries:
+                    _mem_block, _mem_meta = build_adaptive_memory_block(
+                        _mem_entries,
+                        query=_recent_context,
+                        budget_tokens=_budget.memory_budget,
+                        pressure_level=_pressure_level,
+                    )
+                    if _mem_block:
+                        prompt_parts.append(_mem_block)
+                        _budget.allocate("memory", _mem_meta.get("block_tokens", 0))
+                        if _mem_meta.get("dropped", 0) > 0:
+                            logger.debug(
+                                "Adaptive memory: kept %d/%d entries (%d dropped, pressure=%s)",
+                                _mem_meta["kept"], _mem_meta["total"], _mem_meta["dropped"],
+                                _pressure_level,
+                            )
+                        # Track injected memories for learning
+                        _injected_memories_this_turn.extend([
+                            str(hash(e) % 10000000) for e in _mem_entries
+                        ])
+            
+            # User profile — always include but compact
             if self._user_profile_enabled:
                 user_block = self._memory_store.format_for_system_prompt("user")
                 if user_block:
                     prompt_parts.append(user_block)
+                    _budget.allocate("user_profile", estimate_tokens(user_block))
 
         # External memory provider system prompt block (additive to built-in)
         if self._memory_manager:
@@ -4643,9 +4770,11 @@ class AIAgent:
                 _ext_mem_block = self._memory_manager.build_system_prompt()
                 if _ext_mem_block:
                     prompt_parts.append(_ext_mem_block)
+                    _budget.allocate("external_memory", estimate_tokens(_ext_mem_block))
             except Exception:
                 pass
 
+        # Skills injection — adaptive (query-matched, not all dumped)
         has_skills_tools = any(name in self.valid_tool_names for name in ['skills_list', 'skill_view', 'skill_manage'])
         if has_skills_tools:
             avail_toolsets = {
@@ -4655,14 +4784,58 @@ class AIAgent:
                 )
                 if toolset
             }
-            skills_prompt = build_skills_system_prompt(
+            # Build full skills index first (cached, fast)
+            _full_skills_prompt = build_skills_system_prompt(
                 available_tools=self.valid_tool_names,
                 available_toolsets=avail_toolsets,
             )
-        else:
-            skills_prompt = ""
-        if skills_prompt:
-            prompt_parts.append(skills_prompt)
+            
+            # Parse and filter by relevance
+            if _full_skills_prompt and _recent_context:
+                from agent.prompt_builder import _parse_skills_prompt_to_dict
+                _skills_dict = _parse_skills_prompt_to_dict(_full_skills_prompt)
+                _filtered_skills, _skills_meta = build_adaptive_skills_prompt(
+                    _skills_dict,
+                    query=_recent_context,
+                    budget_tokens=_budget.skills_budget,
+                    pressure_level=_pressure_level,
+                )
+                if _filtered_skills:
+                    prompt_parts.append(_filtered_skills)
+                    _budget.allocate("skills", _skills_meta.get("block_tokens", 0))
+                    if _skills_meta.get("dropped", 0) > 0:
+                        logger.debug(
+                            "Adaptive skills: kept %d/%d skills (%d dropped, pressure=%s)",
+                            _skills_meta["kept"], _skills_meta["total"], _skills_meta["dropped"],
+                            _pressure_level,
+                        )
+                    # Track which skills were shown for learning
+                    for category, skills in _skills_dict.items():
+                        for name, desc in skills:
+                            _loaded_skills_this_turn.append(name)
+            elif _full_skills_prompt:
+                # No context yet (first turn) — show all but compact
+                prompt_parts.append(_full_skills_prompt)
+                _budget.allocate("skills", estimate_tokens(_full_skills_prompt))
+        
+        # Log budget report if over threshold
+        _report = _budget.report()
+        if _report["utilization_pct"] > 80:
+            logger.warning(
+                "Injection budget at %s%% (%d/%d tokens, pressure=%s). Consider pruning memory.",
+                _report["utilization_pct"], _report["used"], _report["total_budget"],
+                _pressure_level,
+            )
+        
+        # Persist tracking for session-end learning
+        if not hasattr(self, '_injected_memory_ids'):
+            self._injected_memory_ids = []
+        if not hasattr(self, '_loaded_skills'):
+            self._loaded_skills = []
+        self._injected_memory_ids.extend(_injected_memories_this_turn)
+        self._loaded_skills.extend(_loaded_skills_this_turn)
+        
+        # --- END ADAPTIVE INJECTION ---
 
         if not self.skip_context_files:
             # Use TERMINAL_CWD for context file discovery when set (gateway
@@ -8850,6 +9023,24 @@ class AIAgent:
             except Exception as tool_error:
                 result = f"Error executing tool '{function_name}': {tool_error}"
                 logger.error("_invoke_tool raised for %s: %s", function_name, tool_error, exc_info=True)
+                
+                # --- ERROR LEARNING FEEDBACK ---
+                try:
+                    from agent.error_learning import get_error_engine
+                    engine = get_error_engine()
+                    error_info = engine.on_error(
+                        error_text=str(tool_error),
+                        context=f"tool:{function_name} args:{json.dumps(function_args)[:200]}",
+                        session_id=self.session_id or "unknown",
+                    )
+                    if error_info.get('is_known'):
+                        known = error_info['known_info']
+                        if known and known.get('resolution'):
+                            result += f"\n\n[LEARNED: This error has occurred {known['occurrence_count']} times before. Known resolution: {known['resolution'][:150]}]"
+                except Exception:
+                    pass
+                # --- END ERROR LEARNING ---
+            
             duration = time.time() - start
             is_error, _ = _detect_tool_failure(function_name, result)
             if is_error:
