@@ -469,6 +469,55 @@ class ContextCompressor(ContextEngine):
             return False
         return True
 
+    def get_pressure_level(self, prompt_tokens: int = None) -> str:
+        """Return context window pressure level: 'low', 'medium', 'high', 'critical'."""
+        tokens = prompt_tokens if prompt_tokens is not None else self.last_prompt_tokens
+        ratio = tokens / self.context_length if self.context_length > 0 else 0
+        if ratio >= 0.95:
+            return "critical"
+        elif ratio >= 0.80:
+            return "high"
+        elif ratio >= 0.60:
+            return "medium"
+        return "low"
+
+    def get_pressure_report(self, prompt_tokens: int = None) -> dict:
+        """Generate detailed pressure report for adaptive injection."""
+        tokens = prompt_tokens if prompt_tokens is not None else self.last_prompt_tokens
+        level = self.get_pressure_level(tokens)
+        ratio = tokens / self.context_length if self.context_length > 0 else 0
+        remaining = self.context_length - tokens
+        
+        recommendations = []
+        if level == "critical":
+            recommendations = [
+                "IMMEDIATE: Compress context with /compress",
+                "Reduce injection budget to 4000 tokens",
+                "Drop all non-essential memory entries",
+                "Start new session with /new",
+            ]
+        elif level == "high":
+            recommendations = [
+                "Compress context soon",
+                "Reduce injection budget to 6000 tokens",
+                "Filter memory to top 15 entries only",
+            ]
+        elif level == "medium":
+            recommendations = [
+                "Monitor context growth",
+                "Enable adaptive injection if not already active",
+            ]
+        
+        return {
+            "level": level,
+            "tokens_used": tokens,
+            "context_limit": self.context_length,
+            "utilization_pct": round(ratio * 100, 1),
+            "tokens_remaining": remaining,
+            "threshold_tokens": self.threshold_tokens,
+            "recommendations": recommendations,
+        }
+
     # ------------------------------------------------------------------
     # Tool output pruning (cheap pre-pass, no LLM call)
     # ------------------------------------------------------------------

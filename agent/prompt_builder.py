@@ -881,6 +881,49 @@ def build_skills_system_prompt(
     return result
 
 
+def _parse_skills_prompt_to_dict(skills_prompt: str) -> dict[str, list[tuple[str, str]]]:
+    """Parse a rendered skills prompt back into a structured dict.
+    
+    Used by adaptive injection to filter skills by relevance.
+    Input format:
+      ## Skills (mandatory)
+      ...
+      <available_skills>
+        category:
+          - name: description
+          - name: description
+      </available_skills>
+    """
+    result: dict[str, list[tuple[str, str]]] = {}
+    current_category: str | None = None
+    
+    for line in skills_prompt.split("\n"):
+        line = line.rstrip()
+        if not line or line.startswith("##") or line.startswith("<") or line.startswith("Before") or line.startswith("If a") or line.startswith("Only") or line.startswith("Err") or line.startswith("Skills") or line.startswith("Load") or line.startswith("After"):
+            continue
+        
+        # Category line: "  category:" or "  category: description"
+        if line.startswith("  ") and not line.startswith("    ") and line.endswith(":"):
+            cat_part = line.strip().rstrip(":")
+            current_category = cat_part
+            result.setdefault(current_category, [])
+            continue
+        
+        # Skill line: "    - name: description"
+        if line.startswith("    - ") and current_category:
+            rest = line[6:]  # Remove "    - "
+            if ":" in rest:
+                name, desc = rest.split(":", 1)
+                name = name.strip()
+                desc = desc.strip()
+            else:
+                name = rest.strip()
+                desc = ""
+            result[current_category].append((name, desc))
+    
+    return result
+
+
 def build_nous_subscription_prompt(valid_tool_names: "set[str] | None" = None) -> str:
     """Build a compact Nous subscription capability block for the system prompt."""
     try:
