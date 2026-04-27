@@ -30,15 +30,12 @@ from uuid import UUID
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Cortex integration
+# Cortex integration — uses centralized cortex_access module
 # ---------------------------------------------------------------------------
 
 def _cortex_cursor():
-    """Get a Cortex database cursor."""
-    import sys
-    from pathlib import Path
-    sys.path.insert(0, str(Path.home() / "subconscious"))
-    from cortex_access import cortex_cursor
+    """Get a Cortex database cursor (backward-compatible wrapper)."""
+    from agent.cortex_access import cortex_cursor
     return cortex_cursor()
 
 

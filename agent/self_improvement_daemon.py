@@ -28,10 +28,8 @@ logger = logging.getLogger(__name__)
 
 
 def _cortex_cursor():
-    """Get a Cortex database cursor."""
-    import sys
-    sys.path.insert(0, str(Path.home() / "subconscious"))
-    from cortex_access import cortex_cursor
+    """Get a Cortex database cursor (backward-compatible wrapper)."""
+    from agent.cortex_access import cortex_cursor
     return cortex_cursor()
 
 
@@ -253,12 +251,7 @@ class SelfImprovementDaemon:
                     
                 # Store findings as a memory
                 try:
-                    from agent.cortex_learning import get_learning_engine
-                    engine = get_learning_engine()
-                    # Add to memory_units as a world fact
-                    import sys
-                    sys.path.insert(0, str(Path.home() / 'subconscious'))
-                    from cortex_access import cortex_cursor
+                    from agent.cortex_access import cortex_cursor
                     
                     with cortex_cursor() as cur:
                         import uuid, json

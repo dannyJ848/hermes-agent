@@ -4818,6 +4818,15 @@ class AIAgent:
                 prompt_parts.append(_full_skills_prompt)
                 _budget.allocate("skills", estimate_tokens(_full_skills_prompt))
         
+        # Memory bloat monitor check
+        try:
+            from agent.memory_bloat_monitor import check_memory_bloat
+            _bloat_alert = check_memory_bloat(self._memory_store)
+            if _bloat_alert:
+                logger.warning(_bloat_alert)
+        except Exception:
+            pass
+        
         # Log budget report if over threshold
         _report = _budget.report()
         if _report["utilization_pct"] > 80:
@@ -9999,11 +10008,30 @@ class AIAgent:
         ):
             # Include tool schema tokens — with many tools these can add
             # 20-30K+ tokens that the old sys+msg estimate missed entirely.
-            _preflight_tokens = estimate_request_tokens_rough(
-                messages,
-                system_prompt=active_system_prompt or "",
-                tools=self.tools or None,
-            )
+            # Use tiktoken for accurate counting (fall back to rough estimate).
+            try:
+                import tiktoken
+                enc = tiktoken.get_encoding("cl100k_base")
+                _preflight_tokens = 0
+                # System prompt
+                if active_system_prompt:
+                    _preflight_tokens += len(enc.encode(active_system_prompt))
+                # Messages
+                for msg in messages:
+                    content = msg.get("content") or ""
+                    _preflight_tokens += len(enc.encode(str(content)))
+                    # Add per-message overhead (role, structure)
+                    _preflight_tokens += 4
+                # Tool schemas (rough estimate — schemas are large)
+                if self.tools:
+                    _schema_chars = sum(len(str(t)) for t in (self.tools or []))
+                    _preflight_tokens += _schema_chars // 4  # rough but closer
+            except Exception:
+                _preflight_tokens = estimate_request_tokens_rough(
+                    messages,
+                    system_prompt=active_system_prompt or "",
+                    tools=self.tools or None,
+                )
 
             if _preflight_tokens >= self.context_compressor.threshold_tokens:
                 logger.info(
@@ -10045,11 +10073,25 @@ class AIAgent:
                     self._last_content_tools_all_housekeeping = False
                     self._mute_post_response = False
                     # Re-estimate after compression
-                    _preflight_tokens = estimate_request_tokens_rough(
-                        messages,
-                        system_prompt=active_system_prompt or "",
-                        tools=self.tools or None,
-                    )
+                    try:
+                        import tiktoken
+                        enc = tiktoken.get_encoding("cl100k_base")
+                        _preflight_tokens = 0
+                        if active_system_prompt:
+                            _preflight_tokens += len(enc.encode(active_system_prompt))
+                        for msg in messages:
+                            content = msg.get("content") or ""
+                            _preflight_tokens += len(enc.encode(str(content)))
+                            _preflight_tokens += 4
+                        if self.tools:
+                            _schema_chars = sum(len(str(t)) for t in (self.tools or []))
+                            _preflight_tokens += _schema_chars // 4
+                    except Exception:
+                        _preflight_tokens = estimate_request_tokens_rough(
+                            messages,
+                            system_prompt=active_system_prompt or "",
+                            tools=self.tools or None,
+                        )
                     if _preflight_tokens < self.context_compressor.threshold_tokens:
                         break  # Under threshold
 

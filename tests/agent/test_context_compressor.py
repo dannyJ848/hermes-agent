@@ -17,6 +17,9 @@ def compressor():
             protect_last_n=2,
             quiet_mode=True,
         )
+        # Set last_prompt_tokens above threshold so tests that call
+        # compress() without current_tokens still trigger compression.
+        c.last_prompt_tokens = 90000
         return c
 
 
@@ -123,6 +126,7 @@ class TestGenerateSummaryNoneContent:
         """System message with content=None should not crash during compress."""
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
             c = ContextCompressor(model="test", quiet_mode=True, protect_first_n=2, protect_last_n=2)
+            c.last_prompt_tokens = 90000  # Above threshold to trigger compression
 
         msgs = [{"role": "system", "content": None}] + [
             {"role": "user" if i % 2 == 0 else "assistant", "content": f"msg {i}"}
@@ -260,6 +264,7 @@ class TestCompressWithClient:
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
             c = ContextCompressor(model="test", quiet_mode=True, protect_first_n=2, protect_last_n=2)
+            c.last_prompt_tokens = 90000  # Above threshold
 
         msgs = [
             {"role": "system", "content": [{"type": "text", "text": "system prompt"}]},
@@ -291,6 +296,7 @@ class TestCompressWithClient:
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
             c = ContextCompressor(model="test", quiet_mode=True, protect_first_n=2, protect_last_n=2)
+            c.last_prompt_tokens = 90000  # Above threshold
 
         msgs = [{"role": "user" if i % 2 == 0 else "assistant", "content": f"msg {i}"} for i in range(10)]
         with patch("agent.context_compressor.call_llm", return_value=mock_response):
@@ -315,6 +321,7 @@ class TestCompressWithClient:
                 protect_first_n=3,
                 protect_last_n=4,
             )
+            c.last_prompt_tokens = 90000  # Above threshold
 
         msgs = [
             {"role": "user", "content": "Could you address the reviewer comments in PR#71"},
@@ -358,6 +365,7 @@ class TestCompressWithClient:
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
             c = ContextCompressor(model="test", quiet_mode=True, protect_first_n=2, protect_last_n=2)
+            c.last_prompt_tokens = 90000  # Above threshold
 
         # Last head message (index 1) is "assistant" → summary should be "user".
         # With min_tail=3, tail = last 3 messages (indices 5-7).
@@ -391,6 +399,7 @@ class TestCompressWithClient:
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
             c = ContextCompressor(model="test", quiet_mode=True, protect_first_n=3, protect_last_n=2)
+            c.last_prompt_tokens = 90000  # Above threshold
 
         # Last head message (index 2) is "user" → summary should be "assistant"
         msgs = [
@@ -420,6 +429,7 @@ class TestCompressWithClient:
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
             c = ContextCompressor(model="test", quiet_mode=True, protect_first_n=2, protect_last_n=2)
+            c.last_prompt_tokens = 90000  # Above threshold
 
         # Head ends with tool (index 1), tail starts with user (index 6).
         # Default: tool → summary_role="user" → collides with tail.
@@ -459,6 +469,7 @@ class TestCompressWithClient:
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
             c = ContextCompressor(model="test", quiet_mode=True, protect_first_n=3, protect_last_n=3)
+            c.last_prompt_tokens = 90000  # Above threshold
 
         # Head: [system, user, assistant]  →  last head = assistant
         # Tail: [user, assistant, user]    →  first tail = user
@@ -497,6 +508,7 @@ class TestCompressWithClient:
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
             c = ContextCompressor(model="test", quiet_mode=True, protect_first_n=3, protect_last_n=3)
+            c.last_prompt_tokens = 90000  # Above threshold
 
         msgs = [
             {"role": "system", "content": "system prompt"},
@@ -533,6 +545,7 @@ class TestCompressWithClient:
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
             c = ContextCompressor(model="test", quiet_mode=True, protect_first_n=2, protect_last_n=2)
+            c.last_prompt_tokens = 90000  # Above threshold
 
         # Head: [system, user]        → last head = user
         # Tail: [assistant, user, assistant] → first tail = assistant
@@ -573,6 +586,7 @@ class TestCompressWithClient:
 
         with patch("agent.context_compressor.get_model_context_length", return_value=100000):
             c = ContextCompressor(model="test", quiet_mode=True, protect_first_n=2, protect_last_n=2)
+            c.last_prompt_tokens = 90000  # Above threshold
 
         # Head=assistant, Tail=assistant → summary_role="user", no collision.
         # With min_tail=3, tail = last 3 messages (indices 5-7).
@@ -605,6 +619,7 @@ class TestCompressWithClient:
                 protect_first_n=2,
                 protect_last_n=3,
             )
+            c.last_prompt_tokens = 90000  # Above threshold
 
         msgs = [
             {"role": "user", "content": "earlier 1"},
@@ -802,7 +817,7 @@ class TestTokenBudgetTailProtection:
         # Should not early-return (needs > protect_first_n + 3 + 1 = 6)
         # Mock the summary generation to avoid real API call
         with patch.object(c, "_generate_summary", return_value="Summary of conversation"):
-            result = c.compress(messages, current_tokens=90_000)
+            result = c.compress(messages, current_tokens=150_000)
         # Should have compressed (fewer messages than original)
         assert len(result) < len(messages)
 
