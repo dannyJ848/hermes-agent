@@ -135,15 +135,15 @@ class ErrorPatternStore:
             row = cur.fetchone()
             
             if row:
-                # Update existing pattern
-                pattern_id = row['id']
-                new_count = row['occurrence_count'] + 1
+                # Existing pattern — update counts
+                pattern_id = row[0]
+                new_count = row[1] + 1
                 
                 # Update success rate if we have new data
                 if resolution_successful is not None:
                     # Bayesian update
-                    old_success = row['resolution_success_rate'] or 0.0
-                    old_count = row['occurrence_count']
+                    old_success = row[2] or 0.0
+                    old_count = row[1]
                     if old_count > 0:
                         new_rate = (old_success * old_count + (1.0 if resolution_successful else 0.0)) / (old_count + 1)
                     else:
@@ -166,6 +166,7 @@ class ErrorPatternStore:
                     """, (new_count, pattern_id))
             else:
                 # Create new pattern
+                new_count = 1
                 cur.execute("""
                     INSERT INTO error_patterns (
                         fingerprint, error_type, error_summary, context,
@@ -174,7 +175,8 @@ class ErrorPatternStore:
                     RETURNING id
                 """, (fingerprint, error_type, error_summary, context[:500], 
                       resolution, 1.0 if resolution_successful else 0.0))
-                pattern_id = cur.fetchone()['id']
+                row = cur.fetchone()
+                pattern_id = row[0] if row else None
             
             # Record occurrence
             cur.execute("""
@@ -188,7 +190,7 @@ class ErrorPatternStore:
                 "fingerprint": fingerprint,
                 "error_type": error_type,
                 "is_repeat": row is not None,
-                "occurrence_count": new_count if row else 1,
+                "occurrence_count": new_count,
             }
     
     def _classify_error(self, error_text: str) -> str:
@@ -250,14 +252,14 @@ class ErrorPatternStore:
                 return None
             
             return {
-                "pattern_id": str(row['id']),
-                "fingerprint": row['fingerprint'],
-                "error_type": row['error_type'],
-                "error_summary": row['error_summary'],
-                "resolution": row['resolution'],
-                "resolution_success_rate": round(row['resolution_success_rate'] or 0, 3),
-                "occurrence_count": row['occurrence_count'],
-                "last_occurred": row['last_occurred'].isoformat() if row['last_occurred'] else None,
+                "pattern_id": str(row[0]),
+                "fingerprint": row[1],
+                "error_type": row[2],
+                "error_summary": row[3],
+                "resolution": row[4],
+                "resolution_success_rate": round(row[5] or 0, 3),
+                "occurrence_count": row[6],
+                "last_occurred": row[7].isoformat() if row[7] else None,
                 "is_known": True,
             }
     
@@ -282,13 +284,13 @@ class ErrorPatternStore:
                 ORDER BY count DESC
             """)
             
-            by_type = {r['error_type']: r['count'] for r in cur.fetchall()}
+            by_type = {r[0]: r[1] for r in cur.fetchall()}
             
             return {
-                "total_patterns": row['total_patterns'],
-                "repeat_patterns": row['repeats'],
-                "average_success_rate": round(row['avg_success_rate'] or 0, 3),
-                "well_solved_count": row['well_solved'],
+                "total_patterns": row[0],
+                "repeat_patterns": row[1],
+                "average_success_rate": round(row[2] or 0, 3),
+                "well_solved_count": row[3],
                 "by_type": by_type,
             }
     
@@ -305,12 +307,12 @@ class ErrorPatternStore:
             """, (limit,))
             
             return [{
-                "fingerprint": r['fingerprint'],
-                "error_type": r['error_type'],
-                "summary": r['error_summary'][:100],
-                "resolution": r['resolution'][:100] if r['resolution'] else None,
-                "success_rate": round(r['resolution_success_rate'] or 0, 3),
-                "occurrences": r['occurrence_count'],
+                "fingerprint": r[0],
+                "error_type": r[1],
+                "summary": r[2][:100],
+                "resolution": r[3][:100] if r[3] else None,
+                "success_rate": round(r[4] or 0, 3),
+                "occurrences": r[5],
             } for r in cur.fetchall()]
 
 
@@ -323,6 +325,27 @@ class ErrorLearningEngine:
     
     def __init__(self):
         self.store = ErrorPatternStore()
+        self._batch_buffer: List[Dict] = []
+        self._batch_size = 5  # Flush every 5 errors
+        self._last_flush = time.time()
+        self._flush_interval = 60  # Or every 60 seconds
+    
+    def _flush_batch(self):
+        """Flush batched error writes to cortex."""
+        if not self._batch_buffer:
+            return
+        
+        try:
+            with _cortex_cursor() as cur:
+                for item in self._batch_buffer:
+                    cur.execute("""
+                        INSERT INTO error_occurrences (pattern_id, resolution_attempted, resolution_successful, context)
+                        VALUES (%s, %s, %s, %s)
+                    """, (item['pattern_id'], item.get('resolution', ''), item.get('successful', False), item.get('context', '')))
+            self._batch_buffer.clear()
+            self._last_flush = time.time()
+        except Exception as e:
+            logger.debug("Error batch flush failed: %s", e)
     
     def on_error(
         self,
@@ -345,13 +368,24 @@ class ErrorLearningEngine:
                 known['resolution_success_rate'] * 100
             )
         
-        # Record it
+        # Record it (always sync for pattern table — small, fast)
         result = self.store.record_error(
             error_text=error_text,
             context=context,
             resolution=known.get('resolution', '') if known else '',
             session_id=session_id,
         )
+        
+        # Batch the occurrence write
+        self._batch_buffer.append({
+            'pattern_id': result['pattern_id'],
+            'context': context,
+            'session_id': session_id,
+        })
+        
+        # Flush if batch full or interval elapsed
+        if len(self._batch_buffer) >= self._batch_size or (time.time() - self._last_flush) > self._flush_interval:
+            self._flush_batch()
         
         return {
             "is_known": known is not None,
@@ -409,14 +443,14 @@ class ErrorLearningEngine:
             
             warnings = []
             for row in rows:
-                if row['resolution_success_rate'] and row['resolution_success_rate'] > 0.5:
+                if row[3] and row[3] > 0.5:
                     warnings.append(
-                        f"- This action has caused errors {row['occurrence_count']} times before. "
-                        f"Known fix: {row['resolution'][:80]}"
+                        f"- This action has caused errors {row[2]} times before. "
+                        f"Known fix: {row[1][:80]}"
                     )
                 else:
                     warnings.append(
-                        f"- This action has caused errors {row['occurrence_count']} times before. "
+                        f"- This action has caused errors {row[2]} times before. "
                         f"No reliable fix known yet."
                     )
             
