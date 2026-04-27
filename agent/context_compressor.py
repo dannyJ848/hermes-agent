@@ -442,6 +442,11 @@ class ContextCompressor(ContextEngine):
         self._summary_failure_cooldown_until: float = 0.0
         self._last_summary_error: Optional[str] = None
 
+        # Hard limits to prevent LCM/state bloat
+        self._max_lcm_messages: int = 10000  # Max messages before forcing LCM trim
+        self._max_lcm_nodes: int = 100        # Max summary nodes before forcing cleanup
+        self._lcm_cleanup_interval: int = 50  # Compressions between LCM cleanups
+
     def update_from_response(self, usage: Dict[str, Any]):
         """Update tracked token usage from API response."""
         self.last_prompt_tokens = usage.get("prompt_tokens", 0)
@@ -741,6 +746,78 @@ class ContextCompressor(ContextEngine):
             parts.append(f"[{role.upper()}]: {content}")
 
         return "\n\n".join(parts)
+
+    def _cleanup_lcm_storage(self) -> None:
+        """Trim LCM database to prevent unbounded growth.
+        
+        Called periodically during compression. Removes old messages and
+        summary nodes that exceed hard limits. Non-blocking — failures are
+        logged but don't stop compression.
+        """
+        try:
+            import sqlite3
+            from pathlib import Path
+            
+            lcm_db = Path.home() / ".hermes/lcm.db"
+            if not lcm_db.exists():
+                return
+            
+            conn = sqlite3.connect(str(lcm_db), timeout=5)
+            cur = conn.cursor()
+            
+            # Check current sizes
+            cur.execute("SELECT COUNT(*) FROM messages")
+            msg_count = cur.fetchone()[0]
+            cur.execute("SELECT COUNT(*) FROM summary_nodes")
+            node_count = cur.fetchone()[0]
+            
+            trimmed = False
+            
+            # Trim messages if over limit (keep most recent)
+            if msg_count > self._max_lcm_messages:
+                keep = self._max_lcm_messages
+                cur.execute("""
+                    DELETE FROM messages 
+                    WHERE rowid NOT IN (
+                        SELECT rowid FROM messages 
+                        ORDER BY timestamp DESC 
+                        LIMIT ?
+                    )
+                """, (keep,))
+                deleted = cur.rowcount
+                trimmed = True
+                if not self.quiet_mode:
+                    logger.info("LCM cleanup: trimmed %d old messages (%d -> %d)", 
+                               deleted, msg_count, keep)
+            
+            # Trim summary nodes if over limit (keep most recent)
+            if node_count > self._max_lcm_nodes:
+                keep = self._max_lcm_nodes
+                cur.execute("""
+                    DELETE FROM summary_nodes 
+                    WHERE rowid NOT IN (
+                        SELECT rowid FROM summary_nodes 
+                        ORDER BY created_at DESC 
+                        LIMIT ?
+                    )
+                """, (keep,))
+                deleted = cur.rowcount
+                trimmed = True
+                if not self.quiet_mode:
+                    logger.info("LCM cleanup: trimmed %d old summary nodes (%d -> %d)", 
+                               deleted, node_count, keep)
+            
+            if trimmed:
+                conn.commit()
+                # Vacuum to reclaim space
+                cur.execute("VACUUM")
+                conn.commit()
+            
+            conn.close()
+            
+        except Exception as e:
+            # Non-blocking: log but don't fail compression
+            logger.warning("LCM cleanup failed (non-critical): %s", e)
 
     def _generate_summary(self, turns_to_summarize: List[Dict[str, Any]], focus_topic: str = None) -> Optional[str]:
         """Generate a structured summary of conversation turns.
@@ -1246,6 +1323,31 @@ The user has requested that this compaction PRIORITISE preserving all informatio
                 everything else.  Inspired by Claude Code's ``/compact``.
         """
         n_messages = len(messages)
+        # Use current_tokens (accurate preflight estimate) if provided,
+        # otherwise fall back to last_prompt_tokens from API usage.
+        _effective_tokens = current_tokens if current_tokens is not None else self.last_prompt_tokens
+
+        # Check if compression is needed using the effective token count
+        _needs_compress = self.should_compress(_effective_tokens)
+
+        # Hard limit: if we have too many messages, force compression regardless of token count
+        _HARD_MESSAGE_LIMIT = 500
+        if n_messages > _HARD_MESSAGE_LIMIT and not _needs_compress:
+            if not self.quiet_mode:
+                logger.warning(
+                    "Forcing compression: %d messages exceeds hard limit of %d",
+                    n_messages, _HARD_MESSAGE_LIMIT,
+                )
+            _needs_compress = True
+
+        if not _needs_compress:
+            return messages
+
+        return self._do_compress(messages, current_tokens, focus_topic)
+    
+    def _do_compress(self, messages: List[Dict[str, Any]], current_tokens: int = None, focus_topic: str = None) -> List[Dict[str, Any]]:
+        """Internal compression implementation (separated to avoid recursion with hard limit)."""
+        n_messages = len(messages)
         # Only need head + 3 tail messages minimum (token budget decides the real tail size)
         _min_for_compress = self.protect_first_n + 3 + 1
         if n_messages <= _min_for_compress:
@@ -1372,6 +1474,10 @@ The user has requested that this compaction PRIORITISE preserving all informatio
             compressed.append(msg)
 
         self.compression_count += 1
+
+        # Periodic LCM cleanup to prevent database bloat
+        if self.compression_count % self._lcm_cleanup_interval == 0:
+            self._cleanup_lcm_storage()
 
         compressed = self._sanitize_tool_pairs(compressed)
 
