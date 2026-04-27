@@ -24,6 +24,8 @@ def _make_compressor():
     compressor.last_prompt_tokens = 0
     compressor._previous_summary = None
     compressor._summary_failure_cooldown_until = 0.0
+    compressor._ineffective_compression_count = 0
+    compressor._lcm_cleanup_interval = 5
     compressor.summary_model = None
     compressor.model = "test-model"
     compressor.provider = "test"
@@ -110,7 +112,7 @@ def test_compress_passes_focus_to_generate_summary():
         {"role": "assistant", "content": "reply4"},
     ]
 
-    compressor.compress(messages, current_tokens=100000, focus_topic="authentication flow")
+    compressor.compress(messages, current_tokens=170000, focus_topic="authentication flow")
 
     assert received_kwargs.get("focus_topic") == "authentication flow"
 
@@ -139,6 +141,6 @@ def test_compress_none_focus_by_default():
         {"role": "assistant", "content": "reply4"},
     ]
 
-    compressor.compress(messages, current_tokens=100000)
+    compressor.compress(messages, current_tokens=170000)
 
     assert received_kwargs.get("focus_topic") is None
