@@ -406,9 +406,13 @@ class ContextCompressor(ContextEngine):
         # kimi-for-coding's 262K-token window, and is measured empirically
         # (5.2 chars/token for English + code + tool output).
         self.char_threshold = 200_000          # HARDCODED
-        self.threshold_tokens = int(self.char_threshold / 5.2)
-        # Keep the legacy percent field for introspection / backward compat.
-        self.threshold_percent = self.threshold_tokens / self.context_length
+        # threshold_tokens derived from user-configurable threshold_percent
+        self.threshold_tokens = max(
+            int(self.context_length * self.threshold_percent),
+            MINIMUM_CONTEXT_LENGTH,
+        )
+        # Note: threshold_percent is a user-configurable parameter (passed to
+        # __init__). Do NOT overwrite it — update_model() uses it to recalc.
         self.compression_count = 0
 
         # Derive token budgets: ratio is relative to the threshold, not total context
