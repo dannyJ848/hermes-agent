@@ -414,16 +414,20 @@ class InjectionBudget:
         
         return allocated
     
+    @property
+    def remaining_budget(self) -> int:
+        """Tokens remaining in the injection budget."""
+        return self.total_budget - self.used
+    
     def report(self) -> Dict[str, Any]:
         """Generate budget usage report."""
         return {
             "total_budget": self.total_budget,
             "used": self.used,
-            "remaining": self.total_budget - self.used,
+            "remaining": self.remaining_budget,
             "utilization_pct": round(self.used / self.total_budget * 100, 1),
             "layers": self.layers,
             "warnings": self.warnings,
-            "over_budget": self.used > self.total_budget,
         }
 
 
