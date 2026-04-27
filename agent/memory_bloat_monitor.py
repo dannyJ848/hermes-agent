@@ -238,13 +238,27 @@ class MemoryBloatMonitor:
 
 # ── Integration Hook ──────────────────────────────────────────────────────
 
-def check_memory_bloat(memory_store=None) -> str:
+def check_memory_bloat(memory_store=None, auto_trim: bool = True) -> str:
     """Quick check function for use in run_agent.py every turn.
+    
+    Args:
+        auto_trim: If True (default), automatically trim memory files when
+                   they exceed critical thresholds.
     
     Returns a short status string or empty if all clear.
     """
     monitor = MemoryBloatMonitor()
     results = monitor.check_all(memory_store)
+    
+    # Auto-trim on critical even if not already trimmed by check_all
+    if auto_trim and results["status"] == "critical" and not results["actions"]:
+        # Force trim for any critical metrics that weren't auto-trimmed
+        for metric_name, metric_data in results.get("metrics", {}).items():
+            if metric_data.get("level") == "critical":
+                if metric_name in ("memory", "user"):
+                    trimmed = monitor._auto_trim_memory(metric_name)
+                    if trimmed:
+                        results["actions"].append(f"Auto-trimmed {metric_name}: removed {trimmed} entries")
     
     if results["status"] == "critical":
         alerts = " | ".join(results["alerts"])

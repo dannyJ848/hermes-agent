@@ -4818,12 +4818,15 @@ class AIAgent:
                 prompt_parts.append(_full_skills_prompt)
                 _budget.allocate("skills", estimate_tokens(_full_skills_prompt))
         
-        # Memory bloat monitor check
+        # Memory bloat monitor check with auto-trim
         try:
             from agent.memory_bloat_monitor import check_memory_bloat
-            _bloat_alert = check_memory_bloat(self._memory_store)
+            _bloat_alert = check_memory_bloat(self._memory_store, auto_trim=True)
             if _bloat_alert:
                 logger.warning(_bloat_alert)
+                # Emit critical bloat alerts to user
+                if "[BLOAT ALERT]" in _bloat_alert:
+                    self._emit_status(f"⚠ {_bloat_alert}")
         except Exception:
             pass
         
@@ -12682,16 +12685,24 @@ class AIAgent:
                         _real_tokens = estimate_messages_tokens_rough(messages)
 
                     if self.compression_enabled and _compressor.should_compress(_real_tokens):
-                        self._safe_print("  ⟳ compacting context…")
-                        messages, active_system_prompt = self._compress_context(
-                            messages, system_message,
-                            approx_tokens=self.context_compressor.last_prompt_tokens,
-                            task_id=effective_task_id,
-                        )
-                        # Compression created a new session — clear history so
-                        # _flush_messages_to_session_db writes compressed messages
-                        # to the new session (see preflight compression comment).
-                        conversation_history = None
+                        # Reentrancy guard: prevent recursive compression during active compression
+                        if getattr(self, '_compression_in_progress', False):
+                            logger.warning("Compression skipped: already in progress")
+                        else:
+                            self._compression_in_progress = True
+                            try:
+                                self._safe_print("  ⟳ compacting context…")
+                                messages, active_system_prompt = self._compress_context(
+                                    messages, system_message,
+                                    approx_tokens=self.context_compressor.last_prompt_tokens,
+                                    task_id=effective_task_id,
+                                )
+                                # Compression created a new session — clear history so
+                                # _flush_messages_to_session_db writes compressed messages
+                                # to the new session (see preflight compression comment).
+                                conversation_history = None
+                            finally:
+                                self._compression_in_progress = False
                     
                     # Save session log incrementally (so progress is visible even if interrupted)
                     self._session_messages = messages
