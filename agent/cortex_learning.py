@@ -24,6 +24,7 @@ import logging
 import math
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 from uuid import UUID
 
@@ -48,6 +49,60 @@ class CortexLearningEngine:
     
     def __init__(self):
         self._bank_id = "hermes_memory_archive"
+        self._schema_ensured = False
+        self.store = _CortexLearningStore()  # Expose store for adaptive_injection.py
+    
+    def _ensure_schema(self):
+        """Create missing tables if they don't exist."""
+        if self._schema_ensured:
+            return
+        with _cortex_cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS memory_units (
+                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    bank_id TEXT NOT NULL DEFAULT 'hermes_memory_archive',
+                    content TEXT NOT NULL,
+                    content_hash TEXT UNIQUE,
+                    memory_type TEXT DEFAULT 'fact',
+                    usefulness_score FLOAT DEFAULT 0.5,
+                    success_count INT DEFAULT 0,
+                    failure_count INT DEFAULT 0,
+                    access_count INT DEFAULT 0,
+                    created_at TIMESTAMPTZ DEFAULT NOW(),
+                    last_accessed TIMESTAMPTZ,
+                    last_evaluated TIMESTAMPTZ,
+                    usage_contexts JSONB DEFAULT '[]',
+                    metadata JSONB DEFAULT '{}'
+                )
+            """)
+            cur.execute("""
+                CREATE INDEX IF NOT EXISTS idx_memory_units_bank 
+                ON memory_units(bank_id, usefulness_score DESC)
+            """)
+            cur.execute("""
+                CREATE INDEX IF NOT EXISTS idx_memory_units_hash 
+                ON memory_units(content_hash)
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS memory_usage_log (
+                    id SERIAL PRIMARY KEY,
+                    memory_id UUID REFERENCES memory_units(id) ON DELETE SET NULL,
+                    session_id TEXT,
+                    action TEXT NOT NULL,
+                    was_useful BOOLEAN,
+                    query_context TEXT,
+                    created_at TIMESTAMPTZ DEFAULT NOW()
+                )
+            """)
+            cur.execute("""
+                CREATE INDEX IF NOT EXISTS idx_usage_log_memory 
+                ON memory_usage_log(memory_id, created_at DESC)
+            """)
+            cur.execute("""
+                CREATE INDEX IF NOT EXISTS idx_usage_log_session 
+                ON memory_usage_log(session_id, created_at DESC)
+            """)
+        self._schema_ensured = True
     
     def record_memory_injected(
         self,
@@ -56,6 +111,7 @@ class CortexLearningEngine:
         query_context: str = "",
     ):
         """Record that a memory was injected into the system prompt."""
+        self._ensure_schema()
         with _cortex_cursor() as cur:
             cur.execute("""
                 INSERT INTO memory_usage_log (memory_id, session_id, action, query_context)
@@ -342,6 +398,93 @@ class CortexLearningEngine:
             "Cortex learning: processed session %s — %d memories, %d skills",
             session_id, len(injected_memory_ids), len(loaded_skills)
         )
+
+
+# ---------------------------------------------------------------------------
+# Store adapter — exposes get_usage_stats() for adaptive_injection.py
+# ---------------------------------------------------------------------------
+
+class _CortexLearningStore:
+    """Lightweight adapter that exposes the interface adaptive_injection expects.
+    
+    Reads from cerebrum_memory.db (local SQLite) for tips, and from
+    cortex PostgreSQL for memory usage stats. This avoids per-turn
+    PostgreSQL queries for tip injection — the hot path stays local.
+    """
+    
+    def __init__(self):
+        self._tip_cache: List[Dict] = []
+        self._tip_cache_time = 0.0
+        self._TIP_CACHE_TTL = 300  # 5 minutes
+        self._cerebrum_path = Path.home() / ".hermes" / "cerebrum_memory.db"
+    
+    def get_usage_stats(self, memory_ids: List[str]) -> Dict[str, Dict]:
+        """Return usage stats for given memory IDs from cortex.
+        
+        Called by adaptive_injection.py every turn — keep it fast.
+        """
+        if not memory_ids:
+            return {}
+        
+        stats = {}
+        try:
+            with _cortex_cursor() as cur:
+                # Batch query all at once
+                placeholders = ','.join(['%s'] * len(memory_ids))
+                cur.execute(f"""
+                    SELECT id, usefulness_score, success_count, failure_count, access_count
+                    FROM memory_units
+                    WHERE id IN ({placeholders})
+                """, tuple(memory_ids))
+                for row in cur.fetchall():
+                    stats[str(row[0])] = {
+                        "usefulness_score": row[1] or 0.5,
+                        "success_count": row[2] or 0,
+                        "failure_count": row[3] or 0,
+                        "access_count": row[4] or 0,
+                    }
+        except Exception as e:
+            logger.debug("get_usage_stats failed: %s", e)
+        
+        return stats
+    
+    def get_distilled_tips(self, limit: int = 50) -> List[Dict]:
+        """Read distilled tips from local cerebrum_memory.db.
+        
+        This is the HOT PATH — called every turn during system prompt building.
+        Uses local SQLite with caching to avoid PostgreSQL round-trips.
+        """
+        now = time.time()
+        if self._tip_cache and (now - self._tip_cache_time) < self._TIP_CACHE_TTL:
+            return self._tip_cache[:limit]
+        
+        tips = []
+        try:
+            import sqlite3
+            conn = sqlite3.connect(str(self._cerebrum_path))
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT content, category, confidence, usage_count, last_used
+                FROM distilled_tips
+                WHERE confidence >= 0.6
+                ORDER BY usage_count DESC, confidence DESC, last_used DESC
+                LIMIT ?
+            """, (limit,))
+            for row in cur.fetchall():
+                tips.append({
+                    "content": row["content"],
+                    "category": row["category"],
+                    "confidence": row["confidence"],
+                    "usage_count": row["usage_count"],
+                })
+            conn.close()
+        except Exception as e:
+            logger.debug("get_distilled_tips failed: %s", e)
+        
+        self._tip_cache = tips
+        self._tip_cache_time = now
+        return tips[:limit]
 
 
 # ---------------------------------------------------------------------------

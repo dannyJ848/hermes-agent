@@ -4818,6 +4818,77 @@ class AIAgent:
                 prompt_parts.append(_full_skills_prompt)
                 _budget.allocate("skills", estimate_tokens(_full_skills_prompt))
         
+        # Distilled tips injection — from cerebrum_memory.db (local, cached)
+        # HOT PATH: must be fast, no PostgreSQL, no API calls
+        _tip_budget = _budget.remaining_budget * 0.15  # 15% of remaining for tips
+        if _tip_budget > 100:  # Only inject if we have meaningful budget
+            try:
+                from agent.cortex_learning import get_learning_engine
+                engine = get_learning_engine()
+                tips = engine.store.get_distilled_tips(limit=20)
+                if tips:
+                    # Filter to most relevant based on query context
+                    relevant_tips = []
+                    query_lower = _recent_context.lower() if _recent_context else ""
+                    for tip in tips:
+                        tip_text = tip.get("content", "")
+                        # Simple relevance: tip contains words from query
+                        tip_score = tip.get("confidence", 0.5) * 100
+                        if query_lower:
+                            tip_words = set(tip_text.lower().split())
+                            query_words = set(query_lower.split())
+                            overlap = len(tip_words & query_words)
+                            tip_score += overlap * 5  # Boost for word overlap
+                        relevant_tips.append((tip_score, tip_text))
+                    
+                    # Sort by score, take top N that fit budget
+                    relevant_tips.sort(reverse=True)
+                    tip_lines = ["## Distilled Learnings"]
+                    tip_tokens = estimate_tokens("\n".join(tip_lines))
+                    for score, tip_text in relevant_tips:
+                        line = f"- {tip_text}"
+                        line_tokens = estimate_tokens(line)
+                        if tip_tokens + line_tokens > _tip_budget:
+                            break
+                        tip_lines.append(line)
+                        tip_tokens += line_tokens
+                    
+                    if len(tip_lines) > 1:
+                        tip_block = "\n".join(tip_lines)
+                        prompt_parts.append(tip_block)
+                        _budget.allocate("tips", tip_tokens)
+                        logger.debug("Injected %d distilled tips (%d tokens)", len(tip_lines)-1, tip_tokens)
+            except Exception as e:
+                logger.debug("Tip injection failed: %s", e)
+        
+        # Predictive tool pre-loading — suggest tools based on query context
+        # Throttled: only runs every 5 turns to avoid overhead
+        _turn_count = getattr(self, '_turn_counter', 0)
+        if _turn_count % 5 == 0 and _recent_context:
+            try:
+                from agent.predictive_tools import get_predictive_loader
+                loader = get_predictive_loader()
+                recent_tools = getattr(self, '_recent_tools_used', [])
+                predictions = loader.predict_needed_tools(
+                    query=_recent_context,
+                    recent_tools_used=recent_tools[-5:] if recent_tools else [],
+                    top_k=3,
+                )
+                if predictions:
+                    pred_lines = ["## Likely Tools"]
+                    for tool_name, score in predictions:
+                        if score > 0.4:
+                            pred_lines.append(f"- {tool_name} (confidence: {score:.0%})")
+                    if len(pred_lines) > 1:
+                        pred_block = "\n".join(pred_lines)
+                        pred_tokens = estimate_tokens(pred_block)
+                        if _budget.remaining_budget > pred_tokens + 50:
+                            prompt_parts.append(pred_block)
+                            _budget.allocate("predictions", pred_tokens)
+                            logger.debug("Injected %d tool predictions", len(pred_lines)-1)
+            except Exception as e:
+                logger.debug("Predictive tool loading failed: %s", e)
+        
         # Memory bloat monitor check with auto-trim
         try:
             from agent.memory_bloat_monitor import check_memory_bloat
@@ -8944,6 +9015,13 @@ class AIAgent:
                 except Exception:
                     pass
 
+            # Track tool usage for predictive loading
+            if not hasattr(self, '_recent_tools_used'):
+                self._recent_tools_used = []
+            self._recent_tools_used.append(function_name)
+            # Keep only last 20 to avoid unbounded growth
+            self._recent_tools_used = self._recent_tools_used[-20:]
+            
             parsed_calls.append((tool_call, function_name, function_args))
 
         # ── Logging / callbacks ──────────────────────────────────────────
@@ -10136,6 +10214,7 @@ class AIAgent:
 
         # Main conversation loop
         api_call_count = 0
+        self._turn_counter = getattr(self, '_turn_counter', 0) + 1
         final_response = None
         interrupted = False
         codex_ack_continuations = 0
