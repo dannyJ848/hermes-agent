@@ -12763,7 +12763,7 @@ class AIAgent:
                     else:
                         _real_tokens = estimate_messages_tokens_rough(messages)
 
-                    if self.compression_enabled and _compressor.should_compress(_real_tokens):
+                    if self.compression_enabled and _compressor.should_compress(messages=messages):
                         # Reentrancy guard: prevent recursive compression during active compression
                         if getattr(self, '_compression_in_progress', False):
                             logger.warning("Compression skipped: already in progress")

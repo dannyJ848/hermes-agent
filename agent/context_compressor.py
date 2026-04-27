@@ -400,14 +400,15 @@ class ContextCompressor(ContextEngine):
             config_context_length=config_context_length,
             provider=provider,
         )
-        # Floor: never compress below MINIMUM_CONTEXT_LENGTH tokens even if
-        # the percentage would suggest a lower value.  This prevents premature
-        # compression on large-context models at 50% while keeping the % sane
-        # for models right at the minimum.
-        self.threshold_tokens = max(
-            int(self.context_length * threshold_percent),
-            MINIMUM_CONTEXT_LENGTH,
-        )
+        # ── HARDWIRED CHARACTER-BASED THRESHOLD ──
+        # Trigger compression at 200K characters (~38-40K tokens for mixed
+        # content).  This is well before attention degradation starts on
+        # kimi-for-coding's 262K-token window, and is measured empirically
+        # (5.2 chars/token for English + code + tool output).
+        self.char_threshold = 200_000          # HARDCODED
+        self.threshold_tokens = int(self.char_threshold / 5.2)
+        # Keep the legacy percent field for introspection / backward compat.
+        self.threshold_percent = self.threshold_tokens / self.context_length
         self.compression_count = 0
 
         # Derive token budgets: ratio is relative to the threshold, not total context
@@ -452,17 +453,39 @@ class ContextCompressor(ContextEngine):
         self.last_prompt_tokens = usage.get("prompt_tokens", 0)
         self.last_completion_tokens = usage.get("completion_tokens", 0)
 
-    def should_compress(self, prompt_tokens: int = None) -> bool:
+    def should_compress(self, prompt_tokens: int = None, messages: List[Dict[str, Any]] = None) -> bool:
         """Check if context exceeds the compression threshold.
+
+        Uses character count as the primary signal when prompt_tokens is
+        unavailable (kimi-coding does not return usage data).  Falls back
+        to the hardwired 200K-character threshold, which maps to ~38K
+        tokens for mixed content.
 
         Includes anti-thrashing protection: if the last two compressions
         each saved less than 10%, skip compression to avoid infinite loops
         where each pass removes only 1-2 messages.
         """
+        # ── Character-based check (primary for kimi-coding) ──
+        if messages is not None:
+            total_chars = sum(len(str(m.get("content", ""))) for m in messages)
+            if total_chars >= self.char_threshold:
+                # Anti-thrashing still applies
+                if self._ineffective_compression_count >= 2:
+                    if not self.quiet_mode:
+                        logger.warning(
+                            "Compression skipped — last %d compressions saved <10%% each. "
+                            "Consider /new to start a fresh session, or /compress <topic> "
+                            "for focused compression.",
+                            self._ineffective_compression_count,
+                        )
+                    return False
+                return True
+            return False
+
+        # ── Token-based check (fallback when usage data is present) ──
         tokens = prompt_tokens if prompt_tokens is not None else self.last_prompt_tokens
         if tokens < self.threshold_tokens:
             return False
-        # Anti-thrashing: back off if recent compressions were ineffective
         if self._ineffective_compression_count >= 2:
             if not self.quiet_mode:
                 logger.warning(
