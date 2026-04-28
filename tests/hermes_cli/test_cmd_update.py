@@ -128,18 +128,20 @@ class TestCmdUpdateBranchFallback:
         #   1. repo root  — slash-command / TUI bridge deps
         #   2. ui-tui/    — Ink TUI deps
         #   3. web/       — install + "npm run build" for the web frontend
-        full_flags = [
+        # When package-lock.json exists, `npm ci` is used instead of `npm install`
+        # for deterministic, lockfile-preserving installs.
+        ci_flags = [
             "/usr/bin/npm",
-            "install",
+            "ci",
             "--silent",
             "--no-fund",
             "--no-audit",
             "--progress=false",
         ]
         assert npm_calls == [
-            (full_flags, PROJECT_ROOT),
-            (full_flags, PROJECT_ROOT / "ui-tui"),
-            (["/usr/bin/npm", "install", "--silent"], PROJECT_ROOT / "web"),
+            (ci_flags, PROJECT_ROOT),
+            (ci_flags, PROJECT_ROOT / "ui-tui"),
+            (["/usr/bin/npm", "ci", "--silent"], PROJECT_ROOT / "web"),
             (["/usr/bin/npm", "run", "build"], PROJECT_ROOT / "web"),
         ]
 
