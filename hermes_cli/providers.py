@@ -85,11 +85,6 @@ HERMES_OVERLAYS: Dict[str, HermesOverlay] = {
         transport="anthropic_messages",
         extra_env_vars=("ANTHROPIC_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"),
     ),
-    "zai": HermesOverlay(
-        transport="openai_chat",
-        extra_env_vars=("GLM_API_KEY", "ZAI_API_KEY", "Z_AI_API_KEY"),
-        base_url_env_var="GLM_BASE_URL",
-    ),
     "kimi-for-coding": HermesOverlay(
         transport="openai_chat",
         base_url_env_var="KIMI_BASE_URL",
@@ -208,12 +203,6 @@ class ProviderDef:
 ALIASES: Dict[str, str] = {
     # openrouter
     "openai": "openrouter",     # bare "openai" → route through aggregator
-
-    # zai
-    "glm": "zai",
-    "z-ai": "zai",
-    "z.ai": "zai",
-    "zhipu": "zai",
 
     # xai
     "x-ai": "xai",

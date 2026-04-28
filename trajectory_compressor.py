@@ -444,8 +444,6 @@ class TrajectoryCompressor:
             and "/backend-api/codex" in url.lower()
         ):
             return "codex"
-        if base_url_host_matches(url, "z.ai"):
-            return "zai"
         if (
             base_url_host_matches(url, "moonshot.ai")
             or base_url_host_matches(url, "moonshot.cn")

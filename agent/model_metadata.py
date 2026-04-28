@@ -46,7 +46,7 @@ def _resolve_requests_verify() -> bool | str:
 # are preserved so the full model name reaches cache lookups and server queries.
 _PROVIDER_PREFIXES: frozenset[str] = frozenset({
     "openrouter", "nous", "openai-codex", "copilot", "copilot-acp",
-    "gemini", "ollama-cloud", "zai", "kimi-coding", "kimi-coding-cn", "stepfun", "minimax", "minimax-cn", "anthropic", "deepseek",
+    "gemini", "ollama-cloud", "kimi-coding", "kimi-coding-cn", "stepfun", "minimax", "minimax-cn", "anthropic", "deepseek",
     "opencode-zen", "opencode-go", "ai-gateway", "kilocode", "alibaba",
     "qwen-oauth",
     "xiaomi",
@@ -55,7 +55,7 @@ _PROVIDER_PREFIXES: frozenset[str] = frozenset({
     "custom", "local",
     # Common aliases
     "google", "google-gemini", "google-ai-studio",
-    "glm", "z-ai", "z.ai", "zhipu", "github", "github-copilot",
+    "github", "github-copilot",
     "github-models", "kimi", "moonshot", "kimi-cn", "moonshot-cn", "claude", "deep-seek",
     "ollama",
     "stepfun", "opencode", "zen", "go", "vercel", "kilo", "dashscope", "aliyun", "qwen",
@@ -63,8 +63,23 @@ _PROVIDER_PREFIXES: frozenset[str] = frozenset({
     "arcee-ai", "arceeai",
     "gmi-cloud", "gmicloud",
     "xai", "x-ai", "x.ai", "grok",
-    "nvidia", "nim", "nvidia-nim", "nemotron",
-    "qwen-portal",
+    "nvidia", "nvidia-nim", "nim",
+    "bedrock", "aws-bedrock", "aws",
+    "azure-foundry", "azure-ai", "azure",
+    "huggingface", "hf", "hugging-face",
+    "openai", "chatgpt", "gpt",
+    "anthropic", "claude", "claude-ai",
+    "deepseek", "deep-seek",
+    "gemini", "google-gemini", "bard",
+    "alibaba", "aliyun", "dashscope", "qwen",
+    "minimax", "minimax-cn",
+    "ollama-cloud", "ollama",
+    "kimi", "moonshot", "kimi-coding", "kimi-cn", "moonshot-cn",
+    "copilot", "github-copilot", "copilot-acp",
+    "openai-codex", "codex",
+    "nous", "nous-research",
+    "openrouter",
+    "google-gemini-cli", "gemini-cli",
 })
 
 
@@ -228,7 +243,7 @@ DEFAULT_CONTEXT_LENGTHS = {
     "mimo-v2.5": 1048576,
     "mimo-v2-omni": 262144,
     "mimo-v2-flash": 262144,
-    "zai-org/GLM-5": 202752,
+
 }
 
 _CONTEXT_LENGTH_KEYS = (
@@ -285,8 +300,7 @@ _URL_TO_PROVIDER: Dict[str, str] = {
     "api.openai.com": "openai",
     "chatgpt.com": "openai",
     "api.anthropic.com": "anthropic",
-    "api.z.ai": "zai",
-    "open.bigmodel.cn": "zai",
+
     "api.moonshot.ai": "kimi-coding",
     "api.moonshot.cn": "kimi-coding-cn",
     "api.kimi.com": "kimi-coding",
