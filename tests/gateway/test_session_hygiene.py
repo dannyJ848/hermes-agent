@@ -30,7 +30,10 @@ from gateway.session import SessionEntry, SessionSource
 def _make_history(n_messages: int, content_size: int = 100) -> list:
     """Build a fake transcript with n_messages user/assistant pairs."""
     history = []
-    content = "x" * content_size
+    # Use varied content to avoid tiktoken BPE compression of repeated chars
+    base = "The quick brown fox jumps over the lazy dog. "
+    repeats = (content_size // len(base)) + 1
+    content = (base * repeats)[:content_size]
     for i in range(n_messages):
         role = "user" if i % 2 == 0 else "assistant"
         history.append({"role": role, "content": content, "timestamp": f"t{i}"})
@@ -39,15 +42,11 @@ def _make_history(n_messages: int, content_size: int = 100) -> list:
 
 def _make_large_history_tokens(target_tokens: int) -> list:
     """Build a history that estimates to roughly target_tokens tokens."""
-    # estimate_messages_tokens_rough counts total chars in str(msg) // 4
-    # Each msg dict has ~60 chars of overhead + content chars
-    # So for N tokens we need roughly N * 4 total chars across all messages
-    target_chars = target_tokens * 4
-    # Each message as a dict string is roughly len(content) + 60 chars
-    msg_overhead = 60
-    # Use 50 messages with appropriately sized content
+    # With tiktoken on varied English text, tokens ≈ chars / 4
+    # Plus ~4 tokens overhead per message for role/structure
+    # Add 20% margin to ensure we hit the target despite estimation variance
     n_msgs = 50
-    content_size = max(10, (target_chars // n_msgs) - msg_overhead)
+    content_size = max(100, int(((target_tokens * 1.2 * 4) // n_msgs) - 4))
     return _make_history(n_msgs, content_size=content_size)
 
 
