@@ -150,7 +150,8 @@ class TestFileDedup(unittest.TestCase):
 
     def setUp(self):
         _read_tracker.clear()
-        self._tmpdir = tempfile.mkdtemp()
+        # Use /tmp to avoid macOS /var/folders matching /private/var/ sensitive prefix
+        self._tmpdir = tempfile.mkdtemp(dir="/tmp")
         self._tmpfile = os.path.join(self._tmpdir, "dedup_test.txt")
         with open(self._tmpfile, "w") as f:
             f.write("line one\nline two\n")
@@ -615,7 +616,8 @@ class TestWriteInvalidatesDedup(unittest.TestCase):
 
     def setUp(self):
         _read_tracker.clear()
-        self._tmpdir = tempfile.mkdtemp()
+        # Use /tmp to avoid macOS /var/folders matching /private/var/ sensitive prefix
+        self._tmpdir = tempfile.mkdtemp(dir="/tmp")
         self._tmpfile = os.path.join(self._tmpdir, "write_dedup.txt")
         with open(self._tmpfile, "w") as f:
             f.write("original content\n")

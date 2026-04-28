@@ -216,7 +216,8 @@ class FileToolsIntegrationTests(unittest.TestCase):
 
     def setUp(self) -> None:
         file_state.get_registry().clear()
-        self._tmpdir = tempfile.mkdtemp(prefix="hermes_file_state_int_")
+        # Use /tmp to avoid macOS /var/folders matching /private/var/ sensitive prefix
+        self._tmpdir = tempfile.mkdtemp(prefix="hermes_file_state_int_", dir="/tmp")
 
     def tearDown(self) -> None:
         import shutil
