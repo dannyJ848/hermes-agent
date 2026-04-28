@@ -67,14 +67,16 @@ class NonEditingProgressCaptureAdapter(ProgressCaptureAdapter):
 
 class FakeAgent:
     def __init__(self, **kwargs):
-        self.tool_progress_callback = kwargs.get("tool_progress_callback")
+        self.tool_progress_callback = None  # Set by runner after init
         self.tools = []
 
     def run_conversation(self, message, conversation_history=None, task_id=None):
-        self.tool_progress_callback("tool.started", "terminal", "pwd", {})
-        time.sleep(0.35)
-        self.tool_progress_callback("tool.started", "browser_navigate", "https://example.com", {})
-        time.sleep(0.35)
+        # Callback is set by runner after instantiation
+        if self.tool_progress_callback:
+            self.tool_progress_callback("tool.started", "terminal", "pwd", {})
+            time.sleep(0.35)
+            self.tool_progress_callback("tool.started", "browser_navigate", "https://example.com", {})
+            time.sleep(0.35)
         return {
             "final_response": "done",
             "messages": [],
@@ -87,12 +89,13 @@ class LongPreviewAgent:
     LONG_CMD = "cd /home/teknium/.hermes/hermes-agent/.worktrees/hermes-d8860339 && source .venv/bin/activate && python -m pytest tests/gateway/test_run_progress_topics.py -n0 -q"
 
     def __init__(self, **kwargs):
-        self.tool_progress_callback = kwargs.get("tool_progress_callback")
+        self.tool_progress_callback = None  # Set by runner after init
         self.tools = []
 
     def run_conversation(self, message, conversation_history=None, task_id=None):
-        self.tool_progress_callback("tool.started", "terminal", self.LONG_CMD, {})
-        time.sleep(0.35)
+        if self.tool_progress_callback:
+            self.tool_progress_callback("tool.started", "terminal", self.LONG_CMD, {})
+            time.sleep(0.35)
         return {
             "final_response": "done",
             "messages": [],
@@ -265,6 +268,11 @@ async def test_run_agent_progress_uses_event_message_id_for_slack_dm(monkeypatch
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
     monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
+    # Ensure tool progress is enabled regardless of user config
+    import gateway.display_config as display_config
+    monkeypatch.setattr(
+        display_config, "resolve_display_setting", lambda _config, _platform, _setting: None
+    )
 
     source = SessionSource(
         platform=Platform.SLACK,
