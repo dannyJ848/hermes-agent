@@ -117,26 +117,34 @@ class TestBuildAnthropicClient:
 
 
 class TestReadClaudeCodeCredentials:
+    @pytest.fixture(autouse=True)
+    def mock_keychain(self, monkeypatch):
+        """Mock keychain to avoid real macOS security calls during tests."""
+        monkeypatch.setattr(
+            "agent.anthropic_adapter._read_claude_code_credentials_from_keychain",
+            lambda: None,
+        )
+
     def test_reads_valid_credentials(self, tmp_path, monkeypatch):
         cred_file = tmp_path / ".claude" / ".credentials.json"
         cred_file.parent.mkdir(parents=True)
         cred_file.write_text(json.dumps({
             "claudeAiOauth": {
-                "accessToken": "sk-ant-oat01-token",
-                "refreshToken": "sk-ant-oat01-refresh",
+                "accessToken": "sk-ant...oken",
+                "refreshToken": "sk-ant...resh",
                 "expiresAt": int(time.time() * 1000) + 3600_000,
             }
         }))
         monkeypatch.setattr("agent.anthropic_adapter.Path.home", lambda: tmp_path)
         creds = read_claude_code_credentials()
         assert creds is not None
-        assert creds["accessToken"] == "sk-ant-oat01-token"
-        assert creds["refreshToken"] == "sk-ant-oat01-refresh"
+        assert creds["accessToken"] == "sk-ant...oken"
+        assert creds["refreshToken"] == "sk-ant...resh"
         assert creds["source"] == "claude_code_credentials_file"
 
     def test_ignores_primary_api_key_for_native_anthropic_resolution(self, tmp_path, monkeypatch):
         claude_json = tmp_path / ".claude.json"
-        claude_json.write_text(json.dumps({"primaryApiKey": "sk-ant-api03-primary"}))
+        claude_json.write_text(json.dumps({"primaryApiKey": "sk-ant...mary"}))
         monkeypatch.setattr("agent.anthropic_adapter.Path.home", lambda: tmp_path)
 
         creds = read_claude_code_credentials()
@@ -178,6 +186,14 @@ class TestIsClaudeCodeTokenValid:
 
 
 class TestResolveAnthropicToken:
+    @pytest.fixture(autouse=True)
+    def mock_keychain(self, monkeypatch):
+        """Mock keychain to avoid real macOS security calls during tests."""
+        monkeypatch.setattr(
+            "agent.anthropic_adapter._read_claude_code_credentials_from_keychain",
+            lambda: None,
+        )
+
     def test_prefers_oauth_token_over_api_key(self, monkeypatch, tmp_path):
         monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-api03-mykey")
         monkeypatch.setenv("ANTHROPIC_TOKEN", "sk-ant-oat01-mytoken")
@@ -386,6 +402,14 @@ class TestResolveWithRefresh:
 
 
 class TestRunOauthSetupToken:
+    @pytest.fixture(autouse=True)
+    def mock_keychain(self, monkeypatch):
+        """Mock keychain to avoid real macOS security calls during tests."""
+        monkeypatch.setattr(
+            "agent.anthropic_adapter._read_claude_code_credentials_from_keychain",
+            lambda: None,
+        )
+
     def test_raises_when_claude_not_installed(self, monkeypatch):
         monkeypatch.setattr("shutil.which", lambda _: None)
         with pytest.raises(FileNotFoundError, match="claude.*CLI.*not installed"):
