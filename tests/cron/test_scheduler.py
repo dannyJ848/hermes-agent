@@ -1300,6 +1300,7 @@ class TestSilentDelivery:
              patch("cron.scheduler.run_job", return_value=(False, "# output", "", "some error")), \
              patch("cron.scheduler.save_job_output", return_value="/tmp/out.md"), \
              patch("cron.scheduler._deliver_result") as deliver_mock, \
+             patch("cron.scheduler.advance_next_run"), \
              patch("cron.scheduler.mark_job_run"):
             from cron.scheduler import tick
             tick(verbose=False)
@@ -1310,6 +1311,7 @@ class TestSilentDelivery:
              patch("cron.scheduler.run_job", return_value=(True, "# full output", "[SILENT]", None)), \
              patch("cron.scheduler.save_job_output") as save_mock, \
              patch("cron.scheduler._deliver_result") as deliver_mock, \
+             patch("cron.scheduler.advance_next_run"), \
              patch("cron.scheduler.mark_job_run"):
             save_mock.return_value = "/tmp/out.md"
             from cron.scheduler import tick

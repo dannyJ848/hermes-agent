@@ -522,6 +522,8 @@ class TestToolResultPreflightCompression:
         agent.context_compressor.threshold_tokens = 130_000  # below the 135k reported usage
         agent.context_compressor.last_prompt_tokens = 130_000
         agent.context_compressor.last_completion_tokens = 5_000
+        # Lower char threshold so test messages trigger compression
+        agent.context_compressor.char_threshold = 50_000
 
         tc = SimpleNamespace(
             id="tc1", type="function",

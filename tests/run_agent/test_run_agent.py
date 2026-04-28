@@ -1070,7 +1070,7 @@ class TestBuildApiKwargs:
         kwargs = agent._build_api_kwargs(messages)
         assert kwargs["model"] == agent.model
         assert kwargs["messages"] is messages
-        assert kwargs["timeout"] == 1800.0
+        assert kwargs["timeout"] == agent._resolved_api_call_timeout()
 
     def test_public_moonshot_kimi_k2_5_omits_temperature(self, agent):
         """Kimi models should NOT have client-side temperature overrides.

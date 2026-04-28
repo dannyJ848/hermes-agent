@@ -14,6 +14,7 @@ died.  See commit message for full context.
 import os
 import signal
 import subprocess
+import sys
 import threading
 import time
 
@@ -37,6 +38,7 @@ def _pgid_still_alive(pgid: int) -> bool:
         return False
 
 
+@pytest.mark.skipif(sys.platform == "darwin", reason="Linux-specific process group test")
 def test_wait_for_process_kills_subprocess_on_keyboardinterrupt():
     """When KeyboardInterrupt arrives mid-poll, the subprocess group must be
     killed before the exception is re-raised."""
