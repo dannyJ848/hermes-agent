@@ -47,11 +47,12 @@ class TestEstimateTokensRough:
         assert estimate_tokens_rough(None) == 0
 
     def test_known_length(self):
-        assert estimate_tokens_rough("a" * 400) == 100
+        # tiktoken cl100k_base: "a" * 400 = 50 tokens (repeating char is efficient)
+        assert estimate_tokens_rough("a" * 400) == 50
 
     def test_short_text(self):
-        # "hello" = 5 chars → ceil(5/4) = 2
-        assert estimate_tokens_rough("hello") == 2
+        # tiktoken cl100k_base: "hello" = 1 token
+        assert estimate_tokens_rough("hello") == 1
 
     def test_proportional(self):
         short = estimate_tokens_rough("hello world")
@@ -59,9 +60,9 @@ class TestEstimateTokensRough:
         assert long > short
 
     def test_unicode_multibyte(self):
-        """Unicode chars are still 1 Python char each — 4 chars/token holds."""
+        # tiktoken cl100k_base: CJK chars are ~1 token each
         text = "你好世界"  # 4 CJK characters
-        assert estimate_tokens_rough(text) == 1
+        assert estimate_tokens_rough(text) == 5
 
 
 class TestEstimateMessagesTokensRough:
@@ -69,12 +70,11 @@ class TestEstimateMessagesTokensRough:
         assert estimate_messages_tokens_rough([]) == 0
 
     def test_single_message_concrete_value(self):
-        """Verify against known str(msg) length (ceiling division)."""
+        """Verify tiktoken-based token count for a single message."""
         msg = {"role": "user", "content": "a" * 400}
         result = estimate_messages_tokens_rough([msg])
-        n = len(str(msg))
-        expected = (n + 3) // 4
-        assert result == expected
+        # tiktoken: ~50 tokens for 400 chars + 4 overhead = 54
+        assert result == 54
 
     def test_multiple_messages_additive(self):
         msgs = [
@@ -82,9 +82,8 @@ class TestEstimateMessagesTokensRough:
             {"role": "assistant", "content": "Hi there, how can I help?"},
         ]
         result = estimate_messages_tokens_rough(msgs)
-        n = sum(len(str(m)) for m in msgs)
-        expected = (n + 3) // 4
-        assert result == expected
+        # tiktoken: "Hello"=1+4=5, "Hi there..."=8+4=12, total=17
+        assert result == 17
 
     def test_tool_call_message(self):
         """Tool call messages with no 'content' key still contribute tokens."""
@@ -92,7 +91,8 @@ class TestEstimateMessagesTokensRough:
                "tool_calls": [{"id": "1", "function": {"name": "terminal", "arguments": "{}"}}]}
         result = estimate_messages_tokens_rough([msg])
         assert result > 0
-        assert result == (len(str(msg)) + 3) // 4
+        # tiktoken: empty content + 4 overhead = 4
+        assert result == 4
 
     def test_message_with_list_content(self):
         """Vision messages with multimodal content arrays."""
@@ -101,7 +101,8 @@ class TestEstimateMessagesTokensRough:
             {"type": "image_url", "image_url": {"url": "data:image/png;base64,AAAA"}}
         ]}
         result = estimate_messages_tokens_rough([msg])
-        assert result == (len(str(msg)) + 3) // 4
+        # tiktoken: list content str + 4 overhead = 41
+        assert result == 41
 
 
 # =========================================================================
