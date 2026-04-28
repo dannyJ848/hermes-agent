@@ -77,7 +77,7 @@ _openrouter_catalog_cache: list[tuple[str, str]] | None = None
 VERCEL_AI_GATEWAY_MODELS: list[tuple[str, str]] = [
     ("moonshotai/kimi-k2.6",                 "recommended"),
     ("alibaba/qwen3.6-plus",                 ""),
-    ("zai/glm-5.1",                          ""),
+
     ("minimax/minimax-m2.7",                 ""),
     ("anthropic/claude-sonnet-4.6",          ""),
     ("anthropic/claude-opus-4.7",            ""),
@@ -183,15 +183,6 @@ _PROVIDER_MODELS: dict[str, list[str]] = {
         "gemini-3.1-pro-preview",
         "gemini-3-pro-preview",
         "gemini-3-flash-preview",
-    ],
-    "zai": [
-        "glm-5.1",
-        "glm-5",
-        "glm-5v-turbo",
-        "glm-5-turbo",
-        "glm-4.7",
-        "glm-4.5",
-        "glm-4.5-flash",
     ],
     "xai": [
         "grok-4.20-reasoning",
@@ -733,7 +724,6 @@ CANONICAL_PROVIDERS: list[ProviderEntry] = [
     ProviderEntry("google-gemini-cli", "Google Gemini (OAuth)",   "Google Gemini via OAuth + Code Assist (free tier supported; no API key needed)"),
     ProviderEntry("deepseek",       "DeepSeek",                 "DeepSeek (DeepSeek-V3, R1, coder — direct API)"),
     ProviderEntry("xai",            "xAI",                      "xAI (Grok models — direct API)"),
-    ProviderEntry("zai",            "Z.AI / GLM",               "Z.AI / GLM (Zhipu AI direct API)"),
     ProviderEntry("kimi-coding",    "Kimi / Kimi Coding Plan",  "Kimi Coding Plan (api.kimi.com) & Moonshot API"),
     ProviderEntry("kimi-coding-cn", "Kimi / Moonshot (China)",  "Kimi / Moonshot China (Moonshot CN direct API)"),
     ProviderEntry("stepfun",        "StepFun Step Plan",       "StepFun Step Plan (agent/coding models via Step Plan API)"),
@@ -756,10 +746,6 @@ _PROVIDER_LABELS["custom"] = "Custom endpoint"  # special case: not a named prov
 
 
 _PROVIDER_ALIASES = {
-    "glm": "zai",
-    "z-ai": "zai",
-    "z.ai": "zai",
-    "zhipu": "zai",
     "github": "copilot",
     "github-copilot": "copilot",
     "github-models": "copilot",

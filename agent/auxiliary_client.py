@@ -74,10 +74,6 @@ _PROVIDER_ALIASES = {
     "x-ai": "xai",
     "x.ai": "xai",
     "grok": "xai",
-    "glm": "zai",
-    "z-ai": "zai",
-    "z.ai": "zai",
-    "zhipu": "zai",
     "kimi": "kimi-coding",
     "moonshot": "kimi-coding",
     "kimi-cn": "kimi-coding-cn",
@@ -153,7 +149,6 @@ def _fixed_temperature_for_model(
 # Default auxiliary models for direct API-key providers (cheap/fast for side tasks)
 _API_KEY_PROVIDER_AUX_MODELS: Dict[str, str] = {
     "gemini": "gemini-3-flash-preview",
-    "zai": "glm-4.5-flash",
     "kimi-coding": "kimi-k2-turbo-preview",
     "stepfun": "step-3.5-flash",
     "kimi-coding-cn": "kimi-k2-turbo-preview",
@@ -174,7 +169,6 @@ _API_KEY_PROVIDER_AUX_MODELS: Dict[str, str] = {
 # "exotic provider" branch checks this before falling back to the main model.
 _PROVIDER_VISION_MODELS: Dict[str, str] = {
     "xiaomi": "mimo-v2.5",
-    "zai": "glm-5v-turbo",
 }
 
 # OpenRouter app attribution headers

@@ -92,7 +92,7 @@ _AUTHORITATIVE_NATIVE_PROVIDERS: frozenset[str] = frozenset({
 # Direct providers that accept bare native names but should repair a matching
 # provider/ prefix when users copy the aggregator form into config.yaml.
 _MATCHING_PREFIX_STRIP_PROVIDERS: frozenset[str] = frozenset({
-    "zai",
+
     "kimi-coding",
     "kimi-coding-cn",
     "minimax",
@@ -227,7 +227,7 @@ def _strip_matching_provider_prefix(model_name: str, target_provider: str) -> st
 
     This prevents arbitrary slash-bearing model IDs from being mangled on
     native providers while still repairing manual config values like
-    ``zai/glm-5.1`` for the ``zai`` provider.
+
     """
     if "/" not in model_name:
         return model_name

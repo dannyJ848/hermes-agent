@@ -17,7 +17,7 @@ Configuration in config.yaml:
           group_policy: "open"             # open | allowlist | disabled
           group_allow_from: ["group_openid_1"]
           stt:                             # Voice-to-text config (optional)
-            provider: "zai"                # zai (GLM-ASR), openai (Whisper), etc.
+            provider: "openai"              # openai (Whisper), etc.
             baseUrl: "https://open.bigmodel.cn/api/coding/paas/v4"
             apiKey: "your-stt-api-key"     # or set QQ_STT_API_KEY env var
             model: "glm-asr"               # glm-asr, whisper-1, etc.
@@ -1613,20 +1613,17 @@ class QQAdapter(BasePlatformAdapter):
                 }
             # Provider-only config: just model name, use default provider
             if api_key:
-                provider = stt_cfg.get("provider", "zai")
+                provider = stt_cfg.get("provider", "openai")
                 # Map provider to base URL
                 _PROVIDER_BASE_URLS = {
-                    "zai": "https://open.bigmodel.cn/api/coding/paas/v4",
                     "openai": "https://api.openai.com/v1",
-                    "glm": "https://open.bigmodel.cn/api/coding/paas/v4",
                 }
                 base_url = _PROVIDER_BASE_URLS.get(provider, "")
                 if base_url:
                     return {
                         "base_url": base_url,
                         "api_key": api_key,
-                        "model": model
-                                 or ("glm-asr" if provider in ("zai", "glm") else "whisper-1"),
+                        "model": model or "whisper-1",
                     }
 
         # 2. QQ-specific env vars (set by `hermes setup gateway` / `hermes gateway`)
