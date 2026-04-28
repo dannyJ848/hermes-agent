@@ -322,7 +322,8 @@ def _create_app(adapter: APIServerAdapter) -> web.Application:
 
 
 @pytest.fixture
-def adapter():
+def adapter(monkeypatch):
+    monkeypatch.delenv("API_SERVER_CORS_ORIGINS", raising=False)
     return _make_adapter()
 
 

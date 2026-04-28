@@ -34,7 +34,7 @@ class TestLocalStreamReadTimeout:
             _stream_read_timeout = float(os.getenv("HERMES_STREAM_READ_TIMEOUT", 120.0))
             if _stream_read_timeout == 120.0 and base_url and is_local_endpoint(base_url):
                 _stream_read_timeout = _base_timeout
-            assert _stream_read_timeout == 1800.0
+            assert _stream_read_timeout == _base_timeout
 
     def test_user_override_respected_for_local(self):
         """User sets HERMES_STREAM_READ_TIMEOUT -> keep their value even for local."""
