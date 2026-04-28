@@ -1283,10 +1283,12 @@ class TestSilentDelivery:
         deliver_mock.assert_not_called()
 
     def test_silent_is_case_insensitive(self):
+        """[silent] lowercase variant — must suppress delivery."""
         with patch("cron.scheduler.get_due_jobs", return_value=[self._make_job()]), \
              patch("cron.scheduler.run_job", return_value=(True, "# output", "[silent] nothing new", None)), \
              patch("cron.scheduler.save_job_output", return_value="/tmp/out.md"), \
              patch("cron.scheduler._deliver_result") as deliver_mock, \
+             patch("cron.scheduler.advance_next_run"), \
              patch("cron.scheduler.mark_job_run"):
             from cron.scheduler import tick
             tick(verbose=False)
