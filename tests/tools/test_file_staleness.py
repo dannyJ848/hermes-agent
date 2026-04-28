@@ -79,7 +79,8 @@ class TestStalenessCheck(unittest.TestCase):
     def setUp(self):
         _read_tracker.clear()
         file_state.get_registry().clear()
-        self._tmpdir = tempfile.mkdtemp()
+        # Use /tmp to avoid macOS /var/folders matching /private/var/ sensitive prefix
+        self._tmpdir = tempfile.mkdtemp(dir="/tmp")
         self._tmpfile = os.path.join(self._tmpdir, "stale_test.txt")
         with open(self._tmpfile, "w") as f:
             f.write("original content\n")
@@ -206,7 +207,8 @@ class TestPatchStaleness(unittest.TestCase):
     def setUp(self):
         _read_tracker.clear()
         file_state.get_registry().clear()
-        self._tmpdir = tempfile.mkdtemp()
+        # Use /tmp to avoid macOS /var/folders matching /private/var/ sensitive prefix
+        self._tmpdir = tempfile.mkdtemp(dir="/tmp")
         self._tmpfile = os.path.join(self._tmpdir, "patch_test.txt")
         with open(self._tmpfile, "w") as f:
             f.write("original line\n")
