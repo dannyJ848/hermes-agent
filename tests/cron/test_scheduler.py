@@ -1250,6 +1250,7 @@ class TestSilentDelivery:
              patch("cron.scheduler.run_job", return_value=(True, "# output", "[SILENT]", None)), \
              patch("cron.scheduler.save_job_output", return_value="/tmp/out.md"), \
              patch("cron.scheduler._deliver_result") as deliver_mock, \
+             patch("cron.scheduler.advance_next_run"), \
              patch("cron.scheduler.mark_job_run"):
             from cron.scheduler import tick
             with caplog.at_level(logging.INFO, logger="cron.scheduler"):
@@ -1262,6 +1263,7 @@ class TestSilentDelivery:
              patch("cron.scheduler.run_job", return_value=(True, "# output", "[SILENT] No changes detected", None)), \
              patch("cron.scheduler.save_job_output", return_value="/tmp/out.md"), \
              patch("cron.scheduler._deliver_result") as deliver_mock, \
+             patch("cron.scheduler.advance_next_run"), \
              patch("cron.scheduler.mark_job_run"):
             from cron.scheduler import tick
             tick(verbose=False)
@@ -1274,6 +1276,7 @@ class TestSilentDelivery:
              patch("cron.scheduler.run_job", return_value=(True, "# output", response, None)), \
              patch("cron.scheduler.save_job_output", return_value="/tmp/out.md"), \
              patch("cron.scheduler._deliver_result") as deliver_mock, \
+             patch("cron.scheduler.advance_next_run"), \
              patch("cron.scheduler.mark_job_run"):
             from cron.scheduler import tick
             tick(verbose=False)
