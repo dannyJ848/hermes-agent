@@ -46,40 +46,27 @@ def _resolve_requests_verify() -> bool | str:
 # are preserved so the full model name reaches cache lookups and server queries.
 _PROVIDER_PREFIXES: frozenset[str] = frozenset({
     "openrouter", "nous", "openai-codex", "copilot", "copilot-acp",
-    "gemini", "ollama-cloud", "kimi-coding", "kimi-coding-cn", "stepfun", "minimax", "minimax-cn", "anthropic", "deepseek",
+    "gemini", "ollama-cloud", "zai", "kimi-coding", "kimi-coding-cn", "stepfun", "minimax", "minimax-oauth", "minimax-cn", "anthropic", "deepseek",
     "opencode-zen", "opencode-go", "ai-gateway", "kilocode", "alibaba",
     "qwen-oauth",
     "xiaomi",
     "arcee",
     "gmi",
+    "tencent-tokenhub",
     "custom", "local",
     # Common aliases
     "google", "google-gemini", "google-ai-studio",
-    "github", "github-copilot",
+    "glm", "z-ai", "z.ai", "zhipu", "github", "github-copilot",
     "github-models", "kimi", "moonshot", "kimi-cn", "moonshot-cn", "claude", "deep-seek",
     "ollama",
     "stepfun", "opencode", "zen", "go", "vercel", "kilo", "dashscope", "aliyun", "qwen",
     "mimo", "xiaomi-mimo",
+    "tencent", "tokenhub", "tencent-cloud", "tencentmaas",
     "arcee-ai", "arceeai",
     "gmi-cloud", "gmicloud",
     "xai", "x-ai", "x.ai", "grok",
-    "nvidia", "nvidia-nim", "nim",
-    "bedrock", "aws-bedrock", "aws",
-    "azure-foundry", "azure-ai", "azure",
-    "huggingface", "hf", "hugging-face",
-    "openai", "chatgpt", "gpt",
-    "anthropic", "claude", "claude-ai",
-    "deepseek", "deep-seek",
-    "gemini", "google-gemini", "bard",
-    "alibaba", "aliyun", "dashscope", "qwen",
-    "minimax", "minimax-cn",
-    "ollama-cloud", "ollama",
-    "kimi", "moonshot", "kimi-coding", "kimi-cn", "moonshot-cn",
-    "copilot", "github-copilot", "copilot-acp",
-    "openai-codex", "codex",
-    "nous", "nous-research",
-    "openrouter",
-    "google-gemini-cli", "gemini-cli",
+    "nvidia", "nim", "nvidia-nim", "nemotron",
+    "qwen-portal",
 })
 
 
@@ -223,6 +210,8 @@ DEFAULT_CONTEXT_LENGTHS = {
     "grok": 131072,             # catch-all (grok-beta, unknown grok-*)
     # Kimi
     "kimi": 262144,
+    # Tencent — Hy3 Preview (Hunyuan) with 256K context window
+    "hy3-preview": 256000,
     # Nemotron — NVIDIA's open-weights series (128K context across all sizes)
     "nemotron": 131072,
     # Arcee
@@ -243,7 +232,7 @@ DEFAULT_CONTEXT_LENGTHS = {
     "mimo-v2.5": 1048576,
     "mimo-v2-omni": 262144,
     "mimo-v2-flash": 262144,
-
+    "zai-org/GLM-5": 202752,
 }
 
 _CONTEXT_LENGTH_KEYS = (
@@ -300,7 +289,8 @@ _URL_TO_PROVIDER: Dict[str, str] = {
     "api.openai.com": "openai",
     "chatgpt.com": "openai",
     "api.anthropic.com": "anthropic",
-
+    "api.z.ai": "zai",
+    "open.bigmodel.cn": "zai",
     "api.moonshot.ai": "kimi-coding",
     "api.moonshot.cn": "kimi-coding-cn",
     "api.kimi.com": "kimi-coding",
@@ -324,6 +314,7 @@ _URL_TO_PROVIDER: Dict[str, str] = {
     "api.xiaomimimo.com": "xiaomi",
     "xiaomimimo.com": "xiaomi",
     "api.gmi-serving.com": "gmi",
+    "tokenhub.tencentmaas.com": "tencent-tokenhub",
     "ollama.com": "ollama-cloud",
 }
 
@@ -634,8 +625,6 @@ def fetch_endpoint_model_metadata(
                         if isinstance(ctx, int) and ctx > 0:
                             context_length = ctx
                             break
-                    if context_length is None:
-                        context_length = _extract_context_length(model)
                     if context_length is not None:
                         entry["context_length"] = context_length
 
@@ -1025,10 +1014,7 @@ def _query_local_context_length(model: str, base_url: str, api_key: str = "") ->
                                 ctx = cfg.get("context_length")
                                 if ctx and isinstance(ctx, (int, float)):
                                     return int(ctx)
-                            # Fall back to max_context_length (theoretical model max)
-                            ctx = m.get("max_context_length") or m.get("context_length")
-                            if ctx and isinstance(ctx, (int, float)):
-                                return int(ctx)
+                            break
 
             # LM Studio / vLLM / llama.cpp: try /v1/models/{model}
             resp = client.get(f"{server_url}/v1/models/{model}")
@@ -1261,7 +1247,7 @@ def get_model_context_length(
     6. Nous suffix-match via OpenRouter cache
     7. models.dev registry lookup (provider-aware)
     8. Thin hardcoded defaults (broad family patterns)
-    9. Default fallback (128K)
+    9. Default fallback (256K)
     """
     # 0. Explicit config override — user knows best
     if config_context_length is not None and isinstance(config_context_length, int) and config_context_length > 0:
@@ -1290,7 +1276,10 @@ def get_model_context_length(
     model = _strip_provider_prefix(model)
 
     # 1. Check persistent cache (model+provider)
-    if base_url:
+    # LM Studio is excluded — its loaded context length is transient (the
+    # user can reload the model with a different context_length at any time
+    # via /api/v1/models/load), so a stale cached value would mask reloads.
+    if base_url and provider != "lmstudio":
         cached = get_cached_context_length(model, base_url)
         if cached is not None:
             # Invalidate stale Codex OAuth cache entries: pre-PR #14935 builds
@@ -1343,7 +1332,8 @@ def get_model_context_length(
             if is_local_endpoint(base_url):
                 local_ctx = _query_local_context_length(model, base_url, api_key=api_key)
                 if local_ctx and local_ctx > 0:
-                    save_context_length(model, base_url, local_ctx)
+                    if provider != "lmstudio":
+                        save_context_length(model, base_url, local_ctx)
                     return local_ctx
             logger.info(
                 "Could not detect context length for model %r at %s — "
@@ -1433,47 +1423,30 @@ def get_model_context_length(
     if base_url and is_local_endpoint(base_url):
         local_ctx = _query_local_context_length(model, base_url, api_key=api_key)
         if local_ctx and local_ctx > 0:
-            save_context_length(model, base_url, local_ctx)
+            if provider != "lmstudio":
+                save_context_length(model, base_url, local_ctx)
             return local_ctx
 
-    # 10. Default fallback — 128K
+    # 10. Default fallback — 256K
     return DEFAULT_FALLBACK_CONTEXT
 
 
 def estimate_tokens_rough(text: str) -> int:
-    """Token estimate with tiktoken accuracy, fallback to ~4 chars/token.
+    """Rough token estimate (~4 chars/token) for pre-flight checks.
 
-    Uses tiktoken cl100k_base when available for accurate counting.
-    Falls back to ceiling division for speed when tiktoken fails.
+    Uses ceiling division so short texts (1-3 chars) never estimate as
+    0 tokens, which would cause the compressor and pre-flight checks to
+    systematically undercount when many short tool results are present.
     """
     if not text:
         return 0
-    # Try tiktoken first
-    try:
-        import tiktoken
-        enc = tiktoken.get_encoding("cl100k_base")
-        return len(enc.encode(text))
-    except Exception:
-        pass
-    # Fallback: ceiling division so short texts never estimate as 0
     return (len(text) + 3) // 4
 
 
 def estimate_messages_tokens_rough(messages: List[Dict[str, Any]]) -> int:
-    """Token estimate for a message list with tiktoken accuracy."""
-    try:
-        import tiktoken
-        enc = tiktoken.get_encoding("cl100k_base")
-        total = 0
-        for msg in messages:
-            content = msg.get("content", "") or ""
-            total += len(enc.encode(str(content)))
-            # Add overhead for role and structure
-            total += 4
-        return total
-    except Exception:
-        total_chars = sum(len(str(msg)) for msg in messages)
-        return (total_chars + 3) // 4
+    """Rough token estimate for a message list (pre-flight only)."""
+    total_chars = sum(len(str(msg)) for msg in messages)
+    return (total_chars + 3) // 4
 
 
 def estimate_request_tokens_rough(

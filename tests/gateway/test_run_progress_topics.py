@@ -67,15 +67,19 @@ class NonEditingProgressCaptureAdapter(ProgressCaptureAdapter):
 
 class FakeAgent:
     def __init__(self, **kwargs):
-        self.tool_progress_callback = None  # Set by runner after init
+        # Capture anything passed via kwargs (older code path) but don't
+        # freeze it — production now assigns tool_progress_callback after
+        # construction (see gateway/run.py around the agent-cache hit),
+        # so we must read it at call time, not at init.
+        self.tool_progress_callback = kwargs.get("tool_progress_callback")
         self.tools = []
 
     def run_conversation(self, message, conversation_history=None, task_id=None):
-        # Callback is set by runner after instantiation
-        if self.tool_progress_callback:
-            self.tool_progress_callback("tool.started", "terminal", "pwd", {})
+        cb = self.tool_progress_callback
+        if cb is not None:
+            cb("tool.started", "terminal", "pwd", {})
             time.sleep(0.35)
-            self.tool_progress_callback("tool.started", "browser_navigate", "https://example.com", {})
+            cb("tool.started", "browser_navigate", "https://example.com", {})
             time.sleep(0.35)
         return {
             "final_response": "done",
@@ -89,13 +93,12 @@ class LongPreviewAgent:
     LONG_CMD = "cd /home/teknium/.hermes/hermes-agent/.worktrees/hermes-d8860339 && source .venv/bin/activate && python -m pytest tests/gateway/test_run_progress_topics.py -n0 -q"
 
     def __init__(self, **kwargs):
-        self.tool_progress_callback = None  # Set by runner after init
+        self.tool_progress_callback = kwargs.get("tool_progress_callback")
         self.tools = []
 
     def run_conversation(self, message, conversation_history=None, task_id=None):
-        if self.tool_progress_callback:
-            self.tool_progress_callback("tool.started", "terminal", self.LONG_CMD, {})
-            time.sleep(0.35)
+        self.tool_progress_callback("tool.started", "terminal", self.LONG_CMD, {})
+        time.sleep(0.35)
         return {
             "final_response": "done",
             "messages": [],
@@ -254,6 +257,14 @@ async def test_run_agent_progress_does_not_use_event_message_id_for_telegram_dm(
 async def test_run_agent_progress_uses_event_message_id_for_slack_dm(monkeypatch, tmp_path):
     """Slack DM progress should keep event ts fallback threading."""
     monkeypatch.setenv("HERMES_TOOL_PROGRESS_MODE", "all")
+    # Since PR #8006, Slack's built-in display tier sets tool_progress="off"
+    # by default. Override via config so this test still exercises the
+    # progress-callback path the Slack DM event_message_id threading depends on.
+    import yaml
+    (tmp_path / "config.yaml").write_text(
+        yaml.dump({"display": {"platforms": {"slack": {"tool_progress": "all"}}}}),
+        encoding="utf-8",
+    )
 
     fake_dotenv = types.ModuleType("dotenv")
     fake_dotenv.load_dotenv = lambda *args, **kwargs: None
@@ -268,11 +279,6 @@ async def test_run_agent_progress_uses_event_message_id_for_slack_dm(monkeypatch
     gateway_run = importlib.import_module("gateway.run")
     monkeypatch.setattr(gateway_run, "_hermes_home", tmp_path)
     monkeypatch.setattr(gateway_run, "_resolve_runtime_agent_kwargs", lambda: {"api_key": "***"})
-    # Ensure tool progress is enabled regardless of user config
-    import gateway.display_config as display_config
-    monkeypatch.setattr(
-        display_config, "resolve_display_setting", lambda _config, _platform, _setting: None
-    )
 
     source = SessionSource(
         platform=Platform.SLACK,
