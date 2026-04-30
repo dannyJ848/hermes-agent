@@ -465,18 +465,28 @@ class _CortexLearningStore:
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
             cur.execute("""
-                SELECT content, category, confidence, usage_count, last_used
+                SELECT tip_type, condition, recommendation, rationale, tool_name, domain, confidence, frequency, upvotes, downvotes
                 FROM distilled_tips
                 WHERE confidence >= 0.6
-                ORDER BY usage_count DESC, confidence DESC, last_used DESC
+                ORDER BY frequency DESC, confidence DESC, upvotes DESC
                 LIMIT ?
             """, (limit,))
             for row in cur.fetchall():
+                # Build content from condition + recommendation + rationale
+                parts = []
+                if row["condition"]:
+                    parts.append(f"Condition: {row['condition']}")
+                if row["recommendation"]:
+                    parts.append(f"Action: {row['recommendation']}")
+                if row["rationale"]:
+                    parts.append(f"Why: {row['rationale']}")
+                content = " | ".join(parts) if parts else ""
                 tips.append({
-                    "content": row["content"],
-                    "category": row["category"],
+                    "content": content,
+                    "category": row["domain"] or row["tip_type"] or "general",
                     "confidence": row["confidence"],
-                    "usage_count": row["usage_count"],
+                    "usage_count": row["frequency"] or 0,
+                    "tool_name": row["tool_name"] or "",
                 })
             conn.close()
         except Exception as e:

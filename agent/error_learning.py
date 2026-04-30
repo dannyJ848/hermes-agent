@@ -28,9 +28,37 @@ logger = logging.getLogger(__name__)
 
 
 def _cortex_cursor():
-    """Get a Cortex database cursor (backward-compatible wrapper)."""
-    from agent.cortex_access import cortex_cursor
-    return cortex_cursor()
+    """Get a Cortex database cursor (backward-compatible wrapper).
+    
+    NOTE: This now uses local SQLite instead of PostgreSQL for the error
+    learning store. The cerebrum_memory.db is local and fast.
+    """
+    # Use local SQLite for error patterns (fast, no network, no PostgreSQL needed)
+    import sqlite3
+    from pathlib import Path
+    db_path = Path.home() / ".hermes" / "cerebrum_memory.db"
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+    return _SQLiteCursorContext(conn)
+
+class _SQLiteCursorContext:
+    """Context manager that mimics the cortex_cursor() interface but uses SQLite."""
+    def __init__(self, conn):
+        self.conn = conn
+        self.cur = None
+    
+    def __enter__(self):
+        self.cur = self.conn.cursor()
+        return self.cur
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            self.conn.commit()
+        else:
+            self.conn.rollback()
+        self.cur.close()
+        self.conn.close()
+        return False  # Don't suppress exceptions
 
 
 # ---------------------------------------------------------------------------
@@ -75,39 +103,43 @@ class ErrorPatternStore:
         self._ensure_schema()
     
     def _ensure_schema(self):
-        """Ensure error patterns table exists."""
+        """Ensure error patterns table exists (SQLite-compatible schema)."""
         with _cortex_cursor() as cur:
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS error_patterns (
-                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                     fingerprint TEXT UNIQUE NOT NULL,
                     error_type TEXT,
                     error_summary TEXT,
                     context TEXT,
                     resolution TEXT,
-                    resolution_success_rate FLOAT DEFAULT 0.0,
+                    resolution_success_rate REAL DEFAULT 0.0,
                     occurrence_count INTEGER DEFAULT 1,
-                    last_occurred TIMESTAMP DEFAULT NOW(),
-                    first_occurred TIMESTAMP DEFAULT NOW(),
-                    metadata JSONB DEFAULT '{}'::jsonb
+                    last_occurred TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    first_occurred TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    metadata TEXT DEFAULT '{}'
                 )
             """)
             
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS error_occurrences (
-                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                    pattern_id UUID REFERENCES error_patterns(id) ON DELETE CASCADE,
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    pattern_id INTEGER REFERENCES error_patterns(id) ON DELETE CASCADE,
                     session_id TEXT,
                     full_error TEXT,
                     resolution_attempted TEXT,
-                    resolution_successful BOOLEAN,
-                    timestamp TIMESTAMP DEFAULT NOW()
+                    resolution_successful INTEGER DEFAULT 0,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
             
             cur.execute("""
                 CREATE INDEX IF NOT EXISTS idx_error_patterns_fingerprint 
                 ON error_patterns(fingerprint)
+            """)
+            cur.execute("""
+                CREATE INDEX IF NOT EXISTS idx_error_occurrences_pattern 
+                ON error_occurrences(pattern_id)
             """)
     
     def record_error(
@@ -129,7 +161,7 @@ class ErrorPatternStore:
         with _cortex_cursor() as cur:
             # Check if pattern exists
             cur.execute(
-                "SELECT id, occurrence_count, resolution_success_rate FROM error_patterns WHERE fingerprint = %s",
+                "SELECT id, occurrence_count, resolution_success_rate FROM error_patterns WHERE fingerprint = ?",
                 (fingerprint,)
             )
             row = cur.fetchone()
@@ -151,18 +183,18 @@ class ErrorPatternStore:
                     
                     cur.execute("""
                         UPDATE error_patterns 
-                        SET occurrence_count = %s,
-                            last_occurred = NOW(),
-                            resolution_success_rate = %s,
-                            resolution = COALESCE(NULLIF(%s, ''), resolution)
-                        WHERE id = %s
+                        SET occurrence_count = ?,
+                            last_occurred = CURRENT_TIMESTAMP,
+                            resolution_success_rate = ?,
+                            resolution = COALESCE(NULLIF(?, ''), resolution)
+                        WHERE id = ?
                     """, (new_count, new_rate, resolution, pattern_id))
                 else:
                     cur.execute("""
                         UPDATE error_patterns 
-                        SET occurrence_count = %s,
-                            last_occurred = NOW()
-                        WHERE id = %s
+                        SET occurrence_count = ?,
+                            last_occurred = CURRENT_TIMESTAMP
+                        WHERE id = ?
                     """, (new_count, pattern_id))
             else:
                 # Create new pattern
@@ -171,19 +203,18 @@ class ErrorPatternStore:
                     INSERT INTO error_patterns (
                         fingerprint, error_type, error_summary, context,
                         resolution, resolution_success_rate, occurrence_count
-                    ) VALUES (%s, %s, %s, %s, %s, %s, 1)
-                    RETURNING id
+                    ) VALUES (?, ?, ?, ?, ?, ?, 1)
                 """, (fingerprint, error_type, error_summary, context[:500], 
                       resolution, 1.0 if resolution_successful else 0.0))
-                row = cur.fetchone()
-                pattern_id = row[0] if row else None
+                pattern_id = cur.lastrowid
             
             # Record occurrence
             cur.execute("""
                 INSERT INTO error_occurrences (
                     pattern_id, session_id, full_error, resolution_attempted, resolution_successful
-                ) VALUES (%s, %s, %s, %s, %s)
-            """, (pattern_id, session_id, error_text[:2000], resolution, resolution_successful))
+                ) VALUES (?, ?, ?, ?, ?)
+            """, (pattern_id, session_id, error_text[:2000], resolution, 
+                  1 if resolution_successful else 0 if resolution_successful is not None else None))
             
             return {
                 "pattern_id": str(pattern_id),
@@ -244,12 +275,18 @@ class ErrorPatternStore:
                     resolution, resolution_success_rate, occurrence_count,
                     last_occurred
                 FROM error_patterns
-                WHERE fingerprint = %s
+                WHERE fingerprint = ?
             """, (fingerprint,))
             
             row = cur.fetchone()
             if not row:
                 return None
+            
+            last_occurred = row[7]
+            if last_occurred and hasattr(last_occurred, 'isoformat'):
+                last_occurred = last_occurred.isoformat()
+            elif last_occurred:
+                last_occurred = str(last_occurred)
             
             return {
                 "pattern_id": str(row[0]),
@@ -259,7 +296,7 @@ class ErrorPatternStore:
                 "resolution": row[4],
                 "resolution_success_rate": round(row[5] or 0, 3),
                 "occurrence_count": row[6],
-                "last_occurred": row[7].isoformat() if row[7] else None,
+                "last_occurred": last_occurred,
                 "is_known": True,
             }
     
@@ -269,9 +306,9 @@ class ErrorPatternStore:
             cur.execute("""
                 SELECT 
                     COUNT(*) as total_patterns,
-                    COUNT(*) FILTER (WHERE occurrence_count > 1) as repeats,
+                    SUM(CASE WHEN occurrence_count > 1 THEN 1 ELSE 0 END) as repeats,
                     AVG(resolution_success_rate) as avg_success_rate,
-                    COUNT(*) FILTER (WHERE resolution_success_rate > 0.8) as well_solved
+                    SUM(CASE WHEN resolution_success_rate > 0.8 THEN 1 ELSE 0 END) as well_solved
                 FROM error_patterns
             """)
             
@@ -303,7 +340,7 @@ class ErrorPatternStore:
                     resolution, resolution_success_rate, occurrence_count
                 FROM error_patterns
                 ORDER BY occurrence_count DESC
-                LIMIT %s
+                LIMIT ?
             """, (limit,))
             
             return [{
@@ -340,8 +377,9 @@ class ErrorLearningEngine:
                 for item in self._batch_buffer:
                     cur.execute("""
                         INSERT INTO error_occurrences (pattern_id, resolution_attempted, resolution_successful, context)
-                        VALUES (%s, %s, %s, %s)
-                    """, (item['pattern_id'], item.get('resolution', ''), item.get('successful', False), item.get('context', '')))
+                        VALUES (?, ?, ?, ?)
+                    """, (item['pattern_id'], item.get('resolution', ''), 
+                          1 if item.get('successful', False) else 0, item.get('context', '')))
             self._batch_buffer.clear()
             self._last_flush = time.time()
         except Exception as e:
@@ -405,19 +443,19 @@ class ErrorLearningEngine:
         with _cortex_cursor() as cur:
             cur.execute("""
                 UPDATE error_patterns
-                SET resolution = %s,
+                SET resolution = ?,
                     resolution_success_rate = (
-                        (resolution_success_rate * occurrence_count + %s) / (occurrence_count + 1)
+                        (resolution_success_rate * occurrence_count + ?) / (occurrence_count + 1)
                     ),
                     occurrence_count = occurrence_count + 1
-                WHERE id = %s
+                WHERE id = ?
             """, (resolution, 1.0 if successful else 0.0, pattern_id))
             
             cur.execute("""
                 INSERT INTO error_occurrences (
                     pattern_id, resolution_attempted, resolution_successful
-                ) VALUES (%s, %s, %s)
-            """, (pattern_id, resolution, successful))
+                ) VALUES (?, ?, ?)
+            """, (pattern_id, resolution, 1 if successful else 0))
     
     def get_preemptive_warning(
         self,
@@ -432,7 +470,7 @@ class ErrorLearningEngine:
             cur.execute("""
                 SELECT error_summary, resolution, occurrence_count, resolution_success_rate
                 FROM error_patterns
-                WHERE context ILIKE %s AND occurrence_count > 1
+                WHERE context LIKE ? AND occurrence_count > 1
                 ORDER BY occurrence_count DESC
                 LIMIT 3
             """, (f"%{action_description[:50]}%",))
