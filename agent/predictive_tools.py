@@ -206,11 +206,14 @@ class PredictiveToolLoader:
                 old_success = row['success_rate'] or 0.5
                 new_success = (old_success * row['usage_count'] + (1.0 if successful else 0.0)) / new_count
                 
-                # Simple latency update (SQLite doesn't have COALESCE in same way)
-                if latency_ms and row['avg_latency_ms']:
-                    new_latency = (row['avg_latency_ms'] * row['usage_count'] + latency_ms) / new_count
+                # Update avg latency (sqlite3.Row doesn't have .get())
+                avg_lat = row['avg_latency_ms'] if 'avg_latency_ms' in row.keys() else None
+                if latency_ms and avg_lat:
+                    new_latency = (avg_lat * row['usage_count'] + latency_ms) / new_count
+                elif latency_ms:
+                    new_latency = latency_ms
                 else:
-                    new_latency = latency_ms or row['avg_latency_ms'] or 0
+                    new_latency = avg_lat
                 
                 cur.execute("""
                     UPDATE tool_usage_patterns

@@ -9516,6 +9516,23 @@ class AIAgent:
             elif function_name == "skill_manage":
                 self._iters_since_skill = 0
 
+            # Track skill_manage calls for curator integration
+            if function_name == "skill_manage":
+                try:
+                    _sm_args = json.loads(tool_call.function.arguments)
+                    if isinstance(_sm_args, dict):
+                        _sm_action = _sm_args.get("action", "")
+                        if _sm_action in ("create", "write_file"):
+                            skill_name = _sm_args.get("name", "unknown")
+                            from agent.curator_integration import record_skill_creation
+                            record_skill_creation(
+                                skill_name=skill_name,
+                                trigger="agent_tool_call",
+                                quality_score=0.7,
+                            )
+                except Exception:
+                    pass
+
             try:
                 function_args = json.loads(tool_call.function.arguments)
             except json.JSONDecodeError:
@@ -9653,6 +9670,15 @@ class AIAgent:
                         context=f"tool:{function_name} args:{json.dumps(function_args)[:200]}",
                         session_id=self.session_id or "unknown",
                     )
+                    # Track error in session history for curator integration
+                    if not hasattr(self, '_error_history'):
+                        self._error_history = []
+                    self._error_history.append({
+                        "error_type": error_info.get('error_type', 'unknown'),
+                        "tool_name": function_name,
+                        "timestamp": time.time(),
+                        "is_known": error_info.get('is_known', False),
+                    })
                     if error_info.get('is_known'):
                         known = error_info['known_info']
                         if known and known.get('resolution'):
@@ -10765,6 +10791,22 @@ class AIAgent:
         # Main conversation loop
         api_call_count = 0
         self._turn_counter = getattr(self, '_turn_counter', 0) + 1
+        
+        # --- CURATOR INTEGRATION ---
+        # Trigger curator review every N turns from the iteration pipeline
+        try:
+            from agent.curator_integration import maybe_run_curator_in_iteration
+            _tool_history = getattr(self, '_recent_tools_used', [])
+            _error_history = getattr(self, '_error_history', [])
+            maybe_run_curator_in_iteration(
+                turn_count=self._turn_counter,
+                tool_usage_history=_tool_history,
+                error_history=_error_history,
+            )
+        except Exception:
+            pass
+        # --- END CURATOR INTEGRATION ---
+        
         final_response = None
         interrupted = False
         codex_ack_continuations = 0
