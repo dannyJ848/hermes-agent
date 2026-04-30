@@ -239,19 +239,16 @@ class CortexLearningEngine:
             cur.execute("""
                 SELECT 
                     id,
-                    text,
-                    fact_type,
+                    content,
+                    memory_type,
                     metadata->>'key' as key,
                     access_count,
                     usefulness_score,
-                    success_count,
-                    failure_count,
-                    ts_rank(search_vector, plainto_tsquery('english', %s)) * 
-                        COALESCE(usefulness_score, 0.5) as combined_score,
-                    created_at
+                    ts_rank(to_tsvector('english', content), plainto_tsquery('english', %s)) * 
+                        COALESCE(usefulness_score, 0.5) as combined_score
                 FROM memory_units
                 WHERE bank_id = %s
-                  AND search_vector @@ plainto_tsquery('english', %s)
+                AND to_tsvector('english', content) @@ plainto_tsquery('english', %s)
                 ORDER BY combined_score DESC
                 LIMIT %s
             """, (query, self._bank_id, query, limit))
@@ -263,12 +260,10 @@ class CortexLearningEngine:
                 results.append({
                     "id": str(row['id']),
                     "key": row['key'],
-                    "text": row['text'][:300] + "..." if len(row['text']) > 300 else row['text'],
-                    "fact_type": row['fact_type'],
+                    "text": row['content'][:300] + "..." if len(row['content']) > 300 else row['content'],
+                    "fact_type": row['memory_type'],
                     "usefulness_score": round(row['usefulness_score'] or 0.5, 3),
                     "access_count": row['access_count'],
-                    "success_count": row['success_count'],
-                    "failure_count": row['failure_count'],
                     "combined_score": round(row['combined_score'], 4),
                     "date": row['created_at'].isoformat() if row['created_at'] else None,
                 })
@@ -286,16 +281,14 @@ class CortexLearningEngine:
                 SELECT 
                     id,
                     metadata->>'skill_name' as skill_name,
-                    text,
+                    content,
                     usefulness_score,
-                    success_count,
-                    failure_count,
-                    ts_rank(search_vector, plainto_tsquery('english', %s)) * 
+                    ts_rank(to_tsvector('english', content), plainto_tsquery('english', %s)) * 
                         COALESCE(usefulness_score, 0.5) as combined_score
                 FROM memory_units
                 WHERE bank_id = %s
-                  AND tags @> ARRAY['skill']::varchar[]
-                  AND search_vector @@ plainto_tsquery('english', %s)
+                  AND metadata->>'type' = 'skill'
+                  AND to_tsvector('english', content) @@ plainto_tsquery('english', %s)
                 ORDER BY combined_score DESC
                 LIMIT %s
             """, (query, self._bank_id, query, limit))
