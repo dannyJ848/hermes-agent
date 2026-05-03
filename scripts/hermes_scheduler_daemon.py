@@ -24,6 +24,27 @@ def handle_signal(signum, frame):
 signal.signal(signal.SIGTERM, handle_signal)
 signal.signal(signal.SIGINT, handle_signal)
 
+def cleanup_stuck_cycles():
+    """Kill flywheel cycles stuck running for >30 minutes."""
+    try:
+        import psycopg2
+        conn = psycopg2.connect(
+            dbname='cortex', user='hindsight', password='hindsight',
+            host='localhost', port=5432
+        )
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE cortex_flywheel SET status = 'killed' "
+            "WHERE status = 'running' AND started_at < NOW() - INTERVAL '30 minutes'"
+        )
+        killed = cur.rowcount
+        conn.commit()
+        conn.close()
+        if killed > 0:
+            print(f"[Scheduler] Cleaned up {killed} stuck flywheel cycles")
+    except Exception as e:
+        print(f"[Scheduler] Cleanup error: {e}")
+
 def main():
     # Write PID file
     with open(PID_FILE, 'w') as f:
@@ -32,11 +53,18 @@ def main():
     print(f"[Scheduler] Daemon started (PID {os.getpid()}). Running tick() every 60s.")
     print(f"[Scheduler] PID file: {PID_FILE}")
     
+    tick_count = 0
     while RUNNING:
         try:
             tick(verbose=False)
         except Exception as e:
             print(f"[Scheduler] tick() error: {e}")
+        
+        # Cleanup stuck cycles every 10 ticks (10 minutes)
+        tick_count += 1
+        if tick_count >= 10:
+            cleanup_stuck_cycles()
+            tick_count = 0
         
         # Sleep in 1-second increments to respond to signals quickly
         for _ in range(60):
