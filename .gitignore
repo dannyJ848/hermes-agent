@@ -22,3 +22,5 @@ api_captures/
 anki_output/
 claude-bridge/
 twitter_bridge/
+sessions/
+logs/
