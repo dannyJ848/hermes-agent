@@ -1,10 +1,17 @@
-# Never commit these
+# Runtime data - never commit
 .env
 *.db
 *.db-shm
 *.db-wal
 *.db.corrupt*
 *.db.backup*
+*.db.pre_*
+*.db.CORRUPTED*
+*.db.CLEAN_*
+*.pid
+*.lock
+
+# Large directories
 checkpoints/
 cache/
 logs/
@@ -17,10 +24,10 @@ memory_backups/
 __pycache__/
 *.pyc
 *.pyo
-*.pid
-*.lock
 api_captures/
 anki_output/
 claude-bridge/
 twitter_bridge/
-feishu_seen_message_ids.json
+
+# Session artifacts (keep in repo via explicit add if needed)
+*.db
