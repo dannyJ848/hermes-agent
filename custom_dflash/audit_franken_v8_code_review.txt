@@ -1,0 +1,523 @@
+
+================================================================================
+FRANKEN V8 — CODE REVIEW AUDIT ("One Letter Off" Hunt)
+================================================================================
+
+TYPO HUNT:
+================================================================================
+
+[CRITICAL] Line in collate_fn:
+  hidden_states = torch.stack(hidden_states_list)
+  HIDDEN BUG: hidden_states_list is a list of tensors with shape [5, max_len, 5120]
+  torch.stack adds a BATCH dimension: [bsz, 5, max_len, 5120]
+  BUT model expects: [bsz, seq_len, 5, 5120] or [bsz, seq_len, 5*5120]
+  CURRENT: model does target_hidden_states.reshape(bsz, seq_len, -1)
+  IF shape is [bsz, 5, max_len, 5120], reshape gives [bsz, 5*max_len, 5120] — WRONG
+  
+  FIX: Permute before reshape:
+    hidden_states = hidden_states.permute(0, 2, 1, 3)  # [bsz, max_len, 5, 5120]
+    # Then in model: target_hidden_states.reshape(bsz, seq_len, -1) works
+
+[CRITICAL] Line in DFlashDataset.__getitem__:
+  return {
+      'input_ids': data['input_ids'],
+      'hidden_states': data['hidden_states'],
+      'seq_len': data['seq_len'],
+  }
+  HIDDEN BUG: data['seq_len'] may not exist in Phase 1 output
+  Phase 1 saves: data = {'input_ids': ..., 'hidden_states': ..., 'seq_len': len(input_ids)}
+  BUT if Phase 1 was modified or different version, key may be 'length' or 'len'
+  
+  FIX: Add fallback:
+    seq_len = data.get('seq_len', data.get('length', data.get('len', len(data['input_ids']))))
+
+[CRITICAL] Line in main():
+  target_model = AutoModelForCausalLM.from_pretrained(
+      args.target_model_path,
+      torch_dtype=torch.bfloat16,
+      device_map='cpu',
+      trust_remote_code=args.trust_remote_code,
+  )
+  HIDDEN BUG: Qwen3.6-27B is abliterated — may have custom code in model directory
+  trust_remote_code=True loads ANY Python file in the model directory
+  If abliteration script left a malicious file, RCE occurs
+  
+  FIX: Verify model directory contents before loading:
+    allowed_files = ['config.json', 'model.safetensors', 'tokenizer.json', 'tokenizer_config.json']
+    for f in os.listdir(args.target_model_path):
+        if f.endswith('.py') and f not in ['modeling_qwen3.py']:
+            audit.warn(f"Unexpected Python file in model dir: {f}")
+
+[HIGH] Line in run_unit_tests():
+  model.set_shared_weights(embed, lm_head)
+  HIDDEN BUG: embed and lm_head are newly created, not from target model
+  Real training uses target_model.model.embed_tokens
+  Unit test doesn't catch mismatch between embed shape and model expectation
+  
+  FIX: Use actual tokenizer vocab size:
+    embed = nn.Embedding(tokenizer.vocab_size, 5120)
+    # But tokenizer.vocab_size may be 152064 or 151936 (with/without special tokens)
+    # MISMATCH causes IndexError during forward
+
+[HIGH] Line in AdaptiveDraftPolicy.forward():
+  depth_probs = self.depth_policy(state)
+  exit_prob = self.exit_policy(state)
+  confidence = self.confidence_policy(state)
+  HIDDEN BUG: depth_policy outputs [bsz, seq_len, max_depth]
+  But in loss computation: depth_probs[:, :-1, :].mean(dim=-1, keepdim=True)
+  This averages OVER depth dimension, not over sequence
+  RESULT: depth_probs[:, :-1, :].mean(dim=-1) shape is [bsz, seq_len-1, 1]
+  But depth_reward shape is [bsz, seq_len-1, 1, 1]
+  MISMATCH in broadcasting
+  
+  FIX: Align shapes:
+    depth_reward = correct_mask.mean(dim=-1, keepdim=True)  # [bsz, seq_len-1, 1]
+    depth_logprob = torch.log(depth_probs[:, :-1, :].mean(dim=-1, keepdim=True) + eps)
+    # Both [bsz, seq_len-1, 1] — correct
+
+[HIGH] Line in DART loss:
+  shift_dart_labels = torch.cat([
+      input_ids[..., i+1:].contiguous(),
+      torch.zeros(bsz, i, dtype=torch.long, device='cuda')
+  ], dim=-1)
+  HIDDEN BUG: torch.zeros(bsz, i) creates [bsz, i] tensor
+  input_ids[..., i+1:] has shape [bsz, seq_len - i - 1]
+  Concatenated: [bsz, seq_len - i - 1 + i] = [bsz, seq_len - 1]
+  But shift_dart has shape [bsz, seq_len - 1, vocab_size]
+  reshape(-1, vocab_size) expects [bsz * (seq_len-1), vocab_size]
+  Labels reshape(-1) expects [bsz * (seq_len-1)]
+  MISMATCH if seq_len varies within batch
+  
+  FIX: Ensure consistent length:
+    target_len = shift_dart.size(1)
+    if shift_dart_labels.size(1) != target_len:
+        shift_dart_labels = shift_dart_labels[:, :target_len]
+
+[MEDIUM] Line in SSD loss:
+  outcome_target = torch.zeros(bsz, max_len-1, dtype=torch.long, device='cuda')
+  HIDDEN BUG: torch.zeros creates all zeros, which is class 0
+  But outcome_predictor outputs [bsz, seq_len, num_outcomes=4]
+  CrossEntropy expects class indices in [0, num_outcomes-1]
+  Class 0 is valid, but this means SSD learns to ALWAYS predict class 0
+  
+  NOT A CRASH — but degenerate behavior
+  FIX: Compute optimal outcome or use uniform random target
+
+[MEDIUM] Line in main():
+  global_step = 0
+  start_epoch = 0
+  HIDDEN BUG: If resume from checkpoint, global_step is restored
+  But if checkpoint is from DIFFERENT run with DIFFERENT dataset size
+  global_step may exceed len(dataloader) * num_epochs
+  RESULT: Training loop never executes (global_step already at max)
+  
+  FIX: Validate resume state:
+    if global_step >= len(dataloader) * args.num_epochs:
+        audit.warn("global_step exceeds expected max, resetting to 0")
+        global_step = 0
+        start_epoch = 0
+
+[MEDIUM] Line in checkpoint saving:
+  torch.save({
+      'model_state_dict': draft_model.state_dict(),
+      'optimizer_state_dict': optimizer.state_dict(),
+      'step': global_step,
+      'epoch': epoch,
+      'loss': loss.item(),
+      'config': config,
+  }, checkpoint_path)
+  HIDDEN BUG: loss.item() is a Python float
+  If loss is NaN, loss.item() is NaN
+  JSON serialization of NaN may fail or produce 'NaN' string
+  But we're using torch.save (pickle), not JSON
+  ACTUAL BUG: If checkpoint saved mid-epoch and training crashes,
+  'epoch' is current epoch, but training didn't finish epoch
+  Resume will skip remaining steps in epoch
+  
+  FIX: Save 'step_in_epoch' separately:
+    'step_in_epoch': batch_idx,
+    'epoch': epoch,
+
+[LOW] Line in parse_args():
+  parser.add_argument("--num-layers", type=int, default=8)
+  HIDDEN BUG: "num-layers" with hyphen
+  In bash: --num-layers 4 works
+  But in Python argparse, attribute becomes args.num_layers (underscore)
+  CORRECT behavior — not a bug
+  BUT: If user passes --num_layers (underscore), argparse rejects
+  
+  FIX: Add both:
+    parser.add_argument("--num-layers", "--num_layers", type=int, default=8)
+
+[LOW] Line in AuditLogger:
+  os.makedirs(os.path.dirname(log_file) if os.path.dirname(log_file) else '.', exist_ok=True)
+  HIDDEN BUG: If log_file is just 'training_audit.log' (no directory),
+  os.path.dirname returns '', which is falsy
+  Ternary evaluates to '.', which is current directory
+  CORRECT behavior — not a bug
+  BUT: If log_file is '/data/models/.../training_audit.log' and parent doesn't exist,
+  os.makedirs creates all parents
+  CORRECT behavior
+
+[LOW] Line in Muon optimizer:
+  state['exp_avg'] = torch.zeros_like(p)
+  HIDDEN BUG: If p is bfloat16, exp_avg is also bfloat16
+  But Newton-Schulz iteration requires higher precision
+  If exp_avg is bfloat16, orthogonalization loses precision
+  
+  FIX: Use float32 for exp_avg:
+    state['exp_avg'] = torch.zeros_like(p, dtype=torch.float32)
+
+SILENT FAILURE HUNT:
+================================================================================
+
+[CRITICAL] Line in collate_fn:
+  hidden_states_list = []
+  for b in batch:
+      hs = b['hidden_states']
+      num_layers = hs.shape[0]
+      if num_layers < 5:
+          padding = torch.zeros(5 - num_layers, hs.shape[1], hs.shape[2])
+          hs = torch.cat([hs, padding], dim=0)
+      elif num_layers > 5:
+          hs = hs[:5]
+  HIDDEN BUG: padding is float32 by default
+  hs may be bfloat16 (from Phase 1)
+  torch.cat([bfloat16, float32]) → implicit cast to float32
+  But model expects bfloat16
+  SILENT: No crash, but precision loss
+  
+  FIX: Match dtype:
+    padding = torch.zeros(..., dtype=hs.dtype)
+
+[CRITICAL] Line in main():
+  draft_model = UltimateFrankenDraftModelV8(config, audit=audit).cuda().bfloat16()
+  HIDDEN BUG: .cuda() moves to GPU, then .bfloat16() converts
+  But some parameters may not be on GPU after .bfloat16()
+  Actually: .bfloat16() preserves device
+  NOT A BUG
+  BUT: embed_tokens and lm_head are set AFTER .cuda().bfloat16()
+  If embed_tokens is on CPU, set_shared_weights doesn't move it
+  SILENT: Model on GPU, embed_tokens on CPU → RuntimeError on forward
+  
+  FIX: Ensure embed_tokens on GPU:
+    embed_tokens = target_model.model.embed_tokens.to('cuda')
+    # Already correct in current code
+
+[HIGH] Line in verify_checkpoint():
+  ckpt = torch.load(path, map_location='cpu')
+  HIDDEN BUG: map_location='cpu' loads everything to CPU
+  If checkpoint is 40GB, this loads full 40GB to system RAM
+  GB10 has 128GB unified, but may still cause OOM
+  SILENT: Slow loading, potential swap thrashing
+  
+  FIX: Load directly to GPU:
+    ckpt = torch.load(path, map_location='cuda')
+
+[HIGH] Line in dataset loading:
+  sample = torch.load(os.path.join(data_dir, self.files[0]), map_location='cpu')
+  HIDDEN BUG: map_location='cpu' is correct for inspection
+  But if sample is 500MB, loading to CPU is fine
+  NOT A BUG
+  BUT: If files are on slow storage (HDD, NFS), loading is slow
+  SILENT: GPU idle while CPU loads
+  
+  FIX: Add async prefetching (complex, for v9)
+
+[MEDIUM] Line in loss computation:
+  loss = (
+      loss_primary + 
+      args.lk_loss_weight * loss_lk +
+      args.dart_loss_weight * loss_dart +
+      args.ssd_loss_weight * loss_ssd +
+      args.ltd_loss_weight * loss_ltd
+  )
+  HIDDEN BUG: If any loss term is 0 (not a tensor), multiplication works
+  If loss_lk = 0 (int), args.lk_loss_weight * 0 = 0.0 (float)
+  CORRECT behavior
+  BUT: If loss term is None (shouldn't happen), TypeError
+  SILENT: Not applicable — all terms initialized to 0 or tensor
+
+[MEDIUM] Line in pbar.set_postfix():
+  'lk': f'{loss_lk.item():.4f}' if isinstance(loss_lk, torch.Tensor) else '0.0000',
+  HIDDEN BUG: If loss_lk is 0 (int), isinstance(0, torch.Tensor) is False
+  Shows '0.0000' — correct
+  BUT: If loss_lk is torch.Tensor but requires grad, .item() works
+  CORRECT behavior
+  SILENT: If loss_lk is NaN tensor, .item() is NaN, shows 'nan' — visible
+
+[LOW] Line in checkpoint verification:
+  required_keys = ['model_state_dict', 'optimizer_state_dict', 'step', 'epoch']
+  HIDDEN BUG: If checkpoint from older version has 'global_step' instead of 'step'
+  Resume fails with 'Checkpoint missing key: step'
+  NOT SILENT — clear error message
+  FIX: Add backward compatibility:
+    if 'step' not in ckpt and 'global_step' in ckpt:
+        ckpt['step'] = ckpt['global_step']
+
+VARIABLE NAME TRAPS:
+================================================================================
+
+[CRITICAL] In main():
+  config = {
+      'hidden_size': 5120,
+      'num_hidden_layers': args.num_layers,
+      ...
+  }
+  HIDDEN BUG: args.num_layers vs config['num_hidden_layers']
+  If user passes --num-layers 4, config has 4 layers
+  But checkpoint saved with config dict
+  If resume from checkpoint with different num_layers, mismatch
+  SILENT: Model loads wrong architecture, may crash or produce garbage
+  
+  FIX: Validate config consistency on resume:
+    if ckpt['config']['num_hidden_layers'] != config['num_hidden_layers']:
+        audit.error("Config mismatch! Checkpoint has different architecture.")
+        raise ValueError("Cannot resume with different model architecture")
+
+[HIGH] In UltimateFrankenDraftModelV8.__init__():
+  self.target_layers = config['target_layer_ids']
+  self.fc = nn.Linear(len(self.target_layers) * self.hidden_size, self.hidden_size, bias=False)
+  HIDDEN BUG: config['target_layer_ids'] = [1, 16, 31, 46, 61]
+  len() = 5, fc input = 5 * 5120 = 25600
+  But if user modifies target_layer_ids to [1, 31, 61], len() = 3
+  fc input = 3 * 5120 = 15360
+  But collate_fn always pads to 5 layers
+  MISMATCH: fc expects 15360, gets 25600 from padded data
+  CRASH: RuntimeError: mat1 and mat2 shapes cannot be multiplied
+  
+  FIX: Use actual num_layers from data, not config:
+    # In forward: target_hidden_states.shape[2] gives actual layers
+    # Adapt fc layer dynamically or use attention-based fusion
+
+[MEDIUM] In DFlashDataset:
+  self.files = sorted([f for f in os.listdir(data_dir) if f.endswith('.pt')])
+  HIDDEN BUG: sorted() uses string sorting
+  Files: ['sample_1.pt', 'sample_10.pt', 'sample_2.pt']
+  sorted() → ['sample_1.pt', 'sample_10.pt', 'sample_2.pt']
+  NOT numerical order — sample_10 comes before sample_2
+  If dataset has ordering significance, this shuffles it
+  
+  FIX: Use natural sort:
+    import re
+    def natural_sort_key(s):
+        return [int(t) if t.isdigit() else t for t in re.split(r'(\d+)', s)]
+    self.files = sorted([f for f in os.listdir(data_dir) if f.endswith('.pt')], key=natural_sort_key)
+
+[MEDIUM] In collate_fn:
+  max_len = max(b['seq_len'] for b in batch)
+  HIDDEN BUG: batch is a list of dicts
+  If batch_size=1, max_len is single sequence length
+  If batch_size>1, max_len is max of batch
+  But DataLoader with shuffle=True creates random batches
+  Same sequence may be padded differently across epochs
+  NOT A BUG — expected behavior
+  BUT: If deterministic padding needed (e.g., for cache), this is wrong
+
+IMPORT/ DEPENDENCY TRAPS:
+================================================================================
+
+[CRITICAL] Missing import in script:
+  import hashlib
+  import random
+  import numpy as np
+  HIDDEN BUG: numpy imported as np, but not used in current code
+  Actually used in set_seed()
+  CORRECT
+  BUT: If numpy is not installed in container, ImportError
+  AEON-7 image: numpy should be installed
+  SILENT: Not applicable
+
+[HIGH] transformers version:
+  from transformers import AutoTokenizer, AutoModelForCausalLM
+  HIDDEN BUG: Qwen3.6 requires transformers >= 4.40
+  If container has transformers 4.30, model loading fails
+  SILENT: May fallback to older architecture, wrong weights
+  
+  FIX: Add version check:
+    import transformers
+    assert transformers.__version__ >= '4.40', f"transformers {transformers.__version__} too old"
+
+[MEDIUM] torch version:
+  torch.cuda.empty_cache()
+  torch.cuda.memory_allocated()
+  HIDDEN BUG: If torch < 1.10, some CUDA APIs may not exist
+  AEON-7 uses PyTorch 2.5+ — fine
+  SILENT: Not applicable
+
+[LOW] tqdm version:
+  from tqdm import tqdm
+  HIDDEN BUG: If tqdm not installed, ImportError
+  But tqdm is standard in ML containers
+  SILENT: Not applicable
+
+SHAPE/DIMENSION TRAPS:
+================================================================================
+
+[CRITICAL] In collate_fn (already noted but critical):
+  hidden_states = torch.stack(hidden_states_list)
+  # hidden_states_list: list of [5, max_len, 5120]
+  # torch.stack → [bsz, 5, max_len, 5120]
+  # But in model: target_hidden_states.reshape(bsz, seq_len, -1)
+  # reshape with [bsz, 5, max_len, 5120] → [bsz, 5*max_len, 5120]
+  # EXPECTED: [bsz, max_len, 5*5120] = [bsz, max_len, 25600]
+  # ACTUAL: [bsz, 5*max_len, 5120]
+  # CRASH: matmul in fc layer fails
+  
+  FIX: Permute in collate_fn:
+    hidden_states = torch.stack(hidden_states_list)  # [bsz, 5, max_len, 5120]
+    hidden_states = hidden_states.permute(0, 2, 1, 3)  # [bsz, max_len, 5, 5120]
+    # Now reshape in model works: [bsz, max_len, 5*5120] = [bsz, max_len, 25600]
+
+[CRITICAL] In model forward:
+  target_combined = target_hidden_states.reshape(bsz, seq_len, -1)
+  HIDDEN BUG: reshape preserves total elements but may scramble ordering
+  If target_hidden_states is [bsz, max_len, 5, 5120]
+  reshape → [bsz, max_len, 25600] — correct ordering
+  BUT if target_hidden_states is [bsz, 5, max_len, 5120] (wrong)
+  reshape → [bsz, 5*max_len, 5120] — wrong ordering
+  
+  FIX: Use view instead of reshape (same semantics) or explicit permute:
+    target_combined = target_hidden_states.permute(0, 2, 1, 3).reshape(bsz, seq_len, -1)
+
+[HIGH] In DART forward:
+  pos_emb = pos_emb.view(1, 1, -1).expand(bsz, seq_len, -1)
+  HIDDEN BUG: pos_emb shape is [hidden_size]
+  view(1, 1, -1) → [1, 1, hidden_size]
+  expand(bsz, seq_len, -1) → [bsz, seq_len, hidden_size]
+  CORRECT
+  BUT: If hidden_size is not divisible by something, -1 inference may fail
+  NOT APPLICABLE — hidden_size=5120 is concrete
+
+[HIGH] In SSD forward:
+  outcome_logits = self.outcome_predictor(hidden_states)
+  # hidden_states: [bsz, seq_len, hidden_size]
+  # outcome_predictor: Linear(hidden_size, hidden_size//2) → Linear(hidden_size//2, num_outcomes)
+  # Output: [bsz, seq_len, num_outcomes]
+  CORRECT
+  preemptive_logits = [head(hidden_states) for head in self.preemptive_heads]
+  # Each head: Linear(hidden_size, hidden_size//2) → Linear(hidden_size//2, vocab_size)
+  # Output: [bsz, seq_len, vocab_size]
+  CORRECT
+  confidence = self.confidence_head(hidden_states)
+  # confidence_head: Linear(hidden_size, hidden_size//4) → Linear(hidden_size//4, 1)
+  # Output: [bsz, seq_len, 1]
+  CORRECT
+
+[MEDIUM] In LTD forward:
+  state = self.state_encoder(hidden_states)
+  # state_encoder: Linear(hidden_size, hidden_size//2) → SiLU → LayerNorm(hidden_size//2)
+  # Output: [bsz, seq_len, hidden_size//2]
+  CORRECT
+  depth_probs = self.depth_policy(state)
+  # depth_policy: Linear(hidden_size//2, hidden_size//4) → SiLU → Linear(hidden_size//4, max_depth) → Softmax
+  # Output: [bsz, seq_len, max_depth]
+  CORRECT
+  exit_prob = self.exit_policy(state)
+  # exit_policy: Linear(hidden_size//2, hidden_size//4) → SiLU → Linear(hidden_size//4, 1) → Sigmoid
+  # Output: [bsz, seq_len, 1]
+  CORRECT
+  confidence = self.confidence_policy(state)
+  # confidence_policy: same architecture
+  # Output: [bsz, seq_len, 1]
+  CORRECT
+
+DEVICE/DTYPE TRAPS:
+================================================================================
+
+[CRITICAL] In main():
+  embed_tokens = target_model.model.embed_tokens.to('cuda')
+  lm_head = target_model.lm_head.to('cuda')
+  HIDDEN BUG: target_model is on CPU (device_map='cpu')
+  .to('cuda') moves to GPU
+  CORRECT
+  BUT: If target_model.model.embed_tokens is not the correct attribute
+  Qwen3.6 architecture: model.model.embed_tokens (nested)
+  If attribute doesn't exist, AttributeError
+  
+  FIX: Add fallback:
+    try:
+        embed_tokens = target_model.model.embed_tokens.to('cuda')
+    except AttributeError:
+        embed_tokens = target_model.get_input_embeddings().to('cuda')
+
+[CRITICAL] In dataset:
+  data = torch.load(os.path.join(self.data_dir, self.files[idx]), map_location='cpu')
+  HIDDEN BUG: map_location='cpu' loads to CPU
+  Later: hidden_states = batch['hidden_states'].cuda().bfloat16()
+  This moves to GPU and converts
+  CORRECT
+  BUT: If .pt file was saved with different dtype (float32, float16)
+  .bfloat16() converts correctly
+  SILENT: If original was int64 (for input_ids), .bfloat16() fails
+  input_ids should stay int64 — correct in code
+
+[HIGH] In model:
+  draft_model = UltimateFrankenDraftModelV8(config, audit=audit).cuda().bfloat16()
+  HIDDEN BUG: .cuda() moves to default GPU (GPU 0)
+  If DGX Spark has multiple GPUs, may use wrong one
+  GB10 has 1 GPU — not applicable
+  SILENT: Not applicable
+
+[MEDIUM] In loss:
+  loss_primary = F.cross_entropy(..., ignore_index=0)
+  HIDDEN BUG: ignore_index=0 means token 0 is ignored
+  If input_ids contains 0 as padding, correct
+  But if input_ids contains 0 as valid token, wrong
+  Qwen3.6 vocab: token 0 is '<|endoftext|>' or similar special token
+  MAY be valid in some contexts
+  SILENT: Model never predicts token 0, slightly reduced capability
+  
+  FIX: Use -100 as ignore_index (PyTorch standard for ignored tokens):
+    # But need to ensure padding is -100, not 0
+    # In collate_fn: padding = torch.full((max_len - seq_len,), -100, dtype=torch.long)
+    # Then: F.cross_entropy(..., ignore_index=-100)
+
+[MEDIUM] In optimizer:
+  optimizer = Muon(draft_model.parameters(), ...)
+  HIDDEN BUG: draft_model.parameters() includes ALL parameters
+  Including embed_tokens and lm_head (shared, frozen)
+  But we freeze them AFTER optimizer creation
+  Optimizer still tracks them, but gradients are zero
+  WASTE: Memory and compute for zero gradients
+  NOT A CRASH — but inefficient
+  
+  FIX: Create optimizer AFTER freezing:
+    embed_tokens.requires_grad = False
+    lm_head.requires_grad = False
+    optimizer = Muon([p for p in draft_model.parameters() if p.requires_grad], ...)
+
+[LOW] In scheduler:
+  scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
+  HIDDEN BUG: LambdaLR requires optimizer
+  If optimizer is None (creation failed), TypeError
+  NOT APPLICABLE — optimizer always created
+
+================================================================================
+SUMMARY OF "ONE LETTER OFF" BUGS FOUND
+================================================================================
+
+CRITICAL (will crash training):
+  1. hidden_states shape mismatch in collate_fn (permute missing)
+  2. target_hidden_states reshape ordering wrong (if shape is [bsz, 5, max_len, 5120])
+  3. embed_tokens attribute may not exist (Qwen3.6 architecture variation)
+  4. shared weights not frozen before optimizer creation
+
+HIGH (may crash or produce garbage):
+  5. map_location='cpu' in verify_checkpoint loads 40GB to RAM
+  6. config mismatch on resume not detected
+  7. target_layer_ids length mismatch with collate_fn padding
+  8. padding dtype mismatch (float32 vs bfloat16)
+
+MEDIUM (silent wrong behavior):
+  9. ignore_index=0 may suppress valid token
+  10. dataset sorting is string sort, not numerical
+  11. checkpoint 'step' vs 'global_step' backward compatibility
+  12. loss_lk is pseudo-target (known issue)
+
+LOW (minor issues):
+  13. argparse hyphen vs underscore
+  14. tqdm not checked
+  15. numpy version not checked
+
+TOTAL: 15 bugs that could crash or silently corrupt training

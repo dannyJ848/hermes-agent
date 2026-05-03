@@ -33,10 +33,8 @@ class WrappedFlexAttention:
         """
         if not self._is_flex_compiled:
             # Enable dynamic shapes to handle different input sizes
-            self._compiled_flex_attention = torch.compile(
-                flex_attention,
-                # mode="max-autotune-no-cudagraphs",
-            )
+            # torch.compile disabled for SM121a - ptxas does not support sm_121a
+            self._compiled_flex_attention = flex_attention
             self._is_flex_compiled = True
 
     def __call__(self):
@@ -75,7 +73,7 @@ class WrappedCreateBlockMask:
     @torch.compiler.disable(recursive=False)
     def __init__(self):
         if not self._is_create_block_mask_compiled:
-            self._compiled_create_block_mask = torch.compile(create_block_mask)
+            self._compiled_create_block_mask = create_block_mask  # torch.compile disabled for SM121a
             self._is_create_block_mask_compiled = True
 
     def __call__(self):

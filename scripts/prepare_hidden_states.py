@@ -186,10 +186,10 @@ def build_target_model(
             .cuda()
         )
     else:
-        target_model_kwargs = SGLangBackendArgs.from_args(args).to_kwargs()
+        target_model_kwargs = {}  # SGLangBackendArgs.from_args(args).to_kwargs()
         target_model = get_eagle3_target_model(
             pretrained_model_name_or_path=args.target_model_path,
-            backend="sglang",  # we set this as the default backend to minimize precision mismatch in training and serving
+            backend="hf",  # we set this as the default backend to minimize precision mismatch in training and serving
             torch_dtype=(
                 model_config.dtype
                 if hasattr(model_config, "dtype")

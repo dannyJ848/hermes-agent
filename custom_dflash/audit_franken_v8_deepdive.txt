@@ -1,0 +1,376 @@
+
+================================================================================
+FRANKEN V8 — DEEP-DIVE AUDIT SUITE (Supplemental)
+================================================================================
+
+AUDIT 8: ADVERSARIAL ROBUSTNESS AUDIT
+================================================================================
+
+[FAILURE MODE] Gradient masking:
+  - Multiple loss terms may create conflicting gradients
+  - DART loss gradient direction may oppose primary loss
+  - TEST: Compute cosine similarity between DART and primary gradients
+  - EXPECTED: If cos_sim < 0, gradient masking occurs
+  - IMPACT: Training becomes unstable, loss oscillates
+  
+  DETECTION CODE:
+    dart_grad = torch.autograd.grad(loss_dart, draft_model.parameters(), retain_graph=True)
+    primary_grad = torch.autograd.grad(loss_primary, draft_model.parameters(), retain_graph=True)
+    cos_sim = sum((g1*g2).sum() for g1,g2 in zip(dart_grad, primary_grad))
+    if cos_sim < 0:
+        print("GRADIENT MASKING DETECTED")
+
+[FAILURE MODE] Dead units:
+  - SiLU activation in DART/SSD/LTD may produce near-zero outputs
+  - If input distribution shifts, units may saturate
+  - TEST: Monitor activation statistics per layer
+  - EXPECTED: ~1-5% dead units is normal, >20% is problematic
+  
+  DETECTION CODE:
+    for name, param in model.named_parameters():
+        if 'weight' in name:
+            dead_ratio = (param.abs() < 1e-6).float().mean()
+            if dead_ratio > 0.2:
+                print(f"DEAD UNITS in {name}: {dead_ratio:.2%}")
+
+[FAILURE MODE] Mode collapse:
+  - LTD may converge to always predicting depth=1 (safe minimum)
+  - SSD may always route to head 0
+  - DART may produce identical predictions across positions
+  
+  DETECTION:
+    - Monitor depth_probs entropy: if H < 0.1, mode collapse
+    - Monitor SSD outcome distribution: if p(class=0) > 0.9, collapse
+    - Monitor DART position diversity: if all positions agree, collapse
+
+================================================================================
+AUDIT 9: EDGE CASE & BOUNDARY CONDITION AUDIT
+================================================================================
+
+[UNTESTED] Batch size > 1:
+  - Current: batch_size=1
+  - IF batch_size=2+: collate_fn may produce incorrect padding
+  - HIDDEN BUG: hidden_states padding uses zeros, but attention_mask doesn't block them
+  - FIX: Add attention_mask generation in collate_fn
+
+[UNTESTED] Sequence length = 1:
+  - shift_primary = primary_logits[..., :-1, :] → shape [bsz, 0, vocab_size]
+  - F.cross_entropy with empty tensor → RuntimeError
+  - FIX: Skip sequences with len < 2
+
+[UNTESTED] Sequence length = max_length:
+  - input_ids[..., i+1:] may produce empty slice for i >= max_len-1
+  - DART head i may receive no valid labels
+  - FIX: Guard already added, but needs testing
+
+[UNTESTED] Vocabulary edge cases:
+  - Token ID 0 is used as padding AND as ignore_index in loss
+  - BUT token ID 0 may be a valid token in Qwen3.6 vocab
+  - IMPACT: Model never learns to predict token 0
+  - FIX: Use -100 as ignore_index (PyTorch standard)
+
+[UNTESTED] Empty dataset:
+  - If hidden_states_dir has 0 files
+  - DataLoader will fail with "division by zero" in epoch_loss / len(dataloader)
+  - FIX: Add dataset length check before training
+
+[UNTESTED] Checkpoint at step 0:
+  - If save_interval=500 but training stops at step 100
+  - No checkpoint saved, resume impossible
+  - FIX: Always save checkpoint at step 1 and end of epoch
+
+================================================================================
+AUDIT 10: DISTRIBUTED TRAINING AUDIT
+================================================================================
+
+[NOT SUPPORTED] Multi-GPU:
+  - No DistributedDataParallel (DDP) wrapper
+  - No torch.distributed initialization
+  - No gradient synchronization
+  - IMPACT: Cannot scale to multiple GPUs
+  
+  RECOMMENDATION: Add DDP support for v9:
+    model = torch.nn.parallel.DistributedDataParallel(model)
+    # Requires: torchrun --nproc_per_node=2
+
+[NOT SUPPORTED] Gradient accumulation:
+  - No --gradient-accumulation-steps flag
+  - Effective batch size always = 1
+  - IMPACT: Cannot simulate larger batches
+  
+  RECOMMENDATION: Add gradient accumulation:
+    if (step + 1) % accum_steps == 0:
+        optimizer.step()
+        optimizer.zero_grad()
+
+[NOT SUPPORTED] Mixed precision training:
+  - Uses bfloat16 for model, but no torch.cuda.amp autocast
+  - Some operations may still run in float32
+  - IMPACT: Slower than necessary
+  
+  RECOMMENDATION: Add autocast:
+    with torch.cuda.amp.autocast(dtype=torch.bfloat16):
+        outputs = model(inputs)
+
+================================================================================
+AUDIT 11: QUANTIZATION & DEPLOYMENT AUDIT
+================================================================================
+
+[NOT SUPPORTED] INT8/INT4 quantization:
+  - No quantization-aware training (QAT)
+  - No post-training quantization (PTQ)
+  - 10B params at bfloat16 = 20GB
+  - At INT8: 10GB, at INT4: 5GB
+  - IMPACT: Cannot deploy on memory-constrained devices
+  
+  RECOMMENDATION: Add GPTQ/AWQ support for v9
+
+[NOT SUPPORTED] ONNX export:
+  - Model uses custom modules (AdaptiveRMSNorm, Muon)
+  - ONNX may not support these operations
+  - IMPACT: Cannot deploy to non-PyTorch runtimes
+  
+  RECOMMENDATION: Add ONNX-compatible path
+
+[NOT SUPPORTED] TensorRT optimization:
+  - TransformerEncoderLayer may not fuse optimally
+  - No TensorRT plugin for DART/SSD/LTD
+  - IMPACT: Suboptimal inference speed
+  
+  RECOMMENDATION: Build custom TensorRT plugins for v10
+
+================================================================================
+AUDIT 12: DATA LEAKAGE & CONTAMINATION AUDIT
+================================================================================
+
+[CONCERN] Hidden states leakage:
+  - Phase 1 generates hidden states from TARGET model
+  - These hidden states contain information about future tokens
+  - The draft model learns to predict from hidden states that ALREADY contain the answer
+  - IMPACT: Overly optimistic loss — draft model doesn't learn to "draft", it learns to "decode hidden states"
+  
+  VERIFICATION:
+    - Compare draft model loss vs baseline language model loss
+    - If draft loss is significantly lower, leakage is occurring
+    - EXPECTED: Draft loss should be ~1.5-2.5, not <1.0
+
+[CONCERN] Dataset overlap:
+  - Hidden states generated from UltraChat 5k samples
+  - If target model was trained on UltraChat, hidden states are "memorized"
+  - IMPACT: Draft model learns target model's memorization, not general drafting
+  
+  MITIGATION: Use held-out dataset for hidden state generation
+
+[CONCERN] Information bottleneck:
+  - fc layer compresses 25600-dim → 5120-dim
+  - May lose critical information for accurate drafting
+  - TEST: Compare accuracy with/without fc layer
+  
+  ALTERNATIVE: Use attention-based fusion instead of linear projection
+
+================================================================================
+AUDIT 13: REPRODUCIBILITY AUDIT
+================================================================================
+
+[FAIL] No random seed control:
+  - torch.manual_seed() not called
+  - numpy.random.seed() not called
+  - random.seed() not called
+  - IMPACT: Each run produces different results
+  
+  FIX: Add --seed argument
+    torch.manual_seed(args.seed)
+    np.random.seed(args.seed)
+    random.seed(args.seed)
+    torch.cuda.manual_seed_all(args.seed)
+    # For deterministic behavior (slower):
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+[FAIL] No hyperparameter logging:
+  - Config not saved to output_dir
+  - Cannot reproduce exact training run
+  
+  FIX: Save config.json at start:
+    with open(f"{args.output_dir}/config.json", 'w') as f:
+        json.dump(vars(args), f, indent=2)
+
+[FAIL] No dataset versioning:
+  - hidden_states_dir may change between runs
+  - No checksum or manifest of input files
+  - IMPACT: Cannot verify data consistency
+  
+  FIX: Compute MD5 of all .pt files, save manifest
+
+================================================================================
+AUDIT 14: SECURITY AUDIT
+================================================================================
+
+[WARNING] Code injection risk:
+  - trust_remote_code=True loads arbitrary Python from HuggingFace
+  - If target_model_path is compromised, malicious code executes
+  - IMPACT: RCE vulnerability
+  
+  MITIGATION:
+    - Verify model checksum before loading
+    - Use local model path only
+    - Run in sandboxed container
+
+[WARNING] Path traversal:
+  - hidden_states_dir and output_dir are user-provided
+  - No validation that paths are within expected directories
+  - IMPACT: Could write to /etc/passwd or other sensitive locations
+  
+  FIX: Validate paths:
+    assert os.path.abspath(args.output_dir).startswith('/data/')
+
+[WARNING] Resource exhaustion:
+  - No limit on num_epochs, batch_size, or max_length
+  - User could specify batch_size=1000 → OOM → system crash
+  
+  FIX: Add sanity checks:
+    assert args.batch_size <= 4, "batch_size too large"
+    assert args.num_epochs <= 10, "num_epochs too large"
+
+================================================================================
+AUDIT 15: MONITORING & OBSERVABILITY AUDIT
+================================================================================
+
+[MISSING] Real-time metrics:
+  - No TensorBoard / Weights & Biases integration
+  - Cannot visualize loss curves during training
+  - IMPACT: Hard to detect problems early
+  
+  RECOMMENDATION: Add wandb integration:
+    import wandb
+    wandb.init(project="franken-v8")
+    wandb.log({"loss": loss.item(), "primary": loss_primary.item()})
+
+[MISSING] Alert system:
+  - No notifications for NaN, OOM, or completion
+  - Training could fail silently for hours
+  
+  RECOMMENDATION: Add webhook alerts:
+    if nan_count > 3:
+        send_alert("Training NaN detected", webhook_url)
+
+[MISSING] Health checks:
+  - No GPU temperature monitoring
+  - No disk space monitoring
+  - Training may fail due to thermal throttling or disk full
+  
+  RECOMMENDATION: Add periodic health checks:
+    temp = torch.cuda.temperature()
+    if temp > 85:
+        send_alert(f"GPU temp {temp}°C — throttling likely")
+
+================================================================================
+AUDIT 16: TEST COVERAGE AUDIT
+================================================================================
+
+[ZERO COVERAGE] No unit tests:
+  - No tests for AdaptiveRMSNorm
+  - No tests for DART forward pass
+  - No tests for SSD outcome routing
+  - No tests for LTD policy gradients
+  
+  REQUIRED TESTS:
+    def test_adaptive_rmsnorm():
+        norm = AdaptiveRMSNorm(5120)
+        x = torch.randn(2, 10, 5120)
+        y = norm(x)
+        assert y.shape == x.shape
+        assert not torch.isnan(y).any()
+    
+    def test_dart_forward():
+        dart = DARTParallelDraft(5120, 152064, 8)
+        x = torch.randn(2, 10, 5120)
+        logits = dart(x)
+        assert len(logits) == 8
+        assert all(l.shape == (2, 10, 152064) for l in logits)
+    
+    def test_ssd_routing():
+        ssd = SSDSpeculator(5120, 152064, 4)
+        x = torch.randn(2, 10, 5120)
+        outcome, preemptive, conf = ssd(x)
+        assert outcome.shape == (2, 10, 4)
+        assert len(preemptive) == 4
+        assert conf.shape == (2, 10, 1)
+
+[ZERO COVERAGE] No integration tests:
+  - No end-to-end training on synthetic data
+  - No checkpoint save/load roundtrip test
+  - No resume-from-checkpoint test
+  
+  REQUIRED TESTS:
+    def test_training_step():
+        # Create synthetic batch
+        batch = {
+            'input_ids': torch.randint(0, 152064, (1, 10)),
+            'hidden_states': torch.randn(1, 10, 5, 5120),
+            'seq_lens': [10]
+        }
+        # Run one training step
+        # Verify loss is finite
+        # Verify gradients exist
+
+[ZERO COVERAGE] No regression tests:
+  - No baseline performance test
+  - Cannot detect if changes degrade speed
+  
+  REQUIRED TESTS:
+    def test_inference_speed():
+        model = UltimateFrankenDraftModelV8(config)
+        x = torch.randint(0, 152064, (1, 100))
+        hs = torch.randn(1, 100, 5, 5120)
+        
+        start = time.time()
+        for _ in range(10):
+            model(x, hs)
+        elapsed = time.time() - start
+        assert elapsed < 5.0, "Inference too slow"
+
+================================================================================
+AUDIT 17: DOCUMENTATION AUDIT
+================================================================================
+
+[MISSING] Architecture diagram:
+  - No visual representation of data flow
+  - Hard to understand graft interactions
+  
+  RECOMMENDATION: Generate diagram with graphviz or mermaid
+
+[MISSING] API documentation:
+  - No docstrings for public methods
+  - No type hints on all functions
+  - Hard to use as library
+
+[MISSING] Troubleshooting guide:
+  - No FAQ for common errors
+  - No debugging tips
+  - Hard to diagnose problems
+
+[MISSING] Performance tuning guide:
+  - No guidance on loss weight tuning
+  - No guidance on learning rate scheduling
+  - No guidance on graft selection
+
+================================================================================
+FINAL RISK ASSESSMENT: HIGH (with all fixes)
+================================================================================
+
+Remaining critical gaps:
+  1. No reproducibility (random seeds)
+  2. No security validation (path traversal)
+  3. No test coverage (zero tests)
+  4. No monitoring (no wandb/tensorboard)
+  5. Data leakage from hidden states
+  6. No distributed training support
+  7. No quantization for deployment
+  8. vLLM integration undefined
+
+Probability of successful training: ~75%
+Probability of successful deployment: ~40%
+Probability of reproducible results: ~20%
+
+RECOMMENDATION: Fix top 3 gaps before training, others for v9

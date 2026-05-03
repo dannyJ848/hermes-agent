@@ -1,0 +1,370 @@
+
+================================================================================
+FRANKEN V8 — EXHAUSTIVE FINAL SWEEP AUDIT
+================================================================================
+
+CROSS-DOMAIN AUDIT (Interactions between unrelated systems)
+================================================================================
+
+[UNAUDITED] Python version compatibility:
+  - Script uses walrus operator? No
+  - Uses match/case? No  
+  - Uses type hints with |? No
+  - Python 3.8+ should work
+  - DGX Spark has Python 3.11 — compatible ✓
+  - BUT: torch.compile not used (requires 2.0+)
+  - RISK: If PyTorch < 2.0, some features may not work
+  - DEBUG: Check python --version and torch.__version__
+
+[UNAUDITED] CUDA version compatibility:
+  - Blackwell SM121 requires CUDA 12.8+
+  - PyTorch must be compiled with CUDA 12.8
+  - If PyTorch uses CUDA 12.1, may have kernel launch failures
+  - RISK: Silent wrong results or crashes
+  - DEBUG: torch.cuda.get_device_capability() should return (12,1)
+
+[UNAUDITED] Docker container isolation:
+  - Training runs inside AEON-7 container
+  - Container may have different library versions than host
+  - RISK: Missing dependencies (e.g., numpy, tqdm not installed)
+  - DEBUG: Add pip freeze to audit log at startup
+
+[UNAUDITED] SSH session persistence:
+  - If SSH drops, training may receive SIGHUP
+  - Python process may terminate unless nohup/tmux used
+  - RISK: 30% of training runs may be interrupted
+  - MITIGATION: tmux mandatory (already planned)
+
+[UNAUDITED] File system race conditions:
+  - Multiple processes may write to same checkpoint file
+  - If training restarted while old process still running
+  - RISK: Corrupted checkpoint from concurrent write
+  - MITIGATION: Use atomic rename for checkpoint saves
+
+[UNAUDITED] Network file system issues:
+  - /data may be NFS-mounted
+  - NFS caching may cause stale reads
+  - RISK: Resume loads old checkpoint despite new one existing
+  - DEBUG: Add sync() after checkpoint save
+
+TEMPORAL AUDIT (Time-dependent failures)
+================================================================================
+
+[UNAUDITED] Long-running process degradation:
+  - After 48+ hours, memory fragmentation may occur
+  - torch.cuda.empty_cache() may not fully defragment
+  - RISK: Gradual memory growth → OOM after day 3
+  - MITIGATION: Periodic process restart from checkpoint
+
+[UNAUDITED] Clock drift:
+  - If system clock changes (NTP sync), time-based logging may show jumps
+  - RISK: Confusing audit logs, incorrect ETA calculations
+  - MITIGATION: Use monotonic clock for timing: time.monotonic()
+
+[UNAUDITED] Log rotation:
+  - training_audit.log may grow to 100MB+ over 6 days
+  - RISK: Disk full from logs alone
+  - MITIGATION: Add log rotation or periodic truncation
+
+[UNAUDITED] Temperature throttling:
+  - GB10 may thermal throttle after sustained 90%+ GPU utilization
+  - Training speed may decrease 20-40% after hour 12
+  - RISK: ETA estimates become inaccurate
+  - MITIGATION: Monitor nvidia-smi temperature, add cooling breaks
+
+INTERACTION AUDIT (Multiple components interacting unexpectedly)
+================================================================================
+
+[UNAUDITED] Muon + bfloat16 interaction:
+  - zeropower_via_newtonschulz5 uses bfloat16 explicitly
+  - But Newton-Schulz requires high precision for convergence
+  - RISK: Orthogonalization may fail silently in bfloat16
+  - DEBUG: Check if exp_avg norms become NaN or diverge
+  - MITIGATION: Use float32 for orthogonalization, cast back
+
+[UNAUDITED] TransformerEncoderLayer + batch_first=True:
+  - PyTorch's TransformerEncoderLayer expects (seq, batch, feat) by default
+  - batch_first=True changes to (batch, seq, feat)
+  - RISK: If any library code assumes old format, shapes mismatch
+  - DEBUG: Verify all custom attention code uses batch_first consistently
+
+[UNAUDITED] DART + SSD simultaneous forward:
+  - Both compute parallel heads from same hidden_states
+  - CUDA streams may serialize them unnecessarily
+  - RISK: Slower than expected due to stream synchronization
+  - DEBUG: Use torch.cuda.Event to measure actual parallelism
+  - MITIGATION: Explicit CUDA stream assignment for each graft
+
+[UNAUDITED] Gradient clipping + Muon interaction:
+  - clip_grad_norm_ modifies gradients in-place
+  - Muon also modifies gradients via orthogonalization
+  - RISK: Order matters — clip after Muon may undo orthogonalization
+  - CURRENT ORDER: backward → clip → Muon.step (correct?)
+  - ACTUAL: backward → clip → optimizer.step (Muon inside step)
+  - RISK: Muon orthogonalization happens AFTER clipping — may re-scale
+  - DEBUG: Compare loss curves with/without clipping
+
+[UNAUDITED] Shared weights + optimizer interaction:
+  - embed_tokens and lm_head are shared from target model
+  - But they are in optimizer's parameter list
+  - RISK: Shared weights get updated by draft training
+  - IMPACT: Target model weights drift — may affect hidden states quality
+  - MITIGATION: Freeze shared weights: embed_tokens.requires_grad = False
+
+EMERGENT BEHAVIOR AUDIT (Complex system-level failures)
+================================================================================
+
+[UNAUDITED] Loss term interference:
+  - 5 loss terms with different scales and frequencies
+  - Over 50,000 steps, rare combinations may cause instability
+  - Example: DART loss spikes on rare token, causes gradient spike,
+    triggers NaN detection, skips batch, reduces effective dataset
+  - RISK: Training may "learn" to avoid certain inputs
+  - MITIGATION: Per-loss gradient clipping, not just global
+
+[UNAUDITED] Mode collapse cascade:
+  - If SSD collapses to head 0, DART may compensate by being more diverse
+  - But DART diversity may trigger LTD to be more conservative
+  - Result: System finds degenerate equilibrium
+  - RISK: Suboptimal but stable — hard to detect
+  - DETECTION: Monitor cross-graft metrics, not just individual losses
+
+[UNAUDITED] Checkpoint size explosion:
+  - 10B params × 2 bytes = 20GB per checkpoint
+  - With optimizer state: 40GB
+  - Save every 500 steps = 40 checkpoints per epoch = 1.6TB
+  - RISK: Disk full mid-training
+  - MITIGATION: Keep only last 3 checkpoints, delete older ones
+
+[UNAUDITED] Hidden states staleness:
+  - Phase 1 generated hidden states from target model
+  - But target model is NOT frozen during draft training
+  - Wait — target model is deleted after weight extraction
+  - So hidden states are from ORIGINAL target model
+  - RISK: If target model updated later, hidden states become stale
+  - MITIGATION: Regenerate hidden states if target model changes
+
+[UNAUDITED] Dataset ordering bias:
+  - DataLoader shuffle=True uses default random seed
+  - But we set seed at start — shuffle is deterministic per run
+  - RISK: Same order every run may cause overfitting to sequence
+  - MITIGATION: Use different seed for DataLoader than model
+
+[UNAUDITED] Batch size 1 statistical issues:
+  - Batch norm not used (good)
+  - But gradient variance is high with batch=1
+  - RISK: Noisy gradients, slower convergence
+  - MITIGATION: Gradient accumulation (simulate larger batch)
+
+[UNAUDITED] Sequence length bias:
+  - collate_fn pads to max_len in batch
+  - If one sample is 1024 tokens and rest are 100, waste 90% compute
+  - RISK: Effective throughput much lower than theoretical
+  - MITIGATION: Bucketing — group similar lengths together
+
+[UNAUDITED] Tokenizer vocabulary mismatch:
+  - Qwen3.6 vocab size: 152064
+  - But DART/SSD heads output 152064
+  - If tokenizer was updated after model training, vocab may differ
+  - RISK: Out-of-vocabulary tokens during inference
+  - DEBUG: Verify tokenizer.vocab_size == config['vocab_size']
+
+[UNAUDITED] Attention mask missing:
+  - TransformerEncoderLayer without attention_mask
+  - All positions attend to all positions (including padding)
+  - RISK: Padding tokens influence real token predictions
+  - MITIGATION: Add src_key_padding_mask to TransformerEncoderLayer
+
+[UNAUDITED] Positional encoding missing:
+  - TransformerEncoderLayer has built-in position encoding
+  - But it's absolute sinusoidal, not learned
+  - RISK: May not generalize to positions > max_position_embeddings
+  - MITIGATION: Add learned position embeddings or use RoPE
+
+[UNAUDITED] Weight initialization:
+  - Default PyTorch init for Linear layers: uniform(-1/sqrt(in), 1/sqrt(in))
+  - For 25600×5120 matrix, init range is very small
+  - RISK: Vanishing gradients in early training
+  - MITIGATION: Use Xavier/Kaiming initialization explicitly
+
+[UNAUDITED] Bias terms missing:
+  - self.fc = nn.Linear(..., bias=False)
+  - Some Linear layers in DART/SSD also have no bias
+  - RISK: Reduced expressivity, harder to learn offsets
+  - MITIGATION: Add bias=True, especially for final layers
+
+[UNAUDITED] Dropout missing:
+  - No dropout in custom modules
+  - TransformerEncoderLayer has dropout=0.1 by default
+  - RISK: Overfitting on small dataset (10K samples)
+  - MITIGATION: Add dropout to DART/SSD/LTD heads
+
+[UNAUDITED] Learning rate schedule:
+  - Constant LR throughout training
+  - No warmup, no decay
+  - RISK: Early training unstable, late training plateaus
+  - MITIGATION: Cosine annealing with warmup
+
+[UNAUDITED] Weight decay interaction:
+  - weight_decay=0.1 applied to ALL parameters
+  - Including bias terms (if they existed) and LayerNorm weights
+  - RISK: LayerNorm scale parameters decay to zero
+  - MITIGATION: Separate parameter groups, no decay on norms/bias
+
+[UNAUDITED] Gradient accumulation missing:
+  - Effective batch size = 1
+  - High gradient variance
+  - RISK: Noisy updates, slower convergence
+  - MITIGATION: Add --gradient-accumulation-steps flag
+
+[UNAUDITED] Mixed precision training:
+  - Model in bfloat16, but some ops may upcast to float32
+  - RISK: Slower than necessary, more memory than needed
+  - MITIGATION: Use torch.cuda.amp.autocast for explicit control
+
+[UNAUDITED] CPU offloading:
+  - Dataset loads to CPU, then transfers to GPU
+  - RISK: Data transfer bottleneck
+  - MITIGATION: Use pin_memory=True in DataLoader
+
+[UNAUDITED] Multi-worker data loading:
+  - num_workers=0 (main process loads data)
+  - RISK: GPU idle while CPU loads next batch
+  - MITIGATION: num_workers=2-4 with proper multiprocessing
+
+[UNAUDITED] Memory pinning:
+  - No pin_memory in DataLoader
+  - RISK: Slow CPU→GPU transfers
+  - MITIGATION: Add pin_memory=True
+
+[UNAUDITED] Gradient checkpointing:
+  - Not used — full forward graph stored
+  - RISK: OOM on longer sequences
+  - MITIGATION: Enable gradient checkpointing for transformer layers
+
+[UNAUDITED] torch.compile:
+  - Not used
+  - RISK: Missing 20-40% speedup from compilation
+  - MITIGATION: Add torch.compile(model) if PyTorch 2.0+
+  - BUT: torch.compile may crash on custom modules
+
+[UNAUDITED] Distributed training:
+  - Single GPU only
+  - RISK: Cannot scale if training too slow
+  - MITIGATION: Add DDP support for multi-GPU (if available)
+
+[UNAUDITED] Model parallelism:
+  - 10B params on single GPU
+  - RISK: If model grows, may not fit
+  - MITIGATION: Add pipeline or tensor parallelism
+
+[UNAUDITED] Quantization during training:
+  - No QAT (quantization-aware training)
+  - RISK: Post-training quantization may degrade quality
+  - MITIGATION: Add fake quantization modules for INT8 training
+
+[UNAUDITED] Sparsity:
+  - No structured or unstructured sparsity
+  - RISK: 10B params may be overparameterized
+  - MITIGATION: Add L1 regularization or pruning schedule
+
+[UNAUDITED] Knowledge distillation:
+  - LK loss is pseudo-distillation (self-KL)
+  - No actual teacher model during training
+  - RISK: Draft model doesn't learn from stronger teacher
+  - MITIGATION: Load target model periodically for true distillation
+
+[UNAUDITED] Curriculum learning:
+  - All samples treated equally
+  - RISK: Hard samples may dominate early training
+  - MITIGATION: Start with easy samples, gradually increase difficulty
+
+[UNAUDITED] Data augmentation:
+  - No augmentation of hidden states
+  - RISK: Overfitting to specific hidden state patterns
+  - MITIGATION: Add noise to hidden states, random masking
+
+[UNAUDITED] Adversarial training:
+  - No adversarial examples
+  - RISK: Model brittle to input perturbations
+  - MITIGATION: Add FGSM/PGD adversarial loss
+
+[UNAUDITED] Ensemble methods:
+  - Single draft model
+  - RISK: No diversity in drafting
+  - MITIGATION: Train multiple draft models, ensemble at inference
+
+[UNAUDITED] Uncertainty quantification:
+  - No confidence calibration
+  - RISK: Overconfident wrong predictions
+  - MITIGATION: Add temperature scaling or MC dropout
+
+[UNAUDITED] Interpretability:
+  - No attention visualization
+  - No feature importance
+  - RISK: Cannot debug why model makes specific predictions
+  - MITIGATION: Log attention weights, gradient-based attribution
+
+[UNAUDITED] Fairness:
+  - No demographic parity checks
+  - RISK: Model may be biased toward certain token patterns
+  - MITIGATION: Audit token distribution across demographic groups
+
+[UNAUDITED] Privacy:
+  - Hidden states may leak training data information
+  - RISK: Membership inference attacks
+  - MITIGATION: Add differential privacy noise
+
+[UNAUDITED] Energy efficiency:
+  - No power monitoring
+  - RISK: Unnecessary energy consumption
+  - MITIGATION: Add carbon footprint tracking
+
+[UNAUDITED] Carbon footprint:
+  - 150 hours on GB10 ≈ 50-100 kg CO2
+  - RISK: Environmental impact
+  - MITIGATION: Use renewable energy, offset emissions
+
+[UNAUDITED] Legal compliance:
+  - Model may generate copyrighted text
+  - RISK: Legal liability
+  - MITIGATION: Add copyright filter, content moderation
+
+[UNAUDITED] Ethical considerations:
+  - Uncensored model may generate harmful content
+  - RISK: Misuse for malicious purposes
+  - MITIGATION: Add safety guardrails, usage monitoring
+
+================================================================================
+FINAL VERDICT: 50+ ADDITIONAL AUDIT CATEGORIES IDENTIFIED
+================================================================================
+
+CRITICAL (must fix before training):
+  1. Shared weights getting updated (freeze embed_tokens/lm_head)
+  2. Attention mask missing for padding
+  3. No learning rate schedule
+  4. Weight decay on LayerNorm parameters
+  5. No gradient accumulation
+
+HIGH (should fix):
+  6. No dropout in custom modules
+  7. No mixed precision autocast
+  8. No pin_memory in DataLoader
+  9. No torch.compile
+  10. Checkpoint size management (delete old)
+
+MEDIUM (nice to have):
+  11. Log rotation
+  12. Temperature monitoring
+  13. Per-loss gradient clipping
+  14. Bucketing by sequence length
+  15. Curriculum learning
+
+LOW (future work):
+  16-50. Distributed training, quantization, sparsity, distillation,
+         adversarial training, ensemble, uncertainty, interpretability,
+         fairness, privacy, energy, carbon, legal, ethics
+
+RECOMMENDATION: Fix top 5 critical issues, then launch.
+             The remaining 45+ are optimization/enhancement opportunities
+             for v9/v10, not blockers for v8 training.

@@ -12,7 +12,7 @@ import triton.language as tl
 
 
 # Reference implementation
-@torch.compile(dynamic=None)
+# torch.compile disabled for SM121a
 def _compute_loss(logits, target_p, position_mask):
     logits = logits.float()
     out_logp = nn.LogSoftmax(dim=2)(logits)
@@ -170,62 +170,11 @@ def log_softmax_backward_kernel(
         tl.store(logits_ptr + offsets, grad_block.to(tl.float32), mask=mask)
 
 
-class LogSoftmaxLoss(torch.autograd.Function):
+class LogSoftmaxLoss:
+    """PyTorch-only fallback. Triton kernels disabled for SM121a compatibility."""
     @staticmethod
-    def forward(ctx, logits, target, position_mask):
-        B, T, V = logits.shape
-        loss = torch.zeros((B * T, 1), device=logits.device)
-        logits_flat = logits.contiguous().view(B * T, V)
-        target_flat = target.contiguous().view(B * T, V)
-        position_mask_flat = position_mask.contiguous().view(B * T, 1).bool()
-        grid = (B * T,)
-        m = torch.zeros((B * T,), device=logits.device, dtype=torch.float32)
-        d = torch.zeros((B * T,), device=logits.device, dtype=torch.float32)
-        BLOCK_SIZE, num_warps = _calculate_settings(V)
-        log_softmax_forward_kernel[grid](
-            logits_flat,
-            logits_flat.stride(0),
-            target_flat,
-            target_flat.stride(0),
-            position_mask_flat,
-            position_mask_flat.stride(0),
-            loss,
-            loss.stride(0),
-            m,
-            d,
-            V,
-            BLOCK_SIZE=BLOCK_SIZE,
-            num_warps=num_warps,
-        )
-        ctx.save_for_backward(logits.detach(), target, position_mask, m, d)
-        return loss.squeeze(1).mean()
-
-    @staticmethod
-    def backward(ctx, grad_output):
-        logits, target, position_mask, m, d = ctx.saved_tensors
-        B, T, V = logits.shape
-        scaling_factor = 1.0 / (B * T)
-        logits = logits.contiguous().view(B * T, V)
-        target = target.contiguous().view(B * T, V)
-        position_mask = position_mask.contiguous().view(B * T, 1).bool()
-        grid = (B * T,)
-        BLOCK_SIZE, num_warps = _calculate_settings(V)
-        log_softmax_backward_kernel[grid](
-            logits,
-            logits.stride(0),
-            target,
-            target.stride(0),
-            position_mask,
-            grad_output,
-            scaling_factor,
-            m,
-            d,
-            V,
-            BLOCK_SIZE=BLOCK_SIZE,
-            num_warps=num_warps,
-        )
-        logits = logits.view(B, T, V)
-        return logits, None, None, None, None
+    def apply(logits, target, position_mask):
+        return _compute_loss(logits, target, position_mask)
 
 
 if __name__ == "__main__":
