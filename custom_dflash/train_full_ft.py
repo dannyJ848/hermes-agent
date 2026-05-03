@@ -134,23 +134,19 @@ class GradientScaler:
         return self._scale
 
 # ============================================================================
-# LOAD SAEs
+# LOAD SAEs (only active ones)
 # ============================================================================
 log("Loading Qwen-Scope SAEs...")
 saes = {}
-for layer_idx in range(64):
+for layer_idx in SAE_LAYERS:
     sae_path = os.path.join(SAE_DIR, "layer%d.sae.pt" % layer_idx)
     if os.path.exists(sae_path):
-        saes[layer_idx] = torch.load(sae_path, map_location="cpu")
-        log("  Layer %d: SAE loaded (CPU)" % layer_idx)
+        saes[layer_idx] = torch.load(sae_path, map_location=device)
+        log("  Layer %d: SAE loaded to GPU" % layer_idx)
+    else:
+        log("  Layer %d: SAE NOT FOUND" % layer_idx)
 
-# Only move active SAEs to GPU
-for layer_idx in SAE_LAYERS:
-    if layer_idx in saes:
-        saes[layer_idx] = {k: v.to(device) for k, v in saes[layer_idx].items()}
-        log("  Layer %d: SAE moved to GPU" % layer_idx)
-
-log("Loaded %d SAEs total, %d active on GPU" % (len(saes), len(SAE_LAYERS)))
+log("Loaded %d active SAEs on GPU" % len(saes))
 
 # ============================================================================
 # SAE RECONSTRUCTION
