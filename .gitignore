@@ -1,33 +1,24 @@
-# Runtime data - never commit
-.env
+# Binary/runtime data
 *.db
 *.db-shm
 *.db-wal
 *.db.corrupt*
 *.db.backup*
-*.db.pre_*
-*.db.CORRUPTED*
-*.db.CLEAN_*
 *.pid
 *.lock
+__pycache__/
+*.pyc
+*.pyo
 
 # Large directories
 checkpoints/
 cache/
-logs/
-sessions/
 browser-profile/
 eyes_cache/
 context_snapshots/
 state-snapshots/
 memory_backups/
-__pycache__/
-*.pyc
-*.pyo
 api_captures/
 anki_output/
 claude-bridge/
 twitter_bridge/
-
-# Session artifacts (keep in repo via explicit add if needed)
-*.db
