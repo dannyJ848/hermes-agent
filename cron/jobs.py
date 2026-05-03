@@ -842,7 +842,7 @@ def get_due_jobs() -> List[Dict[str, Any]]:
                     )
                     # Update the job in storage
                     for rj in raw_jobs:
-                        if rj["id"] == job["id"]:
+                        if rj.get("id") == job.get("id"):
                             rj["next_run_at"] = new_next
                             needs_save = True
                             break
