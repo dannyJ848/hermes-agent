@@ -963,6 +963,10 @@ def train(config: TrainConfig):
         ce_loss = outputs.loss
         student_hidden_states = outputs.hidden_states
         
+        # Cast hidden states to float32 for loss computation
+        if student_hidden_states is not None:
+            student_hidden_states = [h.float() if h is not None else h for h in student_hidden_states]
+        
         # Teacher distillation loss
         distill_loss = torch.tensor(0.0, device=device)
         if config.use_teacher and teacher is not None and teacher.model is not None:
