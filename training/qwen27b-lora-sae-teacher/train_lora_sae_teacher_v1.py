@@ -751,27 +751,42 @@ def train(config: TrainConfig):
     # or 4-bit quantization to fit in GPU memory
     logging.info("Loading student model...")
     
-    # Try 8-bit first (better dtype compatibility than 4-bit)
+    # Try bf16 first (fastest, no quantization overhead)
     loaded = False
     try:
-        logging.info("Loading student model (8-bit)...")
-        from transformers import BitsAndBytesConfig
-        from peft import prepare_model_for_kbit_training
-        bnb_config = BitsAndBytesConfig(
-            load_in_8bit=True,
-            llm_int8_threshold=6.0,
-        )
+        logging.info("Loading student model (bf16)...")
         model = AutoModelForCausalLM.from_pretrained(
             config.student_model_path,
-            quantization_config=bnb_config,
+            torch_dtype=torch.bfloat16,
             device_map="auto",
             trust_remote_code=True,
         )
-        model = prepare_model_for_kbit_training(model)
         loaded = True
-        logging.info("Loaded model in 8-bit quantization")
+        logging.info("Loaded model in bf16")
     except Exception as e:
-        logging.warning(f"8-bit loading failed: {e}")
+        logging.warning(f"bf16 loading failed: {e}")
+    
+    # Fallback to 8-bit
+    if not loaded:
+        try:
+            logging.info("Trying 8-bit quantization...")
+            from transformers import BitsAndBytesConfig
+            from peft import prepare_model_for_kbit_training
+            bnb_config = BitsAndBytesConfig(
+                load_in_8bit=True,
+                llm_int8_threshold=6.0,
+            )
+            model = AutoModelForCausalLM.from_pretrained(
+                config.student_model_path,
+                quantization_config=bnb_config,
+                device_map="auto",
+                trust_remote_code=True,
+            )
+            model = prepare_model_for_kbit_training(model)
+            loaded = True
+            logging.info("Loaded model in 8-bit quantization")
+        except Exception as e:
+            logging.warning(f"8-bit loading failed: {e}")
     
     # Fallback to 4-bit
     if not loaded:
