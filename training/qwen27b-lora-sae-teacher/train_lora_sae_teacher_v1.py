@@ -898,6 +898,11 @@ def train(config: TrainConfig):
     
     # Disable use_cache to avoid conflict with gradient checkpointing
     model.config.use_cache = False
+    
+    # Disable gradient checkpointing if enabled (causes use_reentrant deadlock)
+    if hasattr(model, 'gradient_checkpointing_enable'):
+        model.gradient_checkpointing_disable()
+    
     model.train()
     
     global_step = 0
