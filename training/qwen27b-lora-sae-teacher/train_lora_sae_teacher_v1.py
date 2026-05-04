@@ -908,7 +908,8 @@ def train(config: TrainConfig):
     
     model.train()
     
-    global_step = 0
+    global_step = 0  # Optimizer step counter
+    batch_count = 0  # Raw batch counter
     accumulated_loss = 0.0
     accumulated_ce = 0.0
     accumulated_distill = 0.0
@@ -1029,8 +1030,10 @@ def train(config: TrainConfig):
         accumulated_distill += distill_loss.item()
         accumulated_sae += sae_loss.item()
         
+        batch_count += 1
+        
         # Gradient accumulation step
-        if (global_step + 1) % config.grad_accum_steps == 0:
+        if batch_count % config.grad_accum_steps == 0:
             # Clip gradients
             torch.nn.utils.clip_grad_norm_(model.parameters(), config.max_grad_norm)
             
@@ -1043,8 +1046,8 @@ def train(config: TrainConfig):
             optimizer.step()
             optimizer.zero_grad()
             
-            # Log
-            if global_step % 10 == 0:
+            # Log every step (for visibility during testing)
+            if global_step % 10 == 0 or global_step < 5:
                 avg_loss = accumulated_loss / config.grad_accum_steps
                 avg_ce = accumulated_ce / config.grad_accum_steps
                 avg_distill = accumulated_distill / config.grad_accum_steps
@@ -1062,6 +1065,8 @@ def train(config: TrainConfig):
             accumulated_ce = 0.0
             accumulated_distill = 0.0
             accumulated_sae = 0.0
+            
+            global_step += 1
             
             # Checkpoint
             if global_step % config.save_every == 0 and global_step > 0:
@@ -1084,8 +1089,6 @@ def train(config: TrainConfig):
         
         # Update curriculum
         curriculum.step_update()
-        
-        global_step += 1
     
     # Final save
     final_path = os.path.join(config.checkpoint_dir, "final_model")
