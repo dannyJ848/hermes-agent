@@ -213,44 +213,117 @@ class TeacherModelWrapper:
         self._load_model(model_path)
     
     def _load_model(self, model_path: str):
-        """Load teacher model to CPU."""
+        """Load teacher model to CPU. Franken V8 uses custom DFlashQwen3ForCausalLM."""
         logging.info(f"Loading teacher model from {model_path}")
         
-        # Check if model_path is a directory with config.json
-        model_dir = Path(model_path).parent if model_path.endswith('.pt') else Path(model_path)
+        # Franken V8 directory structure: config.json + checkpoint-*.pt or final_model.pt
+        model_dir = Path(model_path)
+        if model_path.endswith('.pt'):
+            model_dir = Path(model_path).parent
+        
         config_json = model_dir / "config.json"
         
-        if config_json.exists():
-            # Load from directory (HuggingFace format)
-            try:
-                self.model = AutoModelForCausalLM.from_pretrained(
-                    str(model_dir),
-                    torch_dtype=torch.bfloat16,
-                    device_map="cpu",
-                    trust_remote_code=True,
-                )
-                self.tokenizer = AutoTokenizer.from_pretrained(str(model_dir), trust_remote_code=True)
-                logging.info("Teacher model loaded from directory")
-                return
-            except Exception as e:
-                logging.warning(f"Failed to load from directory: {e}")
+        if not config_json.exists():
+            logging.warning(f"No config.json found in {model_dir}")
+            return
         
-        # Try loading .pt checkpoint
-        if os.path.exists(model_path) and model_path.endswith('.pt'):
-            try:
-                checkpoint = torch.load(model_path, map_location="cpu")
-                if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
-                    # It's a training checkpoint
-                    logging.info(f"Loaded checkpoint with {len(checkpoint['model_state_dict'])} keys")
-                    self.model = checkpoint  # Store for manual loading later
+        # Load config
+        try:
+            from transformers import AutoConfig
+            config = AutoConfig.from_pretrained(str(model_dir), trust_remote_code=True)
+            logging.info(f"Loaded config: {config.model_type}, {config.num_hidden_layers} layers")
+        except Exception as e:
+            logging.warning(f"Failed to load config: {e}")
+            return
+        
+        # Find checkpoint file
+        checkpoint_path = None
+        if model_path.endswith('.pt') and os.path.exists(model_path):
+            checkpoint_path = model_path
+        else:
+            # Look for final_model.pt or latest checkpoint
+            candidates = list(model_dir.glob('*.pt'))
+            if candidates:
+                # Prefer final_model.pt, then latest checkpoint
+                final_model = model_dir / 'final_model.pt'
+                if final_model.exists():
+                    checkpoint_path = str(final_model)
                 else:
-                    logging.info(f"Loaded raw state dict with {len(checkpoint)} keys")
-                    self.model = checkpoint
-                return
-            except Exception as e:
-                logging.error(f"Failed to load checkpoint: {e}")
+                    # Sort by modification time, pick latest
+                    candidates.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+                    checkpoint_path = str(candidates[0])
         
-        logging.warning(f"Teacher model not found or could not be loaded from {model_path}")
+        if not checkpoint_path or not os.path.exists(checkpoint_path):
+            logging.warning(f"No checkpoint found in {model_dir}")
+            return
+        
+        logging.info(f"Loading checkpoint: {checkpoint_path}")
+        
+        # Load model architecture
+        try:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                str(model_dir),
+                config=config,
+                torch_dtype=torch.bfloat16,
+                device_map="cpu",
+                trust_remote_code=True,
+            )
+            logging.info("Model architecture loaded")
+        except Exception as e:
+            logging.warning(f"Failed to load model architecture: {e}")
+            return
+        
+        # Load checkpoint weights
+        try:
+            checkpoint = torch.load(checkpoint_path, map_location="cpu")
+            
+            # Handle different checkpoint formats
+            state_dict = None
+            if isinstance(checkpoint, dict):
+                if 'model_state_dict' in checkpoint:
+                    state_dict = checkpoint['model_state_dict']
+                    logging.info("Found model_state_dict in checkpoint")
+                elif 'state_dict' in checkpoint:
+                    state_dict = checkpoint['state_dict']
+                    logging.info("Found state_dict in checkpoint")
+                else:
+                    # Assume it's a raw state dict
+                    state_dict = checkpoint
+                    logging.info("Using raw checkpoint dict as state_dict")
+            
+            if state_dict is not None:
+                # Remove 'module.' prefix if present (from DataParallel)
+                cleaned_state_dict = {}
+                for k, v in state_dict.items():
+                    if k.startswith('module.'):
+                        cleaned_state_dict[k[7:]] = v
+                    else:
+                        cleaned_state_dict[k] = v
+                
+                # Load into model
+                missing, unexpected = self.model.load_state_dict(cleaned_state_dict, strict=False)
+                if missing:
+                    logging.info(f"Missing keys: {len(missing)}")
+                if unexpected:
+                    logging.info(f"Unexpected keys: {len(unexpected)}")
+                
+                logging.info(f"Checkpoint loaded: {len(cleaned_state_dict)} parameters")
+            
+            self.model.eval()
+            
+            # Load tokenizer
+            try:
+                self.tokenizer = AutoTokenizer.from_pretrained(str(model_dir), trust_remote_code=True)
+            except:
+                # Fallback: use student tokenizer
+                self.tokenizer = None
+                logging.info("No tokenizer found, will use student tokenizer")
+            
+            logging.info("Teacher model loaded successfully")
+            
+        except Exception as e:
+            logging.error(f"Failed to load checkpoint: {e}")
+            self.model = None
     
     @torch.no_grad()
     def get_hidden_states(self, input_ids: torch.Tensor, layers: List[int]) -> Dict[int, torch.Tensor]:
@@ -454,9 +527,11 @@ class AugmentedStreamingDataset(IterableDataset):
     def _discover_files(self):
         for dir_path in [self.config.curatedthoughts_dir, self.config.openthoughts_dir]:
             if os.path.exists(dir_path):
-                for f in os.listdir(dir_path):
-                    if f.endswith('.parquet'):
-                        self.real_files.append(os.path.join(dir_path, f))
+                # Recursively walk subdirectories to find all .parquet files
+                for root, dirs, files in os.walk(dir_path):
+                    for f in files:
+                        if f.endswith('.parquet'):
+                            self.real_files.append(os.path.join(root, f))
     
     def _format_conversation(self, data: dict) -> str:
         if 'conversations' in data and isinstance(data['conversations'], list):
