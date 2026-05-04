@@ -90,8 +90,8 @@ class TrainConfig:
     
     # Training
     max_steps: int = 10000
-    batch_size: int = 4  # Larger batch with LoRA
-    grad_accum_steps: int = 4  # Effective batch = 16
+    batch_size: int = 1  # REDUCED from 4: OOM at 4 with teacher on CPU
+    grad_accum_steps: int = 1  # REDUCED from 4: effective batch = 1 for now
     max_seq_len: int = 512
     
     # Optimizer — 8-bit AdamW if available, else regular AdamW
@@ -832,8 +832,10 @@ def train(config: TrainConfig):
     
     # Load teacher (optional — precomputed cache makes it fast)
     if config.use_teacher:
-        logging.info("Loading teacher model (CPU)...")
+        logging.info("Loading teacher model (CPU, for cache generation only)...")
         teacher = TeacherModelWrapper(config.teacher_model_path, device="cpu")
+        # Keep teacher on CPU to save GPU memory for student + SAEs
+        logging.info(f"Teacher on CPU. GPU memory free for student: {torch.cuda.memory_allocated()/1e9:.1f}GB used")
     else:
         logging.info("Teacher distillation disabled")
         teacher = None
