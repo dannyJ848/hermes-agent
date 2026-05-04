@@ -249,3 +249,180 @@ pip install bitsandbytes  # For 8-bit AdamW
 ---
 
 *End of session. Ready for new CLI.*
+
+
+---
+
+## Session: May 4, 2026 — Training Execution & Critical Bug Fixes
+
+### What Was Built
+- GPU-accelerated teacher cache precompute: precompute_teacher_cache_gpu.py
+- Training pipeline: train_lora_sae_teacher_v1.py (patched)
+- Monitoring scripts: check_teacher_cache.sh
+
+### Critical Fixes Applied
+1. bf16 loading priority — 4-bit quantization causes MatMul8bitLt deadlock. bf16 loads in ~4 min, uses 58GB.
+2. Step counting bug — global_step must track optimizer steps (after grad_accum), not raw batches.
+3. SAE dtype mismatch — Cast SAE weights to hidden_states.dtype before matmul to avoid backward errors.
+4. Teacher cache indexing bug — index.json only saved every 100 samples; PKL files after row 99 not indexed. Fixed to save index every 50 samples with atomic writes.
+5. GPU precompute fix — Patched get_hidden_states to keep data on GPU (500x speedup). Batch_size=1 to prevent OOM on 130GB GPU.
+6. Training hang fix — Disabled on-the-fly teacher computation on CPU cache miss. Returns None instead, allowing training to continue with CE + SAE loss only.
+
+### Test Results (100 steps, batch=1)
+- Loss: 0.476 → 0.242 (49% reduction)
+- GPU: stable at 58.3GB
+- Speed: ~4-5 sec/step (batch=1)
+
+### Architecture Details
+- Student: Qwen3.6-27B-Uncensored (frozen, bf16, ~58GB GPU)
+- LoRA: rank-128, α=256, all linear layers (~637M trainable params, 2.3155%)
+- Teacher: Franken V8 (precomputed hidden states at layers [8,16,24,32,40,48])
+- SAEs: Qwen-Scope at layers [16,32,48] (feature alignment)
+- Loss: Multi-objective (CE + hidden-state MSE + SAE feature MSE)
+- Optimizer: 8-bit AdamW
+- Schedule: WSD-S (warmup 500, stable 8000, decay 1500)
+- Data: Streaming Parquet (58 files, curatedthoughts + openthoughts2-1m)
+
+### DGX Stability Issues
+- DGX Spark (GB10, 130GB GPU) reboots under sustained 27B model + training load
+- SSH becomes unresponsive during heavy training — expected behavior, system prioritizes training over network I/O
+- Do NOT panic or kill processes when SSH times out; wait for training to complete or system to become responsive
+- Running precompute + training simultaneously on GPU causes OOM and reboots
+- Rule: Only ONE GPU-intensive process at a time
+
+### Verified Paths
+- /data/models/Qwen3.6-27B-Uncensored/
+- /data/models/FrankenV8-Final/
+- /data/models/Qwen-Scope/
+- /data/datasets/curatedthoughts/
+- /data/datasets/openthoughts2-1m/
+- /mnt/bigssd/teacher_cache/ (30K+ PKL files)
+
+### What NOT to Use
+- bitsandbytes 4-bit (deadlock)
+- DeepSpeed ZeRO-3 (NCCL OOM)
+- Full fine-tuning (GPU OOM)
+- Teacher on CPU without cache (stalls training)
+- Running precompute + training on GPU simultaneously (system reboot)
+
+### Run Commands
+```bash
+# Precompute teacher cache (one-time, ~10-12 hours for full dataset)
+cd /data/SpecForge/custom_dflash
+python3 precompute_teacher_cache_gpu.py > /mnt/bigssd/precompute_teacher_cache_gpu.log 2>&1
+
+# Training (batch=1, grad_accum=1, teacher on CPU)
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+python3 train_lora_sae_teacher_v1.py > /mnt/bigssd/train_lora_sae_teacher_v1.log 2>&1
+```
+
+### Monitoring
+```bash
+# Check training progress
+tail -f /mnt/bigssd/train_lora_sae_teacher_v1.log
+
+# Check GPU usage
+nvidia-smi
+
+# Check teacher cache count
+ls /mnt/bigssd/teacher_cache/*.pkl | wc -l
+```
+
+### Repo Info
+- Branch: qwen27b-training-artifacts-may3-2026
+- Commit: e0f67051a (base), 16dd470ac (GPU precompute), 0721d9ef9 (training fixes)
+- Remote: https://github.com/dannyJ848/hermes-agent.git
+
+### Key Insight
+The training hangs were caused by on-the-fly teacher hidden state generation on CPU when cache miss. The patch returns None instead, allowing training to continue with CE + SAE loss only. This is the correct fix for stable training.
+
+*End of May 4 session.*
+
+
+
+---
+
+## Session: May 4, 2026 — Training Execution & Critical Bug Fixes
+
+### What Was Built
+- GPU-accelerated teacher cache precompute: precompute_teacher_cache_gpu.py
+- Training pipeline: train_lora_sae_teacher_v1.py (patched)
+- Monitoring scripts: check_teacher_cache.sh
+
+### Critical Fixes Applied
+1. bf16 loading priority — 4-bit quantization causes MatMul8bitLt deadlock. bf16 loads in ~4 min, uses 58GB.
+2. Step counting bug — global_step must track optimizer steps (after grad_accum), not raw batches.
+3. SAE dtype mismatch — Cast SAE weights to hidden_states.dtype before matmul to avoid backward errors.
+4. Teacher cache indexing bug — index.json only saved every 100 samples; PKL files after row 99 not indexed. Fixed to save index every 50 samples with atomic writes.
+5. GPU precompute fix — Patched get_hidden_states to keep data on GPU (500x speedup). Batch_size=1 to prevent OOM on 130GB GPU.
+6. Training hang fix — Disabled on-the-fly teacher computation on CPU cache miss. Returns None instead, allowing training to continue with CE + SAE loss only.
+
+### Test Results (100 steps, batch=1)
+- Loss: 0.476 → 0.242 (49% reduction)
+- GPU: stable at 58.3GB
+- Speed: ~4-5 sec/step (batch=1)
+
+### Architecture Details
+- Student: Qwen3.6-27B-Uncensored (frozen, bf16, ~58GB GPU)
+- LoRA: rank-128, α=256, all linear layers (~637M trainable params, 2.3155%)
+- Teacher: Franken V8 (precomputed hidden states at layers [8,16,24,32,40,48])
+- SAEs: Qwen-Scope at layers [16,32,48] (feature alignment)
+- Loss: Multi-objective (CE + hidden-state MSE + SAE feature MSE)
+- Optimizer: 8-bit AdamW
+- Schedule: WSD-S (warmup 500, stable 8000, decay 1500)
+- Data: Streaming Parquet (58 files, curatedthoughts + openthoughts2-1m)
+
+### DGX Stability Issues
+- DGX Spark (GB10, 130GB GPU) reboots under sustained 27B model + training load
+- SSH becomes unresponsive during heavy training — expected behavior, system prioritizes training over network I/O
+- Do NOT panic or kill processes when SSH times out; wait for training to complete or system to become responsive
+- Running precompute + training simultaneously on GPU causes OOM and reboots
+- Rule: Only ONE GPU-intensive process at a time
+
+### Verified Paths
+- /data/models/Qwen3.6-27B-Uncensored/
+- /data/models/FrankenV8-Final/
+- /data/models/Qwen-Scope/
+- /data/datasets/curatedthoughts/
+- /data/datasets/openthoughts2-1m/
+- /mnt/bigssd/teacher_cache/ (30K+ PKL files)
+
+### What NOT to Use
+- bitsandbytes 4-bit (deadlock)
+- DeepSpeed ZeRO-3 (NCCL OOM)
+- Full fine-tuning (GPU OOM)
+- Teacher on CPU without cache (stalls training)
+- Running precompute + training on GPU simultaneously (system reboot)
+
+### Run Commands
+```bash
+# Precompute teacher cache (one-time, ~10-12 hours for full dataset)
+cd /data/SpecForge/custom_dflash
+python3 precompute_teacher_cache_gpu.py > /mnt/bigssd/precompute_teacher_cache_gpu.log 2>&1
+
+# Training (batch=1, grad_accum=1, teacher on CPU)
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+python3 train_lora_sae_teacher_v1.py > /mnt/bigssd/train_lora_sae_teacher_v1.log 2>&1
+```
+
+### Monitoring
+```bash
+# Check training progress
+tail -f /mnt/bigssd/train_lora_sae_teacher_v1.log
+
+# Check GPU usage
+nvidia-smi
+
+# Check teacher cache count
+ls /mnt/bigssd/teacher_cache/*.pkl | wc -l
+```
+
+### Repo Info
+- Branch: qwen27b-training-artifacts-may3-2026
+- Commit: e0f67051a (base), 16dd470ac (GPU precompute), 0721d9ef9 (training fixes)
+- Remote: https://github.com/dannyJ848/hermes-agent.git
+
+### Key Insight
+The training hangs were caused by on-the-fly teacher hidden state generation on CPU when cache miss. The patch returns None instead, allowing training to continue with CE + SAE loss only. This is the correct fix for stable training.
+
+*End of May 4 session.*
