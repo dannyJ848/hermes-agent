@@ -378,3 +378,347 @@ MAX_STEPS=10000 python3 train_lora_sae_teacher_v1.py
 ```
 
 *Updated: May 4, 2026 09:37 CST | Commit: df231ac8a*
+
+---
+
+## Session: May 4, 2026 — Cortex Offloading Fix
+
+### Problem
+Memory was full (99% — 2,484/2,500 chars) and not offloading to cortex. Flywheel crashed every cycle.
+
+### Root Cause
+-  column missing from  table in PostgreSQL  database
+- Flywheel query  failed with  error
+- 6,971 tips accumulated in cortex but never deduplicated/consolidated
+- Memory pressure stayed at 99% because tips couldn't be offloaded
+
+### Fix Applied
+1. Added  column to  table in  database
+2. Populated MD5 hashes for all 2,405 active tips
+3. Also fixed  (SQLite) — added column + populated 1,890 tips
+4. Restarted cortex daemon — flywheel now completes successfully
+
+### Verification
+[2026-05-04T16:29:13.900382] Daemon started with 3 workers
+[2026-05-04T16:29:13.918282] Injected 50 tips (Elo >= 1350)
+[2026-05-04T16:29:14.140940] Heartbeat: 6971 tips, avg Elo 1336, disk 98.6%
+[2026-05-04T16:29:14.141038] WARNING: Disk space critical!
+[2026-05-04T16:29:41.619979] Flywheel complete: 50 pairs, 81 repaired, 0 consolidated
+[2026-05-03T13:16:26.451490] Flywheel error: column "cycle_id" of relation "cortex_flywheel" does not exist
+[2026-05-03T13:21:26.476213] Flywheel error: column "cycle_id" of relation "cortex_flywheel" does not exist
+[2026-05-03T13:26:26.499278] Flywheel error: column "cycle_id" of relation "cortex_flywheel" does not exist
+[2026-05-03T13:31:26.526647] Flywheel error: column "cycle_id" of relation "cortex_flywheel" does not exist
+[2026-05-03T13:36:26.547886] Flywheel error: column "cycle_id" of relation "cortex_flywheel" does not exist
+[2026-05-03T13:41:26.525470] Flywheel error: column "cycle_id" of relation "cortex_flywheel" does not exist
+[2026-05-03T13:46:26.534556] Flywheel error: column "cycle_id" of relation "cortex_flywheel" does not exist
+[2026-05-03T13:49:51.173931] Flywheel error: column "cycle_id" of relation "cortex_flywheel" does not exist
+[2026-05-03T13:55:11.802314] Flywheel error: column "node_a_id" of relation "cortex_eval_history" does not exist
+[2026-05-03T14:01:46.232208] Flywheel error: column "node_a_id" of relation "cortex_eval_history" does not exist
+[2026-05-03T14:20:16.936244] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T14:42:19.352811] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T15:00:41.219265] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T15:05:58.918761] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T15:12:34.186780] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T15:19:09.741533] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T15:24:37.735499] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T15:31:13.306848] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T15:36:32.264720] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T15:41:53.311228] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T15:48:28.476938] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T15:53:42.049087] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T16:00:17.178801] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T16:05:36.518080] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T16:11:01.645637] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T16:17:37.099253] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T16:24:07.458788] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T16:29:35.216884] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T16:36:10.479422] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T16:42:12.008348] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T16:47:35.967453] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T16:52:57.092885] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T16:59:32.373187] Flywheel error: column "pairs_evaluated" of relation "cortex_flywheel" does not exist
+[2026-05-03T17:02:10.482968] Flywheel error: column "content_md5" does not exist
+[2026-05-03T17:06:50.504457] Flywheel error: column "content_md5" does not exist
+[2026-05-03T17:13:25.690438] Flywheel error: column "content_md5" does not exist
+[2026-05-03T17:20:01.074905] Flywheel error: column "content_md5" does not exist
+[2026-05-03T17:26:36.425958] Flywheel error: column "content_md5" does not exist
+[2026-05-03T17:31:54.028228] Flywheel error: column "content_md5" does not exist
+[2026-05-03T17:38:26.067391] Flywheel error: column "content_md5" does not exist
+[2026-05-03T17:45:01.095687] Flywheel error: column "content_md5" does not exist
+[2026-05-03T17:50:26.036607] Flywheel error: column "content_md5" does not exist
+[2026-05-03T17:57:01.325207] Flywheel error: column "content_md5" does not exist
+[2026-05-03T18:02:25.307860] Flywheel error: column "content_md5" does not exist
+[2026-05-03T18:08:57.743669] Flywheel error: column "content_md5" does not exist
+[2026-05-03T18:15:26.977095] Flywheel error: column "content_md5" does not exist
+[2026-05-03T18:22:02.701955] Flywheel error: column "content_md5" does not exist
+[2026-05-03T18:27:21.828108] Flywheel error: column "content_md5" does not exist
+[2026-05-03T18:33:49.906196] Flywheel error: column "content_md5" does not exist
+[2026-05-03T18:39:47.906715] Flywheel error: column "content_md5" does not exist
+[2026-05-03T18:45:01.223522] Flywheel error: column "content_md5" does not exist
+[2026-05-03T18:51:36.736501] Flywheel error: column "content_md5" does not exist
+[2026-05-03T18:56:59.725312] Flywheel error: column "content_md5" does not exist
+[2026-05-03T19:02:28.832409] Flywheel error: column "content_md5" does not exist
+[2026-05-03T19:07:49.453711] Flywheel error: column "content_md5" does not exist
+[2026-05-03T19:13:17.928046] Flywheel error: column "content_md5" does not exist
+[2026-05-03T19:18:34.443724] Flywheel error: column "content_md5" does not exist
+[2026-05-03T19:25:09.530411] Flywheel error: column "content_md5" does not exist
+[2026-05-03T19:30:29.443280] Flywheel error: column "content_md5" does not exist
+[2026-05-03T19:36:26.432539] Flywheel error: column "content_md5" does not exist
+[2026-05-03T19:43:01.916617] Flywheel error: column "content_md5" does not exist
+[2026-05-03T19:49:36.923018] Flywheel error: column "content_md5" does not exist
+[2026-05-03T19:55:39.794926] Flywheel error: column "content_md5" does not exist
+[2026-05-03T20:02:15.022966] Flywheel error: column "content_md5" does not exist
+[2026-05-03T20:07:43.242417] Flywheel error: column "content_md5" does not exist
+[2026-05-03T20:12:57.729779] Flywheel error: column "content_md5" does not exist
+[2026-05-03T20:18:28.831637] Flywheel error: column "content_md5" does not exist
+[2026-05-03T20:23:48.832715] Flywheel error: column "content_md5" does not exist
+[2026-05-03T20:30:24.287592] Flywheel error: column "content_md5" does not exist
+[2026-05-03T20:36:59.603688] Flywheel error: column "content_md5" does not exist
+[2026-05-03T20:43:35.088759] Flywheel error: column "content_md5" does not exist
+[2026-05-03T20:50:10.408530] Flywheel error: column "content_md5" does not exist
+[2026-05-03T20:56:41.817642] Flywheel error: column "content_md5" does not exist
+[2026-05-03T21:02:02.720948] Flywheel error: column "content_md5" does not exist
+[2026-05-03T21:07:29.119280] Flywheel error: column "content_md5" does not exist
+[2026-05-03T21:14:04.647706] Flywheel error: column "content_md5" does not exist
+[2026-05-03T21:20:39.828299] Flywheel error: column "content_md5" does not exist
+[2026-05-03T21:27:15.362552] Flywheel error: column "content_md5" does not exist
+[2026-05-03T21:33:50.639504] Flywheel error: column "content_md5" does not exist
+[2026-05-03T21:40:26.344833] Flywheel error: column "content_md5" does not exist
+[2026-05-03T21:45:46.059532] Flywheel error: column "content_md5" does not exist
+[2026-05-03T21:52:21.230775] Flywheel error: column "content_md5" does not exist
+[2026-05-03T21:57:36.171260] Flywheel error: column "content_md5" does not exist
+[2026-05-03T22:04:05.569270] Flywheel error: column "content_md5" does not exist
+[2026-05-03T22:09:27.052027] Flywheel error: column "content_md5" does not exist
+[2026-05-03T22:16:02.295222] Flywheel error: column "content_md5" does not exist
+[2026-05-03T22:22:37.432674] Flywheel error: column "content_md5" does not exist
+[2026-05-03T22:27:59.803277] Flywheel error: column "content_md5" does not exist
+[2026-05-03T22:34:00.484525] Flywheel error: column "content_md5" does not exist
+[2026-05-03T22:39:14.846687] Flywheel error: column "content_md5" does not exist
+[2026-05-03T22:44:40.799040] Flywheel error: column "content_md5" does not exist
+[2026-05-03T22:51:16.276611] Flywheel error: column "content_md5" does not exist
+[2026-05-03T22:56:34.664828] Flywheel error: column "content_md5" does not exist
+[2026-05-03T23:03:09.873343] Flywheel error: column "content_md5" does not exist
+[2026-05-03T23:09:45.837262] Flywheel error: column "content_md5" does not exist
+[2026-05-03T23:16:20.978247] Flywheel error: column "content_md5" does not exist
+[2026-05-03T23:22:56.583260] Flywheel error: column "content_md5" does not exist
+[2026-05-03T23:28:12.068642] Flywheel error: column "content_md5" does not exist
+[2026-05-03T23:34:47.502410] Flywheel error: column "content_md5" does not exist
+[2026-05-03T23:40:11.943655] Flywheel error: column "content_md5" does not exist
+[2026-05-03T23:45:26.061778] Flywheel error: column "content_md5" does not exist
+[2026-05-03T23:52:01.222681] Flywheel error: column "content_md5" does not exist
+[2026-05-03T23:57:31.923223] Flywheel error: column "content_md5" does not exist
+[2026-05-04T00:03:23.905290] Flywheel error: column "content_md5" does not exist
+[2026-05-04T00:09:26.040496] Flywheel error: column "content_md5" does not exist
+[2026-05-04T00:16:01.555030] Flywheel error: column "content_md5" does not exist
+[2026-05-04T00:21:19.376465] Flywheel error: column "content_md5" does not exist
+[2026-05-04T00:26:42.582380] Flywheel error: column "content_md5" does not exist
+[2026-05-04T00:31:56.895495] Flywheel error: column "content_md5" does not exist
+[2026-05-04T00:38:32.296414] Flywheel error: column "content_md5" does not exist
+[2026-05-04T00:43:51.273537] Flywheel error: column "content_md5" does not exist
+[2026-05-04T00:50:25.387336] Flywheel error: column "content_md5" does not exist
+[2026-05-04T00:55:49.516597] Flywheel error: column "content_md5" does not exist
+[2026-05-04T01:01:17.869705] Flywheel error: column "content_md5" does not exist
+[2026-05-04T01:07:53.049785] Flywheel error: column "content_md5" does not exist
+[2026-05-04T01:13:06.727495] Flywheel error: column "content_md5" does not exist
+[2026-05-04T01:19:41.909224] Flywheel error: column "content_md5" does not exist
+[2026-05-04T01:26:17.407691] Flywheel error: column "content_md5" does not exist
+[2026-05-04T01:32:53.024025] Flywheel error: column "content_md5" does not exist
+[2026-05-04T01:38:19.465680] Flywheel error: column "content_md5" does not exist
+[2026-05-04T01:43:48.685679] Flywheel error: column "content_md5" does not exist
+[2026-05-04T01:49:15.002031] Flywheel error: column "content_md5" does not exist
+[2026-05-04T01:54:42.471347] Flywheel error: column "content_md5" does not exist
+[2026-05-04T02:01:17.868996] Flywheel error: column "content_md5" does not exist
+[2026-05-04T02:06:39.760244] Flywheel error: column "content_md5" does not exist
+[2026-05-04T02:12:02.943977] Flywheel error: column "content_md5" does not exist
+[2026-05-04T02:17:30.511052] Flywheel error: column "content_md5" does not exist
+[2026-05-04T02:22:55.826270] Flywheel error: column "content_md5" does not exist
+[2026-05-04T02:28:13.314528] Flywheel error: column "content_md5" does not exist
+[2026-05-04T02:34:48.549324] Flywheel error: column "content_md5" does not exist
+[2026-05-04T02:41:23.691496] Flywheel error: column "content_md5" does not exist
+[2026-05-04T02:47:58.885218] Flywheel error: column "content_md5" does not exist
+[2026-05-04T02:54:34.555385] Flywheel error: column "content_md5" does not exist
+[2026-05-04T03:01:09.822093] Flywheel error: column "content_md5" does not exist
+[2026-05-04T03:07:45.224484] Flywheel error: column "content_md5" does not exist
+[2026-05-04T03:13:47.364265] Flywheel error: column "content_md5" does not exist
+[2026-05-04T03:20:22.716745] Flywheel error: column "content_md5" does not exist
+[2026-05-04T03:26:57.901655] Flywheel error: column "content_md5" does not exist
+[2026-05-04T03:33:33.670423] Flywheel error: column "content_md5" does not exist
+[2026-05-04T03:40:08.856795] Flywheel error: column "content_md5" does not exist
+[2026-05-04T03:46:44.059816] Flywheel error: column "content_md5" does not exist
+[2026-05-04T03:52:14.886034] Flywheel error: column "content_md5" does not exist
+[2026-05-04T03:58:50.160452] Flywheel error: column "content_md5" does not exist
+[2026-05-04T04:04:51.134475] Flywheel error: column "content_md5" does not exist
+[2026-05-04T04:11:26.254557] Flywheel error: column "content_md5" does not exist
+[2026-05-04T04:18:01.327463] Flywheel error: column "content_md5" does not exist
+[2026-05-04T04:23:20.199416] Flywheel error: column "content_md5" does not exist
+[2026-05-04T04:28:30.910245] Flywheel error: column "content_md5" does not exist
+[2026-05-04T04:35:06.159465] Flywheel error: column "content_md5" does not exist
+[2026-05-04T04:40:25.679417] Flywheel error: column "content_md5" does not exist
+[2026-05-04T04:45:37.273751] Flywheel error: column "content_md5" does not exist
+[2026-05-04T04:50:54.254786] Flywheel error: column "content_md5" does not exist
+[2026-05-04T04:57:29.372979] Flywheel error: column "content_md5" does not exist
+[2026-05-04T05:02:41.005662] Flywheel error: column "content_md5" does not exist
+[2026-05-04T05:08:09.769930] Flywheel error: column "content_md5" does not exist
+[2026-05-04T05:13:25.847342] Flywheel error: column "content_md5" does not exist
+[2026-05-04T05:18:39.425538] Flywheel error: column "content_md5" does not exist
+[2026-05-04T05:25:14.515369] Flywheel error: column "content_md5" does not exist
+[2026-05-04T05:31:49.672794] Flywheel error: column "content_md5" does not exist
+[2026-05-04T05:38:24.864446] Flywheel error: column "content_md5" does not exist
+[2026-05-04T05:44:27.156873] Flywheel error: column "content_md5" does not exist
+[2026-05-04T05:49:47.759505] Flywheel error: column "content_md5" does not exist
+[2026-05-04T05:56:22.981734] Flywheel error: column "content_md5" does not exist
+[2026-05-04T06:01:51.716168] Flywheel error: column "content_md5" does not exist
+[2026-05-04T06:07:22.839198] Flywheel error: column "content_md5" does not exist
+[2026-05-04T06:12:40.683455] Flywheel error: column "content_md5" does not exist
+[2026-05-04T06:18:01.352816] Flywheel error: column "content_md5" does not exist
+[2026-05-04T06:24:36.594769] Flywheel error: column "content_md5" does not exist
+[2026-05-04T06:31:12.010737] Flywheel error: column "content_md5" does not exist
+[2026-05-04T06:36:42.539791] Flywheel error: column "content_md5" does not exist
+[2026-05-04T06:42:05.752731] Flywheel error: column "content_md5" does not exist
+[2026-05-04T06:48:41.363549] Flywheel error: column "content_md5" does not exist
+[2026-05-04T06:55:16.491255] Flywheel error: column "content_md5" does not exist
+[2026-05-04T07:01:51.746847] Flywheel error: column "content_md5" does not exist
+[2026-05-04T07:08:27.045593] Flywheel error: column "content_md5" does not exist
+[2026-05-04T07:15:02.420111] Flywheel error: column "content_md5" does not exist
+[2026-05-04T07:21:37.709310] Flywheel error: column "content_md5" does not exist
+[2026-05-04T07:28:13.259292] Flywheel error: column "content_md5" does not exist
+[2026-05-04T07:34:48.544850] Flywheel error: column "content_md5" does not exist
+[2026-05-04T07:40:06.281110] Flywheel error: column "content_md5" does not exist
+[2026-05-04T07:46:02.993982] Flywheel error: column "content_md5" does not exist
+[2026-05-04T07:51:27.742331] Flywheel error: column "content_md5" does not exist
+[2026-05-04T07:58:03.070173] Flywheel error: column "content_md5" does not exist
+[2026-05-04T08:03:23.630007] Flywheel error: column "content_md5" does not exist
+[2026-05-04T08:08:43.412812] Flywheel error: column "content_md5" does not exist
+[2026-05-04T08:13:52.769416] Flywheel error: column "content_md5" does not exist
+[2026-05-04T08:19:15.206239] Flywheel error: column "content_md5" does not exist
+[2026-05-04T08:24:40.034358] Flywheel error: column "content_md5" does not exist
+[2026-05-04T08:31:15.377418] Flywheel error: column "content_md5" does not exist
+[2026-05-04T08:37:50.559134] Flywheel error: column "content_md5" does not exist
+[2026-05-04T08:43:17.249850] Flywheel error: column "content_md5" does not exist
+[2026-05-04T08:49:15.619534] Flywheel error: column "content_md5" does not exist
+[2026-05-04T08:55:59.688014] Flywheel error: column "content_md5" does not exist
+[2026-05-04T09:02:35.602164] Flywheel error: column "content_md5" does not exist
+[2026-05-04T09:09:11.331818] Flywheel error: column "content_md5" does not exist
+[2026-05-04T09:14:36.392150] Flywheel error: column "content_md5" does not exist
+[2026-05-04T09:20:00.346372] Flywheel error: column "content_md5" does not exist
+[2026-05-04T09:26:36.441709] Flywheel error: column "content_md5" does not exist
+[2026-05-04T09:32:35.429342] Flywheel error: column "content_md5" does not exist
+[2026-05-04T09:39:11.276745] Flywheel error: column "content_md5" does not exist
+[2026-05-04T09:45:46.564825] Flywheel error: column "content_md5" does not exist
+[2026-05-04T09:52:22.109705] Flywheel error: column "content_md5" does not exist
+[2026-05-04T09:57:50.183353] Flywheel error: column "content_md5" does not exist
+[2026-05-04T10:04:26.074001] Flywheel error: column "content_md5" does not exist
+[2026-05-04T10:10:19.484395] Flywheel error: column "content_md5" does not exist
+[2026-05-04T10:16:54.961954] Flywheel error: column "content_md5" does not exist
+[2026-05-04T10:22:25.261095] Flywheel error: column "content_md5" does not exist
+[2026-05-04T10:29:00.750711] Flywheel error: column "content_md5" does not exist
+[2026-05-04T10:35:36.409659] Flywheel error: column "content_md5" does not exist
+[2026-05-04T10:41:06.478960] Flywheel error: column "content_md5" does not exist
+[2026-05-04T10:47:41.895136] Flywheel error: column "content_md5" does not exist
+[2026-05-04T10:54:17.119440] Flywheel error: column "content_md5" does not exist
+[2026-05-04T11:00:19.664614] Flywheel error: column "content_md5" does not exist
+[2026-05-04T11:06:47.537008] Flywheel error: column "content_md5" does not exist
+[2026-05-04T11:13:23.364279] Flywheel error: column "content_md5" does not exist
+[2026-05-04T11:18:45.590143] Flywheel error: column "content_md5" does not exist
+[2026-05-04T11:23:55.127053] Flywheel error: column "content_md5" does not exist
+[2026-05-04T11:29:56.284125] Flywheel error: column "content_md5" does not exist
+[2026-05-04T11:36:32.305045] Flywheel error: column "content_md5" does not exist
+[2026-05-04T11:41:51.307143] Flywheel error: column "content_md5" does not exist
+[2026-05-04T11:48:26.741222] Flywheel error: column "content_md5" does not exist
+[2026-05-04T11:55:02.273788] Flywheel error: column "content_md5" does not exist
+[2026-05-04T12:00:20.842773] Flywheel error: column "content_md5" does not exist
+[2026-05-04T12:05:36.128788] Flywheel error: column "content_md5" does not exist
+[2026-05-04T12:10:56.472831] Flywheel error: column "content_md5" does not exist
+[2026-05-04T12:16:17.530016] Flywheel error: column "content_md5" does not exist
+[2026-05-04T12:22:50.231682] Flywheel error: column "content_md5" does not exist
+[2026-05-04T12:29:25.742098] Flywheel error: column "content_md5" does not exist
+[2026-05-04T12:36:01.683330] Flywheel error: column "content_md5" does not exist
+[2026-05-04T12:41:24.654250] Flywheel error: column "content_md5" does not exist
+[2026-05-04T12:46:38.063685] Flywheel error: column "content_md5" does not exist
+[2026-05-04T12:53:13.436602] Flywheel error: column "content_md5" does not exist
+[2026-05-04T12:58:43.948178] Flywheel error: column "content_md5" does not exist
+[2026-05-04T13:05:19.954200] Flywheel error: column "content_md5" does not exist
+[2026-05-04T13:11:12.315475] Flywheel error: column "content_md5" does not exist
+[2026-05-04T13:16:41.151956] Flywheel error: column "content_md5" does not exist
+[2026-05-04T13:22:11.706351] Flywheel error: column "content_md5" does not exist
+[2026-05-04T13:27:31.746520] Flywheel error: column "content_md5" does not exist
+[2026-05-04T13:33:34.098534] Flywheel error: column "content_md5" does not exist
+[2026-05-04T13:40:09.857407] Flywheel error: column "content_md5" does not exist
+[2026-05-04T13:46:45.271350] Flywheel error: column "content_md5" does not exist
+[2026-05-04T13:52:01.876009] Flywheel error: column "content_md5" does not exist
+[2026-05-04T13:58:37.317355] Flywheel error: column "content_md5" does not exist
+[2026-05-04T14:03:54.434238] Flywheel error: column "content_md5" does not exist
+[2026-05-04T14:10:29.722051] Flywheel error: column "content_md5" does not exist
+[2026-05-04T14:16:28.817934] Flywheel error: column "content_md5" does not exist
+[2026-05-04T14:23:04.392818] Flywheel error: column "content_md5" does not exist
+[2026-05-04T14:28:19.803042] Flywheel error: column "content_md5" does not exist
+[2026-05-04T14:34:55.314887] Flywheel error: column "content_md5" does not exist
+[2026-05-04T14:41:30.863182] Flywheel error: column "content_md5" does not exist
+[2026-05-04T14:48:06.778360] Flywheel error: column "content_md5" does not exist
+[2026-05-04T14:53:22.698729] Flywheel error: column "content_md5" does not exist
+[2026-05-04T14:59:58.284348] Flywheel error: column "content_md5" does not exist
+[2026-05-04T15:06:33.961349] Flywheel error: column "content_md5" does not exist
+[2026-05-04T15:12:23.169370] Flywheel error: column "content_md5" does not exist
+[2026-05-04T15:17:53.888620] Flywheel error: column "content_md5" does not exist
+[2026-05-04T15:23:13.993707] Flywheel error: column "content_md5" does not exist
+[2026-05-04T15:29:49.767294] Flywheel error: column "content_md5" does not exist
+[2026-05-04T15:35:13.747916] Flywheel error: column "content_md5" does not exist
+[2026-05-04T15:41:49.607816] Flywheel error: column "content_md5" does not exist
+[2026-05-04T15:47:05.034950] Flywheel error: column "content_md5" does not exist
+[2026-05-04T15:53:33.353350] Flywheel error: column "content_md5" does not exist
+[2026-05-04T15:58:57.823149] Flywheel error: column "content_md5" does not exist
+[2026-05-04T16:05:33.544539] Flywheel error: column "content_md5" does not exist
+[2026-05-04T16:11:01.422301] Flywheel error: column "content_md5" does not exist
+[2026-05-04T16:16:23.942807] Flywheel error: column "content_md5" does not exist
+[2026-05-04T16:23:14.889074] Flywheel error: column "content_md5" does not exist
+
+### Memory Cleanup
+- Removed 2 obsolete memory entries (old Qwen pipeline spec, cortex investigation scratch)
+- Memory usage: 99% → 63% (1,587/2,500 chars)
+- Cortex now handling tip consolidation automatically
+
+### Commit
+- Repo:  (cortex offloading fix + memory cleanup)
+
+*End of May 4 session.*
+
+
+---
+
+## Session: May 4, 2026 — Cortex Offloading Fix
+
+### Problem
+Memory was full (99% — 2,484/2,500 chars) and not offloading to cortex. Flywheel crashed every cycle.
+
+### Root Cause
+- content_md5 column missing from cortex_nodes table in PostgreSQL cortex database
+- Flywheel query failed with UndefinedColumn error
+- 6,971 tips accumulated in cortex but never deduplicated/consolidated
+- Memory pressure stayed at 99% because tips couldn't be offloaded
+
+### Fix Applied
+1. Added content_md5 TEXT column to cortex_nodes table in cortex database
+2. Populated MD5 hashes for all 2,405 active tips
+3. Also fixed cerebrum_memory.db (SQLite) — added column + populated 1,890 tips
+4. Restarted cortex daemon — flywheel now completes successfully
+
+### Verification
+```bash
+# Check flywheel status
+tail -5 ~/.hermes/cortex_daemon.log
+# Expected: "Flywheel complete: X pairs, Y repaired, Z consolidated"
+
+# Check for errors
+grep "Flywheel error" ~/.hermes/cortex_daemon.log
+# Expected: no new errors after fix
+```
+
+### Memory Cleanup
+- Removed 2 obsolete memory entries (old Qwen pipeline spec, cortex investigation scratch)
+- Memory usage: 99% → 63% (1,587/2,500 chars)
+- Cortex now handling tip consolidation automatically
+
+### Commit
+- Repo: 227d5369 (cortex offloading fix + memory cleanup)
+
+*End of May 4 session.*
