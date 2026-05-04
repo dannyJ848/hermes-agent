@@ -107,8 +107,8 @@ class TrainConfig:
     stable_steps: int = 8000
     decay_steps: int = 1500
     
-    # Teacher distillation (disable if teacher too slow on CPU)
-    use_teacher: bool = True
+    # Teacher distillation
+    use_teacher: bool = True  # Now fast via precomputed cache
     teacher_layers: List[int] = field(default_factory=lambda: [8, 16, 24, 32, 40, 48])
     teacher_weight: float = 0.3
     temperature: float = 2.0
@@ -830,7 +830,7 @@ def train(config: TrainConfig):
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
     
-    # Load teacher (optional — disable if too slow on CPU)
+    # Load teacher (optional — precomputed cache makes it fast)
     if config.use_teacher:
         logging.info("Loading teacher model (CPU)...")
         teacher = TeacherModelWrapper(config.teacher_model_path, device="cpu")
