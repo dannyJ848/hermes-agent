@@ -751,44 +751,44 @@ def train(config: TrainConfig):
     # or 4-bit quantization to fit in GPU memory
     logging.info("Loading student model...")
     
-    # Try bf16 first (fastest loading)
+    # Try 4-bit first (memory-efficient)
     loaded = False
     try:
-        logging.info("Loading student model (bf16)...")
+        logging.info("Loading student model (4-bit)...")
+        from transformers import BitsAndBytesConfig
+        from peft import prepare_model_for_kbit_training
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=torch.bfloat16,
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_quant_type="nf4",
+        )
         model = AutoModelForCausalLM.from_pretrained(
             config.student_model_path,
-            torch_dtype=torch.bfloat16,
+            quantization_config=bnb_config,
             device_map="auto",
             trust_remote_code=True,
         )
+        model = prepare_model_for_kbit_training(model)
         loaded = True
-        logging.info("Loaded model in bf16")
+        logging.info("Loaded model in 4-bit quantization")
     except Exception as e:
-        logging.warning(f"bf16 loading failed: {e}")
+        logging.warning(f"4-bit loading failed: {e}")
     
-    # Fallback to 4-bit
+    # Fallback to bf16
     if not loaded:
         try:
-            logging.info("Trying 4-bit quantization...")
-            from transformers import BitsAndBytesConfig
-            from peft import prepare_model_for_kbit_training
-            bnb_config = BitsAndBytesConfig(
-                load_in_4bit=True,
-                bnb_4bit_compute_dtype=torch.bfloat16,
-                bnb_4bit_use_double_quant=True,
-                bnb_4bit_quant_type="nf4",
-            )
+            logging.info("Trying bf16...")
             model = AutoModelForCausalLM.from_pretrained(
                 config.student_model_path,
-                quantization_config=bnb_config,
+                torch_dtype=torch.bfloat16,
                 device_map="auto",
                 trust_remote_code=True,
             )
-            model = prepare_model_for_kbit_training(model)
             loaded = True
-            logging.info("Loaded model in 4-bit quantization")
+            logging.info("Loaded model in bf16")
         except Exception as e:
-            logging.warning(f"4-bit loading failed: {e}")
+            logging.warning(f"bf16 loading failed: {e}")
     
     # Fallback to 8-bit
     if not loaded:

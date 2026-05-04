@@ -10,7 +10,7 @@ config.use_teacher = False  # Skip slow teacher on CPU
 config.use_sae = True
 config.use_curriculum = True
 config.max_steps = 100  # Just 100 steps for testing
-config.batch_size = 4
+config.batch_size = 1
 config.grad_accum_steps = 4
 
 print("=" * 70)
