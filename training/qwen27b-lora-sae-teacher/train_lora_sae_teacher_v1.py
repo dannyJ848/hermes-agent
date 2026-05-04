@@ -468,7 +468,8 @@ class TeacherHiddenStateCache:
                 logging.warning(f"Cache load failed for {sample_id}: {e}")
         
         # Compute from teacher
-        if self.teacher.model is not None:
+        # Cache teacher hidden states if teacher available
+        if self.teacher is not None and self.teacher.model is not None:
             hidden_states = self.teacher.get_hidden_states(input_ids, self.layers)
             
             # Save to cache
@@ -608,8 +609,8 @@ class AugmentedStreamingDataset(IterableDataset):
         return str(data)
     
     def _generate_synthetic_sample(self) -> Dict:
-        """Generate a synthetic reasoning trace from teacher."""
-        if self.teacher.model is None:
+        # Generate synthetic reasoning trace from teacher
+        if self.teacher is None or self.teacher.model is None:
             return None
         
         # Prompts for synthetic reasoning
@@ -821,8 +822,7 @@ def train(config: TrainConfig):
         teacher = TeacherModelWrapper(config.teacher_model_path, device="cpu")
     else:
         logging.info("Teacher distillation disabled")
-        teacher = TeacherModelWrapper(config.teacher_model_path, device="cpu")
-        teacher.model = None  # Don't actually load
+        teacher = None
     
     # Load SAEs
     logging.info("Loading SAEs...")
@@ -952,7 +952,7 @@ def train(config: TrainConfig):
         
         # Teacher distillation loss
         distill_loss = torch.tensor(0.0, device=device)
-        if config.use_teacher and teacher.model is not None:
+        if config.use_teacher and teacher is not None and teacher.model is not None:
             # Get cached teacher hidden states
             teacher_hidden = teacher_cache.get(f"step_{global_step}", input_ids)
             
