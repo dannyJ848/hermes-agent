@@ -259,19 +259,29 @@ class TeacherModelWrapper:
         
         logging.info(f"Loading checkpoint: {checkpoint_path}")
         
-        # Load model architecture
+        # Load model architecture directly from config (no from_pretrained since no HF weights)
         try:
-            self.model = AutoModelForCausalLM.from_pretrained(
-                str(model_dir),
-                config=config,
-                torch_dtype=torch.bfloat16,
-                device_map="cpu",
-                trust_remote_code=True,
-            )
-            logging.info("Model architecture loaded")
+            from transformers import AutoModelForCausalLM
+            # Instantiate model class directly from config
+            self.model = AutoModelForCausalLM.from_config(config, trust_remote_code=True)
+            self.model = self.model.to(torch.bfloat16)
+            logging.info("Model architecture instantiated from config")
         except Exception as e:
-            logging.warning(f"Failed to load model architecture: {e}")
-            return
+            logging.warning(f"Failed to instantiate model from config: {e}")
+            # Fallback: try loading with empty state dict
+            try:
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    str(model_dir),
+                    config=config,
+                    torch_dtype=torch.bfloat16,
+                    device_map="cpu",
+                    trust_remote_code=True,
+                    state_dict={},  # Empty state dict to bypass weight loading
+                )
+                logging.info("Model loaded with empty state dict")
+            except Exception as e2:
+                logging.warning(f"Fallback also failed: {e2}")
+                return
         
         # Load checkpoint weights
         try:
@@ -310,6 +320,7 @@ class TeacherModelWrapper:
                 logging.info(f"Checkpoint loaded: {len(cleaned_state_dict)} parameters")
             
             self.model.eval()
+            self.model = self.model.to("cpu")
             
             # Load tokenizer
             try:
@@ -842,8 +853,44 @@ def train(config: TrainConfig):
     accumulated_distill = 0.0
     accumulated_sae = 0.0
     
+    # Custom collate function to pad sequences to same length
+    def collate_fn(batch):
+        # Find max length in this batch
+        max_len = max(item['input_ids'].shape[0] for item in batch)
+        
+        pad_token_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
+        
+        # Pad all sequences to max_len
+        input_ids_list = []
+        labels_list = []
+        sources = []
+        steps = []
+        
+        for item in batch:
+            seq_len = item['input_ids'].shape[0]
+            if seq_len < max_len:
+                # Pad
+                padding = torch.full((max_len - seq_len,), pad_token_id, dtype=torch.long)
+                input_ids = torch.cat([item['input_ids'], padding])
+                labels = torch.cat([item['labels'], padding])
+            else:
+                input_ids = item['input_ids']
+                labels = item['labels']
+            
+            input_ids_list.append(input_ids)
+            labels_list.append(labels)
+            sources.append(item.get('source', 'real'))
+            steps.append(item.get('step', 0))
+        
+        return {
+            'input_ids': torch.stack(input_ids_list),
+            'labels': torch.stack(labels_list),
+            'source': sources,
+            'step': steps,
+        }
+    
     # Create dataloader
-    dataloader = DataLoader(dataset, batch_size=config.batch_size, num_workers=0)
+    dataloader = DataLoader(dataset, batch_size=config.batch_size, num_workers=0, collate_fn=collate_fn)
     
     for batch in dataloader:
         if global_step >= config.max_steps:
