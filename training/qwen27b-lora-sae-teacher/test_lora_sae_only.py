@@ -6,9 +6,9 @@ sys.path.insert(0, '/data/SpecForge/custom_dflash')
 from train_lora_sae_teacher_v1 import TrainConfig, train
 
 config = TrainConfig()
-config.use_teacher = False  # Disable teacher - causes dtype issues with quantization
-config.use_sae = False  # Disable SAE - causes dtype issues with quantization
-config.use_curriculum = False
+config.use_teacher = False  # Keep teacher disabled for now (CPU bottleneck)
+config.use_sae = True  # Enable SAE - bf16 should work
+config.use_curriculum = True
 config.max_steps = 100  # Just 100 steps for testing
 config.batch_size = 1
 config.grad_accum_steps = 4
