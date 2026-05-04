@@ -90,7 +90,7 @@ class TrainConfig:
     
     # Training
     max_steps: int = 10000
-    batch_size: int = 4  # Larger batch with LoRA
+    batch_size: int = 1  # Larger batch with LoRA
     grad_accum_steps: int = 4  # Effective batch = 16
     max_seq_len: int = 512
     
@@ -896,9 +896,9 @@ def train(config: TrainConfig):
     # Disable use_cache to avoid conflict with gradient checkpointing
     model.config.use_cache = False
     
-    # Disable gradient checkpointing if enabled (causes use_reentrant deadlock)
+    # Enable gradient checkpointing with use_reentrant=False for stability
     if hasattr(model, 'gradient_checkpointing_enable'):
-        model.gradient_checkpointing_disable()
+        model.gradient_checkpointing_enable({"use_reentrant": False})
     
     model.train()
     
