@@ -948,15 +948,11 @@ def train(config: TrainConfig):
         
         # Forward pass
         outputs = model(input_ids=input_ids, labels=labels, output_hidden_states=True)
-        ce_loss = outputs.loss.float() if outputs.loss is not None else torch.tensor(0.0, device=device)
+        ce_loss = outputs.loss if outputs.loss is not None else torch.tensor(0.0, device=device)
         student_hidden_states = outputs.hidden_states
         
-        # Cast hidden states to float32 for loss computation
-        if student_hidden_states is not None:
-            student_hidden_states = [h.float() if h is not None else h for h in student_hidden_states]
-        
         # Teacher distillation loss
-        distill_loss = torch.tensor(0.0, device=device)
+        distill_loss = torch.tensor(0.0, device=device, dtype=ce_loss.dtype)
         if config.use_teacher and teacher is not None and teacher.model is not None:
             # Get cached teacher hidden states
             teacher_hidden = teacher_cache.get(f"step_{global_step}", input_ids)
@@ -975,7 +971,7 @@ def train(config: TrainConfig):
                 distill_loss = distill_loss / len(teacher_hidden)
         
         # SAE feature alignment loss
-        sae_loss = torch.tensor(0.0, device=device)
+        sae_loss = torch.tensor(0.0, device=device, dtype=ce_loss.dtype)
         if config.use_sae and saes:
             for layer_idx, sae in saes.items():
                 if layer_idx < len(student_hidden_states):
