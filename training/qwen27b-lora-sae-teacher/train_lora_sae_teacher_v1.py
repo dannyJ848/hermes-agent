@@ -623,13 +623,61 @@ def train(config: TrainConfig):
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     
-    # Load student model
+    # Load student model — use device_map for automatic placement
+    # or 4-bit quantization to fit in GPU memory
     logging.info("Loading student model...")
-    model = AutoModelForCausalLM.from_pretrained(
-        config.student_model_path,
-        torch_dtype=torch.bfloat16,
-        trust_remote_code=True,
-    ).to(device)
+    
+    # Try 4-bit quantization first to save memory
+    loaded_quantized = False
+    try:
+        from transformers import BitsAndBytesConfig
+        from peft import prepare_model_for_kbit_training
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=torch.bfloat16,
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_quant_type="nf4",
+        )
+        model = AutoModelForCausalLM.from_pretrained(
+            config.student_model_path,
+            quantization_config=bnb_config,
+            device_map="auto",
+            trust_remote_code=True,
+        )
+        model = prepare_model_for_kbit_training(model)
+        loaded_quantized = True
+        logging.info("Loaded model in 4-bit quantization")
+    except Exception as e:
+        logging.warning(f"4-bit loading failed: {e}")
+    
+    # Try 8-bit if 4-bit failed
+    if not loaded_quantized:
+        try:
+            from transformers import BitsAndBytesConfig
+            from peft import prepare_model_for_kbit_training
+            bnb_config = BitsAndBytesConfig(load_in_8bit=True)
+            model = AutoModelForCausalLM.from_pretrained(
+                config.student_model_path,
+                quantization_config=bnb_config,
+                device_map="auto",
+                trust_remote_code=True,
+            )
+            model = prepare_model_for_kbit_training(model)
+            loaded_quantized = True
+            logging.info("Loaded model in 8-bit quantization")
+        except Exception as e:
+            logging.warning(f"8-bit loading failed: {e}")
+    
+    # Fallback to bf16 with device_map
+    if not loaded_quantized:
+        logging.info("Trying bf16 with automatic device placement...")
+        model = AutoModelForCausalLM.from_pretrained(
+            config.student_model_path,
+            torch_dtype=torch.bfloat16,
+            device_map="auto",
+            trust_remote_code=True,
+        )
+        logging.info("Loaded model in bf16 with automatic device placement")
     
     # Apply LoRA
     logging.info("Applying LoRA...")
