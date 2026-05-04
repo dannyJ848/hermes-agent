@@ -45,8 +45,9 @@ class TrainingConfig:
     sae_dir: str = "/data/models/Qwen-Scope/"
     
     # Data paths
-    slimorca_dir: str = "/data/datasets/slimorca/"
-    openhermes_dir: str = "/data/datasets/openhermes/"
+    slimorca_dir: str = "/data/datasets/curatedthoughts/"
+    openhermes_dir: str = "/data/datasets/openthoughts2-1m/"
+    synthetic_dir: str = "/mnt/bigssd/synthetic_reasoning/"
     hidden_states_dir: str = "/data/SpecForge/custom_dflash/hidden_states_full/"
     
     # Output
@@ -83,9 +84,9 @@ class TrainingConfig:
     temperature: float = 2.0
     
     # Data mixing ratios
-    slimorca_ratio: float = 0.35
-    openhermes_ratio: float = 0.35
-    synthetic_ratio: float = 0.30
+    slimorca_ratio: float = 0.33
+    openhermes_ratio: float = 0.33
+    synthetic_ratio: float = 0.34
     
     # Checkpointing
     save_every: int = 50
@@ -255,60 +256,110 @@ class MixedReasoningDataset(IterableDataset):
         self.total_samples = len(self.slimorca_samples) + len(self.openhermes_samples)
         
     def _load_slimorca(self):
-        """Load SlimOrca-200k dataset."""
+        """Load curatedthoughts/OpenThoughts-114k dataset."""
         samples = []
-        data_file = os.path.join(self.config.slimorca_dir, "train.jsonl")
-        if os.path.exists(data_file):
-            with open(data_file, 'r') as f:
-                for i, line in enumerate(f):
-                    if i >= 50000:  # Subsample for memory
-                        break
-                    data = json.loads(line)
-                    text = self._format_conversation(data)
-                    tokens = self.tokenizer(text, truncation=True, 
-                                          max_length=self.config.max_seq_len,
-                                          return_tensors="pt")
-                    samples.append({
-                        'input_ids': tokens['input_ids'].squeeze(0),
-                        'labels': tokens['input_ids'].squeeze(0).clone(),
-                        'source': 'slimorca'
-                    })
+        data_dir = os.path.join(self.config.slimorca_dir, "OpenThoughts-114k-math-default/")
+        if os.path.exists(data_dir):
+            parquet_files = sorted(glob.glob(os.path.join(data_dir, "*.parquet")))
+            logging.info(f"Found {len(parquet_files)} curatedthoughts parquet files")
+            for pf in parquet_files[:1]:  # Load only 1 file for fast startup
+                try:
+                    import pandas as pd
+                    logging.info(f"Loading {os.path.basename(pf)}...")
+                    df = pd.read_parquet(pf)
+                    logging.info(f"Tokenizing {len(df)} samples...")
+                    for i, (_, row) in enumerate(df.iterrows()):
+                        if i % 1000 == 0:
+                            logging.info(f"  Tokenized {i}/{len(df)} samples...")
+                        text = self._format_conversation(row.to_dict())
+                        tokens = self.tokenizer(text, truncation=True, 
+                                              max_length=self.config.max_seq_len,
+                                              return_tensors="pt")
+                        samples.append({
+                            'input_ids': tokens['input_ids'].squeeze(0),
+                            'labels': tokens['input_ids'].squeeze(0).clone(),
+                            'source': 'curatedthoughts'
+                        })
+                    logging.info(f"Loaded {len(samples)} curatedthoughts samples")
+                except Exception as e:
+                    logging.warning(f"Failed to load {pf}: {e}")
         return samples
     
     def _load_openhermes(self):
-        """Load OpenHermes-200k dataset."""
+        """Load openthoughts2-1m dataset."""
         samples = []
-        data_file = os.path.join(self.config.openhermes_dir, "train.jsonl")
-        if os.path.exists(data_file):
-            with open(data_file, 'r') as f:
-                for i, line in enumerate(f):
-                    if i >= 50000:  # Subsample for memory
-                        break
-                    data = json.loads(line)
-                    text = self._format_conversation(data)
-                    tokens = self.tokenizer(text, truncation=True,
-                                          max_length=self.config.max_seq_len,
-                                          return_tensors="pt")
-                    samples.append({
-                        'input_ids': tokens['input_ids'].squeeze(0),
-                        'labels': tokens['input_ids'].squeeze(0).clone(),
-                        'source': 'openhermes'
-                    })
+        data_dir = os.path.join(self.config.openhermes_dir, "data/")
+        if os.path.exists(data_dir):
+            parquet_files = sorted(glob.glob(os.path.join(data_dir, "*.parquet")))
+            logging.info(f"Found {len(parquet_files)} openthoughts2 parquet files")
+            for pf in parquet_files[:1]:  # Load only 1 file for fast startup
+                try:
+                    import pandas as pd
+                    logging.info(f"Loading {os.path.basename(pf)}...")
+                    df = pd.read_parquet(pf)
+                    logging.info(f"Tokenizing {len(df)} samples...")
+                    for i, (_, row) in enumerate(df.iterrows()):
+                        if i % 1000 == 0:
+                            logging.info(f"  Tokenized {i}/{len(df)} samples...")
+                        text = self._format_conversation(row.to_dict())
+                        tokens = self.tokenizer(text, truncation=True,
+                                              max_length=self.config.max_seq_len,
+                                              return_tensors="pt")
+                        samples.append({
+                            'input_ids': tokens['input_ids'].squeeze(0),
+                            'labels': tokens['input_ids'].squeeze(0).clone(),
+                            'source': 'openthoughts2'
+                        })
+                    logging.info(f"Loaded {len(samples)} openthoughts2 samples")
+                except Exception as e:
+                    logging.warning(f"Failed to load {pf}: {e}")
         return samples
     
     def _format_conversation(self, data):
         """Format conversation data into text."""
-        if 'conversations' in data:
+        # Helper to safely get conversations/messages as list
+        def get_list(key):
+            if key not in data:
+                return []
+            val = data[key]
+            if hasattr(val, 'tolist'):  # numpy array
+                return val.tolist()
+            return val if isinstance(val, list) else []
+        
+        # Handle 'conversations' key
+        conversations = get_list('conversations')
+        if conversations:
             parts = []
-            for turn in data['conversations']:
-                role = turn.get('from', turn.get('role', 'user'))
-                content = turn.get('value', turn.get('content', ''))
-                parts.append(f"<{role}>\n{content}\n</{role}>")
-            return "\n".join(parts)
-        elif 'instruction' in data and 'output' in data:
-            return f"<instruction>\n{data['instruction']}\n</instruction>\n<response>\n{data['output']}\n</response>"
-        else:
-            return str(data)
+            for turn in conversations:
+                if isinstance(turn, dict):
+                    role = turn.get('from', turn.get('role', 'user'))
+                    content = turn.get('value', turn.get('content', ''))
+                    parts.append(f"<{role}>\n{content}\n</{role}>")
+            if parts:
+                return "\n".join(parts)
+        
+        # Handle 'messages' key
+        messages = get_list('messages')
+        if messages:
+            parts = []
+            for turn in messages:
+                if isinstance(turn, dict):
+                    role = turn.get('role', turn.get('from', 'user'))
+                    content = turn.get('content', turn.get('value', ''))
+                    parts.append(f"<{role}>\n{content}\n</{role}>")
+            if parts:
+                return "\n".join(parts)
+        
+        # Handle 'problem' + 'solution' format
+        if 'problem' in data and 'solution' in data:
+            return f"<problem>\n{data['problem']}\n</problem>\n<solution>\n{data['solution']}\n</solution>"
+        
+        # Handle 'question'
+        if 'question' in data:
+            return f"<question>\n{data['question']}\n</question>"
+        
+        # Fallback
+        return str(data)
     
     def __iter__(self):
         """Infinite iterator with curriculum learning."""
