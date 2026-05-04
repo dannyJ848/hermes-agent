@@ -107,14 +107,16 @@ class TrainConfig:
     stable_steps: int = 8000
     decay_steps: int = 1500
     
-    # SAE
+    # Teacher distillation (disable if teacher too slow on CPU)
+    use_teacher: bool = True
+    teacher_layers: List[int] = field(default_factory=lambda: [8, 16, 24, 32, 40, 48])
+    teacher_weight: float = 0.3
+    temperature: float = 2.0
+    
+    # SAE guidance
+    use_sae: bool = True
     sae_layers: List[int] = field(default_factory=lambda: [16, 32, 48])
     sae_weight: float = 0.1
-    
-    # Teacher distillation
-    teacher_weight: float = 0.3
-    teacher_layers: List[int] = field(default_factory=lambda: [8, 16, 24, 32, 40, 48])
-    temperature: float = 2.0
     
     # Synthetic data generation
     synthetic_ratio: float = 0.3  # 30% synthetic from Franken V8
@@ -778,9 +780,14 @@ def train(config: TrainConfig):
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
     
-    # Load teacher
-    logging.info("Loading teacher model (CPU)...")
-    teacher = TeacherModelWrapper(config.teacher_model_path, device="cpu")
+    # Load teacher (optional — disable if too slow on CPU)
+    if config.use_teacher:
+        logging.info("Loading teacher model (CPU)...")
+        teacher = TeacherModelWrapper(config.teacher_model_path, device="cpu")
+    else:
+        logging.info("Teacher distillation disabled")
+        teacher = TeacherModelWrapper(config.teacher_model_path, device="cpu")
+        teacher.model = None  # Don't actually load
     
     # Load SAEs
     logging.info("Loading SAEs...")
@@ -791,7 +798,10 @@ def train(config: TrainConfig):
             saes[layer_idx] = sae
     
     # Initialize caches
-    teacher_cache = TeacherHiddenStateCache(config.teacher_cache_dir, teacher, config.teacher_layers)
+    if config.use_teacher:
+        teacher_cache = TeacherHiddenStateCache(config.teacher_cache_dir, teacher, config.teacher_layers)
+    else:
+        teacher_cache = None
     
     # Dataset
     logging.info("Loading dataset...")
@@ -907,7 +917,7 @@ def train(config: TrainConfig):
         
         # Teacher distillation loss
         distill_loss = torch.tensor(0.0, device=device)
-        if teacher.model is not None:
+        if config.use_teacher and teacher.model is not None:
             # Get cached teacher hidden states
             teacher_hidden = teacher_cache.get(f"step_{global_step}", input_ids)
             
@@ -926,7 +936,7 @@ def train(config: TrainConfig):
         
         # SAE feature alignment loss
         sae_loss = torch.tensor(0.0, device=device)
-        if saes:
+        if config.use_sae and saes:
             for layer_idx, sae in saes.items():
                 if layer_idx < len(student_hidden_states):
                     student_h = student_hidden_states[layer_idx]
@@ -935,14 +945,20 @@ def train(config: TrainConfig):
                     student_features = get_sae_feature_acts(student_h, sae)
                     
                     # Get teacher SAE features (from cached teacher hidden states)
-                    teacher_h = teacher_cache.get(f"step_{global_step}", input_ids)
-                    if teacher_h and layer_idx in teacher_h:
-                        teacher_features = get_sae_feature_acts(
-                            teacher_h[layer_idx].to(device), sae
-                        )
-                        
-                        if student_features is not None and teacher_features is not None:
-                            sae_loss += compute_sae_loss(student_features, teacher_features)
+                    if config.use_teacher:
+                        teacher_h = teacher_cache.get(f"step_{global_step}", input_ids)
+                        if teacher_h and layer_idx in teacher_h:
+                            teacher_features = get_sae_feature_acts(
+                                teacher_h[layer_idx].to(device), sae
+                            )
+                            
+                            if student_features is not None and teacher_features is not None:
+                                sae_loss += compute_sae_loss(student_features, teacher_features)
+                    else:
+                        # Without teacher, just regularize SAE features
+                        if student_features is not None:
+                            # L1 sparsity regularization on SAE features
+                            sae_loss += student_features.abs().mean() * 0.01
             
             sae_loss = sae_loss / len(saes)
         
