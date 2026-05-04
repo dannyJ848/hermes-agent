@@ -120,7 +120,7 @@ def precompute_teacher_cache_gpu(config):
     last_index_save = 0
     
     # Batch size for GPU processing
-    batch_size = config.batch_size  # Use same batch as training
+    batch_size = 1  # Conservative to avoid OOM on 130GB GPU
     
     for file_idx, file_path in enumerate(real_files):
         logging.info(f"Processing file {file_idx+1}/{len(real_files)}: {file_path}")
