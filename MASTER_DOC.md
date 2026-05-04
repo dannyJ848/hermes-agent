@@ -314,3 +314,49 @@ pip install bitsandbytes  # For 8-bit AdamW
 ---
 
 *End of session. Ready for new CLI.*
+
+---
+
+## May 4, 2026 — CLI Context Sync & Cron Setup
+
+### Actions Completed
+1. **Cron job created**: `teacher-cache-monitor` (job_id: 890b87ece26f)
+   - Runs every 30 minutes
+   - Checks DGX teacher cache status via SSH
+   - Auto-notifies when >1000 samples cached and process done
+   - Enabled toolsets: terminal
+
+2. **Training script verified**: Syntax OK, all functions present
+   - `train_lora_sae_teacher_v1.py`: 43KB, committed at df231ac8a
+   - `precompute_teacher_cache.py`: 6.8KB, committed at 0943bba38
+   - `check_teacher_cache.sh`: 1.6KB, committed at a704b2ce3
+
+3. **Skill verified**: `qwen27b-training-pipeline` properly patched
+   - May 4 validated config (bf16, rank-128, alpha-256, batch-1, seq-512)
+   - Test results: 49% loss reduction in 100 steps
+   - Reference file `dgx-ssh-patterns.md` present
+
+4. **Repo status**: Local at df231ac8a, DGX synced to df231ac8a
+
+### Current Status
+- Teacher cache: Running (process 2115072), 19+ samples cached
+- Cache location: /mnt/bigssd/teacher_cache/
+- Log: /mnt/bigssd/precompute_teacher_cache.log
+- ETA: 2-4 hours from start
+- Cron monitoring: Active (next check: 2026-05-04 10:14 CST)
+
+### What NOT to Do
+- Do not SSH to DGX during heavy training (timeouts expected)
+- Do not kill process 2115072 (cache building)
+- Do not start training before cache has >1000 samples
+
+### Verified Commands
+```bash
+# Check cache status (run on DGX)
+bash /data/SpecForge/custom_dflash/check_teacher_cache.sh
+
+# Launch training (when cache ready)
+MAX_STEPS=10000 python3 train_lora_sae_teacher_v1.py
+```
+
+*Updated: May 4, 2026 09:37 CST | Commit: df231ac8a*
