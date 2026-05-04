@@ -80,8 +80,8 @@ class TrainConfig:
     sae_cache_dir: str = "/mnt/bigssd/sae_cache/"
     
     # LoRA config — rank-256 for maximum expressiveness
-    lora_r: int = 256
-    lora_alpha: int = 512  # 2x rank
+    lora_r: int = 128
+    lora_alpha: int = 256  # 2x rank
     lora_dropout: float = 0.05
     lora_target_modules: List[str] = field(default_factory=lambda: [
         "q_proj", "k_proj", "v_proj", "o_proj",
@@ -92,7 +92,7 @@ class TrainConfig:
     max_steps: int = 10000
     batch_size: int = 4  # Larger batch with LoRA
     grad_accum_steps: int = 4  # Effective batch = 16
-    max_seq_len: int = 2048
+    max_seq_len: int = 512
     
     # Optimizer — 8-bit AdamW if available, else regular AdamW
     use_8bit_adam: bool = True
