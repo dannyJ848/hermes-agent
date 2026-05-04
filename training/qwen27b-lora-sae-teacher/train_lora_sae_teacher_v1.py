@@ -751,32 +751,49 @@ def train(config: TrainConfig):
     # or 4-bit quantization to fit in GPU memory
     logging.info("Loading student model...")
     
-    # Try 4-bit quantization first to save memory
-    loaded_quantized = False
+    # Try bf16 first (fastest loading)
+    loaded = False
     try:
-        from transformers import BitsAndBytesConfig
-        from peft import prepare_model_for_kbit_training
-        bnb_config = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_compute_dtype=torch.bfloat16,
-            bnb_4bit_use_double_quant=True,
-            bnb_4bit_quant_type="nf4",
-        )
+        logging.info("Loading student model (bf16)...")
         model = AutoModelForCausalLM.from_pretrained(
             config.student_model_path,
-            quantization_config=bnb_config,
+            torch_dtype=torch.bfloat16,
             device_map="auto",
             trust_remote_code=True,
         )
-        model = prepare_model_for_kbit_training(model)
-        loaded_quantized = True
-        logging.info("Loaded model in 4-bit quantization")
+        loaded = True
+        logging.info("Loaded model in bf16")
     except Exception as e:
-        logging.warning(f"4-bit loading failed: {e}")
+        logging.warning(f"bf16 loading failed: {e}")
     
-    # Try 8-bit if 4-bit failed
-    if not loaded_quantized:
+    # Fallback to 4-bit
+    if not loaded:
         try:
+            logging.info("Trying 4-bit quantization...")
+            from transformers import BitsAndBytesConfig
+            from peft import prepare_model_for_kbit_training
+            bnb_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.bfloat16,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_quant_type="nf4",
+            )
+            model = AutoModelForCausalLM.from_pretrained(
+                config.student_model_path,
+                quantization_config=bnb_config,
+                device_map="auto",
+                trust_remote_code=True,
+            )
+            model = prepare_model_for_kbit_training(model)
+            loaded = True
+            logging.info("Loaded model in 4-bit quantization")
+        except Exception as e:
+            logging.warning(f"4-bit loading failed: {e}")
+    
+    # Fallback to 8-bit
+    if not loaded:
+        try:
+            logging.info("Trying 8-bit quantization...")
             from transformers import BitsAndBytesConfig
             from peft import prepare_model_for_kbit_training
             bnb_config = BitsAndBytesConfig(load_in_8bit=True)
@@ -787,21 +804,10 @@ def train(config: TrainConfig):
                 trust_remote_code=True,
             )
             model = prepare_model_for_kbit_training(model)
-            loaded_quantized = True
+            loaded = True
             logging.info("Loaded model in 8-bit quantization")
         except Exception as e:
             logging.warning(f"8-bit loading failed: {e}")
-    
-    # Fallback to bf16 with device_map
-    if not loaded_quantized:
-        logging.info("Trying bf16 with automatic device placement...")
-        model = AutoModelForCausalLM.from_pretrained(
-            config.student_model_path,
-            torch_dtype=torch.bfloat16,
-            device_map="auto",
-            trust_remote_code=True,
-        )
-        logging.info("Loaded model in bf16 with automatic device placement")
     
     # Apply LoRA
     logging.info("Applying LoRA...")
