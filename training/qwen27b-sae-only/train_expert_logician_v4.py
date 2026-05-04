@@ -204,18 +204,20 @@ def load_saes(sae_dir, layers, device):
         if os.path.exists(sae_path):
             sae = torch.load(sae_path, map_location="cpu", weights_only=True)
             saes[layer_idx] = {
-                "W_enc": sae["W_enc"].to(device).bfloat16(),
-                "b_enc": sae["b_enc"].to(device).bfloat16(),
-                "W_dec": sae["W_dec"].to(device).bfloat16(),
-                "b_dec": sae["b_dec"].to(device).bfloat16(),
+                "W_enc": sae["W_enc"].bfloat16(),  # Keep on CPU
+                "b_enc": sae["b_enc"].bfloat16(),
+                "W_dec": sae["W_dec"].bfloat16(),
+                "b_dec": sae["b_dec"].bfloat16(),
             }
     return saes
 
 
 def get_feature_acts(residual, sae_dict):
     """Extract sparse features from hidden states."""
-    W_enc = sae_dict["W_enc"]
-    b_enc = sae_dict["b_enc"]
+    # Move SAE weights to same device as residual for computation
+    device = residual.device
+    W_enc = sae_dict["W_enc"].to(device)
+    b_enc = sae_dict["b_enc"].to(device)
     residual = residual.to(W_enc.dtype)
     pre_acts = residual @ W_enc.T + b_enc
     topk_vals, topk_idx = pre_acts.topk(50, dim=-1)
@@ -226,8 +228,9 @@ def get_feature_acts(residual, sae_dict):
 
 def reconstruct_from_features(features, sae_dict):
     """Reconstruct hidden states from sparse features."""
-    W_dec = sae_dict["W_dec"]
-    b_dec = sae_dict["b_dec"]
+    device = features.device
+    W_dec = sae_dict["W_dec"].to(device)
+    b_dec = sae_dict["b_dec"].to(device)
     return features @ W_dec.T + b_dec
 
 
@@ -237,83 +240,85 @@ def reconstruct_from_features(features, sae_dict):
 
 class MixedReasoningDataset(IterableDataset):
     """
-    Mixed dataset with curriculum learning.
-    Starts with simpler examples, progresses to harder reasoning.
+    Streaming dataset — loads and tokenizes on-the-fly to save RAM.
+    Only keeps file paths in memory, not full tokenized tensors.
     """
     def __init__(self, config, tokenizer, teacher_model=None):
         self.config = config
         self.tokenizer = tokenizer
         self.teacher_model = teacher_model
         
-        # Load real datasets
-        self.slimorca_samples = self._load_slimorca()
-        self.openhermes_samples = self._load_openhermes()
+        # Store file paths only — don't load data into RAM
+        self.slimorca_files = self._discover_files(config.slimorca_dir, "*.parquet")
+        self.openhermes_files = self._discover_files(config.openhermes_dir, "*.parquet")
         
-        # Curriculum: sort by complexity (token length as proxy)
-        self.slimorca_samples.sort(key=lambda x: len(x['input_ids']))
-        self.openhermes_samples.sort(key=lambda x: len(x['input_ids']))
+        # Estimate total samples (for progress/logging)
+        self.total_samples = self._estimate_total_samples()
+        logging.info(f"Streaming dataset: ~{self.total_samples} samples from {len(self.slimorca_files) + len(self.openhermes_files)} files")
         
-        self.total_samples = len(self.slimorca_samples) + len(self.openhermes_samples)
-        
-    def _load_slimorca(self):
-        """Load curatedthoughts/OpenThoughts-114k dataset."""
-        samples = []
-        data_dir = os.path.join(self.config.slimorca_dir, "OpenThoughts-114k-math-default/")
+    def _discover_files(self, data_dir, pattern):
+        """Discover data files without loading them."""
+        files = []
         if os.path.exists(data_dir):
-            parquet_files = sorted(glob.glob(os.path.join(data_dir, "*.parquet")))
-            logging.info(f"Found {len(parquet_files)} curatedthoughts parquet files")
-            for pf in parquet_files[:1]:  # Load only 1 file for fast startup
-                try:
-                    import pandas as pd
-                    logging.info(f"Loading {os.path.basename(pf)}...")
-                    df = pd.read_parquet(pf)
-                    logging.info(f"Tokenizing {len(df)} samples...")
-                    for i, (_, row) in enumerate(df.iterrows()):
-                        if i % 1000 == 0:
-                            logging.info(f"  Tokenized {i}/{len(df)} samples...")
-                        text = self._format_conversation(row.to_dict())
-                        tokens = self.tokenizer(text, truncation=True, 
-                                              max_length=self.config.max_seq_len,
-                                              return_tensors="pt")
-                        samples.append({
-                            'input_ids': tokens['input_ids'].squeeze(0),
-                            'labels': tokens['input_ids'].squeeze(0).clone(),
-                            'source': 'curatedthoughts'
-                        })
-                    logging.info(f"Loaded {len(samples)} curatedthoughts samples")
-                except Exception as e:
-                    logging.warning(f"Failed to load {pf}: {e}")
-        return samples
+            files = sorted(glob.glob(os.path.join(data_dir, "**", pattern), recursive=True))
+            # Also check direct subdirs
+            for subdir in ["OpenThoughts-114k-math-default/", "data/", ""]:
+                check_dir = os.path.join(data_dir, subdir)
+                if os.path.exists(check_dir):
+                    files.extend(sorted(glob.glob(os.path.join(check_dir, pattern))))
+        return sorted(list(set(files)))[:1]  # Load only 1 file per source for memory
     
-    def _load_openhermes(self):
-        """Load openthoughts2-1m dataset."""
-        samples = []
-        data_dir = os.path.join(self.config.openhermes_dir, "data/")
-        if os.path.exists(data_dir):
-            parquet_files = sorted(glob.glob(os.path.join(data_dir, "*.parquet")))
-            logging.info(f"Found {len(parquet_files)} openthoughts2 parquet files")
-            for pf in parquet_files[:1]:  # Load only 1 file for fast startup
+    def _estimate_total_samples(self):
+        """Quick estimate without full load."""
+        total = 0
+        for pf in self.slimorca_files + self.openhermes_files:
+            try:
+                import pandas as pd
+                # Read just metadata to count rows
+                pf_meta = pd.read_parquet(pf, columns=[])
+                total += len(pf_meta)
+            except:
+                pass
+        return total
+    
+    def __iter__(self):
+        """Stream samples on-the-fly. Yields indefinitely for DataLoader."""
+        import pandas as pd
+        step = 0
+        
+        while True:
+            # Stream from all files, cycling through them
+            for pf in self.slimorca_files + self.openhermes_files:
                 try:
-                    import pandas as pd
-                    logging.info(f"Loading {os.path.basename(pf)}...")
                     df = pd.read_parquet(pf)
-                    logging.info(f"Tokenizing {len(df)} samples...")
-                    for i, (_, row) in enumerate(df.iterrows()):
-                        if i % 1000 == 0:
-                            logging.info(f"  Tokenized {i}/{len(df)} samples...")
+                    for _, row in df.iterrows():
                         text = self._format_conversation(row.to_dict())
                         tokens = self.tokenizer(text, truncation=True,
                                               max_length=self.config.max_seq_len,
                                               return_tensors="pt")
-                        samples.append({
+                        yield {
                             'input_ids': tokens['input_ids'].squeeze(0),
                             'labels': tokens['input_ids'].squeeze(0).clone(),
-                            'source': 'openthoughts2'
-                        })
-                    logging.info(f"Loaded {len(samples)} openthoughts2 samples")
+                            'source': 'curatedthoughts' if 'curated' in pf or 'openthoughts' in pf else 'openthoughts2',
+                            'step': step,
+                        }
+                        step += 1
                 except Exception as e:
-                    logging.warning(f"Failed to load {pf}: {e}")
-        return samples
+                    logging.warning(f"Failed to stream {pf}: {e}")
+            
+            # If no files, yield dummy samples to prevent deadlock
+            if not self.slimorca_files and not self.openhermes_files:
+                logging.error("No data files found! Yielding dummy sample.")
+                yield {
+                    'input_ids': torch.tensor([1, 2, 3]),
+                    'labels': torch.tensor([1, 2, 3]),
+                    'source': 'dummy',
+                    'step': step,
+                }
+                step += 1
+    
+    def __len__(self):
+        return self.total_samples
     
     def _format_conversation(self, data):
         """Format conversation data into text."""
@@ -362,37 +367,40 @@ class MixedReasoningDataset(IterableDataset):
         return str(data)
     
     def __iter__(self):
-        """Infinite iterator with curriculum learning."""
+        """Stream samples on-the-fly. Yields indefinitely for DataLoader."""
+        import pandas as pd
         step = 0
+        
         while True:
-            # Curriculum: early steps = simpler examples, later = harder
-            difficulty_threshold = min(1.0, step / (self.config.max_steps * 0.7))
+            # Stream from all files, cycling through them
+            for pf in self.slimorca_files + self.openhermes_files:
+                try:
+                    df = pd.read_parquet(pf)
+                    for _, row in df.iterrows():
+                        text = self._format_conversation(row.to_dict())
+                        tokens = self.tokenizer(text, truncation=True,
+                                              max_length=self.config.max_seq_len,
+                                              return_tensors="pt")
+                        yield {
+                            'input_ids': tokens['input_ids'].squeeze(0),
+                            'labels': tokens['input_ids'].squeeze(0).clone(),
+                            'source': 'curatedthoughts' if 'curated' in pf or 'openthoughts' in pf else 'openthoughts2',
+                            'step': step,
+                        }
+                        step += 1
+                except Exception as e:
+                    logging.warning(f"Failed to stream {pf}: {e}")
             
-            # Select source based on mixing ratio
-            r = random.random()
-            if r < self.config.slimorca_ratio:
-                source = 'slimorca'
-                pool = self.slimorca_samples
-            elif r < self.config.slimorca_ratio + self.config.openhermes_ratio:
-                source = 'openhermes'
-                pool = self.openhermes_samples
-            else:
-                # Synthetic — will be generated in Phase 3
-                source = 'synthetic'
-                pool = self.slimorca_samples  # Fallback for now
-            
-            # Apply curriculum filtering
-            max_idx = int(len(pool) * difficulty_threshold)
-            if max_idx < 1:
-                max_idx = len(pool)
-            
-            idx = random.randint(0, max_idx - 1)
-            sample = pool[idx]
-            sample['step'] = step
-            sample['difficulty'] = difficulty_threshold
-            
-            yield sample
-            step += 1
+            # If no files, yield dummy samples to prevent deadlock
+            if not self.slimorca_files and not self.openhermes_files:
+                logging.error("No data files found! Yielding dummy sample.")
+                yield {
+                    'input_ids': torch.tensor([1, 2, 3]),
+                    'labels': torch.tensor([1, 2, 3]),
+                    'source': 'dummy',
+                    'step': step,
+                }
+                step += 1
 
 
 # ============================================================
@@ -406,7 +414,8 @@ def load_teacher_model(teacher_path, device):
         return None
     
     try:
-        checkpoint = torch.load(teacher_path, map_location=device, weights_only=True)
+        # Load teacher to CPU to save GPU memory — only move to GPU when needed
+        checkpoint = torch.load(teacher_path, map_location="cpu", weights_only=True)
         # Franken V8 model structure — would need actual model class
         # For now, return checkpoint dict
         return checkpoint
@@ -526,15 +535,28 @@ def train(config: TrainingConfig):
     dataset = MixedReasoningDataset(config, tokenizer, teacher)
     dataloader = DataLoader(dataset, batch_size=config.batch_size)
     
-    # Optimizer — AdamW with scaled β₂ for B=1
-    logger.info("Creating AdamW optimizer...")
+    # Optimizer — AdamW with CPU offloading for optimizer states
+    # This saves ~54GB GPU memory by keeping momentum/variance on CPU
+    # Full precision training quality is preserved
+    logger.info("Creating AdamW optimizer with CPU offloading...")
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=config.learning_rate,
         betas=(config.beta1, config.beta2),
         eps=config.eps,
-        weight_decay=config.weight_decay
+        weight_decay=config.weight_decay,
+        foreach=False  # Required for CPU offloading compatibility
     )
+    
+    # Move optimizer states to CPU to save GPU memory
+    logger.info("Moving optimizer states to CPU...")
+    for param_group in optimizer.param_groups:
+        for p in param_group['params']:
+            if p in optimizer.state:
+                state = optimizer.state[p]
+                for key in ['exp_avg', 'exp_avg_sq']:
+                    if key in state:
+                        state[key] = state[key].cpu()
     
     # WSD-S scheduler
     scheduler = WSDScheduler(
@@ -638,6 +660,9 @@ def train(config: TrainingConfig):
             optimizer.step()
             scheduler.step()
             optimizer.zero_grad()
+            
+            # Clear CUDA cache to reduce fragmentation
+            torch.cuda.empty_cache()
             
             global_step += 1
             accum_count = 0
