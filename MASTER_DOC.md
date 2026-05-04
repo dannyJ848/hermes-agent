@@ -339,16 +339,21 @@ pip install bitsandbytes  # For 8-bit AdamW
 4. **Repo status**: Local at df231ac8a, DGX synced to df231ac8a
 
 ### Current Status
-- Teacher cache: Running (process 2115072), 19+ samples cached
+- Teacher cache: Running (process 2115072), 177 samples cached, index stuck at 101 entries
+- **BUG FOUND**: Index only saves every 100 samples. PKL files created but not indexed after row 99.
+- **OPTIMIZATION**: GPU-accelerated version written (precompute_teacher_cache_gpu.py)
+  - Teacher on GPU (was CPU), batch processing, frequent index saves
+  - Expected speedup: 10-50x (GPU vs CPU for 29GB model)
 - Cache location: /mnt/bigssd/teacher_cache/
 - Log: /mnt/bigssd/precompute_teacher_cache.log
-- ETA: 2-4 hours from start
-- Cron monitoring: Active (next check: 2026-05-04 10:14 CST)
+- ETA: Unknown — need to restart with GPU version
+- Cron monitoring: Active (next check: every 30 min)
 
 ### What NOT to Do
 - Do not SSH to DGX during heavy training (timeouts expected)
-- Do not kill process 2115072 (cache building)
+- Do not kill process 2115072 manually — use restart_gpu_precompute.sh when SSH recovers
 - Do not start training before cache has >1000 samples
+- Do not use old CPU precompute — GPU version is 10-50x faster
 
 ### Self-Stop Protocol
 When this CLI session reaches 5 compressions:
@@ -364,6 +369,9 @@ When this CLI session reaches 5 compressions:
 ```bash
 # Check cache status (run on DGX)
 bash /data/SpecForge/custom_dflash/check_teacher_cache.sh
+
+# Restart with GPU acceleration (run on DGX when SSH recovers)
+bash /data/SpecForge/custom_dflash/training/qwen27b-lora-sae-teacher/restart_gpu_precompute.sh
 
 # Launch training (when cache ready)
 MAX_STEPS=10000 python3 train_lora_sae_teacher_v1.py
