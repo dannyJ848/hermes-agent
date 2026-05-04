@@ -896,6 +896,8 @@ def train(config: TrainConfig):
     logging.info("STARTING TRAINING")
     logging.info("=" * 70)
     
+    # Disable use_cache to avoid conflict with gradient checkpointing
+    model.config.use_cache = False
     model.train()
     
     global_step = 0
