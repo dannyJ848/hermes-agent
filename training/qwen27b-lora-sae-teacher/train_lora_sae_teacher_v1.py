@@ -166,13 +166,40 @@ def load_sae(sae_dir: str, layer_idx: int, device: str = "cpu"):
         return None
 
 
-def get_sae_feature_acts(hidden_states: torch.Tensor, sae: nn.Module) -> torch.Tensor:
-    """Extract sparse feature activations from hidden states using SAE."""
+def get_sae_feature_acts(hidden_states: torch.Tensor, sae) -> torch.Tensor:
+    """Extract sparse feature activations from hidden states using SAE.
+    
+    Args:
+        hidden_states: [batch, seq_len, hidden_dim]
+        sae: Either an nn.Module or a dict with 'W_enc', 'W_dec', 'b_enc', 'b_dec'
+    """
     if sae is None:
         return None
     
     with torch.no_grad():
-        # Move to SAE device
+        # Handle dict format (state dict)
+        if isinstance(sae, dict):
+            device = hidden_states.device
+            hidden_states = hidden_states.to(device)
+            
+            # Get SAE parameters from dict
+            W_enc = sae['W_enc'].to(device)  # [hidden_dim, n_features]
+            b_enc = sae['b_enc'].to(device)  # [n_features]
+            
+            # Flatten hidden states: [batch*seq_len, hidden_dim]
+            original_shape = hidden_states.shape
+            hidden_flat = hidden_states.reshape(-1, original_shape[-1])
+            
+            # Encode: features = relu(hidden_flat @ W_enc + b_enc)
+            features = torch.matmul(hidden_flat, W_enc) + b_enc
+            features = torch.relu(features)
+            
+            # Reshape back: [batch, seq_len, n_features]
+            features = features.reshape(original_shape[0], original_shape[1], -1)
+            
+            return features
+        
+        # Handle nn.Module format
         device = next(sae.parameters()).device
         hidden_states = hidden_states.to(device)
         
@@ -183,9 +210,17 @@ def get_sae_feature_acts(hidden_states: torch.Tensor, sae: nn.Module) -> torch.T
             features = sae(hidden_states)
         else:
             # Fallback: assume W_enc, b_enc attributes
-            features = torch.matmul(hidden_states, sae.W_enc) + sae.b_enc
-    
-    return features
+            if hasattr(sae, 'W_enc'):
+                W_enc = sae.W_enc
+                b_enc = sae.b_enc
+                hidden_flat = hidden_states.reshape(-1, hidden_states.shape[-1])
+                features = torch.matmul(hidden_flat, W_enc) + b_enc
+                features = torch.relu(features)
+                features = features.reshape(hidden_states.shape[0], hidden_states.shape[1], -1)
+            else:
+                return None
+        
+        return features
 
 
 def compute_sae_loss(student_features: torch.Tensor, teacher_features: torch.Tensor) -> torch.Tensor:
