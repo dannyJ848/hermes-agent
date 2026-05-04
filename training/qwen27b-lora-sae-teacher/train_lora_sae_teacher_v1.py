@@ -68,7 +68,7 @@ logging.basicConfig(
 class TrainConfig:
     # Model paths
     student_model_path: str = "/data/models/Qwen3.6-27B-Uncensored/"
-    teacher_model_path: str = "/data/models/FrankenV8-Final/final_model.pt"
+    teacher_model_path: str = "/data/models/FrankenV8-Final/"
     sae_dir: str = "/data/models/Qwen-Scope/"
     
     # Data paths
@@ -143,9 +143,16 @@ class TrainConfig:
 
 def load_sae(sae_dir: str, layer_idx: int, device: str = "cpu"):
     """Load a single SAE for a specific layer."""
+    # Try multiple naming conventions
     sae_path = Path(sae_dir) / f"sae_layer_{layer_idx}.pt"
     if not sae_path.exists():
-        logging.warning(f"SAE not found: {sae_path}")
+        sae_path = Path(sae_dir) / f"layer{layer_idx}.sae.pt"
+    if not sae_path.exists():
+        sae_path = Path(sae_dir) / f"layer_{layer_idx}.pt"
+    if not sae_path.exists():
+        sae_path = Path(sae_dir) / f"sae_{layer_idx}.pt"
+    if not sae_path.exists():
+        logging.warning(f"SAE not found for layer {layer_idx} in {sae_dir}")
         return None
     
     try:
@@ -209,29 +216,41 @@ class TeacherModelWrapper:
         """Load teacher model to CPU."""
         logging.info(f"Loading teacher model from {model_path}")
         
-        if not os.path.exists(model_path):
-            logging.warning(f"Teacher model not found at {model_path}")
-            return
+        # Check if model_path is a directory with config.json
+        model_dir = Path(model_path).parent if model_path.endswith('.pt') else Path(model_path)
+        config_json = model_dir / "config.json"
         
-        try:
-            # Try loading as a full model first
-            self.model = AutoModelForCausalLM.from_pretrained(
-                model_path,
-                torch_dtype=torch.bfloat16,
-                device_map="cpu",
-                trust_remote_code=True,
-            )
-            self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-            logging.info("Teacher model loaded successfully")
-        except Exception as e:
-            logging.warning(f"Failed to load teacher as full model: {e}")
-            # Try loading as state dict
+        if config_json.exists():
+            # Load from directory (HuggingFace format)
+            try:
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    str(model_dir),
+                    torch_dtype=torch.bfloat16,
+                    device_map="cpu",
+                    trust_remote_code=True,
+                )
+                self.tokenizer = AutoTokenizer.from_pretrained(str(model_dir), trust_remote_code=True)
+                logging.info("Teacher model loaded from directory")
+                return
+            except Exception as e:
+                logging.warning(f"Failed to load from directory: {e}")
+        
+        # Try loading .pt checkpoint
+        if os.path.exists(model_path) and model_path.endswith('.pt'):
             try:
                 checkpoint = torch.load(model_path, map_location="cpu")
-                logging.info(f"Loaded teacher checkpoint with {len(checkpoint)} keys")
-                self.model = checkpoint  # Store as state dict
-            except Exception as e2:
-                logging.error(f"Failed to load teacher: {e2}")
+                if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
+                    # It's a training checkpoint
+                    logging.info(f"Loaded checkpoint with {len(checkpoint['model_state_dict'])} keys")
+                    self.model = checkpoint  # Store for manual loading later
+                else:
+                    logging.info(f"Loaded raw state dict with {len(checkpoint)} keys")
+                    self.model = checkpoint
+                return
+            except Exception as e:
+                logging.error(f"Failed to load checkpoint: {e}")
+        
+        logging.warning(f"Teacher model not found or could not be loaded from {model_path}")
     
     @torch.no_grad()
     def get_hidden_states(self, input_ids: torch.Tensor, layers: List[int]) -> Dict[int, torch.Tensor]:
