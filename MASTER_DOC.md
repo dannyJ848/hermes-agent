@@ -1,5 +1,6 @@
 # Qwen 27B Expert Logician Training — Master Document
-## Session: May 3, 2026 | Branch: qwen27b-training-artifacts-may3-2026
+## Session: May 3-4, 2026 | Branch: qwen27b-training-artifacts-may3-2026
+## Latest Commit: a704b2ce3
 
 ---
 
@@ -224,14 +225,78 @@ pip install bitsandbytes  # For 8-bit AdamW
 
 ---
 
+## May 4, 2026 Session — Validation & Fixes
+
+### What Was Fixed
+
+1. **bf16 Loading Priority** (Commit `6c84dca17`)
+   - Problem: 4-bit quantization took 30+ min to load 851 shards, timeout killed process
+   - Fix: Try bf16 first (fast, ~4 min), fallback to 8-bit, then 4-bit
+   - Result: bf16 loads successfully, uses 58GB GPU, ~16 sec/step
+
+2. **Step Counting Bug** (Commit `364b8663d`)
+   - Problem: `global_step` tracked batches instead of optimizer steps
+   - Fix: `global_step` increments only after `optimizer.step()`, `batch_count` tracks raw batches
+   - Result: Correct LR schedule, correct checkpointing
+
+3. **SAE dtype Mismatch** (Commit `c4a96fd63`)
+   - Problem: SAE weights (float32) × hidden states (bf16) = dtype error on backward
+   - Fix: Cast SAE weights to `hidden_states.dtype` before matmul
+   - Result: SAE loss computes correctly, no backward errors
+
+4. **SAE-Enabled Test Success** (Commit `183ccbbd3`)
+   - Test: 100 steps, LoRA r=128 + SAE (layers 16,32,48), teacher disabled
+   - Results: Loss 0.476 → 0.242 (49% drop), GPU stable at 58.3GB
+
+5. **Teacher Cache Precomputation** (Commit `0943bba38`)
+   - Problem: Teacher distillation disabled because Franken V8 on CPU stalled training
+   - Solution: `precompute_teacher_cache.py` — precomputes all teacher hidden states before training
+   - Status: Running on DGX (process 2115072), 19+ samples cached
+
+6. **Status Monitoring Script** (Commit `a704b2ce3`)
+   - Added `check_teacher_cache.sh` for easy DGX status checks
+
+### Updated Pipeline Configuration
+
+| Parameter | May 3 Spec | May 4 Validated |
+|-----------|-----------|-----------------|
+| Model loading | 4-bit fallback | **bf16 priority** |
+| LoRA rank | 256 | **128** (faster, sufficient) |
+| LoRA alpha | 512 | **256** |
+| Batch size | 4 | **1** (with grad_accum 4) |
+| Max seq len | 2048 | **512** (memory stable) |
+| Teacher | Disabled (slow) | **Cache precomputation** |
+| GPU usage | ~47GB (theoretical) | **58.3GB** (validated) |
+| Step time | unknown | **~16 sec** |
+
+### Test Results (100 steps, validated)
+
+| Step | Loss | CE | GPU |
+|------|------|-----|-----|
+| 0 | 0.4763 | — | 58.3GB |
+| 10 | 0.4700 | 0.495 | 58.3GB |
+| 50 | 0.2640 | 0.352 | 58.3GB |
+| 90 | 0.2419 | 0.440 | 58.3GB |
+
+**Loss reduction: 49% | GPU: stable | No errors**
+
+### Files Added May 4
+
+| File | Purpose |
+|------|---------|
+| `precompute_teacher_cache.py` | Precompute teacher hidden states to SSD |
+| `SESSION_ARCHIVE_MAY4_2026.md` | Complete factual session record |
+| `check_teacher_cache.sh` | DGX status monitoring script |
+
+---
+
 ## Next Steps for New CLI
 
 1. **Pull repo**: `git pull origin qwen27b-training-artifacts-may3-2026`
-2. **Install deps**: `pip install peft transformers torch pandas` (and optionally `bitsandbytes`)
-3. **Verify data**: Check `/data/datasets/curatedthoughts/` and `/data/datasets/openthoughts2-1m/` exist
-4. **Verify models**: Check `/data/models/Qwen3.6-27B-Uncensored/`, `/data/models/FrankenV8-Final/`, `/data/models/Qwen-Scope/`
-5. **Run**: `python3 training/qwen27b-lora-sae-teacher/train_lora_sae_teacher_v1.py`
-6. **Monitor**: `tail -f /mnt/bigssd/train_lora_sae_teacher_v1.log`
+2. **Check cache status**: `bash check_teacher_cache.sh`
+3. **If cache ready**: `MAX_STEPS=10000 python3 train_lora_sae_teacher_v1.py`
+4. **If cache not ready**: Wait, or run with `use_teacher=False`
+5. **Monitor**: `tail -f /mnt/bigssd/train_lora_sae_teacher_v1.log`
 
 ---
 
