@@ -779,4 +779,38 @@ Neural network backprop requires ALL layer gradients simultaneously. Each layer'
 - "Loaded model in bf16"
 - Blackwell GPU native bf16 tensor cores = 91% utilization
 
-*Updated: May 4, 2026 16:40 CST | Commit: TBD*
+### Cache Miss Bug & Fix (Commit 9723287d6)
+- **Root cause**: Precompute used file-based keys (`f"{file_idx}_{sample_idx}"`), training used content-based keys (`hashlib.md5(input_ids.tobytes()).hexdigest()`)
+- **Result**: 100% cache miss, teacher distillation never activated (D=0 always)
+- **Fix**: Unified both scripts to use MD5 of input_ids for cache keys
+- **Impact**: Teacher guidance now active, training quality significantly improved
+
+### Strategy Shift: Full Cache First
+- User decision: No half-measures. Generate complete cache (50K samples), then train.
+- Precompute running on GPU at ~12 samples/sec
+- Current: 33,039 cached | Target: 50,000 | ETA: ~1 hour
+- Training will resume once cache hits 50K
+
+### Resume Command
+```bash
+ssh spark-85e8.local
+cd /data/SpecForge/custom_dflash/training/qwen27b-lora-sae-teacher
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+nohup python3 -u train_lora_sae_teacher_v1.py > /mnt/bigssd/train_lora_sae_teacher_v1.log 2>&1 &
+echo $! > /mnt/bigssd/train.pid
+```
+
+### Monitoring
+- Precompute log: `/mnt/bigssd/precompute_gpu.log`
+- Training log: `/mnt/bigssd/train_lora_sae_teacher_v1.log`
+- Cache index: `/mnt/bigssd/teacher_cache/index.json`
+- Cron: `precompute-monitor` (checks every 10 min, alerts at 40K and 50K)
+
+### Critical Rules
+1. Only ONE GPU process — training OR precompute, never both
+2. Use nohup on DGX directly (not Hermes SSH tunnel)
+3. Teacher stays on CPU during training — loading to GPU causes OOM reboot
+4. SSH will timeout under load — this is normal, wait it out
+5. Check logs via SSH after timeout recovery, don't assume crash
+
+*Updated: May 4, 2026 18:45 CST | Commit: 9723287d6*
