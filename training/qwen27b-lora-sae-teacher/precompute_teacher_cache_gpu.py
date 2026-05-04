@@ -51,23 +51,46 @@ def precompute_teacher_cache_gpu(config):
     
     # Initialize tokenizer
     from transformers import AutoTokenizer
-    tokenizer = AutoTokenizer.from_pretrained(config.model_name, trust_remote_code=True)
+    from train_lora_sae_teacher_v1 import TeacherModelWrapper
+    tokenizer = AutoTokenizer.from_pretrained(config.student_model_path, trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     
     # Initialize teacher on GPU
     logging.info("Loading Franken V8 teacher model to GPU...")
-    teacher = FrankenV8Bridge(
-        model_path=config.teacher_model_path,
-        device="cuda",  # GPU!
-        dtype=torch.bfloat16 if config.bf16 else torch.float32
-    )
+    teacher = TeacherModelWrapper(config.teacher_model_path, "cuda")
     
     if teacher.model is None:
-        logging.error("Failed to load teacher model. Aborting.")
+        logging.error("Failed to load teacher model")
         return False
     
-    # Log GPU memory after teacher load
+    # CRITICAL FIX: Move model to GPU and patch get_hidden_states to keep data on GPU
+    teacher.model = teacher.model.to("cuda")
+    
+    # Override get_hidden_states to work on GPU
+    original_get_hidden = teacher.get_hidden_states
+    
+    @torch.no_grad()
+    def gpu_get_hidden_states(input_ids, layers):
+        if teacher.model is None:
+            return {}
+        # Keep input on GPU
+        input_ids = input_ids.to("cuda")
+        try:
+            outputs = teacher.model(input_ids=input_ids, output_hidden_states=True)
+            hidden_states = outputs.hidden_states
+            result = {}
+            for layer_idx in layers:
+                if layer_idx < len(hidden_states):
+                    result[layer_idx] = hidden_states[layer_idx].detach().cpu()
+            return result
+        except Exception as e:
+            logging.warning(f"Teacher forward pass failed: {e}")
+            return {}
+    
+    teacher.get_hidden_states = gpu_get_hidden_states
+    
+    logging.info(f"Teacher loaded. GPU memory used: {torch.cuda.memory_allocated()/1e9:.1f}GB")
     teacher_mem = torch.cuda.memory_allocated() / 1e9
     logging.info(f"Teacher loaded. GPU memory used: {teacher_mem:.1f}GB")
     
