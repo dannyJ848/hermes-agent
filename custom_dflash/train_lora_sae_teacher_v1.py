@@ -460,11 +460,30 @@ class TeacherHiddenStateCache:
         """Get cache file path for a sample."""
         return self.cache_dir / f"{sample_id}.pkl"
     
+    def _get_sample_key(self, input_ids: torch.Tensor) -> str:
+        """Generate content-based cache key from input_ids."""
+        # Use first 100 tokens + length as key (fast, unique enough)
+        if input_ids.numel() == 0:
+            return "empty"
+        prefix = input_ids[:min(100, input_ids.numel())].cpu().numpy().tobytes()
+        import hashlib
+        return hashlib.md5(prefix + str(input_ids.numel()).encode()).hexdigest()[:16]
+    
     def get(self, sample_id: str, input_ids: torch.Tensor) -> Optional[Dict[int, torch.Tensor]]:
         """Get cached hidden states for a sample. Compute if not cached."""
-        cache_path = self._get_cache_path(sample_id)
+        # Try content-based key first (matches precompute cache)
+        content_key = self._get_sample_key(input_ids)
+        cache_path = self._get_cache_path(content_key)
         
-        # Check cache
+        if content_key in self._cache_index and cache_path.exists():
+            try:
+                with open(cache_path, 'rb') as f:
+                    return pickle.load(f)
+            except Exception as e:
+                logging.warning(f"Cache load failed for {content_key}: {e}")
+        
+        # Fallback to old step-based key (backward compat)
+        cache_path = self._get_cache_path(sample_id)
         if sample_id in self._cache_index and cache_path.exists():
             try:
                 with open(cache_path, 'rb') as f:
@@ -473,10 +492,7 @@ class TeacherHiddenStateCache:
                 logging.warning(f"Cache load failed for {sample_id}: {e}")
         
         # Skip on-the-fly teacher computation (too slow on CPU)
-        # Precompute cache separately with precompute_teacher_cache.py
-        logging.debug(f"Teacher cache miss for {sample_id}, skipping distillation")
-        return None
-        
+        logging.debug(f"Teacher cache miss for content_key={content_key}, sample_id={sample_id}, skipping distillation")
         return None
     
     def precompute_all(self, dataset, tokenizer):
@@ -964,7 +980,7 @@ def train(config: TrainConfig):
         # Teacher distillation loss
         distill_loss = torch.tensor(0.0, device=device, dtype=ce_loss.dtype)
         if config.use_teacher and teacher is not None and teacher.model is not None:
-            # Get cached teacher hidden states
+            # Get cached teacher hidden states (content-based lookup)
             teacher_hidden = teacher_cache.get(f"step_{global_step}", input_ids)
             
             if teacher_hidden:
