@@ -6,12 +6,14 @@
 
 ## Project: Qwen 27B → Expert Logician (Claude/Opus Level)
 
-### Current State (Last Updated: May 3, 2026 ~19:15 CDT)
+### Current State (Last Updated: May 3, 2026 ~21:15 CDT)
+- **NEW TRAINING RUNNING** — `train_expert_logician_v4.py` launched by second CLI
+- **PID 287961** on DGX, CPU 92%, GPU loading model (0% util, 43°C)
 - **Previous training KILLED** at step 50/1000 — flat losses, no learning
-- **GPU clean** — DGX ready for new run
-- **8 training scripts pushed** to branch `qwen27b-training-artifacts-may3-2026`
 - **Franken V8** fully loaded via custom bridge (11.5B params, 0 missing keys)
 - **Teacher hidden states pre-computed** (991MB, 44 samples, 9 layers each)
+- **Qwen-Scope SAEs** integrated: layers 16, 32, 48 loaded from `/data/models/Qwen-Scope/`
+- **New scripts added:** `train_expert_logician_v4.py` (660 lines), `generate_synthetic_traces.py` (358 lines)
 
 ### Why Previous Run Failed
 | Issue | Root Cause | Fix Required |
@@ -96,6 +98,7 @@ Run full training:
 | 44 samples only | Overfitting, no generalization | Must use 200k+ real data |
 | No LR warmup | Cold start instability | Always warmup |
 | 8-bit AdamW (bnb) | Crashed with CUDA errors | Use full AdamW or test first |
+| MSE teacher matching | Scale mismatch, loss ~2000 | Use CKA or layer-norm first |
 
 ---
 
@@ -103,9 +106,11 @@ Run full training:
 
 | File | Purpose | Status |
 |------|---------|--------|
+| `train_expert_logician_v4.py` | New CLI's opus-level pipeline | ✅ RUNNING NOW |
+| `generate_synthetic_traces.py` | Franken V8 synthetic data generator | ✅ Ready |
 | `franken_v8_bridge_v3.py` | Load Franken V8 (11.5B params) | ✅ Working |
-| `train_ultimate_v3_trainonly.py` | Previous training script | ⚠️ Reference only, rebuild |
 | `precompute_teacher_v2.py` | Generate teacher hidden states | ✅ Working |
+| `train_ultimate_v3_trainonly.py` | Previous training script | ⚠️ Reference only |
 | `evaluate_checkpoints.py` | Evaluate saved checkpoints | ✅ Working |
 | `SESSION_LOG_MAY3.md` | Session history | ✅ Updated |
 
@@ -128,12 +133,25 @@ Run full training:
 
 ## Session History
 
-### May 3, 2026 — Session 1
+### May 3, 2026 — Session 1 (First CLI)
 - Built Franken V8 bridge v3 (complete architecture match)
 - Pre-computed teacher hidden states (991MB)
 - Ran training with SGD — flat losses, killed at step 50
 - Learned: Need AdamW, more data, warmup, higher teacher weight
 - Pushed 8 files to `qwen27b-training-artifacts-may3-2026`
+
+### May 3, 2026 — Session 2 (Second CLI)
+- **Research phase completed** by second CLI
+- Built `train_expert_logician_v4.py` with:
+  - AdamW with β₂ scaled for batch=1
+  - WSD-S learning rate schedule (warmup-stable-decay)
+  - CKA hidden state matching (better than MSE)
+  - SAE reconstruction loss (Qwen-Scope layers 16/32/48)
+  - Curriculum learning with SlimOrca + OpenHermes
+  - Gradient accumulation (effective batch=16)
+- Built `generate_synthetic_traces.py` for Franken V8 synthetic data
+- **Training launched** — PID 287961, running on DGX
+- Pushed all context files: MASTER_PLAN.md, DGX_ENVIRONMENT.md, .hermes/plans/
 
 ### [Next session — update here]
 
