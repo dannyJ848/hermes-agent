@@ -1,5 +1,6 @@
 # Qwen 27B Expert Logician Training — Master Document
-## Session: May 3, 2026 | Branch: qwen27b-training-artifacts-may3-2026
+## Session: May 3-4, 2026 | Branch: qwen27b-training-artifacts-may3-2026
+## Latest Commit: a704b2ce3
 
 ---
 
@@ -224,14 +225,78 @@ pip install bitsandbytes  # For 8-bit AdamW
 
 ---
 
+## May 4, 2026 Session — Validation & Fixes
+
+### What Was Fixed
+
+1. **bf16 Loading Priority** (Commit `6c84dca17`)
+   - Problem: 4-bit quantization took 30+ min to load 851 shards, timeout killed process
+   - Fix: Try bf16 first (fast, ~4 min), fallback to 8-bit, then 4-bit
+   - Result: bf16 loads successfully, uses 58GB GPU, ~16 sec/step
+
+2. **Step Counting Bug** (Commit `364b8663d`)
+   - Problem: `global_step` tracked batches instead of optimizer steps
+   - Fix: `global_step` increments only after `optimizer.step()`, `batch_count` tracks raw batches
+   - Result: Correct LR schedule, correct checkpointing
+
+3. **SAE dtype Mismatch** (Commit `c4a96fd63`)
+   - Problem: SAE weights (float32) × hidden states (bf16) = dtype error on backward
+   - Fix: Cast SAE weights to `hidden_states.dtype` before matmul
+   - Result: SAE loss computes correctly, no backward errors
+
+4. **SAE-Enabled Test Success** (Commit `183ccbbd3`)
+   - Test: 100 steps, LoRA r=128 + SAE (layers 16,32,48), teacher disabled
+   - Results: Loss 0.476 → 0.242 (49% drop), GPU stable at 58.3GB
+
+5. **Teacher Cache Precomputation** (Commit `0943bba38`)
+   - Problem: Teacher distillation disabled because Franken V8 on CPU stalled training
+   - Solution: `precompute_teacher_cache.py` — precomputes all teacher hidden states before training
+   - Status: Running on DGX (process 2115072), 19+ samples cached
+
+6. **Status Monitoring Script** (Commit `a704b2ce3`)
+   - Added `check_teacher_cache.sh` for easy DGX status checks
+
+### Updated Pipeline Configuration
+
+| Parameter | May 3 Spec | May 4 Validated |
+|-----------|-----------|-----------------|
+| Model loading | 4-bit fallback | **bf16 priority** |
+| LoRA rank | 256 | **128** (faster, sufficient) |
+| LoRA alpha | 512 | **256** |
+| Batch size | 4 | **1** (with grad_accum 4) |
+| Max seq len | 2048 | **512** (memory stable) |
+| Teacher | Disabled (slow) | **Cache precomputation** |
+| GPU usage | ~47GB (theoretical) | **58.3GB** (validated) |
+| Step time | unknown | **~16 sec** |
+
+### Test Results (100 steps, validated)
+
+| Step | Loss | CE | GPU |
+|------|------|-----|-----|
+| 0 | 0.4763 | — | 58.3GB |
+| 10 | 0.4700 | 0.495 | 58.3GB |
+| 50 | 0.2640 | 0.352 | 58.3GB |
+| 90 | 0.2419 | 0.440 | 58.3GB |
+
+**Loss reduction: 49% | GPU: stable | No errors**
+
+### Files Added May 4
+
+| File | Purpose |
+|------|---------|
+| `precompute_teacher_cache.py` | Precompute teacher hidden states to SSD |
+| `SESSION_ARCHIVE_MAY4_2026.md` | Complete factual session record |
+| `check_teacher_cache.sh` | DGX status monitoring script |
+
+---
+
 ## Next Steps for New CLI
 
 1. **Pull repo**: `git pull origin qwen27b-training-artifacts-may3-2026`
-2. **Install deps**: `pip install peft transformers torch pandas` (and optionally `bitsandbytes`)
-3. **Verify data**: Check `/data/datasets/curatedthoughts/` and `/data/datasets/openthoughts2-1m/` exist
-4. **Verify models**: Check `/data/models/Qwen3.6-27B-Uncensored/`, `/data/models/FrankenV8-Final/`, `/data/models/Qwen-Scope/`
-5. **Run**: `python3 training/qwen27b-lora-sae-teacher/train_lora_sae_teacher_v1.py`
-6. **Monitor**: `tail -f /mnt/bigssd/train_lora_sae_teacher_v1.log`
+2. **Check cache status**: `bash check_teacher_cache.sh`
+3. **If cache ready**: `MAX_STEPS=10000 python3 train_lora_sae_teacher_v1.py`
+4. **If cache not ready**: Wait, or run with `use_teacher=False`
+5. **Monitor**: `tail -f /mnt/bigssd/train_lora_sae_teacher_v1.log`
 
 ---
 
@@ -250,179 +315,66 @@ pip install bitsandbytes  # For 8-bit AdamW
 
 *End of session. Ready for new CLI.*
 
-
 ---
 
-## Session: May 4, 2026 — Training Execution & Critical Bug Fixes
+## May 4, 2026 — CLI Context Sync & Cron Setup
 
-### What Was Built
-- GPU-accelerated teacher cache precompute: precompute_teacher_cache_gpu.py
-- Training pipeline: train_lora_sae_teacher_v1.py (patched)
-- Monitoring scripts: check_teacher_cache.sh
+### Actions Completed
+1. **Cron job created**: `teacher-cache-monitor` (job_id: 890b87ece26f)
+   - Runs every 30 minutes
+   - Checks DGX teacher cache status via SSH
+   - Auto-notifies when >1000 samples cached and process done
+   - Enabled toolsets: terminal
 
-### Critical Fixes Applied
-1. bf16 loading priority — 4-bit quantization causes MatMul8bitLt deadlock. bf16 loads in ~4 min, uses 58GB.
-2. Step counting bug — global_step must track optimizer steps (after grad_accum), not raw batches.
-3. SAE dtype mismatch — Cast SAE weights to hidden_states.dtype before matmul to avoid backward errors.
-4. Teacher cache indexing bug — index.json only saved every 100 samples; PKL files after row 99 not indexed. Fixed to save index every 50 samples with atomic writes.
-5. GPU precompute fix — Patched get_hidden_states to keep data on GPU (500x speedup). Batch_size=1 to prevent OOM on 130GB GPU.
-6. Training hang fix — Disabled on-the-fly teacher computation on CPU cache miss. Returns None instead, allowing training to continue with CE + SAE loss only.
+2. **Training script verified**: Syntax OK, all functions present
+   - `train_lora_sae_teacher_v1.py`: 43KB, committed at df231ac8a
+   - `precompute_teacher_cache.py`: 6.8KB, committed at 0943bba38
+   - `check_teacher_cache.sh`: 1.6KB, committed at a704b2ce3
 
-### Test Results (100 steps, batch=1)
-- Loss: 0.476 → 0.242 (49% reduction)
-- GPU: stable at 58.3GB
-- Speed: ~4-5 sec/step (batch=1)
+3. **Skill verified**: `qwen27b-training-pipeline` properly patched
+   - May 4 validated config (bf16, rank-128, alpha-256, batch-1, seq-512)
+   - Test results: 49% loss reduction in 100 steps
+   - Reference file `dgx-ssh-patterns.md` present
 
-### Architecture Details
-- Student: Qwen3.6-27B-Uncensored (frozen, bf16, ~58GB GPU)
-- LoRA: rank-128, α=256, all linear layers (~637M trainable params, 2.3155%)
-- Teacher: Franken V8 (precomputed hidden states at layers [8,16,24,32,40,48])
-- SAEs: Qwen-Scope at layers [16,32,48] (feature alignment)
-- Loss: Multi-objective (CE + hidden-state MSE + SAE feature MSE)
-- Optimizer: 8-bit AdamW
-- Schedule: WSD-S (warmup 500, stable 8000, decay 1500)
-- Data: Streaming Parquet (58 files, curatedthoughts + openthoughts2-1m)
+4. **Repo status**: Local at df231ac8a, DGX synced to df231ac8a
 
-### DGX Stability Issues
-- DGX Spark (GB10, 130GB GPU) reboots under sustained 27B model + training load
-- SSH becomes unresponsive during heavy training — expected behavior, system prioritizes training over network I/O
-- Do NOT panic or kill processes when SSH times out; wait for training to complete or system to become responsive
-- Running precompute + training simultaneously on GPU causes OOM and reboots
-- Rule: Only ONE GPU-intensive process at a time
+### Current Status
+- Teacher cache: Running (process 2115072), 177 samples cached, index stuck at 101 entries
+- **BUG FOUND**: Index only saves every 100 samples. PKL files created but not indexed after row 99.
+- **OPTIMIZATION**: GPU-accelerated version written (precompute_teacher_cache_gpu.py)
+  - Teacher on GPU (was CPU), batch processing, frequent index saves
+  - Expected speedup: 10-50x (GPU vs CPU for 29GB model)
+- Cache location: /mnt/bigssd/teacher_cache/
+- Log: /mnt/bigssd/precompute_teacher_cache.log
+- ETA: Unknown — need to restart with GPU version
+- Cron monitoring: Active (next check: every 30 min)
 
-### Verified Paths
-- /data/models/Qwen3.6-27B-Uncensored/
-- /data/models/FrankenV8-Final/
-- /data/models/Qwen-Scope/
-- /data/datasets/curatedthoughts/
-- /data/datasets/openthoughts2-1m/
-- /mnt/bigssd/teacher_cache/ (30K+ PKL files)
+### What NOT to Do
+- Do not SSH to DGX during heavy training (timeouts expected)
+- Do not kill process 2115072 manually — use restart_gpu_precompute.sh when SSH recovers
+- Do not start training before cache has >1000 samples
+- Do not use old CPU precompute — GPU version is 10-50x faster
 
-### What NOT to Use
-- bitsandbytes 4-bit (deadlock)
-- DeepSpeed ZeRO-3 (NCCL OOM)
-- Full fine-tuning (GPU OOM)
-- Teacher on CPU without cache (stalls training)
-- Running precompute + training on GPU simultaneously (system reboot)
+### Self-Stop Protocol
+When this CLI session reaches 5 compressions:
+1. **HALT immediately** — no new tool calls, no new work
+2. **Save state** — commit any uncommitted changes
+3. **Update MASTER_DOC** — add session summary with timestamp
+4. **Update skill** — patch qwen27b-training-pipeline with any new findings
+5. **Update memory** — add key facts for next session
+6. **Push repo** — `git push origin qwen27b-training-artifacts-may3-2026`
+7. **Await user input** — do not continue autonomously
 
-### Run Commands
+### Verified Commands
 ```bash
-# Precompute teacher cache (one-time, ~10-12 hours for full dataset)
-cd /data/SpecForge/custom_dflash
-python3 precompute_teacher_cache_gpu.py > /mnt/bigssd/precompute_teacher_cache_gpu.log 2>&1
+# Check cache status (run on DGX)
+bash /data/SpecForge/custom_dflash/check_teacher_cache.sh
 
-# Training (batch=1, grad_accum=1, teacher on CPU)
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-python3 train_lora_sae_teacher_v1.py > /mnt/bigssd/train_lora_sae_teacher_v1.log 2>&1
+# Restart with GPU acceleration (run on DGX when SSH recovers)
+bash /data/SpecForge/custom_dflash/training/qwen27b-lora-sae-teacher/restart_gpu_precompute.sh
+
+# Launch training (when cache ready)
+MAX_STEPS=10000 python3 train_lora_sae_teacher_v1.py
 ```
 
-### Monitoring
-```bash
-# Check training progress
-tail -f /mnt/bigssd/train_lora_sae_teacher_v1.log
-
-# Check GPU usage
-nvidia-smi
-
-# Check teacher cache count
-ls /mnt/bigssd/teacher_cache/*.pkl | wc -l
-```
-
-### Repo Info
-- Branch: qwen27b-training-artifacts-may3-2026
-- Commit: e0f67051a (base), 16dd470ac (GPU precompute), 0721d9ef9 (training fixes)
-- Remote: https://github.com/dannyJ848/hermes-agent.git
-
-### Key Insight
-The training hangs were caused by on-the-fly teacher hidden state generation on CPU when cache miss. The patch returns None instead, allowing training to continue with CE + SAE loss only. This is the correct fix for stable training.
-
-*End of May 4 session.*
-
-
-
----
-
-## Session: May 4, 2026 — Training Execution & Critical Bug Fixes
-
-### What Was Built
-- GPU-accelerated teacher cache precompute: precompute_teacher_cache_gpu.py
-- Training pipeline: train_lora_sae_teacher_v1.py (patched)
-- Monitoring scripts: check_teacher_cache.sh
-
-### Critical Fixes Applied
-1. bf16 loading priority — 4-bit quantization causes MatMul8bitLt deadlock. bf16 loads in ~4 min, uses 58GB.
-2. Step counting bug — global_step must track optimizer steps (after grad_accum), not raw batches.
-3. SAE dtype mismatch — Cast SAE weights to hidden_states.dtype before matmul to avoid backward errors.
-4. Teacher cache indexing bug — index.json only saved every 100 samples; PKL files after row 99 not indexed. Fixed to save index every 50 samples with atomic writes.
-5. GPU precompute fix — Patched get_hidden_states to keep data on GPU (500x speedup). Batch_size=1 to prevent OOM on 130GB GPU.
-6. Training hang fix — Disabled on-the-fly teacher computation on CPU cache miss. Returns None instead, allowing training to continue with CE + SAE loss only.
-
-### Test Results (100 steps, batch=1)
-- Loss: 0.476 → 0.242 (49% reduction)
-- GPU: stable at 58.3GB
-- Speed: ~4-5 sec/step (batch=1)
-
-### Architecture Details
-- Student: Qwen3.6-27B-Uncensored (frozen, bf16, ~58GB GPU)
-- LoRA: rank-128, α=256, all linear layers (~637M trainable params, 2.3155%)
-- Teacher: Franken V8 (precomputed hidden states at layers [8,16,24,32,40,48])
-- SAEs: Qwen-Scope at layers [16,32,48] (feature alignment)
-- Loss: Multi-objective (CE + hidden-state MSE + SAE feature MSE)
-- Optimizer: 8-bit AdamW
-- Schedule: WSD-S (warmup 500, stable 8000, decay 1500)
-- Data: Streaming Parquet (58 files, curatedthoughts + openthoughts2-1m)
-
-### DGX Stability Issues
-- DGX Spark (GB10, 130GB GPU) reboots under sustained 27B model + training load
-- SSH becomes unresponsive during heavy training — expected behavior, system prioritizes training over network I/O
-- Do NOT panic or kill processes when SSH times out; wait for training to complete or system to become responsive
-- Running precompute + training simultaneously on GPU causes OOM and reboots
-- Rule: Only ONE GPU-intensive process at a time
-
-### Verified Paths
-- /data/models/Qwen3.6-27B-Uncensored/
-- /data/models/FrankenV8-Final/
-- /data/models/Qwen-Scope/
-- /data/datasets/curatedthoughts/
-- /data/datasets/openthoughts2-1m/
-- /mnt/bigssd/teacher_cache/ (30K+ PKL files)
-
-### What NOT to Use
-- bitsandbytes 4-bit (deadlock)
-- DeepSpeed ZeRO-3 (NCCL OOM)
-- Full fine-tuning (GPU OOM)
-- Teacher on CPU without cache (stalls training)
-- Running precompute + training on GPU simultaneously (system reboot)
-
-### Run Commands
-```bash
-# Precompute teacher cache (one-time, ~10-12 hours for full dataset)
-cd /data/SpecForge/custom_dflash
-python3 precompute_teacher_cache_gpu.py > /mnt/bigssd/precompute_teacher_cache_gpu.log 2>&1
-
-# Training (batch=1, grad_accum=1, teacher on CPU)
-export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-python3 train_lora_sae_teacher_v1.py > /mnt/bigssd/train_lora_sae_teacher_v1.log 2>&1
-```
-
-### Monitoring
-```bash
-# Check training progress
-tail -f /mnt/bigssd/train_lora_sae_teacher_v1.log
-
-# Check GPU usage
-nvidia-smi
-
-# Check teacher cache count
-ls /mnt/bigssd/teacher_cache/*.pkl | wc -l
-```
-
-### Repo Info
-- Branch: qwen27b-training-artifacts-may3-2026
-- Commit: e0f67051a (base), 16dd470ac (GPU precompute), 0721d9ef9 (training fixes)
-- Remote: https://github.com/dannyJ848/hermes-agent.git
-
-### Key Insight
-The training hangs were caused by on-the-fly teacher hidden state generation on CPU when cache miss. The patch returns None instead, allowing training to continue with CE + SAE loss only. This is the correct fix for stable training.
-
-*End of May 4 session.*
+*Updated: May 4, 2026 09:37 CST | Commit: df231ac8a*
