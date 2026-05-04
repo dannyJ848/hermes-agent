@@ -186,6 +186,11 @@ def get_sae_feature_acts(hidden_states: torch.Tensor, sae) -> torch.Tensor:
             W_enc = sae['W_enc'].to(device)  # [n_features, hidden_dim]
             b_enc = sae['b_enc'].to(device)  # [n_features]
             
+            # Match dtype to hidden_states (bf16/fp16)
+            target_dtype = hidden_states.dtype
+            W_enc = W_enc.to(target_dtype)
+            b_enc = b_enc.to(target_dtype)
+            
             # Flatten hidden states: [batch*seq_len, hidden_dim]
             original_shape = hidden_states.shape
             hidden_flat = hidden_states.reshape(-1, original_shape[-1])
