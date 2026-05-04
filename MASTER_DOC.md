@@ -350,6 +350,16 @@ pip install bitsandbytes  # For 8-bit AdamW
 - Do not kill process 2115072 (cache building)
 - Do not start training before cache has >1000 samples
 
+### Self-Stop Protocol
+When this CLI session reaches 5 compressions:
+1. **HALT immediately** — no new tool calls, no new work
+2. **Save state** — commit any uncommitted changes
+3. **Update MASTER_DOC** — add session summary with timestamp
+4. **Update skill** — patch qwen27b-training-pipeline with any new findings
+5. **Update memory** — add key facts for next session
+6. **Push repo** — `git push origin qwen27b-training-artifacts-may3-2026`
+7. **Await user input** — do not continue autonomously
+
 ### Verified Commands
 ```bash
 # Check cache status (run on DGX)
