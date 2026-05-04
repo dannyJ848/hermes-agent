@@ -6,9 +6,9 @@ sys.path.insert(0, '/data/SpecForge/custom_dflash')
 from train_lora_sae_teacher_v1 import TrainConfig, train
 
 config = TrainConfig()
-config.use_teacher = False  # Skip slow teacher on CPU
-config.use_sae = False  # Disable SAE for basic test first
-config.use_curriculum = False
+config.use_teacher = True  # Enable teacher distillation
+config.use_sae = True
+config.use_curriculum = True
 config.max_steps = 100  # Just 100 steps for testing
 config.batch_size = 1
 config.grad_accum_steps = 4
