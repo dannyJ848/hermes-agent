@@ -183,15 +183,15 @@ def get_sae_feature_acts(hidden_states: torch.Tensor, sae) -> torch.Tensor:
             hidden_states = hidden_states.to(device)
             
             # Get SAE parameters from dict
-            W_enc = sae['W_enc'].to(device)  # [hidden_dim, n_features]
+            W_enc = sae['W_enc'].to(device)  # [n_features, hidden_dim]
             b_enc = sae['b_enc'].to(device)  # [n_features]
             
             # Flatten hidden states: [batch*seq_len, hidden_dim]
             original_shape = hidden_states.shape
             hidden_flat = hidden_states.reshape(-1, original_shape[-1])
             
-            # Encode: features = relu(hidden_flat @ W_enc + b_enc)
-            features = torch.matmul(hidden_flat, W_enc) + b_enc
+            # Encode: features = relu(hidden_flat @ W_enc.T + b_enc)
+            features = torch.matmul(hidden_flat, W_enc.t()) + b_enc
             features = torch.relu(features)
             
             # Reshape back: [batch, seq_len, n_features]
