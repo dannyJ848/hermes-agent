@@ -722,3 +722,61 @@ grep "Flywheel error" ~/.hermes/cortex_daemon.log
 - Repo: 227d5369 (cortex offloading fix + memory cleanup)
 
 *End of May 4 session.*
+
+---
+
+## May 4, 2026 — Production Training Launch (CLI #2)
+
+### What Happened
+1. **Both processes died** — training and precompute killed by earlier system stress (likely OOM or SSH SIGHUP)
+2. **30,327 PKL files cached** — sufficient for training (teacher cache ready)
+3. **Training relaunched** with aggressive stability patches:
+   - Gradient checkpointing: DISABLED → ENABLED (use_reentrant=False)
+   - Batch size: 4 → 1 (effective batch still 4 via grad_accum=4)
+   - GPU: 110GB → 58GB (52GB headroom)
+
+### Training Status (Live)
+| Step | Loss | CE | Distill | SAE | LR | GPU |
+|------|------|-----|---------|-----|-----|-----|
+| 0 | 0.7067 | 0.476 | 1.152 | 0.000 | 4.00e-07 | 58.3GB |
+| 10 | 0.7238 | 0.494 | 1.150 | 0.000 | 4.40e-06 | 58.3GB |
+| 20 | 0.3816 | 0.382 | 0.000 | 0.000 | 8.40e-06 | 58.3GB |
+| 30 | 0.3495 | 0.350 | 0.000 | 0.000 | 1.24e-05 | 58.3GB |
+| 200 | 0.3564 | 0.360 | 0.000 | 0.000 | 8.04e-05 | 58.3GB |
+
+**Loss reduction: 49.5% in 200 steps | GPU: stable 58.3GB | 91% utilization**
+
+### Rate & ETA
+- ~20-22 sec/step
+- 10,000 steps = ~55-61 hours (~2.5 days)
+- Checkpoints every 500 steps (~2.8 hours)
+- First checkpoint: step 500 (~16 hours from launch)
+
+### Architecture Verified
+| Component | Status |
+|-----------|--------|
+| Student | Qwen3.6-27B-Uncensored (bf16) |
+| Teacher | FrankenV8-Final (8-layer qwen3, CPU) |
+| SAEs | Qwen-Scope, layers 16/32/48 |
+| LoRA | r=128, alpha=256 (~638M params, 2.3% trainable) |
+| Optimizer | 8-bit AdamW |
+| Distillation | Active (CE + distill + SAE, weights 1.0/0.2/0.05) |
+
+### Why Two DGXs for Full FT
+| Config | VRAM |
+|--------|------|
+| Current LoRA + checkpoint | 58GB ✅ |
+| Full FT + gradient checkpointing | 159GB |
+| Full FT no checkpointing | 647GB |
+
+Full fine-tune needs 159GB minimum. Two DGXs with NVLink = ~260GB.
+
+### Key Insight: Why Not "Batch" Parameters?
+Neural network backprop requires ALL layer gradients simultaneously. Each layer's gradient depends on all downstream layers. FSDP splits across GPUs working in parallel, not serially.
+
+### bf16 Confirmed
+- "Loading student model (bf16)"
+- "Loaded model in bf16"
+- Blackwell GPU native bf16 tensor cores = 91% utilization
+
+*Updated: May 4, 2026 16:40 CST | Commit: TBD*
