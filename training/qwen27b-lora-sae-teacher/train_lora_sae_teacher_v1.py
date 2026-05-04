@@ -960,7 +960,7 @@ def train(config: TrainConfig):
         
         # Forward pass
         outputs = model(input_ids=input_ids, labels=labels, output_hidden_states=True)
-        ce_loss = outputs.loss
+        ce_loss = outputs.loss.float() if outputs.loss is not None else torch.tensor(0.0, device=device)
         student_hidden_states = outputs.hidden_states
         
         # Cast hidden states to float32 for loss computation
