@@ -54,11 +54,12 @@
 - MASTER_DOC → full session history
 
 **Critical Notes for New CLI:**
-- DGX SSH host: `spark-85e8.local`
+- DGX SSH host: `spark-85e8.local` (use from user's Mac terminal, NOT from Hermes SSH — DGX SSH times out under GPU load)
 - Precompute log: `/mnt/bigssd/precompute_gpu.log`
 - Cache dir: `/mnt/bigssd/teacher_cache/`
 - Training resume command ready (see skill)
 - Cron monitor: `precompute-monitor` (checks every 10 min, alerts at 40K)
 - Push from Mac, not DGX (SSH times out under GPU load)
+- **DGX access: User's Mac has SSH config for spark-85e8.local. Hermes CLI cannot reach DGX directly — always use user's Mac terminal or DGX-local processes.**
 
 **Everything is wired. Ready for new CLI session.**
