@@ -101,17 +101,24 @@
 
 **All persistence layers updated for new CLI session.**
 
-## May 5, 2026 09:30 CDT — Training at Step 990
+## May 5, 2026 11:41 CDT — Training at Step 1400, Cortex Daemon Fixed
 
-**Status:** Training RUNNING. Step 990/10000. Loss 1.12 (81% reduction from 6.02).
+**Status:** Training RUNNING. Step 1400/10000. Loss 1.62 (73% reduction from 6.02).
 
 **Current metrics:**
-- Step 990 | Loss: 1.12 (CE: 0.92, D: 1.06) | LR: 1.99e-04 | GPU: 58.3GB
-- Progress: 9.9% complete
+- Step 1400 | Loss: 1.62 (CE: 1.46, D: 1.07, SAE: 0.000) | LR: 1.96e-04 | GPU: 58.3GB
+- Weights: CE:0.93, Distill:0.24, SAE:0.06
+- Progress: 14.0% complete
 - Speed: ~21s/step
-- ETA: ~52 hours for 10K steps
+- ETA: ~50 hours for 10K steps
 - PID: 583342 on DGX 10.0.0.171
-- Runtime: ~7h 30m
-- Next checkpoint: Step 1000 (imminent)
+- Runtime: ~20.5h
+- Next checkpoint: Step 1500
+
+**Cortex daemon schema fix (May 5, 11:35 CDT):**
+- Problem: `cortex_access.py` INSERT referenced non-existent columns (`tip_type`, `condition`, `recommendation`, `rationale`, `tool_name`, `last_seen`)
+- Fix: Removed columns from INSERT, store tip fields in `metadata` JSON, use `updated_at` instead of `last_seen`, remove broken `ON CONFLICT` clause
+- Result: Daemon running (PID 97192), 7060 tips, flywheel active, Elo avg 1336
+- Watchdog cron: `cortex-watchdog-shell` every 5 min via `~/.hermes/cortex_watchdog.sh`
 
 **Updated all persistence layers with latest status.**
