@@ -100,3 +100,18 @@
 **Milestone:** Passed 220-step hang threshold where previous runs froze. Now 3x further without issues.
 
 **All persistence layers updated for new CLI session.**
+
+## May 5, 2026 09:30 CDT — Training at Step 990
+
+**Status:** Training RUNNING. Step 990/10000. Loss 1.12 (81% reduction from 6.02).
+
+**Current metrics:**
+- Step 990 | Loss: 1.12 (CE: 0.92, D: 1.06) | LR: 1.99e-04 | GPU: 58.3GB
+- Progress: 9.9% complete
+- Speed: ~21s/step
+- ETA: ~52 hours for 10K steps
+- PID: 583342 on DGX 10.0.0.171
+- Runtime: ~7h 30m
+- Next checkpoint: Step 1000 (imminent)
+
+**Updated all persistence layers with latest status.**
