@@ -63,3 +63,40 @@
 - **DGX access: User's Mac has SSH config for spark-85e8.local. Hermes CLI cannot reach DGX directly — always use user's Mac terminal or DGX-local processes.**
 
 **Everything is wired. Ready for new CLI session.**
+
+## May 4, 2026 23:04 UTC - Teacher Distillation 5-Fix Activation
+
+**Problem:** Training runs but teacher distillation loss (D) stays at 0.000 even with 74K cached files.
+
+**Root causes (ALL must be fixed simultaneously):**
+- **A: Tokenizer mismatch** — Precompute uses Qwen3-0.6B tokenizer, training uses student's. Different tokenizers → different token IDs → different MD5 cache keys → 100% cache misses.
+- **B: Text formatting mismatch** — Precompute joins messages with `\n\n`, training uses `\n`.
+- **C: File ordering mismatch** — Precompute sorts files, training uses os.walk (arbitrary order).
+- **D: Column handling mismatch** — Precompute handles multiple column formats + fallback, training only conversations/messages.
+- **E: Tensor dimension mismatch** — Precompute saves 2D [seq_len, hidden], training expects 3D.
+
+**Fixes applied:**
+- A: Force training to use `/data/models/Qwen3-0.6B/` tokenizer
+- B: Update `_format_conversation` to use `\n\n`
+- C: Add `sorted()` to training file discovery
+- D: Copy precompute's full column handling logic
+- E: Add `.unsqueeze(0)` in training distillation loop
+
+**Result:** Step 0: Loss 6.0187 (CE:5.776 D:1.215). Teacher distillation ACTIVE. D ~1.07 stable.
+
+**Key insight:** Content-based MD5 cache keys are fragile — entire tokenization pipeline must match exactly.
+
+## May 5, 2026 07:58 CDT — Training Stable at Step 730
+
+**Status:** Training RUNNING. Step 730/10000. Loss 1.87 (69% reduction from 6.02).
+
+**Current metrics:**
+- Step 730 | Loss: 1.87 (CE: 1.69, D: 1.07) | LR: 2.00e-04 | GPU: 58.3GB
+- Progress: 7.3% complete
+- Speed: ~21s/step
+- ETA: ~55 hours for 10K steps
+- PID: 583342 on DGX 10.0.0.171
+
+**Milestone:** Passed 220-step hang threshold where previous runs froze. Now 3x further without issues.
+
+**All persistence layers updated for new CLI session.**
