@@ -57,37 +57,39 @@ ssh djg6228@10.0.0.171 'rm -f /mnt/bigssd/training_launched.flag /mnt/bigssd/tra
 - **Schedule:** WSD-S (warmup 500, stable 8000, decay 1500)
 - **Data:** Streaming Parquet (58 files, curatedthoughts + openthoughts2-1m)
 
-## Current Live Training State (May 5, 2026 11:41 CDT)
+## Current Live Training State (May 5, 2026 17:42 UTC)
 
-**Training is RUNNING. Do not restart unless explicitly asked.**
+**Training STOPPED. SAE loss bug identified but not verified in running process.**
 
 | Attribute | Value |
 |-----------|-------|
-| Step | 1400/10000 (14.0%) |
-| Loss | 1.62 (CE: 1.46, D: 1.07, SAE: 0.000) |
-| Loss reduction | 73% from start (6.02 → 1.62) |
-| GPU | 58.3GB / 121.7GB |
-| Speed | ~21 sec/step |
-| ETA | ~50 hours for 10K steps |
-| PID | 583342 |
+| Step | ~4/10000 (stopped) |
+| Loss | ~6.79 (CE:~6.55 D:~1.21 SAE:0.000) |
+| GPU | 58.4GB / 130GB |
 | DGX | 10.0.0.171 (djg6228/6228) |
-| Runtime | ~20.5h (started May 4 15:16 CST) |
-| LR | 1.96e-04 (stable phase) |
-| Checkpoints | Every 500 steps |
-| Next checkpoint | Step 1500 |
-| Weights | CE:0.93, Distill:0.24, SAE:0.06 |
+| Status | STOPPED — screen session killed |
+
+**SAE Loss Bug (Root Cause Identified):**
+- SAE loss permanently 0.000 despite 74K cache files
+- Root cause: SAE code calls `teacher_cache.get_by_cache_key()` which looks for `{md5_hash}.pkl` files directly on disk
+- But cache files are stored with positional IDs (`file{idx}_row{idx}.pkl`) via `precompute_teacher_cache.py`
+- Distillation loss (D) works because it uses `teacher_cache.get()` which checks `index.json` mapping
+- **Fix:** Change SAE lookup to use `teacher_cache.get()` instead of `get_by_cache_key()`
+- Fix applied to disk at line ~1155 in train script, NOT verified in running process (training stopped before verification)
+
+**All 5 Cache Alignment Fixes Active:**
+- (A) tokenizer=Qwen3-0.6B
+- (B) text format=\n\n
+- (C) file order=sorted
+- (D) columns=full multi-format
+- (E) tensor dim=.unsqueeze(0)
 
 **Quick status check:**
 ```bash
 sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null djg6228@10.0.0.171 'grep "Step [0-9]*.*Loss" /mnt/bigssd/train_lora_sae_teacher_v1.log | tail -5'
 ```
 
-**Process check:**
-```bash
-sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null djg6228@10.0.0.171 'ps -p 583342 -o pid,comm,etime,pcpu,pmem 2>/dev/null || echo "PROCESS_DEAD"'
-```
-
-**What to do if process is dead:**
+**What to do to restart:**
 1. Check log tail for crash reason: `tail -50 /mnt/bigssd/train_lora_sae_teacher_v1.log`
 2. Check for OOM: `dmesg | grep -i 'killed process' | tail -3`
 3. Check latest checkpoint: `ls -lt /data/SpecForge/custom_dflash/checkpoints/ | head -5`
@@ -128,6 +130,7 @@ When user asks "is everything updated completely" or "update everything before d
 8. **Training hang debugging** — Silent hangs (no error, no OOM) require granular debug logging to identify which operation blocks. See `references/training-hang-debugging-pattern.md`.
 9. **Teacher distillation 5-fix activation** — D loss stays at 0.000 despite 74K cache files. Five simultaneous fixes required: (A) tokenizer mismatch — use Qwen3-0.6B tokenizer in training, (B) text format — precompute uses \n\n, training used \n, (C) file order — precompute sorts files, training used os.walk, (D) columns — precompute handles multiple column formats + fallback, training only conversations/messages, (E) tensor dim — precompute saves 2D [seq_len, hidden], training expected 3D. Fix: .unsqueeze(0). See `references/teacher-distillation-activation-five-fixes.md`.
 10. **220-step hang threshold passed** — Previous runs hung around step 220. Current run (May 4 15:16 CST) passed step 730 without hangs. Root cause was combination of fixes #7 (remove empty_cache) + #9 (cache alignment). Training stable at ~21s/step, GPU 58.3GB.
+11. **SAE loss 0.000 — cache key mismatch (May 5, 17:42 UTC)** — SAE loss permanently 0.000 even though distillation loss (D) is active (~1.21) and 74K cache files exist. Root cause: SAE code calls `teacher_cache.get_by_cache_key()` which looks for `{md5_hash}.pkl` files directly on disk, but cache files use positional IDs (`file{idx}_row{idx}.pkl`) via precompute. Distillation works via `index.json` mapping. Fix: Change SAE lookup to use `teacher_cache.get()` (same as distillation) instead of `get_by_cache_key()`. Applied to disk at line ~1155, not verified in running process.
 
 ## Session Handoff Protocol
 When resuming across CLI sessions:
@@ -564,37 +567,32 @@ ssh djg6228@10.0.0.171 'chmod +x /mnt/bigssd/precompute_monitor.sh && bash /mnt/
 
 **Full pattern:** See `references/auto-launch-monitor-pattern.md`
 
-### Production Training Launch (May 4, 15:16 CST)
+### Production Training Launch (May 5, 17:42 UTC)
 
-**Status: RUNNING — Step 1400/10000, loss 1.62 (73% reduction from 6.02)**
+**Status: STOPPED at step ~4/10000 — SAE loss bug identified, fix applied to disk, not verified**
 
 ### What Happened
-1. Both processes died (training + precompute) — likely OOM or SSH SIGHUP during system stress
-2. 30,327 PKL files cached — sufficient for training
-3. Relaunched with aggressive stability patches:
-   - Gradient checkpointing: DISABLED → ENABLED (use_reentrant=False)
-   - Batch size: 4 → 1 (effective batch still 4 via grad_accum=4)
-   - GPU: 110GB → 58GB (52GB headroom)
-4. Teacher distillation D:0.000 despite 74K cache — fixed with 5 simultaneous cache alignment fixes
-5. Training passed 220-step hang threshold, now at step 1400+ without hangs
-6. Cortex daemon schema fixed May 5 — tip fields stored in metadata JSON, daemon running with flywheel active
+1. Training restarted in screen session after DGX reboot
+2. All 5 cache alignment fixes active (tokenizer, text format, file order, columns, tensor dim)
+3. Distillation loss (D) active at ~1.21 — teacher guidance working
+4. SAE loss permanently 0.000 — root cause identified: SAE code uses `get_by_cache_key()` with MD5 hash keys, but cache files use positional IDs (`file{idx}_row{idx}.pkl`)
+5. Fix applied to disk: change SAE lookup to use `teacher_cache.get()` (same as distillation)
+6. Training stopped before fix could be verified in running process
+7. No checkpoints saved yet (next checkpoint at step 1000)
 
-### Live Training Metrics (Latest)
-| Step | Loss | CE | Distill | SAE | LR | GPU |
-|------|------|-----|---------|-----|-----|-----|
-| 0 | 6.0187 | 5.776 | 1.215 | 0.000 | 4.00e-07 | 58.3GB |
-| 100 | 3.958 | 3.756 | 1.088 | 0.000 | 4.04e-05 | 58.3GB |
-| 200 | 2.933 | 2.737 | 1.080 | 0.000 | 8.04e-05 | 58.3GB |
-| 300 | 2.165 | 1.967 | 1.066 | 0.000 | 1.20e-04 | 58.3GB |
-| 500 | 1.551 | 1.360 | 1.082 | 0.000 | 2.00e-04 | 58.3GB |
-| 700 | 1.316 | 1.116 | 1.080 | 0.000 | 2.00e-04 | 58.3GB |
-| 1000 | 1.120 | 0.920 | 1.060 | 0.000 | 2.00e-04 | 58.3GB |
-| 1400 | 1.620 | 1.460 | 1.070 | 0.000 | 1.96e-04 | 58.3GB |
+### Current State
+- Log: `/mnt/bigssd/train_lora_sae_teacher_v1.log` (steps 0-4 logged)
+- Script: `/data/SpecForge/custom_dflash/train_lora_sae_teacher_v1.py` (SAE fix applied at ~line 1155)
+- Cache: 74,194 PKL files at `/mnt/bigssd/teacher_cache/`
+- Checkpoints: `/data/SpecForge/custom_dflash/checkpoints/` (empty — no checkpoints yet)
+- Screen session: Killed
 
-**Rate: ~21 sec/step | ETA: ~50 hours for 10K steps | Checkpoints every 500 steps**
-**PID: 583342 on DGX 10.0.0.171**
+### To Resume/Restart
+1. Verify SAE fix is correct in script: `grep -n "teacher_cache.get" train_lora_sae_teacher_v1.py | grep -i sae`
+2. Start fresh training from step 0 (no checkpoints to resume from)
+3. Monitor first steps for SAE loss > 0
 
-### Architecture Verified
+### Architecture
 | Component | Status |
 |-----------|--------|
 | Student | Qwen3.6-27B-Uncensored (bf16) |
@@ -603,7 +601,7 @@ ssh djg6228@10.0.0.171 'chmod +x /mnt/bigssd/precompute_monitor.sh && bash /mnt/
 | LoRA | r=128, alpha=256 (~638M params, 2.3% trainable) |
 | Optimizer | 8-bit AdamW |
 | Distillation | ACTIVE (CE + distill + SAE, weights 1.0/0.2/0.05) |
-| Cache | 74K PKL files, content-based MD5 keys |
+| Cache | 74K PKL files, index-based lookup working for D, needs fix for SAE |
 
 ### Why Two DGXs for Full FT
 | Config | VRAM |
