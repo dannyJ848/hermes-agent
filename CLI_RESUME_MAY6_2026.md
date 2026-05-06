@@ -1,9 +1,9 @@
 # CLI Resume — Qwen 27B Training (r=1024, Restarted Step 0/4000)
 
-**Generated:** May 6, 2026 11:55 UTC
+**Generated:** May 6, 2026 12:05 UTC
 **For:** New Hermes Agent CLI session
 **Branch:** `qwen27b-training-artifacts-may3-2026`
-**Commit:** `6621c1613` (with upstream cherry-picks)
+**Commit:** `f8225793c` (with upstream cherry-picks)
 
 ---
 
@@ -88,18 +88,20 @@ sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nul
 
 ## Upstream Sync Status (May 6)
 
-**Cherry-picked from upstream:**
+**Cherry-picked from upstream (applied May 6 morning):**
 - ✓ grok-4.3 model addition
 - ✓ deepseek-v4-pro model addition
 - ✓ arcee temperature + compression overrides
 - ✓ aux provider compression context length fix
 - ✓ hindsight API append mode + dedupe
 
-**Deferred (conflict risk with custom training code):**
-- ○ kanban max_spawn config
-- ○ kanban failure counter unification
-- ○ SSE token batching fix
-- ○ providers pluggable architecture
+**Applied May 6 afternoon (deferred updates):**
+- ✓ kanban max_spawn config (f0d278412)
+- ✓ SSE token batching + error handling (3188e63b0)
+
+**Skipped (structural conflicts):**
+- ✗ kanban failure counter unification (1fc8733a6) — depends on f67063ba8 (diagnostics engine) which has 5-file conflict with our branch
+- ✗ providers pluggable architecture (9022804d7) — our branch deleted providers/ directory, upstream renames all files
 
 **Skipped (i18n/docs):**
 - ✗ Turkish/Ukrainian/French/Chinese locales
