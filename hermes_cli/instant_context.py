@@ -76,6 +76,36 @@ def show_context():
     else:
         print("  Tips learned: 0 (judge evaluates on each tool call with tip output)")
     
+    # Tiered Memory System
+    print("\n[TIERED MEMORY]")
+    try:
+        import sys
+        sys.path.insert(0, 'hermes_cli/subconscious')
+        from tiered_memory import TieredMemory
+        tm = TieredMemory()
+        stats = tm.get_stats()
+        hot = stats['hot']
+        warm = stats['warm']
+        cold = stats['cold']
+        
+        # Hot tier bar
+        bar_width = 20
+        filled = int((hot['usage_pct'] / 100) * bar_width)
+        bar = '█' * filled + '░' * (bar_width - filled)
+        print(f"  HOT   [{bar}] {hot['usage_pct']:.1f}% ({hot['size_chars']}/{hot['limit']})")
+        print(f"        {hot['entries']} entries — immediate context")
+        
+        # Warm tier
+        print(f"  WARM  {warm['unrated']} unrated tips awaiting evaluation")
+        if warm['ready_for_cortex'] > 0:
+            print(f"        {warm['ready_for_cortex']} ready for cortex archive")
+        
+        # Cold tier
+        print(f"  COLD  {'cortex connected' if cold['has_cortex'] else 'fallback SQLite'}")
+        print(f"        {cold['high_performers']} high-performer memories")
+    except Exception as e:
+        print(f"  Status: unavailable ({e})")
+    
     # Active session
     print("\n[ACTIVE SESSION]")
     c.execute('''
