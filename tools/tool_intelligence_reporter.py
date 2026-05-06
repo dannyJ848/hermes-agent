@@ -13,11 +13,11 @@ def get_tool_success_rates():
         SELECT 
             tool_name,
             COUNT(*) as total,
-            SUM(CASE WHEN success THEN 1 ELSE 0 END) as successes,
-            AVG(elapsed_ms) as avg_ms,
-            MAX(timestamp) as last_used
+            SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successes,
+            AVG(speed_ms) as avg_ms,
+            MAX(datetime(created_at, 'unixepoch')) as last_used
         FROM tool_call_log
-        WHERE timestamp > datetime('now', '-7 days')
+        WHERE created_at > strftime('%s', 'now', '-7 days')
         GROUP BY tool_name
         ORDER BY successes DESC
     """)

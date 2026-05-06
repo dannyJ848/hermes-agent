@@ -12,10 +12,10 @@ def get_adaptive_timeout(tool_name, default_timeout=30.0):
     
     # Get average successful execution time
     c.execute("""
-        SELECT AVG(elapsed_ms), COUNT(*)
+        SELECT AVG(speed_ms), COUNT(*)
         FROM tool_call_log
-        WHERE tool_name = ? AND success = 1
-        AND timestamp > datetime('now', '-7 days')
+        WHERE tool_name = ? AND status = 'success'
+        AND created_at > strftime('%s', 'now', '-7 days')
     """, (tool_name,))
     avg_ms, count = c.fetchone()
     
@@ -34,7 +34,7 @@ def get_all_adaptive_timeouts():
     c = conn.cursor()
     c.execute("""
         SELECT DISTINCT tool_name FROM tool_call_log
-        WHERE timestamp > datetime('now', '-7 days')
+        WHERE created_at > strftime('%s', 'now', '-7 days')
     """)
     tools = [row[0] for row in c.fetchall()]
     conn.close()
