@@ -53,5 +53,32 @@
       "adaptive_timeout.py": "calculates timeouts from history",
       "context_pressure_gauge.py": "monitors token pressure"
     }
+  },
+  "persistence": {
+    "cerebrum_memory": {
+      "path": "~/.hermes/cerebrum_memory.db",
+      "tables": [
+        "cortex_nodes",
+        "cortex_eval_history",
+        "tool_intelligence",
+        "system_registry",
+        "session_outcomes"
+      ],
+      "size_mb": 13.8,
+      "last_backup": null
+    },
+    "training_gym": {
+      "path": "~/.hermes/training_gym.db",
+      "tables": [
+        "training_runs",
+        "training_metrics"
+      ],
+      "size_mb": 0.02
+    },
+    "checkpoints": {
+      "path": "~/.hermes/workspace/checkpoints/",
+      "count": 775,
+      "last_updated": null
+    }
   }
 }
