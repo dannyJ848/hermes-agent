@@ -1,13 +1,13 @@
-# CLI Resume — Qwen 27B Training (r=1024, Restarted Step 0/4000)
+# CLI Resume — Qwen 27B Training + Learning Apparatus + Hermes Harness
 
-**Generated:** May 6, 2026 12:05 UTC
+**Generated:** May 6, 2026 12:35 UTC
 **For:** New Hermes Agent CLI session
 **Branch:** `qwen27b-training-artifacts-may3-2026`
-**Commit:** `f8225793c` (with upstream cherry-picks)
+**Commit:** `46ee245e4` (with upstream cherry-picks + enhancements)
 
 ---
 
-## Training Status (RESTARTED — Step 0)
+## Training Status (RESTARTED — Step 0/4000)
 
 | Attribute | Value |
 |-----------|-------|
@@ -31,24 +31,6 @@
 - CE: 6.31 → 1.5 (76% drop)
 - D: 2.02 → 1.58 (22% drop)
 - SAE: 0.65 → 0.58 (stable)
-
----
-
-## What Happened
-
-Training died at step ~500 during `model.save_pretrained()`. GPU was at 85.5GB/130GB — the save operation needed extra memory to serialize 5.1B LoRA weights, causing OOM.
-
-**Fixes applied:**
-1. `save_every` changed from 500 → 1000 (less frequent saves)
-2. Pre-save: `torch.cuda.empty_cache()` + `gc.collect()` + `torch.cuda.synchronize()`
-3. CPU offload: `model.to('cpu')` before save, `model.to('cuda')` after
-4. Try/except/finally around save to ensure GPU return even on failure
-5. Auto-resume logic: detects latest checkpoint on startup
-
-**Checkpoint status:**
-- Step 500: EMPTY (only README.md, no weights — save failed mid-write)
-- Step 1000: Not yet reached
-- No valid checkpoints exist — restart from scratch
 
 ---
 
@@ -98,25 +80,21 @@ sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nul
 **Applied May 6 afternoon (deferred updates):**
 - ✓ kanban max_spawn config (f0d278412)
 - ✓ SSE token batching + error handling (3188e63b0)
+- ✓ kanban failure counter unification (1fc8733a6) + diagnostics engine (f67063ba8)
+
+**Applied May 6 evening (new features):**
+- ✓ Per-capability backend selection (bf4e50214) — web_search/web_extract split
+- ✓ Hook context spill to disk (b6c53ef0b) — prevents context overflow
+- ✓ Kanban task_runs.summary (3f9729741) — better task visibility
+- ✓ Cron no_agent mode (3db6b9cc8) — script-only cron jobs
 
 **Skipped (structural conflicts):**
-- ✗ kanban failure counter unification (1fc8733a6) — depends on f67063ba8 (diagnostics engine) which has 5-file conflict with our branch
-- ✗ providers pluggable architecture (9022804d7) — our branch deleted providers/ directory, upstream renames all files
+- ✗ providers pluggable architecture (9022804d7) — our branch deleted providers/ directory
 
 **Skipped (i18n/docs):**
 - ✗ Turkish/Ukrainian/French/Chinese locales
 - ✗ README translations
 - ✗ Open WebUI/Ollama guides
-
----
-
-## Critical Notes
-
-- **DGX SSH times out during heavy loads** — this is expected. Use `process_poll` instead of SSH when training is active.
-- **No screen session** — training runs via nohup directly. PID 590094.
-- **First checkpoint at step 1000** — ~8 hours from now. Watch for OOM.
-- **If training dies again:** Check `/mnt/bigssd/train_lora_sae_teacher_v1_restart.log` for "Checkpoint save failed" or OOM signs.
-
 
 ---
 
@@ -140,3 +118,33 @@ sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nul
 - Cross-domain transfer tracker
 - Session compression quality tracker
 - Tip velocity tracker (14 days history)
+
+---
+
+## Hermes Harness — Workflow Helpers
+
+Created to work around weak tools:
+
+| Helper | Replaces | Success Rate |
+|--------|----------|-------------|
+| `~/.hermes/scripts/cron_helper.py` | cronjob tool | 13% → CLI |
+| `~/.hermes/scripts/patch_helper.py` | patch tool | 59% → validated |
+| `~/.hermes/scripts/skill_helper.py` | skill_manage | 49% → YAML-safe |
+
+**Usage:**
+```bash
+python3 ~/.hermes/scripts/cron_helper.py list
+python3 ~/.hermes/scripts/cron_helper.py remove <job_name>
+python3 ~/.hermes/scripts/patch_helper.py <file> <old> <new>
+python3 ~/.hermes/scripts/skill_helper.py create <name> <category> <content>
+```
+
+---
+
+## Critical Notes
+
+- **DGX SSH times out during heavy loads** — this is expected. Use `process_poll` instead of SSH when training is active.
+- **No screen session** — training runs via nohup directly. PID 590094.
+- **First checkpoint at step 1000** — ~8 hours from now. Watch for OOM.
+- **If training dies again:** Check `/mnt/bigssd/train_lora_sae_teacher_v1_restart.log` for "Checkpoint save failed" or OOM signs.
+- **Use helpers for cron/patch/skill ops** — avoid weak tools directly.
