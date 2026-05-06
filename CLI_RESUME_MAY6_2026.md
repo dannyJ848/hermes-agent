@@ -7,30 +7,32 @@
 
 ---
 
-## Training Status (RESTARTED — Step 0/4000)
+## Training Status (RUNNING — Step ~670/4000)
 
 | Attribute | Value |
 |-----------|-------|
-| **Step** | 0/4000 (0%) |
-| **Previous** | 490/4000 lost (OOM at checkpoint save) |
-| **Loss** | N/A (just started) |
-| **GPU** | TBD / 130GB |
+| **Step** | ~670/4000 (16.5%) |
+| **Previous** | 490/4000 lost (OOM at checkpoint save, May 6 11:44 AM restart) |
+| **Loss** | 1.93 (CE:1.53 D:1.90 SAE:0.59) |
+| **GPU** | 85.3GB / 130GB (65.6%, stable) |
 | **DGX** | 10.0.0.171 (djg6228/6228) |
-| **PID** | 590094 (new restart) |
+| **PID** | 590094 |
 | **Screen** | None (running via nohup) |
 | **LoRA** | r=1024, alpha=2048 |
-| **Trainable** | 5.1B params (15.9% of 32B) |
-| **MAX_STEPS** | 4000 |
-| **save_every** | 1000 (was 500, changed to reduce OOM) |
-| **Checkpoint fix** | CPU offload + empty_cache + synchronize before save |
-| **Rate** | ~30 sec/step |
-| **ETA** | ~33 hours (completion ~May 7, 21:00 UTC) |
+| **Trainable** | ~2GB params (LoRA only, frozen 27B base) |
+| **MAX_STEPS** | 4000 (corrected from 10K) |
+| **save_every** | 500 (corrected from 1000) |
+| **warmup_steps** | 400 |
+| **Checkpoint fix** | CPU offload + empty_cache + synchronize + try/finally |
+| **Rate** | 30.2 sec/step (log interval is 10 steps = 302.5s) |
+| **ETA** | ~28 hours (completion ~May 7, 21:00 UTC) |
+| **Next checkpoint** | Step 1000 (~25 min, watcher PID 778063 monitoring) |
 
-**Loss trajectory (previous run, for reference):**
-- Step 4: 6.74 → Step 490: 1.6-2.5 (65%+ reduction)
-- CE: 6.31 → 1.5 (76% drop)
-- D: 2.02 → 1.58 (22% drop)
-- SAE: 0.65 → 0.58 (stable)
+**Loss trajectory:**
+- Step 360: 2.08 → Step 660: 1.93 (7% reduction)
+- CE: 1.75 → 1.53 (12% drop)
+- D: 1.56 → 1.90 (teacher distillation active)
+- SAE: 0.56 → 0.59 (stable)
 
 ---
 
@@ -118,6 +120,9 @@ sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nul
 - Cross-domain transfer tracker
 - Session compression quality tracker
 - Tip velocity tracker (14 days history)
+- **Tiered Memory System**: Hot→Warm→Cold auto-overflow (hermes_cli/subconscious/)
+- **LLM Judge Integration**: deepseek-v4-pro auto-evaluates tips in post_tool_call hook
+- **Checkpoint Watcher**: Background monitor for step 1000 save test
 
 ---
 
@@ -145,8 +150,9 @@ python3 ~/.hermes/scripts/skill_helper.py create <name> <category> <content>
 
 - **DGX SSH times out during heavy loads** — this is expected. Use `process_poll` instead of SSH when training is active.
 - **No screen session** — training runs via nohup directly. PID 590094.
-- **First checkpoint at step 1000** — ~8 hours from now. Watch for OOM.
-- **If training dies again:** Check `/mnt/bigssd/train_lora_sae_teacher_v1_restart.log` for "Checkpoint save failed" or OOM signs.
+- **First checkpoint at step 1000** — ~25 min from now (step ~670 currently). Watcher PID 778063 monitoring.
+- **If training dies again:** Run `/tmp/recovery_plan.sh` on DGX to auto-find latest checkpoint and print resume command.
+- **Checkpoint OOM fixes:** CPU-offload save (model.to('cpu')), empty_cache, synchronize, try/finally wrapper — implemented but untested at 85GB.
 - **Use helpers for cron/patch/skill ops** — avoid weak tools directly.
 
 
