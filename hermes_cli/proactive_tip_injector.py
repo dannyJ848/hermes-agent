@@ -13,7 +13,12 @@ class ProactiveTipInjector:
         """Get tips relevant to current task."""
         c = self.conn.cursor()
         
-        # Simple keyword matching — in practice use embeddings
+        # Check if cortex_nodes exists
+        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='cortex_nodes'")
+        if not c.fetchone():
+            return []
+        
+        # Simple keyword matching
         keywords = current_task.lower().split()
         
         c.execute('''

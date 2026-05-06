@@ -42,6 +42,15 @@ class FailurePostMortem:
         
         # Store or update
         c = self.conn.cursor()
+        # Check if table has the right schema
+        c.execute("PRAGMA table_info(error_patterns)")
+        columns = [col[1] for col in c.fetchall()]
+        
+        if 'error_signature' not in columns:
+            # Recreate table with correct schema
+            c.execute('DROP TABLE IF EXISTS error_patterns')
+            self._ensure_table()
+        
         c.execute('''
             SELECT id, occurrence_count FROM error_patterns
             WHERE error_signature = ? AND tool_name = ?
