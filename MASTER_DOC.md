@@ -101,31 +101,44 @@
 
 **All persistence layers updated for new CLI session.**
 
-## May 5, 2026 17:42 UTC — Training STOPPED, SAE Loss Bug Identified
+## May 5, 2026 21:17 UTC — Training LIVE, SAE+Distillation+CE All Active
 
-**Status:** Training STOPPED at step ~4/10000. Screen session killed.
+**Status:** Training LIVE at step 30/10000. All 3 loss components active.
 
 **What happened:**
-1. Training restarted in screen session `62208.training` after DGX reboot
-2. All 5 cache alignment fixes active — distillation loss (D) working at ~1.21
-3. SAE loss permanently 0.000 on every step
-4. Root cause identified: SAE code calls `teacher_cache.get_by_cache_key()` which looks for `{md5_hash}.pkl` files directly on disk
-5. But cache files use positional IDs (`file{idx}_row{idx}.pkl`) via `precompute_teacher_cache.py`
-6. Distillation works because it uses `teacher_cache.get()` which checks `index.json` mapping
-7. Fix applied to disk: changed SAE lookup at line ~1155 to use `teacher_cache.get()` instead of `get_by_cache_key()`
-8. Training stopped before fix could be verified in running process
+1. Training restarted in screen session `training` after cache regeneration
+2. All 5 cache alignment fixes active — distillation loss (D) working at ~1.87
+3. SAE loss active at ~0.60 — first non-zero SAE loss in training history
+4. Cache regenerated: 81,762 files with keys [8,16,32,48] (FrankenV8 layer 8 duplicated)
+5. 5 fixes applied: (1) dataclass syntax error, (2) SAE batch dimension .unsqueeze(0), (3) cache regen, (4) teacher_layers=[8], (5) precompute layer duplication
+6. GPU stable at 58.5GB, no hangs, no OOMs
+7. No checkpoints saved yet (next checkpoint at step 1000)
+
+**Current metrics (Step 30):**
+- Loss: 5.6365 (CE:5.239 D:1.869 SAE:0.600)
+- Weights: CE:1.00, Distill:0.20, SAE:0.05
+- LR: 1.24e-05 (ramping from 0.0002 max)
+- GPU: 58.5GB / 130GB
+- Speed: ~4 min/step
+- ETA to step 500: ~31 hours
+- ETA to step 10000: ~27 days
 
 **Current state:**
-- Log: `/mnt/bigssd/train_lora_sae_teacher_v1.log` (steps 0-4 logged, last: Step 4, Loss 6.79)
-- Script: `/data/SpecForge/custom_dflash/train_lora_sae_teacher_v1.py` (SAE fix applied)
-- Cache: 74,194 PKL files at `/mnt/bigssd/teacher_cache/`
-- Checkpoints: None saved (next would be at step 1000)
-- Screen session: Killed
+- Log: `/mnt/bigssd/train_lora_sae_teacher_v1.log` (steps 0-30 logged)
+- Script: `/data/SpecForge/custom_dflash/train_lora_sae_teacher_v1.py` (3 fixes applied)
+- Cache: 81,762 PKL files at `/mnt/bigssd/teacher_cache/` with keys [8,16,32,48]
+- Checkpoints: `/data/SpecForge/custom_dflash/checkpoints/` (empty — no checkpoints yet)
+- Screen session: `training` (active)
+- Monitor: 2 cron jobs reporting every 2 min
 
-**To restart:**
-1. Verify fix in script: `grep -n "teacher_cache.get" train_lora_sae_teacher_v1.py | grep -i sae`
-2. Start fresh from step 0 (no checkpoints)
-3. Monitor first steps for SAE loss > 0
+**To check status:**
+```bash
+# Latest steps
+sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null djg6228@10.0.0.171 'grep "Step [0-9]*.*Loss" /mnt/bigssd/train_lora_sae_teacher_v1.log | tail -5'
+
+# Process check
+sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null djg6228@10.0.0.171 'ps aux | grep train_lora | grep -v grep'
+```
 
 ## May 5, 2026 11:41 CDT — Training at Step 1400, Cortex Daemon Fixed
 
