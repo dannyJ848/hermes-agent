@@ -101,31 +101,31 @@
 
 **All persistence layers updated for new CLI session.**
 
-## May 5, 2026 21:17 UTC — Training LIVE, SAE+Distillation+CE All Active
+## May 5, 2026 23:03 UTC — Training LIVE, r=1024, MAX_STEPS=4000
 
-**Status:** Training LIVE at step 30/10000. All 3 loss components active.
+**Status:** Training LIVE at step 1/4000. LoRA r=1024 (5.1B trainable, 15.9% of 32B total).
 
 **What happened:**
-1. Training restarted in screen session `training` after cache regeneration
-2. All 5 cache alignment fixes active — distillation loss (D) working at ~1.87
-3. SAE loss active at ~0.60 — first non-zero SAE loss in training history
-4. Cache regenerated: 81,762 files with keys [8,16,32,48] (FrankenV8 layer 8 duplicated)
-5. 5 fixes applied: (1) dataclass syntax error, (2) SAE batch dimension .unsqueeze(0), (3) cache regen, (4) teacher_layers=[8], (5) precompute layer duplication
-6. GPU stable at 58.5GB, no hangs, no OOMs
+1. Bumped LoRA from r=128 (637M trainable, 2.3%) to r=1024 (5.1B trainable, 15.9%) — 8x more expressive power
+2. Reduced MAX_STEPS from 10000 to 4000 per Kimi recommendation: "3-4k steps at r=1024 is the sweet spot"
+3. All 5 cache alignment fixes active — distillation loss (D) working at ~1.99
+4. SAE loss active at ~0.64 — verified working at new rank
+5. All 3 loss components (CE + D + SAE) running simultaneously
+6. GPU at 85.5GB (was 58.5GB at r=128) — within 130GB limit with 44.5GB headroom
 7. No checkpoints saved yet (next checkpoint at step 1000)
 
-**Current metrics (Step 30):**
-- Loss: 5.6365 (CE:5.239 D:1.869 SAE:0.600)
+**Current metrics (Step 1):**
+- Loss: 6.36 (CE:5.93 D:1.99 SAE:0.64)
 - Weights: CE:1.00, Distill:0.20, SAE:0.05
-- LR: 1.24e-05 (ramping from 0.0002 max)
-- GPU: 58.5GB / 130GB
-- Speed: ~4 min/step
-- ETA to step 500: ~31 hours
-- ETA to step 10000: ~27 days
+- LR: 8.00e-07 (ramping from 0.0002 max)
+- GPU: 85.5GB / 130GB
+- Speed: ~30 sec/step (slower than r=128's 22 sec due to more params)
+- ETA to 4K: ~33 hours
+- ETA to completion: ~33 hours total
 
 **Current state:**
-- Log: `/mnt/bigssd/train_lora_sae_teacher_v1.log` (steps 0-30 logged)
-- Script: `/data/SpecForge/custom_dflash/train_lora_sae_teacher_v1.py` (3 fixes applied)
+- Log: `/mnt/bigssd/train_lora_sae_teacher_v1.log` (steps 0-1 logged)
+- Script: `/data/SpecForge/custom_dflash/train_lora_sae_teacher_v1.py` (r=1024, alpha=2048)
 - Cache: 81,762 PKL files at `/mnt/bigssd/teacher_cache/` with keys [8,16,32,48]
 - Checkpoints: `/data/SpecForge/custom_dflash/checkpoints/` (empty — no checkpoints yet)
 - Screen session: `training` (active)
