@@ -73,6 +73,8 @@ def show_context():
             tips = json.loads(row[1]) if row[1] else []
             for t in tips[:2]:
                 print(f"    • {t[:80]}")
+    else:
+        print("  Tips learned: 0 (judge evaluates on each tool call with tip output)")
     
     # Active session
     print("\n[ACTIVE SESSION]")
