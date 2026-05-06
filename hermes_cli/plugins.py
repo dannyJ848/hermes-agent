@@ -380,7 +380,48 @@ class PluginContext:
     # -- tool dispatch -------------------------------------------------------
 
     def dispatch_tool(self, tool_name: str, args: dict, **kwargs) -> str:
-        """Dispatch a tool call through the registry, with parent agent context.
+        """Execute a registered tool by name with intelligence tracking."""
+        import time
+        import sqlite3
+        import json
+        
+        start_time = time.time()
+        result = None
+        error = None
+        
+        try:
+            result = self._dispatch_tool_internal(tool_name, args, **kwargs)
+            return result
+        except Exception as e:
+            error = str(e)
+            raise
+        finally:
+            # Track tool performance
+            elapsed = time.time() - start_time
+            try:
+                conn = sqlite3.connect('/Users/dannygomez/.hermes/cerebrum_memory.db')
+                c = conn.cursor()
+                c.execute('''
+                    INSERT INTO tool_call_log (tool_name, success, elapsed_ms, error, timestamp)
+                    VALUES (?, ?, ?, ?, datetime('now'))
+                ''', (tool_name, error is None, int(elapsed * 1000), error))
+                conn.commit()
+                conn.close()
+            except:
+                pass  # Don't fail the tool call if tracking fails
+
+    def _dispatch_tool_internal(self, tool_name: str, args: dict, **kwargs) -> str:
+        """Internal tool dispatch — actual execution.""
+        # Check circuit breaker
+        if self._is_tool_disabled(tool_name):
+            raise ToolDisabledError(f"Tool {tool_name} is temporarily disabled due to consecutive failures")
+        
+        # Check adaptive timeout
+        timeout = self._get_adaptive_timeout(tool_name)
+        if timeout:
+            kwargs['timeout'] = timeout
+        
+        # Original dispatch logic continues here...
 
         This is the public interface for plugin slash commands that need to call
         tools like ``delegate_task`` without reaching into framework internals.
