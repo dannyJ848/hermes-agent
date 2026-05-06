@@ -148,3 +148,33 @@ python3 ~/.hermes/scripts/skill_helper.py create <name> <category> <content>
 - **First checkpoint at step 1000** — ~8 hours from now. Watch for OOM.
 - **If training dies again:** Check `/mnt/bigssd/train_lora_sae_teacher_v1_restart.log` for "Checkpoint save failed" or OOM signs.
 - **Use helpers for cron/patch/skill ops** — avoid weak tools directly.
+
+
+---
+
+## Hermes Source Enhancements (May 6)
+
+**New monitoring tools:**
+| Tool | Purpose | Location |
+|------|---------|----------|
+| `tool_intelligence_reporter.py` | Tracks per-tool success rates | `tools/` |
+| `context_pressure_gauge.py` | Monitors token pressure, spills at >80% | `tools/` |
+| `adaptive_timeout.py` | Calculates timeouts from historical performance | `tools/` |
+
+**Database tables:**
+| Table | Purpose |
+|-------|---------|
+| `circuit_breaker` | Tracks consecutive failures per tool |
+| `context_pressure` | Tracks token usage over time |
+
+**Integration points:**
+- `hermes_cli/plugins.py` — `dispatch_tool()` now tracks performance
+- Circuit breaker auto-disables tools after 5 consecutive failures
+- Adaptive timeout = 3x average + 20% buffer
+
+**Usage:**
+```bash
+python3 tools/tool_intelligence_reporter.py  # View success rates
+python3 tools/adaptive_timeout.py            # View adaptive timeouts
+python3 tools/context_pressure_gauge.py    # Test pressure gauge
+```
