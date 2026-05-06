@@ -53,25 +53,29 @@ def check_training_gym():
 def full_health_report():
     """Generate full health report."""
     print("=" * 70)
-    print(f"PERSISTENCE HEALTH — {datetime.now().isoformat()}")
+    print("PERSISTENCE HEALTH - " + datetime.now().isoformat())
     print("=" * 70)
     
     cerebrum = check_cerebrum()
-    print(f"\n[CEREBRUM]")
-    print(f"  Tables: {len(cerebrum['tables'])}")
-    print(f"  Tips: {cerebrum['tips']}")
-    print(f"  Tools tracked: {cerebrum['tools_tracked']}")
+    print("
+[CEREBRUM]")
+    print("  Tables: " + str(len(cerebrum['tables'])))
+    print("  Tips: " + str(cerebrum['tips']))
+    print("  Tools tracked: " + str(cerebrum['tools_tracked']))
     if cerebrum['failing_tools']:
-        print(f"  ⚠ Failing tools: {', '.join(t[0] for t in cerebrum['failing_tools'])}")
+        failing = ", ".join(t[0] for t in cerebrum['failing_tools'])
+        print("  WARNING Failing tools: " + failing)
     
     training = check_training_gym()
-    print(f"\n[TRAINING GYM]")
-    print(f"  Tables: {len(training['tables'])}")
+    print("
+[TRAINING GYM]")
+    print("  Tables: " + str(len(training['tables'])))
     if 'current_run' in training:
         r = training['current_run']
-        print(f"  Current: {r['run_id']} — Step {r['step']}/{r['total']} ({r['status']})")
+        print("  Current: " + r['run_id'] + " - Step " + str(r['step']) + "/" + str(r['total']) + " (" + r['status'] + ")")
     
-    print("\n" + "=" * 70)
+    print("
+" + "=" * 70)
 
 if __name__ == '__main__':
     full_health_report()
