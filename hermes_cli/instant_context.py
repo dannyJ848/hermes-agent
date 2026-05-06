@@ -47,6 +47,33 @@ def show_context():
         print(f"  ! {row[0]}: {row[1][:60]}...")
         print(f"    → {row[2]}")
     
+    # LLM Judge status
+    print("\n[LLM JUDGE]")
+    c.execute('''
+        SELECT value FROM cli_context WHERE key = 'deepseek_judge'
+    ''')
+    row = c.fetchone()
+    if row:
+        print(f"  Model: {row[0]}")
+    else:
+        print("  Model: deepseek-v4-pro (default)")
+    
+    # Tips learned
+    c.execute('''
+        SELECT session_id, tips_learned
+        FROM session_continuity
+        WHERE tips_learned IS NOT NULL AND tips_learned != '[]'
+        ORDER BY last_activity DESC
+        LIMIT 3
+    ''')
+    tips_rows = c.fetchall()
+    if tips_rows:
+        print(f"  Tips learned: {len(tips_rows)} sessions")
+        for row in tips_rows:
+            tips = json.loads(row[1]) if row[1] else []
+            for t in tips[:2]:
+                print(f"    • {t[:80]}")
+    
     # Active session
     print("\n[ACTIVE SESSION]")
     c.execute('''
