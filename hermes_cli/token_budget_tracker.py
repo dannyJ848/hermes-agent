@@ -13,35 +13,53 @@ class TokenBudgetTracker:
     
     def _ensure_table(self):
         c = self.conn.cursor()
-        c.execute('''
-            CREATE TABLE IF NOT EXISTS token_usage (
-                id INTEGER PRIMARY KEY,
-                session_id TEXT,
-                tool_name TEXT,
-                input_tokens INTEGER,
-                output_tokens INTEGER,
-                timestamp TIMESTAMP
-            )
-        ''')
+        # Check if table exists and what columns it has
+        c.execute("PRAGMA table_info(token_usage)")
+        existing = c.fetchall()
+        
+        if not existing:
+            # Create new table with correct schema
+            c.execute('''
+                CREATE TABLE token_usage (
+                    id INTEGER PRIMARY KEY,
+                    session_id TEXT,
+                    tool_name TEXT,
+                    tokens_in INTEGER DEFAULT 0,
+                    tokens_out INTEGER DEFAULT 0,
+                    speed_ms REAL DEFAULT 0,
+                    success INTEGER DEFAULT 1,
+                    created_at REAL DEFAULT (strftime('%s', 'now'))
+                )
+            ''')
+        else:
+            # Check if session_id column exists
+            columns = [col[1] for col in existing]
+            if 'session_id' not in columns:
+                c.execute('ALTER TABLE token_usage ADD COLUMN session_id TEXT')
+            if 'tokens_in' not in columns:
+                c.execute('ALTER TABLE token_usage ADD COLUMN tokens_in INTEGER DEFAULT 0')
+            if 'tokens_out' not in columns:
+                c.execute('ALTER TABLE token_usage ADD COLUMN tokens_out INTEGER DEFAULT 0')
+        
         self.conn.commit()
     
-    def log_usage(self, session_id, tool_name, input_tokens, output_tokens):
+    def log_usage(self, session_id, tool_name, tokens_in=0, tokens_out=0):
         """Log token usage."""
         c = self.conn.cursor()
         c.execute('''
-            INSERT INTO token_usage (session_id, tool_name, input_tokens, output_tokens, timestamp)
-            VALUES (?, ?, ?, ?, datetime('now'))
-        ''', (session_id, tool_name, input_tokens, output_tokens))
+            INSERT INTO token_usage (session_id, tool_name, tokens_in, tokens_out, created_at)
+            VALUES (?, ?, ?, ?, strftime('%s', 'now'))
+        ''', (session_id, tool_name, tokens_in, tokens_out))
         self.conn.commit()
     
     def get_session_usage(self, session_id):
         """Get total usage for session."""
         c = self.conn.cursor()
         c.execute('''
-            SELECT SUM(input_tokens), SUM(output_tokens), COUNT(DISTINCT tool_name)
+            SELECT SUM(tokens_in), SUM(tokens_out), COUNT(DISTINCT tool_name)
             FROM token_usage
             WHERE session_id = ?
-            AND timestamp > datetime('now', '-1 day')
+            AND created_at > strftime('%s', 'now', '-1 day')
         ''', (session_id,))
         row = c.fetchone()
         return {

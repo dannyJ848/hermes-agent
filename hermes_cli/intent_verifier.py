@@ -51,7 +51,10 @@ class IntentVerifier:
         
         if auto_score:
             c.execute('SELECT expected_outcome FROM intent_checks WHERE id = ?', (check_id,))
-            expected = c.fetchone()[0]
+            row = c.fetchone()
+            if row is None:
+                return {'match_score': None, 'needs_clarification': True, 'error': 'check_id not found'}
+            expected = row[0]
             score = self._calculate_match(expected, actual)
         else:
             score = None

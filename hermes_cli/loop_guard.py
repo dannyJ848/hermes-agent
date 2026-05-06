@@ -8,8 +8,8 @@ from datetime import datetime
 
 class LoopGuard:
     def __init__(self, threshold=3, window_seconds=60):
-        self.threshold = threshold
-        self.window = window_seconds
+        self.threshold = int(threshold)
+        self.window = int(window_seconds)
         self.conn = sqlite3.connect('/Users/dannygomez/.hermes/cerebrum_memory.db')
         self._ensure_table()
     
@@ -38,7 +38,7 @@ class LoopGuard:
             AND timestamp > datetime('now', '-{} seconds')
         '''.format(self.window), (tool_name, args_hash))
         
-        count = c.fetchone()[0]
+        count = int(c.fetchone()[0])
         
         # Log this attempt
         c.execute('''

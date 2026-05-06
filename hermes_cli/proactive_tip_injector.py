@@ -13,31 +13,45 @@ class ProactiveTipInjector:
         """Get tips relevant to current task."""
         c = self.conn.cursor()
         
-        # Check if cortex_nodes exists
-        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='cortex_nodes'")
-        if not c.fetchone():
-            return []
+        # Check available tables
+        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('cortex_nodes', 'distilled_tips')")
+        tables = [r[0] for r in c.fetchall()]
         
-        # Simple keyword matching
         keywords = current_task.lower().split()
+        tips = []
         
-        c.execute('''
-            SELECT text, elo, domain, confidence
-            FROM cortex_nodes
-            WHERE node_type = 'tip' AND is_active = TRUE
-            AND (
-        ''' + ' OR '.join(["LOWER(text) LIKE ?" for _ in keywords]) + '''
-            )
-            ORDER BY elo DESC, confidence DESC
-            LIMIT ?
-        ''', [f'%{k}%' for k in keywords] + [limit])
+        # Try cortex_nodes first
+        if 'cortex_nodes' in tables:
+            try:
+                c.execute('''
+                    SELECT text, elo, domain, confidence
+                    FROM cortex_nodes
+                    WHERE node_type = 'tip' AND is_active = TRUE
+                    AND (''' + ' OR '.join(["LOWER(text) LIKE ?" for _ in keywords]) + ''')
+                    ORDER BY elo DESC, confidence DESC
+                    LIMIT ?
+                ''', [f'%{k}%' for k in keywords] + [limit])
+                for row in c.fetchall():
+                    tips.append({'tip': row[0], 'elo': row[1], 'domain': row[2], 'confidence': row[3]})
+            except:
+                pass
         
-        return [{
-            'text': row[0],
-            'elo': row[1],
-            'domain': row[2],
-            'confidence': row[3]
-        } for row in c.fetchall()]
+        # Fallback to distilled_tips
+        if 'distilled_tips' in tables and len(tips) < limit:
+            try:
+                c.execute('''
+                    SELECT condition, recommendation, tool_name, domain, confidence
+                    FROM distilled_tips
+                    WHERE (''' + ' OR '.join(["LOWER(condition) LIKE ? OR LOWER(recommendation) LIKE ? OR LOWER(tool_name) LIKE ?" for _ in keywords]) + ''')
+                    ORDER BY confidence DESC, frequency DESC
+                    LIMIT ?
+                ''', [f'%{k}%' for k in keywords for _ in range(3)] + [limit - len(tips)])
+                for row in c.fetchall():
+                    tips.append({'tip': f"{row[0]} -> {row[1]}", 'tool': row[2], 'domain': row[3], 'confidence': row[4]})
+            except:
+                pass
+        
+        return tips
     
     def format_tip(self, tip):
         """Format tip for injection."""
