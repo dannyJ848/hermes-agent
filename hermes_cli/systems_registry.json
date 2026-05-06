@@ -1,0 +1,57 @@
+{
+  "hermes_core": {
+    "path": "hermes_cli/",
+    "components": [
+      "plugins.py",
+      "config.py",
+      "auth.py",
+      "hooks.py"
+    ],
+    "status": "active"
+  },
+  "gateway": {
+    "path": "gateway/",
+    "components": [
+      "telegram",
+      "discord",
+      "web_server"
+    ],
+    "status": "active"
+  },
+  "subconscious": {
+    "path": "hermes_cli/subconscious/",
+    "components": {
+      "llm_judge.py": {
+        "default_model": "deepseek-v4-pro",
+        "cost_per_1m": "0.109/0.218",
+        "discount_until": "2026-05-31",
+        "status": "active"
+      },
+      "cortex_flywheel.py": {
+        "heuristic_alignment": "85%",
+        "eval_frequency": "2h",
+        "status": "active"
+      },
+      "cortex_access.py": {
+        "db_path": "~/.hermes/cerebrum_memory.db",
+        "tables": 77,
+        "tips": 1900,
+        "status": "active"
+      }
+    }
+  },
+  "training": {
+    "path": "custom_dflash/",
+    "script": "train_lora_sae_teacher_v1.py",
+    "status": "running",
+    "pid": 590094,
+    "step": "0/4000"
+  },
+  "monitoring": {
+    "tools": {
+      "tool_intelligence_reporter.py": "tracks per-tool success rates",
+      "adaptive_timeout.py": "calculates timeouts from history",
+      "context_pressure_gauge.py": "monitors token pressure"
+    }
+  }
+}
