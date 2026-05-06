@@ -48,11 +48,11 @@ class ContextUpdater:
         ''', (error_message[:100], tool_name, 'auto', fix, error_message[:100]))
         self.conn.commit()
     
-    def update_session(self, session_id, task=None, decision=None, file=None):
+    def update_session(self, session_id, task=None, decision=None, file=None, tip=None):
         """Update active session."""
         c = self.conn.cursor()
         c.execute('''
-            SELECT active_tasks, decisions_made, files_modified
+            SELECT active_tasks, decisions_made, files_modified, tips_learned
             FROM session_continuity WHERE session_id = ?
         ''', (session_id,))
         row = c.fetchone()
@@ -61,6 +61,7 @@ class ContextUpdater:
             tasks = json.loads(row[0]) if row[0] else []
             decisions = json.loads(row[1]) if row[1] else []
             files = json.loads(row[2]) if row[2] else []
+            tips = json.loads(row[3]) if len(row) > 3 and row[3] else []
             
             if task and task not in tasks:
                 tasks.append(task)
@@ -68,13 +69,27 @@ class ContextUpdater:
                 decisions.append(decision)
             if file and file not in files:
                 files.append(file)
+            if tip and tip not in tips:
+                tips.append(tip)
             
             c.execute('''
                 UPDATE session_continuity
                 SET last_activity = datetime('now'),
-                    active_tasks = ?, decisions_made = ?, files_modified = ?
+                    active_tasks = ?, decisions_made = ?, files_modified = ?, tips_learned = ?
                 WHERE session_id = ?
-            ''', (json.dumps(tasks), json.dumps(decisions), json.dumps(files), session_id))
+            ''', (json.dumps(tasks), json.dumps(decisions), json.dumps(files), json.dumps(tips), session_id))
+        else:
+            # Create new session row
+            tasks = [task] if task else []
+            decisions = [decision] if decision else []
+            files = [file] if file else []
+            tips = [tip] if tip else []
+            
+            c.execute('''
+                INSERT INTO session_continuity
+                (session_id, start_time, last_activity, active_tasks, decisions_made, files_modified, status, tips_learned)
+                VALUES (?, datetime('now'), datetime('now'), ?, ?, ?, 'active', ?)
+            ''', (session_id, json.dumps(tasks), json.dumps(decisions), json.dumps(files), json.dumps(tips)))
         
         self.conn.commit()
     

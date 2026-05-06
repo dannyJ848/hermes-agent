@@ -22,10 +22,12 @@ if str(HERMES_ROOT / "hermes_cli") not in sys.path:
 
 from hermes_brain import HermesBrain
 from context_updater import ContextUpdater
+from subconscious.llm_judge import LLMJudge
 
 # Singleton brain instance (lives for plugin lifetime)
 _brain = None
 _updater = None
+_judge = None
 
 def _get_brain():
     global _brain
@@ -38,6 +40,12 @@ def _get_updater():
     if _updater is None:
         _updater = ContextUpdater()
     return _updater
+
+def _get_judge():
+    global _judge
+    if _judge is None:
+        _judge = LLMJudge(model="deepseek-v4-pro")
+    return _judge
 
 
 # ─── Hook: Session Start ───────────────────────────────────────────────────
@@ -126,6 +134,58 @@ def post_tool_call_hook(**kwargs):
     # Run post-flight analysis
     analysis = brain.after_tool_call(tool_name, args, result, error)
     
+    # ─── LLM Judge: Auto-evaluate generated tips ──────────────────────────
+    judge = _get_judge()
+    
+    # Extract tips from successful tool results for evaluation
+    if success and isinstance(result, str):
+        try:
+            parsed = json.loads(result) if result.strip().startswith('{') else {}
+            # Check if result contains tips or learnings
+            tips_found = []
+            if isinstance(parsed, dict):
+                # Look for tip-like content in various result shapes
+                for key in ['tip', 'tips', 'learning', 'learnings', 'lesson', 'lessons']:
+                    if key in parsed:
+                        val = parsed[key]
+                        if isinstance(val, list):
+                            tips_found.extend(val)
+                        elif isinstance(val, str):
+                            tips_found.append(val)
+                
+                # Also check nested structures
+                if 'content' in parsed and isinstance(parsed['content'], str):
+                    # Simple heuristic: if content looks like a tip
+                    content = parsed['content']
+                    if len(content) > 20 and ('use ' in content.lower() or 'always ' in content.lower() or 'never ' in content.lower()):
+                        tips_found.append(content)
+            
+            # Evaluate each found tip
+            for tip_text in tips_found[:3]:  # Max 3 tips per call to control cost
+                if isinstance(tip_text, str) and len(tip_text) > 10:
+                    tip = {"text": tip_text, "domain": tool_name, "confidence": 0.7}
+                    eval_result = judge.evaluate_single(tip)
+                    
+                    # Store low-quality tips for review
+                    quality_score = eval_result.get("quality_score", 0.5)
+                    if quality_score < 0.6:
+                        updater.record_error(
+                            tool_name,
+                            f"Low-quality tip (score {quality_score}): {tip_text[:80]}",
+                            eval_result.get("suggested_fix", "Review and rewrite")
+                        )
+                    
+                    # If tip is actionable and high quality, consider distilling
+                    is_actionable = eval_result.get("is_actionable", True)
+                    if is_actionable and quality_score >= 0.7:
+                        # Log to cortex for potential distillation
+                        updater.update_session(
+                            session_id,
+                            tip=f"[{tool_name}] {tip_text[:120]}"
+                        )
+        except (json.JSONDecodeError, Exception):
+            pass  # Not all results are JSON or contain tips
+    
     # Update tool intelligence in unified context
     updater.update_tool_result(tool_name, success, duration_ms, error)
     
@@ -139,6 +199,7 @@ def post_tool_call_hook(**kwargs):
         "success": success,
         "analyzed": True,
         "healed": analysis.get("healed", False) if error else None,
+        "judge_evaluated": True,
     }
 
 
@@ -169,4 +230,7 @@ def register(ctx):
     ctx.register_hook("post_tool_call", post_tool_call_hook)
     ctx.register_hook("on_session_end", on_session_end_hook)
     
-    print("[learning-brain] Learning loop wired: pre_tool_call, post_tool_call, on_session_start, on_session_end")
+    # Verify judge is ready
+    judge = _get_judge()
+    print(f"[learning-brain] Learning loop wired: pre_tool_call, post_tool_call, on_session_start, on_session_end")
+    print(f"[learning-brain] LLM Judge ready: {judge.model} @ {judge.base_url}")
