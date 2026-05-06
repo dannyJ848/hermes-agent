@@ -11,22 +11,22 @@
 
 | Attribute | Value |
 |-----------|-------|
-| **Step** | 130/4000 (3.2%) |
-| **Loss** | 2.85 (CE:2.56 D:1.41 SAE:0.60) |
+| **Step** | 150/4000 (3.75%) |
+| **Loss** | 2.73 (CE:2.44 D:1.43 SAE:0.57) |
 | **GPU** | 85.5GB / 130GB |
 | **DGX** | 10.0.0.171 (djg6228/6228) |
-| **Screen** | `training` (PID 273364, detached, active) |
+| **Screen** | `training` (PID 273366, detached, active) |
 | **LoRA** | r=1024, alpha=2048 |
 | **Trainable** | 5.1B params (15.9% of 32B) |
 | **MAX_STEPS** | 4000 (per Kimi recommendation) |
 | **Rate** | ~30 sec/step |
-| **ETA** | ~32 hours (completion ~May 7, 08:00 UTC) |
+| **ETA** | ~32 hours (completion ~May 7, 08:30 UTC) |
 
 **Loss trajectory:**
-- Step 4: 6.74 → Step 130: 2.85 = **62% reduction**
-- CE: 6.31 → 2.56 (59% drop)
-- D: 2.02 → 1.41 (30% drop)
-- SAE: 0.65 → 0.60 (stable)
+- Step 4: 6.74 → Step 150: 2.73 = **64% reduction**
+- CE: 6.31 → 2.44 (61% drop)
+- D: 2.02 → 1.43 (29% drop)
+- SAE: 0.65 → 0.57 (stable)
 
 ---
 
@@ -59,7 +59,7 @@ sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nul
 | Training script | `/data/SpecForge/custom_dflash/train_lora_sae_teacher_v1.py` |
 | Teacher cache | `/mnt/bigssd/teacher_cache/` (82,014 PKL files) |
 | Checkpoints | `/data/SpecForge/custom_dflash/checkpoints/` (empty — first at step 1000) |
-| Screen session | `training` (PID 273364) |
+| Screen session | `training` (PID 273366) |
 
 ---
 
