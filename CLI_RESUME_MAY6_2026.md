@@ -116,3 +116,27 @@ sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nul
 - **No screen session** — training runs via nohup directly. PID 590094.
 - **First checkpoint at step 1000** — ~8 hours from now. Watch for OOM.
 - **If training dies again:** Check `/mnt/bigssd/train_lora_sae_teacher_v1_restart.log` for "Checkpoint save failed" or OOM signs.
+
+
+---
+
+## Learning Apparatus Status
+
+| Component | Status | Count |
+|-----------|--------|-------|
+| Cerebrum tips | ✓ | 1900 |
+| ELO entries | ✓ | 1870 |
+| Mastery scores | ✓ | 38 |
+| Reasoning traces | ✓ | 68 |
+| Error patterns | ✓ | 3 (78 occurrences) |
+| Tool mastery tracked | ✓ | 167 tools |
+| Skills | ✓ | 360 total, 0 broken |
+| Cortex nodes | ✓ | 100 (synced from cerebrum) |
+
+**Enhancements (May 6):**
+- Adaptive ELO K-factor (K=40 → 20 after 10 matches)
+- Tool-specific mastery tracking
+- Failure-to-success pipeline
+- Cross-domain transfer tracker
+- Session compression quality tracker
+- Tip velocity tracker (14 days history)
