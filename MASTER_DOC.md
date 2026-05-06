@@ -103,32 +103,33 @@
 
 ## May 5, 2026 23:03 UTC — Training LIVE, r=1024, MAX_STEPS=4000
 
-**Status:** Training LIVE at step 1/4000. LoRA r=1024 (5.1B trainable, 15.9% of 32B total).
+**Status:** Training LIVE at step 130/4000 (3.2%). LoRA r=1024 (5.1B trainable, 15.9% of 32B total).
 
 **What happened:**
 1. Bumped LoRA from r=128 (637M trainable, 2.3%) to r=1024 (5.1B trainable, 15.9%) — 8x more expressive power
 2. Reduced MAX_STEPS from 10000 to 4000 per Kimi recommendation: "3-4k steps at r=1024 is the sweet spot"
-3. All 5 cache alignment fixes active — distillation loss (D) working at ~1.99
-4. SAE loss active at ~0.64 — verified working at new rank
+3. All 5 cache alignment fixes active — distillation loss (D) working at ~1.41
+4. SAE loss active at ~0.60 — verified working at new rank
 5. All 3 loss components (CE + D + SAE) running simultaneously
 6. GPU at 85.5GB (was 58.5GB at r=128) — within 130GB limit with 44.5GB headroom
 7. No checkpoints saved yet (next checkpoint at step 1000)
+8. Loss down 62% from step 4→130: 6.74 → 2.85
 
-**Current metrics (Step 1):**
-- Loss: 6.36 (CE:5.93 D:1.99 SAE:0.64)
+**Current metrics (Step 130):**
+- Loss: 2.85 (CE:2.56 D:1.41 SAE:0.60)
 - Weights: CE:1.00, Distill:0.20, SAE:0.05
-- LR: 8.00e-07 (ramping from 0.0002 max)
+- LR: 4.84e-05 (ramping from 0.0002 max)
 - GPU: 85.5GB / 130GB
 - Speed: ~30 sec/step (slower than r=128's 22 sec due to more params)
-- ETA to 4K: ~33 hours
-- ETA to completion: ~33 hours total
+- ETA to 4K: ~32 hours
+- ETA to completion: ~32 hours total
 
 **Current state:**
-- Log: `/mnt/bigssd/train_lora_sae_teacher_v1.log` (steps 0-1 logged)
+- Log: `/mnt/bigssd/train_lora_sae_teacher_v1.log` (5,538 lines, steps 0-130 logged)
 - Script: `/data/SpecForge/custom_dflash/train_lora_sae_teacher_v1.py` (r=1024, alpha=2048)
-- Cache: 81,762 PKL files at `/mnt/bigssd/teacher_cache/` with keys [8,16,32,48]
+- Cache: 82,014 PKL files at `/mnt/bigssd/teacher_cache/` with keys [8,16,32,48]
 - Checkpoints: `/data/SpecForge/custom_dflash/checkpoints/` (empty — no checkpoints yet)
-- Screen session: `training` (active)
+- Screen session: `training` (PID 273364, detached, active)
 - Monitor: 2 cron jobs reporting every 2 min
 
 **To check status:**
