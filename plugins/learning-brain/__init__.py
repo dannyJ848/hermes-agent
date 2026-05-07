@@ -23,11 +23,13 @@ if str(HERMES_ROOT / "hermes_cli") not in sys.path:
 from hermes_brain import HermesBrain
 from context_updater import ContextUpdater
 from subconscious.llm_judge import LLMJudge
+from subconscious.self_audit_engine import SelfAuditEngine, PreflightChecker
 
 # Singleton brain instance (lives for plugin lifetime)
 _brain = None
 _updater = None
 _judge = None
+_audit = None
 
 def _get_brain():
     global _brain
@@ -46,6 +48,12 @@ def _get_judge():
     if _judge is None:
         _judge = LLMJudge(model="deepseek-v4-pro")
     return _judge
+
+def _get_audit():
+    global _audit
+    if _audit is None:
+        _audit = SelfAuditEngine()
+    return _audit
 
 
 # ─── Hook: Session Start ───────────────────────────────────────────────────
@@ -82,13 +90,34 @@ def pre_tool_call_hook(**kwargs):
     or None to allow it to proceed.
     """
     brain = _get_brain()
+    audit = _get_audit()
     
     tool_name = kwargs.get("tool_name", "")
     args = kwargs.get("args", {})
     session_id = kwargs.get("session_id", "")
     task_id = kwargs.get("task_id", "")
     
-    # Run pre-flight checks
+    # ─── SELF-AUDIT: Pre-flight check ─────────────────────────────────────
+    preflight = PreflightChecker.check(tool_name, args)
+    if not preflight["ready"]:
+        return {
+            "action": "block",
+            "message": f"[SELF-AUDIT] Pre-flight failed: {preflight['advice']}. Fix args before calling."
+        }
+    
+    # ─── SELF-AUDIT: Loop detection ───────────────────────────────────────
+    # We check after recording so we have history
+    audit.record_call(tool_name, args, None, tokens_used=0)
+    loop_status = audit.get_loop_status()
+    
+    if loop_status["loop_detected"]:
+        suggestions = audit.suggest_recovery()
+        return {
+            "action": "block",
+            "message": f"[SELF-AUDIT] LOOP DETECTED ({loop_status['loop_count']} loops). " + " ".join(suggestions[:2])
+        }
+    
+    # Run brain's pre-flight checks
     check = brain.before_tool_call(tool_name, args, session_id)
     
     if check.get("action") == "BLOCK":
@@ -99,10 +128,6 @@ def pre_tool_call_hook(**kwargs):
             "message": f"[LEARNING BRAIN] {reason}. Suggestion: {alt}"
         }
     
-    # Log the attempt
-    updater = _get_updater()
-    # (We update success after the call in post_tool_call)
-    
     return None  # Allow the call
 
 
@@ -112,6 +137,7 @@ def post_tool_call_hook(**kwargs):
     """Called after every tool call completes."""
     brain = _get_brain()
     updater = _get_updater()
+    audit = _get_audit()
     
     tool_name = kwargs.get("tool_name", "")
     args = kwargs.get("args", {})
@@ -119,6 +145,18 @@ def post_tool_call_hook(**kwargs):
     duration_ms = kwargs.get("duration_ms", 0)
     session_id = kwargs.get("session_id", "")
     task_id = kwargs.get("task_id", "")
+    tokens_used = kwargs.get("tokens_used", 0)
+    
+    # ─── SELF-AUDIT: Record and analyze ────────────────────────────────────
+    audit_result = audit.record_call(tool_name, args, result, tokens_used, duration_ms)
+    
+    # Log waste if detected
+    if audit_result.get("waste_detected"):
+        updater.record_error(
+            tool_name,
+            f"Token waste detected: {tokens_used} tokens on failed/repeated call",
+            "Switch approach or verify args before retry"
+        )
     
     # Determine success from result
     success = True
@@ -200,6 +238,7 @@ def post_tool_call_hook(**kwargs):
         "analyzed": True,
         "healed": analysis.get("healed", False) if error else None,
         "judge_evaluated": True,
+        "audit": audit_result,
     }
 
 
