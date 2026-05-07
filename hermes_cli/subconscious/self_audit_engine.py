@@ -97,15 +97,15 @@ class SelfAuditEngine:
         recent = list(self._call_history)[-self.loop_window:]
         hashes = [c["hash"] for c in recent]
         
-        # Check for exact repeats
+        # Check for exact repeats (3+ identical calls)
         unique_hashes = set(hashes)
-        if len(unique_hashes) == 1 and len(hashes) > 2:
+        if len(unique_hashes) == 1 and len(hashes) >= 3:
             self._loop_count += 1
             return True
         
-        # Check for tool-level loops (same tool, different args, all failing)
+        # Check for tool-level loops (same tool, all failing, 3+ calls)
         tools = [c["tool"] for c in recent]
-        if len(set(tools)) == 1 and all(not c["success"] for c in recent):
+        if len(set(tools)) == 1 and all(not c["success"] for c in recent) and len(recent) >= 3:
             self._loop_count += 1
             return True
         
