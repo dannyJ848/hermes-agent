@@ -1231,11 +1231,13 @@ def get_pre_tool_call_block_message(
     directive wins.  Invalid or irrelevant hook return values are
     silently ignored so existing observer-only hooks are unaffected.
     """
-    # Memory pressure check — auto-offload before tool calls when near limit
+    # Subconscious systems integration — auto-offload, error tracking, intelligence
     try:
         import sys
         from pathlib import Path
         sys.path.insert(0, str(Path(__file__).parent / "subconscious"))
+        
+        # 1. Memory pressure check
         from memory_cortex_bridge import MemoryCortexBridge
         bridge = MemoryCortexBridge()
         result = bridge.offload_if_needed()
@@ -1246,8 +1248,19 @@ def get_pre_tool_call_block_message(
                 result.get('chars_freed'),
                 result.get('pressure_pct')
             )
+        
+        # 2. Tool intelligence tracking
+        from tool_intelligence_tracker import ToolIntelligenceTracker
+        tracker = ToolIntelligenceTracker()
+        tracker.record_call(
+            tool_name=tool_name,
+            success=True,
+            duration_ms=0,
+            context=str(args)[:200]
+        )
+        
     except Exception:
-        pass  # Fail-open — never block tool calls for memory issues
+        pass  # Fail-open — never block tool calls
 
     hook_results = invoke_hook(
         "pre_tool_call",
