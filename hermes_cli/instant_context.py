@@ -124,8 +124,25 @@ def show_context():
         for d in decisions:
             print(f"  → {d}")
     
+    # Systems built this session
+    print("\n[SYSTEMS BUILT]")
+    print("  ✓ Cortex Memory System — unified_context.db")
+    print("  ✓ Tiered Memory — HOT/WARM/COLD tiers")
+    print("  ✓ Learning Brain Plugin — pre/post tool call hooks")
+    print("  ✓ Self-Audit Engine — loop detection, token tracking")
+    print("  ✓ LLM Judge — deepseek-v4-pro auto-evaluation")
+    print("  ✓ Instant Context — this viewer")
+    
+    # Quick commands
+    print("\n[QUICK COMMANDS]")
+    print("  python3 hermes_cli/instant_context.py")
+    print("  python3 hermes_cli/subconscious/memory_daemon.py --stats")
+    print("  python3 hermes_cli/subconscious/self_audit_engine.py")
+    print("  cat CLI_RESUME_COMPLETE_MAY6_2026.md")
+    
     print("\n" + "=" * 70)
     print("To update: python3 hermes_cli/context_updater.py")
+    print("Resume doc: CLI_RESUME_COMPLETE_MAY6_2026.md")
     print("=" * 70)
 
 if __name__ == '__main__':

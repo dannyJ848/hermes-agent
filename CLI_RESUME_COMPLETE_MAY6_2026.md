@@ -1,219 +1,227 @@
-======================================================================
-HERMES AGENT — COMPLETE CONTEXT SUMMARY FOR NEW CLI
-======================================================================
-Generated: May 6, 2026 19:35 UTC
-Session: Full day of work — tiered memory, LLM judge, checkpoint fixes, training audit
+# CLI Resume — Complete Session State
+**Generated:** May 6, 2026 21:30 UTC
+**Session:** Hermes Agent — Qwen 27B Training + Cortex Memory + Learning Brain
+**Commit:** adf85f3d0
+**Branch:** qwen27b-training-artifacts-may3-2026
 
-======================================================================
-1. REPO STATE
-======================================================================
-Path: /Users/dannygomez/hermes-agent
-Branch: qwen27b-training-artifacts-may3-2026
-Commit: ef6f9100a (114 commits ahead of remote)
-Remote: dannyJ848/hermes-agent
-PAT: [REDACTED — see memory]
+---
 
-======================================================================
-2. TRAINING STATUS (CRITICAL)
-======================================================================
-Model: Qwen3.6-27B-Uncensored + LoRA r=1024
-PID: 590094 (DGX Spark 10.0.0.171, user djg6228, pass 6228)
-Status: running - healthy since 11:44 AM (7h 50m)
+## [CRITICAL] Training Status
+| Attribute | Value |
+|-----------|-------|
+| PID | 881997 |
+| Step | 0/4000 (restarted from scratch after crash) |
+| Status | RUNNING — model loading in progress |
+| GPU | Loading (will be ~85GB when running) |
+| DGX | 10.0.0.171 (djg6228/6228) |
+| LoRA | r=1024, alpha=2048 |
+| Trainable | 5.1B params (15.9% of 32B) |
+| Config | max_steps=4000, save_every=500, batch=1, grad_accum=4 |
+| Log | `/mnt/bigssd/train_lora_sae_teacher_v1_restart.log` |
+| Script | `/data/SpecForge/custom_dflash/train_lora_sae_teacher_v1.py` |
 
-Current: Step 890/4000 (22.3%)
-Loss: 2.5775 (CE:2.217 D:1.873 SAE:0.582)
-GPU: 85.3GB / 130GB (65.6%, stable)
-LR: 1.99e-04 (plateaued after warmup)
-Weights: CE=0.96, Distill=0.23, SAE=0.06
+**Check status:**
+```bash
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 djg6228@10.0.0.171 "ps -p 881997 -o pid,comm,etime,pcpu,pmem 2>/dev/null || echo 'PROCESS_DEAD'"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 djg6228@10.0.0.171 "tail -5 /mnt/bigssd/train_lora_sae_teacher_v1_restart.log"
+```
 
-Config (VERIFIED — live read in loop):
-  max_steps: 4000 (corrected from 10K, stops at 4000)
-  save_every: 500 (checkpoint at 1000, 1500, 2000...)
-  warmup_steps: 400
-  batch_size: 1, grad_accum: 4 (effective batch=4)
-  max_seq_len: 512
+**Crash History (May 6, 2026):**
+- Step 999/4000: OOM during checkpoint save
+- Fix #1: Save LoRA adapters only (param.detach().cpu()), no full model CPU move
+- Fix #2: Resume bug — `PeftModel.from_pretrained(model, ckpt_path)` with `load_adapter` fallback
+- Empty checkpoint dir deleted, training restarted from step 0
 
-Timing:
-  Step duration: 30.2s (log interval is 10 steps = 302.5s)
-  ETA to 4K: ~26 hours (completion ~May 7, 21:00 UTC)
+---
 
-Next checkpoint: Step 1000 (~30 min from now)
+## [SYSTEMS BUILT THIS SESSION]
 
-======================================================================
-3. CHECKPOINT SYSTEM (UNTESTED AT 85GB)
-======================================================================
-OOM fixes implemented (May 6 restart):
-  - CPU-offload save: model.to('cpu') before save
-  - empty_cache + synchronize + gc.collect
-  - try/finally wrapper (always returns to GPU)
-  - save_every reduced 1000→500 for more frequent saves
+### 1. Cortex Memory System (Unified DB)
+**File:** `~/.hermes/unified_context.db` (SQLite)
+**Purpose:** Single source of truth for all persistent state
 
-Watcher: PID 778063 on DGX monitoring step 1000 save
-Recovery: /tmp/recovery_plan.sh (auto-finds latest checkpoint)
+**Schema:**
+```sql
+CREATE TABLE context (key TEXT PRIMARY KEY, value TEXT, updated_at TEXT);
+```
 
-If training crashes at checkpoint:
-  ssh djg6228@10.0.0.171 'bash /tmp/recovery_plan.sh'
-  # Prints resume command with latest checkpoint
+**Key entries:**
+- `training_status`, `training_step`, `training_pid`, `training_gpu`, `training_loss`
+- `crash_cause`, `crash_fix_1`, `crash_fix_2`
+- `tiered_memory_hot_utilization`, `tiered_memory_warm_count`, `tiered_memory_cold_count`
+- `deepseek_judge_status`, `last_commit`
 
-======================================================================
-4. TIERED MEMORY SYSTEM (NEW — May 6)
-======================================================================
-Files: hermes_cli/subconscious/tiered_memory.py
-       hermes_cli/subconscious/memory_daemon.py
+**Access:**
+```python
+import sqlite3
+conn = sqlite3.connect('~/.hermes/unified_context.db')
+c = conn.cursor()
+c.execute("SELECT value FROM context WHERE key='training_status'")
+```
 
-Architecture:
-  HOT   ~/.hermes/memory.json          2,500 char limit, immediate context
-  WARM  ~/.hermes/cerebrum_memory.db   SQLite staging for distilled tips
-  COLD  Cortex PostgreSQL / SQLite       Elo-rated archive, vector searchable
+### 2. Tiered Memory System
+**File:** `hermes_cli/subconscious/tiered_memory.py`
+**Daemon:** `hermes_cli/subconscious/memory_daemon.py`
 
-Auto-flow:
-  1. HOT ≥80% → distill oldest → WARM staging
-  2. WARM batch ≥50 → heuristic scoring → quality≥0.6 → COLD (Elo 1200)
-  3. COLD Elo>1300 + high access → promote to HOT as "golden rules"
-  4. HOT unused 30 days → demote to WARM
+**Three tiers:**
+- **HOT:** `~/.hermes/memory.json` (2,500 char limit, immediate context)
+- **WARM:** `~/.hermes/cerebrum_memory.db` (SQLite staging for tips awaiting LLM judge)
+- **COLD:** Cortex PostgreSQL/SQLite fallback (Elo-rated archive)
 
-Current state:
-  HOT: 26.8% (671/2500 chars), 2 entries
-  WARM: 3 unrated tips awaiting evaluation
-  COLD: fallback SQLite, 0 high-performers
+**Current state:**
+- HOT: 72.4% utilized (8 entries)
+- WARM: 0 unrated tips
+- COLD: 0 high-performers (fallback SQLite)
 
-Commands:
-  python3 hermes_cli/subconscious/memory_daemon.py --stats
-  python3 hermes_cli/subconscious/memory_daemon.py --once --verbose
+**Commands:**
+```bash
+python3 hermes_cli/subconscious/memory_daemon.py --stats
+python3 hermes_cli/subconscious/memory_daemon.py --offload
+python3 hermes_cli/subconscious/memory_daemon.py --promote
+```
 
-Skill: tiered-memory-system (meta/)
+### 3. Learning Brain Plugin
+**Path:** `plugins/learning-brain/`
+**Files:**
+- `__init__.py` — Plugin registration, hooks, judge singleton
+- `context_updater.py` — DB updates, session continuity, tips_learned
+- `llm_judge.py` — DeepSeek V4 Pro integration, JSON extraction fix
+- `error_registry.py` — Failure logging, pattern matching
+- `self_audit_engine.py` — Loop detection, token waste tracking, preflight checks
 
-======================================================================
-5. LLM JUDGE (INTEGRATED — May 6)
-======================================================================
-Model: deepseek-v4-pro
-Integration: learning-brain plugin, post_tool_call hook
+**Hooks active:**
+- `pre_tool_call` — Circuit breaker for weak tools, preflight validation
+- `post_tool_call` — Tip extraction, LLM judge evaluation, error logging
+- `on_session_start` — Context hydration from unified DB
+- `on_session_end` — State flush to DB
 
-Flow:
-  - Successful tool call with tip output → judge evaluates
-  - Score <0.6 → tip + fix go to error_registry
-  - Score ≥0.7 + actionable → append to session_continuity.tips_learned
+**LLM Judge routing:**
+- Score < 0.6 → `error_registry`
+- Score ≥ 0.7 + actionable → `session_continuity.tips_learned`
 
-Fixes applied:
-  - response_format={"type": "json_object"}
-  - max_tokens=2000 (was truncating)
-  - JSON extraction from reasoning_content vs content
+### 4. Self-Audit Engine
+**File:** `hermes_cli/subconscious/self_audit_engine.py`
 
-======================================================================
-6. LEARNING-BRAIN PLUGIN (WIRED — May 6)
-======================================================================
-Path: plugins/learning-brain/
-Hooks: pre_tool_call, post_tool_call, on_session_start, on_session_end
+**Features:**
+- Loop detection (hash-based sliding window, alerts on 3+ identical calls)
+- Token waste tracker (logs failed calls consuming >100 tokens)
+- Pre-flight check (validates required args before expensive calls)
+- Recovery suggester (pattern-matches errors to known workarounds)
 
-State stored in unified_context.db:
-  - tool_intelligence (success rates, circuit breaker state)
-  - error_registry (pattern → fix mapping)
-  - session_continuity (tips_learned, last_action)
+**Integration:** Wired into learning-brain plugin hooks
 
-Files:
-  __init__.py — plugin entry, judge singleton
-  context_updater.py — DB updates
-  llm_judge.py — DeepSeek evaluation
-  instant_context.py — CLI visibility
+### 5. Hermes Harness Enhancer
+**File:** `hermes_cli/subconscious/hermes_harness_enhancer.py`
 
-======================================================================
-7. SELF-AUDIT ENGINE (NEW — May 6)
-======================================================================
-Files: hermes_cli/subconscious/self_audit_engine.py
-       hermes_cli/subconscious/hermes_harness_enhancer.py
+**Gap analysis identified 10 missing tools:**
+1. loop_detector (built in self_audit_engine)
+2. recovery_suggester (built in self_audit_engine)
+3. preflight_checker (built in self_audit_engine)
+4. token_waste_tracker (built in self_audit_engine)
+5. error_pattern_miner (pending)
+6. multi_step_validator (pending)
+7. context_window_guard (pending)
+8. tool_circuit_breaker (wired in learning-brain)
+9. session_continuity_manager (wired in learning-brain)
+10. distillation_quality_gate (pending)
 
-Purpose: Detect loops, track token waste, pre-flight checks, recovery patterns
+### 6. Instant Context CLI
+**File:** `hermes_cli/instant_context.py`
+**Purpose:** One-command status snapshot for any new CLI session
 
-Loop Detection:
-  - Tracks call hashes in sliding window
-  - Alerts on 3+ identical calls or same-tool failure streaks
-  - Auto-suggests: switch tools, ask user, use execute_code
+**Shows:**
+- Training state (step, loss, GPU, PID)
+- Tool intelligence (success rates, circuit states)
+- Recent errors (with suggested fixes)
+- Tiered memory utilization (HOT/WARM/COLD bars)
+- Session continuity (last 3 tips learned)
 
-Token Waste Tracker:
-  - Logs failed calls with >100 tokens
-  - Reports top wasted tools
-  - Current: cronjob (13% success), skill_manage (56%), patch (59%)
+**Run:**
+```bash
+python3 hermes_cli/instant_context.py
+```
 
-Pre-flight Checker:
-  - Validates required args before expensive calls
-  - patch needs: path, old_string, new_string
-  - write_file needs: path, content
-  - Prevents half-formed calls
+---
 
-Recovery Suggester:
-  - Pattern-matches errors to known fixes
-  - "old_string not found" → use write_file
-  - "frontmatter must include name" → add name field
-  - "id error" → use terminal instead of cronjob
+## [FILE LOCATIONS]
 
-Harness Enhancer:
-  - Identifies missing tools (10 gaps found)
-  - Top priority: loop_detector, recovery_suggester, preflight_checker
-  - Generates implementation code for each gap
+**Core systems:**
+- `~/.hermes/unified_context.db` — Cortex unified database
+- `~/.hermes/memory.json` — HOT tier (2,500 char limit)
+- `~/.hermes/cerebrum_memory.db` — WARM tier (SQLite)
+- `hermes_cli/instant_context.py` — CLI status snapshot
+- `hermes_cli/subconscious/tiered_memory.py` — Tiered memory engine
+- `hermes_cli/subconscious/memory_daemon.py` — Background daemon
+- `hermes_cli/subconscious/self_audit_engine.py` — Self-audit system
+- `hermes_cli/subconscious/hermes_harness_enhancer.py` — Gap analysis
 
-======================================================================
-8. INSTANT CONTEXT SYSTEM
-======================================================================
-Command: python3 hermes_cli/instant_context.py
-Shows: training state, tool intelligence, recent errors, LLM judge,
-       tiered memory, active session
+**Plugin:**
+- `plugins/learning-brain/__init__.py` — Main plugin
+- `plugins/learning-brain/context_updater.py` — DB updater
+- `plugins/learning-brain/llm_judge.py` — DeepSeek judge
+- `plugins/learning-brain/error_registry.py` — Error logging
 
-Updated with tiered memory bar:
-  [TIERED MEMORY]
-    HOT   [█████░░░░░░░░░░░░░░░] 26.8% (671/2500)
+**Resume docs:**
+- `MASTER_DOC.md` — Training master document
+- `CLI_RESUME_MAY6_2026.md` — Session resume (May 6)
+- `CLI_RESUME_MAY6_CRASH.md` — Crash recovery doc
+- `CLI_RESUME_COMPLETE_MAY6_2026.md` — This file
 
-======================================================================
-9. TODAY'S WORK TIMELINE
-======================================================================
-- Built tiered memory system (hot→warm→cold)
-- Integrated LLM judge into learning-brain plugin
-- Fixed DeepSeek V4 Pro JSON extraction
-- Corrected training config (10K→4K steps, save_every 1000→500)
-- Verified max_steps=4000 stops training (live config read)
-- Corrected step duration (5min→30s, log interval is 10 steps)
-- Deployed checkpoint watcher (PID 778063)
-- Created recovery script (/tmp/recovery_plan.sh)
-- Built self-audit engine (loop detection, token waste, pre-flight)
-- Built harness enhancer (gap analysis, tool building)
-- Updated all persistence layers (DB, memory, master doc, skill)
-- Pushed repo: d7c72dd62
+**Skills:**
+- `qwen27b-training-pipeline` — Training pipeline skill
+- `tiered-memory-system` — Memory management skill
 
-======================================================================
-10. CRITICAL NOTES FOR NEW CLI
-======================================================================
-- DGX SSH times out during heavy training — use process_poll, not SSH
-- Training runs via nohup (no screen), PID 590094
-- First checkpoint at step 1000 — ~30 min, watcher monitoring
-- If training dies: run /tmp/recovery_plan.sh on DGX for auto-resume
-- max_steps verified: code reads config live, stops at 4000
-- Use helpers for cron/patch/skill ops — avoid weak tools directly
-- Loop detection: if repeating same call 3x, STOP and switch approach
-- Token waste: failed cronjob calls burn 500+ tokens each
+---
 
-======================================================================
-11. QUICK COMMANDS
-======================================================================
-# Full status
+## [QUICK COMMANDS FOR NEW CLI]
+
+```bash
+# 1. Check everything at once
 python3 hermes_cli/instant_context.py
 
-# Training log (last 5 steps)
-sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null djg6228@10.0.0.171 'grep "Step [0-9]*.*Loss" /mnt/bigssd/train_lora_sae_teacher_v1_restart.log | tail -5'
+# 2. Check training on DGX
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=15 djg6228@10.0.0.171 "tail -5 /mnt/bigssd/train_lora_sae_teacher_v1_restart.log"
 
-# Process alive check
-sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null djg6228@10.0.0.171 'ps -p 590094 -o pid,comm,etime,pcpu,pmem 2>/dev/null || echo "PROCESS_DEAD"'
-
-# Tiered memory stats
+# 3. Check memory daemon
 python3 hermes_cli/subconscious/memory_daemon.py --stats
 
-# Self-audit test
+# 4. Check self-audit
 python3 hermes_cli/subconscious/self_audit_engine.py
 
-# Harness gap report
-python3 hermes_cli/subconscious/hermes_harness_enhancer.py
+# 5. Update repo
+git pull origin qwen27b-training-artifacts-may3-2026
+```
 
-# Recovery if crash
-ssh djg6228@10.0.0.171 'bash /tmp/recovery_plan.sh'
+---
 
-======================================================================
-END OF CONTEXT — New CLI ready to resume
-======================================================================
+## [CONFIGURATION]
+
+**DGX access:**
+- IP: 10.0.0.171
+- User: djg6228
+- Pass: 6228
+- SSH: `ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null djg6228@10.0.0.171`
+
+**GitHub:**
+- Repo: dannyJ848/hermes-agent
+- PAT: [REDACTED — see memory tool]
+- Branch: qwen27b-training-artifacts-may3-2026
+
+**DeepSeek Judge:**
+- Model: deepseek-v4-pro
+- Status: Active in learning-brain plugin
+- Routing: score<0.6→error_registry, score≥0.7→tips_learned
+
+---
+
+## [PENDING TASKS]
+
+1. **Checkpoint test at step 500** — Verify LoRA-only save works (no OOM)
+2. **Memory offload bridge** — Auto-offload from HOT→WARM→COLD when memory full
+3. **Error pattern miner** — Build from error_registry data
+4. **Multi-step validator** — Validate complex tool call sequences
+5. **Context window guard** — Prevent reasoning degradation in long sessions
+
+---
+
+*This resume is the single source of truth for session handoff. Update it whenever state changes.*
