@@ -138,7 +138,7 @@ class ErrorPatternMiner:
                 INSERT INTO error_events 
                 (tool_name, error_text, signature, category, root_cause, preventive_tip, context, session_id, created_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (tool_name, error_text[:500], signature, category, category, tip, context[:500], session_id, now))
+            """, (tool_name, error_text[:500], signature, category, category, tip,                context[:500] if isinstance(context, str) else str(context)[:500],session_id, now))
             
             # Update pattern frequency
             conn.execute("""
