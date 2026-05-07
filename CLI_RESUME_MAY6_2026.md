@@ -7,32 +7,32 @@
 
 ---
 
-## Training Status (RUNNING — Step ~670/4000)
+## Training Status (RUNNING — Step ~890/4000)
 
 | Attribute | Value |
 |-----------|-------|
-| **Step** | ~670/4000 (16.5%) |
+| **Step** | ~890/4000 (22.3%) |
 | **Previous** | 490/4000 lost (OOM at checkpoint save, May 6 11:44 AM restart) |
-| **Loss** | 1.93 (CE:1.53 D:1.90 SAE:0.59) |
+| **Loss** | 2.58 (CE:2.22 D:1.87 SAE:0.58) |
 | **GPU** | 85.3GB / 130GB (65.6%, stable) |
 | **DGX** | 10.0.0.171 (djg6228/6228) |
 | **PID** | 590094 |
 | **Screen** | None (running via nohup) |
 | **LoRA** | r=1024, alpha=2048 |
 | **Trainable** | ~2GB params (LoRA only, frozen 27B base) |
-| **MAX_STEPS** | 4000 (corrected from 10K) |
-| **save_every** | 500 (corrected from 1000) |
+| **MAX_STEPS** | 4000 (verified: live config read in loop, stops at 4000) |
+| **save_every** | 500 |
 | **warmup_steps** | 400 |
 | **Checkpoint fix** | CPU offload + empty_cache + synchronize + try/finally |
 | **Rate** | 30.2 sec/step (log interval is 10 steps = 302.5s) |
-| **ETA** | ~28 hours (completion ~May 7, 21:00 UTC) |
-| **Next checkpoint** | Step 1000 (~25 min, watcher PID 778063 monitoring) |
+| **ETA** | ~26 hours (completion ~May 7, 21:00 UTC) |
+| **Next checkpoint** | Step 1000 (~30 min, watcher PID 778063 monitoring) |
 
 **Loss trajectory:**
-- Step 360: 2.08 → Step 660: 1.93 (7% reduction)
-- CE: 1.75 → 1.53 (12% drop)
-- D: 1.56 → 1.90 (teacher distillation active)
-- SAE: 0.56 → 0.59 (stable)
+- Step 360: 2.08 → Step 890: 2.58 (fluctuating, teacher distillation active)
+- CE: 1.75 → 2.22 (variable)
+- D: 1.56 → 1.87 (teacher distillation active)
+- SAE: 0.56 → 0.58 (stable)
 
 ---
 
@@ -150,9 +150,10 @@ python3 ~/.hermes/scripts/skill_helper.py create <name> <category> <content>
 
 - **DGX SSH times out during heavy loads** — this is expected. Use `process_poll` instead of SSH when training is active.
 - **No screen session** — training runs via nohup directly. PID 590094.
-- **First checkpoint at step 1000** — ~25 min from now (step ~670 currently). Watcher PID 778063 monitoring.
+- **First checkpoint at step 1000** — ~30 min from now (step ~890 currently). Watcher PID 778063 monitoring.
 - **If training dies again:** Run `/tmp/recovery_plan.sh` on DGX to auto-find latest checkpoint and print resume command.
 - **Checkpoint OOM fixes:** CPU-offload save (model.to('cpu')), empty_cache, synchronize, try/finally wrapper — implemented but untested at 85GB.
+- **max_steps verified:** Code reads config live in loop, will stop at 4000 regardless of startup value.
 - **Use helpers for cron/patch/skill ops** — avoid weak tools directly.
 
 
