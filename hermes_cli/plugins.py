@@ -1219,6 +1219,9 @@ def get_pre_tool_call_block_message(
 ) -> Optional[str]:
     """Check ``pre_tool_call`` hooks for a blocking directive.
 
+    Also triggers memory pressure check/offload via memory_cortex_bridge
+    before each tool call.
+
     Plugins that need to enforce policy (rate limiting, security
     restrictions, approval workflows) can return::
 
@@ -1228,6 +1231,24 @@ def get_pre_tool_call_block_message(
     directive wins.  Invalid or irrelevant hook return values are
     silently ignored so existing observer-only hooks are unaffected.
     """
+    # Memory pressure check — auto-offload before tool calls when near limit
+    try:
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).parent / "subconscious"))
+        from memory_cortex_bridge import MemoryCortexBridge
+        bridge = MemoryCortexBridge()
+        result = bridge.offload_if_needed()
+        if result.get('status') == 'offloaded':
+            logger.info(
+                "Memory offloaded: %s entries freed, %s chars, now %s%%",
+                result.get('entries_moved'),
+                result.get('chars_freed'),
+                result.get('pressure_pct')
+            )
+    except Exception:
+        pass  # Fail-open — never block tool calls for memory issues
+
     hook_results = invoke_hook(
         "pre_tool_call",
         tool_name=tool_name,
@@ -1236,16 +1257,9 @@ def get_pre_tool_call_block_message(
         session_id=session_id,
         tool_call_id=tool_call_id,
     )
-
-    for result in hook_results:
-        if not isinstance(result, dict):
-            continue
-        if result.get("action") != "block":
-            continue
-        message = result.get("message")
-        if isinstance(message, str) and message:
-            return message
-
+    for r in hook_results:
+        if isinstance(r, dict) and r.get("action") == "block":
+            return r.get("message", "Tool call blocked by plugin")
     return None
 
 
