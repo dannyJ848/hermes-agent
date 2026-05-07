@@ -117,7 +117,42 @@ Files:
   instant_context.py — CLI visibility
 
 ======================================================================
-7. INSTANT CONTEXT SYSTEM
+7. SELF-AUDIT ENGINE (NEW — May 6)
+======================================================================
+Files: hermes_cli/subconscious/self_audit_engine.py
+       hermes_cli/subconscious/hermes_harness_enhancer.py
+
+Purpose: Detect loops, track token waste, pre-flight checks, recovery patterns
+
+Loop Detection:
+  - Tracks call hashes in sliding window
+  - Alerts on 3+ identical calls or same-tool failure streaks
+  - Auto-suggests: switch tools, ask user, use execute_code
+
+Token Waste Tracker:
+  - Logs failed calls with >100 tokens
+  - Reports top wasted tools
+  - Current: cronjob (13% success), skill_manage (56%), patch (59%)
+
+Pre-flight Checker:
+  - Validates required args before expensive calls
+  - patch needs: path, old_string, new_string
+  - write_file needs: path, content
+  - Prevents half-formed calls
+
+Recovery Suggester:
+  - Pattern-matches errors to known fixes
+  - "old_string not found" → use write_file
+  - "frontmatter must include name" → add name field
+  - "id error" → use terminal instead of cronjob
+
+Harness Enhancer:
+  - Identifies missing tools (10 gaps found)
+  - Top priority: loop_detector, recovery_suggester, preflight_checker
+  - Generates implementation code for each gap
+
+======================================================================
+8. INSTANT CONTEXT SYSTEM
 ======================================================================
 Command: python3 hermes_cli/instant_context.py
 Shows: training state, tool intelligence, recent errors, LLM judge,
@@ -128,7 +163,7 @@ Updated with tiered memory bar:
     HOT   [█████░░░░░░░░░░░░░░░] 26.8% (671/2500)
 
 ======================================================================
-8. TODAY'S WORK TIMELINE
+9. TODAY'S WORK TIMELINE
 ======================================================================
 - Built tiered memory system (hot→warm→cold)
 - Integrated LLM judge into learning-brain plugin
@@ -138,11 +173,13 @@ Updated with tiered memory bar:
 - Corrected step duration (5min→30s, log interval is 10 steps)
 - Deployed checkpoint watcher (PID 778063)
 - Created recovery script (/tmp/recovery_plan.sh)
+- Built self-audit engine (loop detection, token waste, pre-flight)
+- Built harness enhancer (gap analysis, tool building)
 - Updated all persistence layers (DB, memory, master doc, skill)
-- Pushed repo: ef6f9100a
+- Pushed repo: d7c72dd62
 
 ======================================================================
-9. CRITICAL NOTES FOR NEW CLI
+10. CRITICAL NOTES FOR NEW CLI
 ======================================================================
 - DGX SSH times out during heavy training — use process_poll, not SSH
 - Training runs via nohup (no screen), PID 590094
@@ -150,9 +187,11 @@ Updated with tiered memory bar:
 - If training dies: run /tmp/recovery_plan.sh on DGX for auto-resume
 - max_steps verified: code reads config live, stops at 4000
 - Use helpers for cron/patch/skill ops — avoid weak tools directly
+- Loop detection: if repeating same call 3x, STOP and switch approach
+- Token waste: failed cronjob calls burn 500+ tokens each
 
 ======================================================================
-10. QUICK COMMANDS
+11. QUICK COMMANDS
 ======================================================================
 # Full status
 python3 hermes_cli/instant_context.py
@@ -165,6 +204,12 @@ sshpass -p '6228' ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/nul
 
 # Tiered memory stats
 python3 hermes_cli/subconscious/memory_daemon.py --stats
+
+# Self-audit test
+python3 hermes_cli/subconscious/self_audit_engine.py
+
+# Harness gap report
+python3 hermes_cli/subconscious/hermes_harness_enhancer.py
 
 # Recovery if crash
 ssh djg6228@10.0.0.171 'bash /tmp/recovery_plan.sh'
