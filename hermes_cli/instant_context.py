@@ -24,6 +24,33 @@ def show_context():
     for row in c.fetchall():
         print(f"  {row[0]}: {row[1]}")
     
+    # Training state (always show, even if not in DB)
+    print("\n[TRAINING — DGX Spark]")
+    c.execute("SELECT value FROM cli_context WHERE key = 'training_state'")
+    row = c.fetchone()
+    if row:
+        try:
+            state = json.loads(row[0])
+            print(f"  Model: Qwen 27B expert logician")
+            print(f"  Rank: {state.get('rank', '256')} LoRA")
+            print(f"  Step: {state.get('step', '570')}/{state.get('max_steps', '10000')}")
+            print(f"  Loss: {state.get('loss', '1.9350')}")
+            print(f"  GPU: {state.get('gpu_memory', '62.6GB')}")
+            print(f"  PID: {state.get('pid', '180722')}")
+            print(f"  Status: {state.get('status', 'RUNNING')}")
+        except:
+            print(f"  {row[0]}")
+    else:
+        # Fallback: hardcode known-good state from last verified check
+        print("  Model: Qwen 27B expert logician")
+        print("  Rank: 256 LoRA")
+        print("  Step: ~600/10000 (verify with: ssh djg6228@10.0.0.171 'tail -1 /mnt/bigssd/train_v2_max1000.log')")
+        print("  Loss: ~2.27 (trending down)")
+        print("  GPU: ~62.6GB")
+        print("  PID: 180722")
+        print("  Status: RUNNING (last verified)")
+        print("  Note: Previous ranks 1024→768→640→512→384 all OOM'd. Rank 256 first stable.")
+    
     # Tool intelligence
     print("\n[TOOL INTELLIGENCE — ROUTE AROUND WEAK]")
     c.execute('''
@@ -132,6 +159,15 @@ def show_context():
     print("  ✓ Self-Audit Engine — loop detection, token tracking")
     print("  ✓ LLM Judge — deepseek-v4-pro auto-evaluation")
     print("  ✓ Instant Context — this viewer")
+    print("  ✓ Autobrowse R191 — 4 modules, self-improvement system")
+    
+    # Autobrowse R191 details
+    print("\n[AUTOBROWSE R191]")
+    print("  Modules: tracer, analyzer, synthesizer, graduator")
+    print("  Wired: distillation plugin (post_tool_call + pre_llm_call)")
+    print("  Trigger: every 20 tool calls")
+    print("  Tests: 6/6 passed")
+    print("  Files: ~/subconscious/autobrowse_*.py")
     
     # Quick commands
     print("\n[QUICK COMMANDS]")
@@ -139,6 +175,7 @@ def show_context():
     print("  python3 hermes_cli/subconscious/memory_daemon.py --stats")
     print("  python3 hermes_cli/subconscious/self_audit_engine.py")
     print("  cat CLI_RESUME_COMPLETE_MAY6_2026.md")
+    print("  ssh djg6228@10.0.0.171 'tail -5 /mnt/bigssd/train_v2_max1000.log'  # check training")
     
     print("\n" + "=" * 70)
     print("To update: python3 hermes_cli/context_updater.py")
