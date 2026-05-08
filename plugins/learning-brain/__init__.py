@@ -24,12 +24,26 @@ from hermes_brain import HermesBrain
 from context_updater import ContextUpdater
 from subconscious.llm_judge import LLMJudge
 from subconscious.self_audit_engine import SelfAuditEngine, PreflightChecker
+from subconscious.autobrowse_tracer import AutobrowseTracer
+from subconscious.autobrowse_analyzer import AutobrowseAnalyzer
+from subconscious.autobrowse_synthesizer import AutobrowseSynthesizer
+from subconscious.autobrowse_graduator import AutobrowseGraduator
 
 # Singleton brain instance (lives for plugin lifetime)
 _brain = None
 _updater = None
 _judge = None
 _audit = None
+
+# Autobrowse R191 singletons
+_autobrowse = {
+    "tracer": None,
+    "analyzer": None,
+    "synthesizer": None,
+    "graduator": None,
+}
+_tool_call_count = 0
+_AUTOBROWSE_TRIGGER = 20  # Run autobrowse every N tool calls
 
 def _get_brain():
     global _brain
@@ -54,6 +68,65 @@ def _get_audit():
     if _audit is None:
         _audit = SelfAuditEngine()
     return _audit
+
+
+def _get_autobrowse(module_name):
+    """Lazy-load autobrowse modules."""
+    global _autobrowse
+    if _autobrowse[module_name] is None:
+        if module_name == "tracer":
+            _autobrowse[module_name] = AutobrowseTracer()
+        elif module_name == "analyzer":
+            _autobrowse[module_name] = AutobrowseAnalyzer()
+        elif module_name == "synthesizer":
+            _autobrowse[module_name] = AutobrowseSynthesizer()
+        elif module_name == "graduator":
+            _autobrowse[module_name] = AutobrowseGraduator()
+    return _autobrowse[module_name]
+
+
+def _run_autobrowse_cycle(tool_name, args, result, success):
+    """Run the full autobrowse R191 pipeline every N tool calls."""
+    global _tool_call_count
+    _tool_call_count += 1
+    
+    if _tool_call_count % _AUTOBROWSE_TRIGGER != 0:
+        return None
+    
+    try:
+        # 1. TRACE: Record the tool call pattern
+        tracer = _get_autobrowse("tracer")
+        trace = tracer.record(tool_name, args, result, success)
+        
+        # 2. ANALYZE: Extract patterns and insights
+        analyzer = _get_autobrowse("analyzer")
+        analysis = analyzer.analyze(trace)
+        
+        # 3. SYNTHESIZE: Generate actionable tips
+        synthesizer = _get_autobrowse("synthesizer")
+        tips = synthesizer.synthesize(analysis)
+        
+        # 4. GRADUATE: Score and filter tips
+        graduator = _get_autobrowse("graduator")
+        graduated = graduator.graduate(tips)
+        
+        # Log graduated tips to context updater
+        updater = _get_updater()
+        for tip in graduated[:3]:  # Max 3 tips per cycle
+            updater.update_session(
+                "autobrowse",
+                tip=f"[{tool_name}] {tip.get('text', '')[:120]}"
+            )
+        
+        return {
+            "cycle": _tool_call_count // _AUTOBROWSE_TRIGGER,
+            "tips_generated": len(tips),
+            "tips_graduated": len(graduated),
+            "traces": len(trace),
+        }
+    except Exception as e:
+        # Silently fail — autobrowse should never block main flow
+        return {"error": str(e)}
 
 
 # ─── Hook: Session Start ───────────────────────────────────────────────────
@@ -227,6 +300,14 @@ def post_tool_call_hook(**kwargs):
     # Update tool intelligence in unified context
     updater.update_tool_result(tool_name, success, duration_ms, error)
     
+    # ─── AUTOBROWSE R191: Run improvement cycle every 20 calls ────────────
+    autobrowse_result = _run_autobrowse_cycle(tool_name, args, result, success)
+    if autobrowse_result and not autobrowse_result.get("error"):
+        updater.update_session(
+            session_id,
+            autobrowse=f"Cycle {autobrowse_result['cycle']}: {autobrowse_result['tips_graduated']}/{autobrowse_result['tips_generated']} tips"
+        )
+    
     # Record errors
     if error:
         fix = analysis.get("lesson", "Review error and try alternative approach")
@@ -273,3 +354,4 @@ def register(ctx):
     judge = _get_judge()
     print(f"[learning-brain] Learning loop wired: pre_tool_call, post_tool_call, on_session_start, on_session_end")
     print(f"[learning-brain] LLM Judge ready: {judge.model} @ {judge.base_url}")
+    print(f"[learning-brain] Autobrowse R191 wired: tracer, analyzer, synthesizer, graduator (trigger every {_AUTOBROWSE_TRIGGER} calls)")
