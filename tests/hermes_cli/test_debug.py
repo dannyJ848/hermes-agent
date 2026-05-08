@@ -291,9 +291,17 @@ class TestCaptureLogSnapshotRedaction:
         home = tmp_path / ".hermes"
         home.mkdir()
         monkeypatch.setenv("HERMES_HOME", str(home))
+<<<<<<< HEAD
         # Critical: ensure the user has NOT opted in to redaction. The whole
         # point of this PR is that share-time redaction works for users who
         # never set this env var.
+=======
+        # Baseline fixture: no explicit env-var opinion. With the post-#17691
+        # default of ON, the default-path tests below exercise the
+        # secure-default behaviour. The `force=True` regression test
+        # setenvs to "false" inline to prove force=True works even when
+        # the runtime flag is disabled.
+>>>>>>> v0.13-integration
         monkeypatch.delenv("HERMES_REDACT_SECRETS", raising=False)
 
         logs_dir = home / "logs"
@@ -324,11 +332,18 @@ class TestCaptureLogSnapshotRedaction:
         assert _REDACT_FIXTURE_TOKEN in snap.tail_text
         assert _REDACT_FIXTURE_TOKEN in (snap.full_text or "")
 
+<<<<<<< HEAD
     def test_force_true_overrides_unset_env_var(self, hermes_home_with_secret):
+=======
+    def test_force_true_works_when_redaction_disabled(
+        self, hermes_home_with_secret, monkeypatch
+    ):
+>>>>>>> v0.13-integration
         """Regression test: redact_sensitive_text short-circuits without force=True.
 
         If a future refactor drops `force=True` from `_redact_log_text`, this
         test fails immediately. Without `force=True`, the redactor returns the
+<<<<<<< HEAD
         input unchanged when HERMES_REDACT_SECRETS is unset, and the feature
         ships silently broken for its target audience.
         """
@@ -339,6 +354,21 @@ class TestCaptureLogSnapshotRedaction:
         # Belt-and-suspenders: confirm the env var is genuinely unset for this
         # test so we know we're exercising the force=True path.
         assert os.environ.get("HERMES_REDACT_SECRETS", "") == ""
+=======
+        input unchanged when HERMES_REDACT_SECRETS=false, and the share-time
+        redaction feature ships silently broken for users who opted out of
+        runtime redaction (e.g. developers working on the redactor itself).
+        """
+        import os
+
+        # Force the runtime flag off so we're exercising the force=True path,
+        # not the default-on path.
+        monkeypatch.setenv("HERMES_REDACT_SECRETS", "false")
+
+        from hermes_cli.debug import _capture_log_snapshot
+
+        assert os.environ.get("HERMES_REDACT_SECRETS", "") == "false"
+>>>>>>> v0.13-integration
 
         snap = _capture_log_snapshot("agent", tail_lines=10)
 

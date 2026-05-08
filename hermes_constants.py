@@ -12,6 +12,9 @@ from typing import Optional
 _profile_fallback_warned: bool = False
 
 
+_profile_fallback_warned: bool = False
+
+
 def get_hermes_home() -> Path:
     """Return the Hermes home directory (default: ~/.hermes).
 

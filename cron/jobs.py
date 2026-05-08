@@ -810,6 +810,12 @@ def get_due_jobs() -> List[Dict[str, Any]]:
     the job is fast-forwarded to the next future run instead of firing
     immediately.  This prevents a burst of missed jobs on gateway restart.
     """
+    with _jobs_file_lock:
+        return _get_due_jobs_locked()
+
+
+def _get_due_jobs_locked() -> List[Dict[str, Any]]:
+    """Inner implementation of get_due_jobs(); must be called with _jobs_file_lock held."""
     now = _hermes_now()
     raw_jobs = load_jobs()
     jobs = [_apply_skill_fields(j) for j in copy.deepcopy(raw_jobs)]
@@ -822,19 +828,36 @@ def get_due_jobs() -> List[Dict[str, Any]]:
 
         next_run = job.get("next_run_at")
         if not next_run:
+            schedule = job.get("schedule", {})
+            kind = schedule.get("kind")
+
+            # One-shot jobs use a small grace window via the dedicated helper.
             recovered_next = _recoverable_oneshot_run_at(
-                job.get("schedule", {}),
+                schedule,
                 now,
                 last_run_at=job.get("last_run_at"),
             )
+            recovery_kind = "one-shot" if recovered_next else None
+
+            # Recurring jobs reach here only when something — typically a
+            # direct jobs.json edit that bypassed add_job() — left
+            # next_run_at unset.  Without this branch, such jobs are
+            # silently skipped forever; recompute next_run_at from the
+            # schedule so they pick up at their next scheduled tick.
+            if not recovered_next and kind in ("cron", "interval"):
+                recovered_next = compute_next_run(schedule, now.isoformat())
+                if recovered_next:
+                    recovery_kind = kind
+
             if not recovered_next:
                 continue
 
             job["next_run_at"] = recovered_next
             next_run = recovered_next
             logger.info(
-                "Job '%s' had no next_run_at; recovering one-shot run at %s",
+                "Job '%s' had no next_run_at; recovering %s run at %s",
                 job.get("name", job["id"]),
+                recovery_kind,
                 recovered_next,
             )
             for rj in raw_jobs:

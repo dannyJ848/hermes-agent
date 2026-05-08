@@ -20,14 +20,39 @@ HERMES_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(HERMES_ROOT / "hermes_cli") not in sys.path:
     sys.path.insert(0, str(HERMES_ROOT / "hermes_cli"))
 
-from hermes_brain import HermesBrain
-from context_updater import ContextUpdater
-from subconscious.llm_judge import LLMJudge
-from subconscious.self_audit_engine import SelfAuditEngine, PreflightChecker
-from subconscious.autobrowse_tracer import AutobrowseTracer
-from subconscious.autobrowse_analyzer import AutobrowseAnalyzer
-from subconscious.autobrowse_synthesizer import AutobrowseSynthesizer
-from subconscious.autobrowse_graduator import AutobrowseGraduator
+try:
+    from hermes_brain import HermesBrain
+except ImportError:
+    HermesBrain = None
+try:
+    from context_updater import ContextUpdater
+except ImportError:
+    ContextUpdater = None
+try:
+    from subconscious.llm_judge import LLMJudge
+except ImportError:
+    LLMJudge = None
+try:
+    from subconscious.self_audit_engine import SelfAuditEngine, PreflightChecker
+except ImportError:
+    SelfAuditEngine = None
+    PreflightChecker = None
+try:
+    from subconscious.autobrowse_tracer import AutobrowseTracer
+except ImportError:
+    AutobrowseTracer = None
+try:
+    from subconscious.autobrowse_analyzer import AutobrowseAnalyzer
+except ImportError:
+    AutobrowseAnalyzer = None
+try:
+    from subconscious.autobrowse_synthesizer import AutobrowseSynthesizer
+except ImportError:
+    AutobrowseSynthesizer = None
+try:
+    from subconscious.autobrowse_graduator import AutobrowseGraduator
+except ImportError:
+    AutobrowseGraduator = None
 
 # Singleton brain instance (lives for plugin lifetime)
 _brain = None
@@ -47,25 +72,25 @@ _AUTOBROWSE_TRIGGER = 20  # Run autobrowse every N tool calls
 
 def _get_brain():
     global _brain
-    if _brain is None:
+    if _brain is None and HermesBrain is not None:
         _brain = HermesBrain()
     return _brain
 
 def _get_updater():
     global _updater
-    if _updater is None:
+    if _updater is None and ContextUpdater is not None:
         _updater = ContextUpdater()
     return _updater
 
 def _get_judge():
     global _judge
-    if _judge is None:
+    if _judge is None and LLMJudge is not None:
         _judge = LLMJudge(model="deepseek-v4-pro")
     return _judge
 
 def _get_audit():
     global _audit
-    if _audit is None:
+    if _audit is None and SelfAuditEngine is not None:
         _audit = SelfAuditEngine()
     return _audit
 
@@ -74,13 +99,13 @@ def _get_autobrowse(module_name):
     """Lazy-load autobrowse modules."""
     global _autobrowse
     if _autobrowse[module_name] is None:
-        if module_name == "tracer":
+        if module_name == "tracer" and AutobrowseTracer is not None:
             _autobrowse[module_name] = AutobrowseTracer()
-        elif module_name == "analyzer":
+        elif module_name == "analyzer" and AutobrowseAnalyzer is not None:
             _autobrowse[module_name] = AutobrowseAnalyzer()
-        elif module_name == "synthesizer":
+        elif module_name == "synthesizer" and AutobrowseSynthesizer is not None:
             _autobrowse[module_name] = AutobrowseSynthesizer()
-        elif module_name == "graduator":
+        elif module_name == "graduator" and AutobrowseGraduator is not None:
             _autobrowse[module_name] = AutobrowseGraduator()
     return _autobrowse[module_name]
 

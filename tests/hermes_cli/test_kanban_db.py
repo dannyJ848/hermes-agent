@@ -168,18 +168,79 @@ def test_claim_fails_on_non_ready(kanban_home):
         assert kb.claim_task(conn, t) is None
 
 
-def test_stale_claim_reclaimed(kanban_home):
+def test_stale_claim_reclaimed(kanban_home, monkeypatch):
+    import signal
+    import hermes_cli.kanban_db as _kb
+
     with kb.connect() as conn:
         t = kb.create_task(conn, title="x", assignee="a")
-        kb.claim_task(conn, t)
+        host = _kb._claimer_id().split(":", 1)[0]
+        kb.claim_task(conn, t, claimer=f"{host}:worker")
+        killed: list[int] = []
+        state = {"alive": True}
+
+        def _signal(pid, sig):
+            killed.append(sig)
+            if sig == signal.SIGTERM:
+                state["alive"] = False
+
+        kb._set_worker_pid(conn, t, 12345)
         # Rewind claim_expires so it looks stale.
         conn.execute(
             "UPDATE tasks SET claim_expires = ? WHERE id = ?",
             (int(time.time()) - 3600, t),
         )
-        reclaimed = kb.release_stale_claims(conn)
+        monkeypatch.setattr(_kb, "_pid_alive", lambda _pid: state["alive"])
+        reclaimed = kb.release_stale_claims(conn, signal_fn=_signal)
         assert reclaimed == 1
         assert kb.get_task(conn, t).status == "ready"
+        assert killed == [signal.SIGTERM]
+
+
+def test_max_runtime_uses_current_run_start_after_retry(kanban_home):
+    """A retry should get a fresh max-runtime window.
+
+    ``tasks.started_at`` intentionally records the first time the task ever
+    started. Runtime enforcement must therefore use the active
+    ``task_runs.started_at`` row; otherwise every retry of an old task is
+    immediately timed out again.
+    """
+    with kb.connect() as conn:
+        host = kb._claimer_id().split(":", 1)[0]
+        t = kb.create_task(
+            conn, title="retry", assignee="a", max_runtime_seconds=10,
+        )
+
+        kb.claim_task(conn, t, claimer=f"{host}:first")
+        first_run_id = kb.latest_run(conn, t).id
+        old_started = int(time.time()) - 20
+        conn.execute(
+            "UPDATE tasks SET started_at = ?, worker_pid = ? WHERE id = ?",
+            (old_started, 999999, t),
+        )
+        conn.execute(
+            "UPDATE task_runs SET started_at = ?, worker_pid = ? WHERE id = ?",
+            (old_started, 999999, first_run_id),
+        )
+
+        timed_out = kb.enforce_max_runtime(conn, signal_fn=lambda _pid, _sig: None)
+        assert timed_out == [t]
+        assert kb.get_task(conn, t).status == "ready"
+
+        kb.claim_task(conn, t, claimer=f"{host}:retry")
+        retry_run = kb.latest_run(conn, t)
+        conn.execute(
+            "UPDATE tasks SET worker_pid = ? WHERE id = ?",
+            (999999, t),
+        )
+        conn.execute(
+            "UPDATE task_runs SET worker_pid = ? WHERE id = ?",
+            (999999, retry_run.id),
+        )
+
+        timed_out = kb.enforce_max_runtime(conn, signal_fn=lambda _pid, _sig: None)
+        assert timed_out == []
+        assert kb.get_task(conn, t).status == "running"
 
 
 def test_heartbeat_extends_claim(kanban_home):
@@ -252,6 +313,22 @@ def test_assign_reassigns_when_not_running(kanban_home):
         assert kb.get_task(conn, t).assignee == "b"
 
 
+def test_assignee_normalized_to_lowercase_on_create_and_assign(kanban_home):
+    """Dashboard/CLI may pass title-cased profile labels; DB + spawn use canonical id."""
+    with kb.connect() as conn:
+        tid = kb.create_task(conn, title="cased", assignee="Jules")
+        assert kb.get_task(conn, tid).assignee == "jules"
+        assert kb.assign_task(conn, tid, "Librarian")
+        assert kb.get_task(conn, tid).assignee == "librarian"
+
+
+def test_list_tasks_assignee_filter_case_insensitive(kanban_home):
+    with kb.connect() as conn:
+        tid = kb.create_task(conn, title="q", assignee="jules")
+        found = kb.list_tasks(conn, assignee="Jules")
+        assert len(found) == 1 and found[0].id == tid
+
+
 def test_archive_hides_from_default_list(kanban_home):
     with kb.connect() as conn:
         t = kb.create_task(conn, title="x")
@@ -311,7 +388,7 @@ def test_worker_context_includes_parent_results_and_comments(kanban_home):
 # Dispatcher
 # ---------------------------------------------------------------------------
 
-def test_dispatch_dry_run_does_not_claim(kanban_home):
+def test_dispatch_dry_run_does_not_claim(kanban_home, all_assignees_spawnable):
     with kb.connect() as conn:
         t1 = kb.create_task(conn, title="a", assignee="alice")
         t2 = kb.create_task(conn, title="b", assignee="bob")
@@ -328,10 +405,58 @@ def test_dispatch_skips_unassigned(kanban_home):
         t = kb.create_task(conn, title="floater")
         res = kb.dispatch_once(conn, dry_run=True)
     assert t in res.skipped_unassigned
+    assert t not in res.skipped_nonspawnable
     assert not res.spawned
 
 
-def test_dispatch_promotes_ready_and_spawns(kanban_home):
+def test_dispatch_skips_nonspawnable_into_separate_bucket(kanban_home, monkeypatch):
+    """Tasks whose assignee fails profile_exists() must NOT land in
+    ``skipped_unassigned`` (which is operator-actionable) — they go in
+    the dedicated ``skipped_nonspawnable`` bucket so health telemetry
+    can suppress false-positive "stuck" warnings."""
+    from hermes_cli import profiles
+    monkeypatch.setattr(profiles, "profile_exists", lambda name: False)
+    with kb.connect() as conn:
+        t = kb.create_task(conn, title="for-terminal", assignee="orion-cc")
+        res = kb.dispatch_once(conn, dry_run=True)
+    assert t in res.skipped_nonspawnable
+    assert t not in res.skipped_unassigned
+    assert not res.spawned
+
+
+def test_has_spawnable_ready_false_when_only_terminal_lanes(kanban_home, monkeypatch):
+    """``has_spawnable_ready`` returns False when every ready task is
+    assigned to a control-plane lane — used by gateway/CLI dispatchers
+    to silence the stuck-warn while terminals still have queued work."""
+    from hermes_cli import profiles
+    monkeypatch.setattr(profiles, "profile_exists", lambda name: False)
+    with kb.connect() as conn:
+        kb.create_task(conn, title="t1", assignee="orion-cc")
+        kb.create_task(conn, title="t2", assignee="orion-research")
+        assert kb.has_spawnable_ready(conn) is False
+
+
+def test_has_spawnable_ready_true_when_real_profile_present(kanban_home, monkeypatch):
+    """``has_spawnable_ready`` returns True as soon as ANY ready task
+    has an assignee that maps to a real Hermes profile — preserves the
+    real "stuck" signal when a daily/agent task is queued."""
+    from hermes_cli import profiles
+    monkeypatch.setattr(
+        profiles, "profile_exists", lambda name: name == "daily"
+    )
+    with kb.connect() as conn:
+        kb.create_task(conn, title="terminal-task", assignee="orion-cc")
+        kb.create_task(conn, title="hermes-task", assignee="daily")
+        assert kb.has_spawnable_ready(conn) is True
+
+
+def test_has_spawnable_ready_false_on_empty_queue(kanban_home):
+    """Empty queue is the trivial false case — no ready tasks at all."""
+    with kb.connect() as conn:
+        assert kb.has_spawnable_ready(conn) is False
+
+
+def test_dispatch_promotes_ready_and_spawns(kanban_home, all_assignees_spawnable):
     spawns = []
 
     def fake_spawn(task, workspace):
@@ -352,7 +477,7 @@ def test_dispatch_promotes_ready_and_spawns(kanban_home):
         assert kb.get_task(conn, c).status == "running"
 
 
-def test_dispatch_spawn_failure_releases_claim(kanban_home):
+def test_dispatch_spawn_failure_releases_claim(kanban_home, all_assignees_spawnable):
     def boom(task, workspace):
         raise RuntimeError("spawn failed")
 
