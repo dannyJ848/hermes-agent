@@ -96,33 +96,36 @@ def _run_autobrowse_cycle(tool_name, args, result, success):
     try:
         # 1. TRACE: Record the tool call pattern
         tracer = _get_autobrowse("tracer")
-        trace = tracer.record(tool_name, args, result, success)
+        tracer.record_call(tool_name, args, result, success, duration_ms=0)
+        traces = tracer.get_recent_traces(20)
         
         # 2. ANALYZE: Extract patterns and insights
         analyzer = _get_autobrowse("analyzer")
-        analysis = analyzer.analyze(trace)
+        patterns = analyzer.analyze_traces(traces)
         
         # 3. SYNTHESIZE: Generate actionable tips
         synthesizer = _get_autobrowse("synthesizer")
-        tips = synthesizer.synthesize(analysis)
+        tips = synthesizer.generate_tips(patterns)
         
-        # 4. GRADUATE: Score and filter tips
+        # 4. GRADUATE: Check promotions (no args needed)
         graduator = _get_autobrowse("graduator")
-        graduated = graduator.graduate(tips)
+        for tip in tips:
+            graduator.record_application(tip.get("id", "unknown"), tip.get("success", True))
+        graduated = graduator.check_promotions()
         
         # Log graduated tips to context updater
         updater = _get_updater()
         for tip in graduated[:3]:  # Max 3 tips per cycle
             updater.update_session(
                 "autobrowse",
-                tip=f"[{tool_name}] {tip.get('text', '')[:120]}"
+                tip=f"[{tool_name}] {tip.get('tip_id', '')[:120]}"
             )
         
         return {
             "cycle": _tool_call_count // _AUTOBROWSE_TRIGGER,
             "tips_generated": len(tips),
             "tips_graduated": len(graduated),
-            "traces": len(trace),
+            "traces": len(traces),
         }
     except Exception as e:
         # Silently fail — autobrowse should never block main flow
