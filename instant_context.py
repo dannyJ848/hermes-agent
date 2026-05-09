@@ -44,15 +44,28 @@ STATE = {
     },
     
     "current_status": {
-        "step": 1560,
+        "step": 2290,
         "max_steps": 10000,
-        "progress_percent": 15.6,
-        "loss": 3.058,
-        "loss_components": {"CE": 2.899, "distillation": 1.410, "SAE": 0.573},
+        "progress_percent": 22.9,
+        "loss": 1.5435,
+        "loss_breakdown": {"ce": 1.282, "distill": 1.359, "sae": 0.592},
+        "weights": [0.89, 0.27, 0.07],
+        "learning_rate": 1.81e-04,
+        "gpu_memory_log": "62.6GB",
+        "gpu_memory_actual": "~93GB (oscillates 0-93GB, normal for GB10)",
+        "gpu_utilization": "92-93%",
+        "gpu_temp_c": 63,
+        "system_ram": "116.5/128GB",
+        "eta_hours": 35,
+        "pid": 443609,
+        "status": "RUNNING",
+        "last_checkpoint": "step_2200",
+        "checkpoint_interval": 100,
+        "loss_components": {"CE": 1.282, "distillation": 1.359, "SAE": 0.592},
         "gpu_memory_gb": 62.6,
         "gpu_utilization": 92,
-        "gpu_temperature_c": 62,
-        "eta_hours": 46,
+        "gpu_temperature_c": 63,
+        "eta_hours": 35,
         "log_file": "/mnt/bigssd/train_r256_final.log",
         "pid": 443609
     },
@@ -112,7 +125,7 @@ def print_resume_summary():
     print("=" * 60)
     print(f"QWEN 27B EXPERT LOGICIAN — RESUME SUMMARY")
     print("=" * 60)
-    print(f"Step: {s['current_status']['step']}/{s['model_config']['max_steps']}")
+    print(f"Step: {s['current_status']['step']}/{s['current_status']['max_steps']}")
     print(f"Loss: {s['current_status']['loss']:.3f}")
     print(f"GPU: {s['current_status']['gpu_memory_gb']:.1f}GB, {s['current_status']['gpu_utilization']}% util")
     print(f"ETA: {s['current_status']['eta_hours']:.0f} hours")
