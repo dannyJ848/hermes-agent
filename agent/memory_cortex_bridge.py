@@ -64,7 +64,7 @@ class CortexDBBridge:
     def _init(self):
         """Try CortexDB first, fall back to cerebrum SQLite."""
         try:
-            sys.path.insert(0, str(SUBCONSCIOUS))
+            sys.path.insert(0, str(Path.home() / "hermes-agent"))
             from cortex_access import CortexDB as RealCortexDB
             self._db = RealCortexDB()
             self._has_cortex = True

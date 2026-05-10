@@ -29,28 +29,28 @@ try:
 except ImportError:
     ContextUpdater = None
 try:
-    from subconscious.llm_judge import LLMJudge
+    from agent.llm_judge import LLMJudge
 except ImportError:
     LLMJudge = None
 try:
-    from subconscious.self_audit_engine import SelfAuditEngine, PreflightChecker
+    from agent.self_audit_engine import SelfAuditEngine, PreflightChecker
 except ImportError:
     SelfAuditEngine = None
     PreflightChecker = None
 try:
-    from subconscious.autobrowse_tracer import AutobrowseTracer
+    from agent.autobrowse_tracer import AutobrowseTracer
 except ImportError:
     AutobrowseTracer = None
 try:
-    from subconscious.autobrowse_analyzer import AutobrowseAnalyzer
+    from agent.autobrowse_analyzer import AutobrowseAnalyzer
 except ImportError:
     AutobrowseAnalyzer = None
 try:
-    from subconscious.autobrowse_synthesizer import AutobrowseSynthesizer
+    from agent.autobrowse_synthesizer import AutobrowseSynthesizer
 except ImportError:
     AutobrowseSynthesizer = None
 try:
-    from subconscious.autobrowse_graduator import AutobrowseGraduator
+    from agent.autobrowse_graduator import AutobrowseGraduator
 except ImportError:
     AutobrowseGraduator = None
 

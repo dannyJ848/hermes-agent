@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 SUBCONSCIOUS = Path(__file__).parent
-sys.path.insert(0, str(SUBCONSCIOUS))
+sys.path.insert(0, str(Path.home() / "hermes-agent"))
 
 logger = logging.getLogger("hermes.subconscious.wiring")
 

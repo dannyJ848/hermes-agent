@@ -107,7 +107,7 @@ def show_context():
     print("\n[TIERED MEMORY]")
     try:
         import sys
-        sys.path.insert(0, 'hermes_cli/subconscious')
+        # sys.path removed — modules in hermes-agent
         from tiered_memory import TieredMemory
         tm = TieredMemory()
         stats = tm.get_stats()
@@ -167,13 +167,13 @@ def show_context():
     print("  Wired: distillation plugin (post_tool_call + pre_llm_call)")
     print("  Trigger: every 20 tool calls")
     print("  Tests: 6/6 passed")
-    print("  Files: ~/subconscious/autobrowse_*.py")
+    print("  Files: agent/autobrowse_*.py")
     
     # Quick commands
     print("\n[QUICK COMMANDS]")
     print("  python3 hermes_cli/instant_context.py")
-    print("  python3 hermes_cli/subconscious/memory_daemon.py --stats")
-    print("  python3 hermes_cli/subconscious/self_audit_engine.py")
+    print("  python3 agent/memory_daemon.py --stats")
+    print("  python3 agent/self_audit_engine.py")
     print("  cat CLI_RESUME_COMPLETE_MAY6_2026.md")
     print("  ssh djg6228@10.0.0.171 'tail -5 /mnt/bigssd/train_v2_max1000.log'  # check training")
     

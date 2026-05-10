@@ -24,22 +24,39 @@ Updated: 2026-05-07 23:50 UTC
   Monitor: Remote cron every 5 min + local Mac cron every 5 min
   Auto-resume: Enabled (validates checkpoint, clears GPU, restarts)
 
-[CUSTOM CODE — ALL PRESERVED]
-  hermes_cli/subconscious/          24 modules (autobrowse R191 + support)
-  plugins/learning-brain/           Plugin with guarded imports
-  hermes_cli/instant_context.py     Single source of truth
-  hermes_cli/context_updater.py     Context injection
-  custom_dflash/                  Training scripts, DGX monitoring
-  agent/cortex_access.py            CortexDB bridge
-  agent/cortex_learning.py          Learning loop
-  agent/error_learning.py           Error pattern learning
-  agent/memory_learning.py          Memory optimization
-  agent/predictive_tools.py         Tool prediction
-  agent/self_improvement_daemon.py  Background improvement
-  agent/adaptive_injection.py       Adaptive context injection
-  agent/memory_bloat_monitor.py     Memory monitoring
-  agent/curator_integration.py      Curator bridge
-  agent/curator_backup.py           Curator backup
+[CUSTOM CODE — ALL INTEGRATED INTO HERMES SOURCE]
+  agent/                              177 Python modules (all cognitive systems)
+  tools/                              106 Python modules (tools + autobrowse)
+  plugins/learning-brain/             Plugin with guarded imports
+  hermes_cli/instant_context.py       Single source of truth
+  hermes_cli/context_updater.py       Context injection
+  custom_dflash/                    Training scripts, DGX monitoring
+  agent/cortex_access.py              CortexDB bridge
+  agent/cortex_learning.py            Learning loop
+  agent/error_learning.py             Error pattern learning
+  agent/memory_learning.py            Memory optimization
+  agent/predictive_tools.py           Tool prediction
+  agent/self_improvement_daemon.py    Background improvement
+  agent/adaptive_injection.py         Adaptive context injection
+  agent/memory_bloat_monitor.py       Memory monitoring
+  agent/curator_integration.py        Curator bridge
+  agent/curator_backup.py             Curator backup
+  
+  [INTEGRATION COMPLETE — May 9, 2026]
+  ✓ All 97 modules from ~/subconscious/ merged into agent/ and tools/
+  ✓ All 128 data/config files moved to ~/.hermes/
+  ✓ Import paths updated: from agent.X, from tools.X
+  ✓ sys.path.insert("~/subconscious") calls removed
+  ✓ Configuration files updated (cron, MEMORY.md, SKILL.md)
+  ✓ LLM Judge documented as DeepSeek v4-pro
+  ✓ Agent initialization verified: iteration_engine, blackboard, tool_cache
+  ✓ Iteration engine wired into run_agent.py (pre/post action hooks)
+  ✓ Blackboard and tool cache integrated into agent loop
+  
+  [KNOWN ISSUE — PENDING]
+  ⚠ ~/subconscious/ directory keeps being recreated (tool_capability.db)
+  ⚠ Likely cached bytecode or loaded module still referencing old path
+  ⚠ Action needed: Clear all __pycache__ and restart hermes
 
 [INTEGRATION BRANCHES]
   qwen27b-training-artifacts-may3-2026  ← MAIN (v0.13.0 + custom)

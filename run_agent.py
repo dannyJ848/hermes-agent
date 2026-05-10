@@ -157,6 +157,8 @@ from agent.model_metadata import (
     query_ollama_num_ctx,
 )
 from agent.context_compressor import ContextCompressor
+from agent.iteration_engine import IterationEngine, get_engine as _get_iteration_engine
+from agent.multi_agent_blackboard import get_blackboard, get_tool_cache
 from agent.subdirectory_hints import SubdirectoryHintTracker
 from agent.prompt_caching import apply_anthropic_cache_control
 from agent.prompt_builder import build_skills_system_prompt, build_context_files_prompt, build_environment_hints, load_soul_md, TOOL_USE_ENFORCEMENT_GUIDANCE, TOOL_USE_ENFORCEMENT_MODELS, GOOGLE_MODEL_OPERATIONAL_GUIDANCE, OPENAI_MODEL_EXECUTION_GUIDANCE
@@ -2103,7 +2105,32 @@ class AIAgent:
                 provider=self.provider,
                 api_mode=self.api_mode,
             )
+        self.iteration_engine = _get_iteration_engine()
+
+        # ── Multi-Agent Blackboard ───────────────────────────────────────────
+        self.blackboard = get_blackboard()
+        self.tool_cache = get_tool_cache()
+
         self.compression_enabled = compression_enabled
+        # COGNITIVE SYSTEMS LOADER — Load all cognitive systems from agent/
+        # ═══════════════════════════════════════════════════════════════════════════════
+        try:
+            from agent.subconscious_plugin_loader import init_subconscious_plugins
+            self._subconscious_plugins = init_subconscious_plugins()
+            _sp_count = len(self._subconscious_plugins)
+            if _sp_count > 0:
+                print(f"🧠 Subconscious plugins loaded: {_sp_count} cognitive systems")
+        except Exception as _sp_err:
+            logger.warning("Subconscious plugin loader failed: %s", _sp_err)
+            self._subconscious_plugins = {}
+
+        # ── Iteration Engine: experiential learning loop ──────────────────
+        try:
+            self.iteration_engine = _get_iteration_engine()
+            print("🔄 Iteration engine ready: experiential learning loop active")
+        except Exception as _ie_err:
+            logger.warning("Iteration engine init failed: %s", _ie_err)
+            self.iteration_engine = None
 
         # Reject models whose context window is below the minimum required
         # for reliable tool-calling workflows (64K tokens).
@@ -2665,6 +2692,88 @@ class AIAgent:
         if len(detail) > 220:
             detail = detail[:217].rstrip() + "..."
         self._emit_warning(f"⚠ Auxiliary {task} failed: {detail}")
+
+    def _trigger_compression_handoff(self, compression_count: int, messages: list, system_prompt: str) -> None:
+        """Self-manager: trigger full handoff when compression threshold reached.
+        
+        Creates checkpoint, saves to all context systems, and prepares resume.
+        This runs INSIDE the hermes agent, not as external script.
+        """
+        import time
+        import json
+        from pathlib import Path
+        
+        _handoff_label = f"auto-handoff-{int(time.time())}"
+        _workspace = Path.home() / ".hermes" / "workspace"
+        _workspace.mkdir(parents=True, exist_ok=True)
+        
+        self._emit_warning(
+            f"🔄 COMPRESSION THRESHOLD REACHED ({compression_count}x). "
+            f"Initiating auto-handoff: {_handoff_label}"
+        )
+        
+        # 1. Build context snapshot
+        _context = {
+            "timestamp": time.time(),
+            "session_id": self.session_id,
+            "compression_count": compression_count,
+            "message_count": len(messages),
+            "model": self.model,
+            "system_prompt_preview": system_prompt[:500] if system_prompt else "",
+            "todo_snapshot": self._todo_store.format_for_injection() if hasattr(self, '_todo_store') else "",
+        }
+        
+        # 2. Save checkpoint
+        _checkpoint_file = _workspace / "checkpoints" / f"{_handoff_label}.json"
+        _checkpoint_file.parent.mkdir(parents=True, exist_ok=True)
+        _checkpoint_data = {
+            "label": _handoff_label,
+            "timestamp": time.time(),
+            "context": _context,
+            "session_id": self.session_id,
+        }
+        try:
+            _checkpoint_file.write_text(json.dumps(_checkpoint_data, indent=2, default=str))
+            self._vprint(f"{self.log_prefix}✓ Checkpoint saved: {_handoff_label}", force=True)
+        except Exception as e:
+            logger.warning("Handoff checkpoint failed: %s", e)
+        
+        # 3. Save handoff for CLI resume
+        _handoff_file = _workspace / "handoff_pending.json"
+        _handoff = {
+            "timestamp": time.time(),
+            "reason": "compression_threshold",
+            "checkpoint_label": _handoff_label,
+            "session_id": self.session_id,
+            "compression_count": compression_count,
+            "active_tasks": [],
+            "next_steps": f"Resume from checkpoint {_handoff_label}",
+            "notes": f"Auto-handoff after {compression_count} compressions. Start new CLI and resume.",
+        }
+        try:
+            _handoff_file.write_text(json.dumps(_handoff, indent=2, default=str))
+            self._vprint(f"{self.log_prefix}✓ Handoff saved for next CLI", force=True)
+        except Exception as e:
+            logger.warning("Handoff file failed: %s", e)
+        
+        # 4. Log to rapid learnings via memory manager if available
+        if self._memory_manager:
+            try:
+                self._memory_manager.add_rapid_learning(
+                    lesson=f"Session handoff at {compression_count} compressions. Resume with '{_handoff_label}'.",
+                    category="meta",
+                    confidence=0.99,
+                    source="self_manager",
+                )
+            except Exception:
+                pass
+        
+        # 5. Emit final instruction to user
+        self._emit_warning(
+            f"📋 HANDOFF COMPLETE. Start new Hermes CLI and say: "
+            f"'resume from checkpoint {_handoff_label}'\n"
+            f"   Or run: hermes --resume {_handoff_label}"
+        )
 
     def _current_main_runtime(self) -> Dict[str, str]:
         """Return the live main runtime for session-scoped auxiliary routing."""
@@ -9810,6 +9919,12 @@ class AIAgent:
                 f"accuracy may degrade. Consider /new to start fresh.",
                 force=True,
             )
+        
+        # ── SELF-MANAGER: Auto-handoff at 5th compression ──
+        # When context has been compressed 5 times, quality is severely degraded.
+        # Trigger full checkpoint, distill to all systems, and prepare for resume.
+        if _cc >= 5:
+            self._trigger_compression_handoff(_cc, messages, new_system_prompt)
 
         # Update token estimate after compaction so pressure calculations
         # use the post-compression count, not the stale pre-compression one.
@@ -9930,6 +10045,20 @@ class AIAgent:
         tools. Used by the concurrent execution path; the sequential path retains
         its own inline invocation for backward-compatible display handling.
         """
+        import time as _time
+        _tool_start_time = _time.time()
+
+        # ── Iteration Engine: pre-action lookup ────────────────────────────
+        _iteration_context = None
+        if hasattr(self, "iteration_engine") and self.iteration_engine:
+            try:
+                _iteration_context = self.iteration_engine.before_action(
+                    action_type=function_name,
+                    detail=json.dumps(function_args, ensure_ascii=False)[:200],
+                )
+            except Exception:
+                pass
+
         # Check plugin hooks for a block directive before executing anything.
         block_message: Optional[str] = None
         if not pre_tool_block_checked:
@@ -9998,13 +10127,33 @@ class AIAgent:
         elif function_name == "delegate_task":
             return self._dispatch_delegate_task(function_args)
         else:
-            return handle_function_call(
+            result = handle_function_call(
                 function_name, function_args, effective_task_id,
                 tool_call_id=tool_call_id,
                 session_id=self.session_id or "",
                 enabled_tools=list(self.valid_tool_names) if self.valid_tool_names else None,
                 skip_pre_tool_call_hook=True,
             )
+
+        # ── Iteration Engine + Tool Cache: post-action capture ───────────────
+        if hasattr(self, "iteration_engine") and self.iteration_engine:
+            try:
+                _tool_end = _time.time()
+                _is_error = "error" in result.lower() or result.startswith("Error")
+                self.iteration_engine.after_action(
+                    action_type=function_name,
+                    detail=json.dumps(function_args, ensure_ascii=False)[:200],
+                    result="failure" if _is_error else "success",
+                    error=result[:500] if _is_error else "",
+                    speed_ms=int((_tool_end - _tool_start_time) * 1000),
+                )
+                # Cache successful tool results
+                if not _is_error and hasattr(self, "tool_cache") and self.tool_cache:
+                    self.tool_cache.put(function_name, function_args, result)
+            except Exception:
+                pass
+
+        return result
 
     @staticmethod
     def _wrap_verbose(label: str, text: str, indent: str = "     ") -> str:
@@ -10536,6 +10685,20 @@ class AIAgent:
                 self._current_tool = function_name
                 self._touch_activity(f"executing tool: {function_name}")
 
+            # ── Iteration Engine: pre-action lookup ────────────────────────────
+            _iteration_context = None
+            if not _execution_blocked and hasattr(self, "iteration_engine") and self.iteration_engine:
+                try:
+                    _iteration_context = self.iteration_engine.before_action(
+                        action_type=function_name,
+                        detail=json.dumps(function_args, ensure_ascii=False)[:200],
+                    )
+                    if _iteration_context and _iteration_context.get("warnings"):
+                        _warn = _iteration_context["warnings"][0]
+                        print(f"  ⚠️  {_warn['lesson'][:100]}")
+                except Exception:
+                    pass
+
             # Set activity callback for long-running tool execution (terminal
             # commands, etc.) so the gateway's inactivity monitor doesn't kill
             # the agent while a command is running.
@@ -10773,6 +10936,23 @@ class AIAgent:
             result_preview = function_result if self.verbose_logging else (
                 function_result[:200] if len(function_result) > 200 else function_result
             )
+
+            # ── Iteration Engine + Tool Cache: post-action capture ──────────────
+            if not _execution_blocked and hasattr(self, "iteration_engine") and self.iteration_engine:
+                try:
+                    _is_err = _is_error_result if '_is_error_result' in dir() else False
+                    self.iteration_engine.after_action(
+                        action_type=function_name,
+                        detail=json.dumps(function_args, ensure_ascii=False)[:200],
+                        result="failure" if _is_err else "success",
+                        error=function_result[:500] if _is_err else "",
+                        speed_ms=int(tool_duration * 1000),
+                    )
+                    # Cache successful tool results
+                    if not _is_err and hasattr(self, "tool_cache") and self.tool_cache:
+                        self.tool_cache.put(function_name, function_args, function_result)
+                except Exception:
+                    pass
 
             # Log tool errors to the persistent error log so [error] tags
             # in the UI always have a corresponding detailed entry on disk.

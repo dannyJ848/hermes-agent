@@ -135,7 +135,7 @@ c.execute('''
     session_id,
     json.dumps(['Qwen 27B training restart', 'Hermes source enhancement', 'Self-improvement cycle']),
     json.dumps(['Use write_file over patch', 'Centralize subconscious', 'Build loop guard']),
-    json.dumps(['hermes_cli/subconscious/', 'hermes_cli/hermes_brain.py', 'hermes_cli/loop_guard.py'])
+    json.dumps(['agent/', 'hermes_cli/hermes_brain.py', 'hermes_cli/loop_guard.py'])
 ))
 
 conn.commit()

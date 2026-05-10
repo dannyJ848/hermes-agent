@@ -299,7 +299,7 @@ class HermesEnhancementSuite:
             return
         
         try:
-            sys.path.insert(0, str(SUBCONSCIOUS))
+            sys.path.insert(0, str(Path.home() / "hermes-agent"))
             
             # Import all subconscious systems
             from memory_cortex_bridge import MemoryCortexBridge, pre_tool_call_hook

@@ -406,9 +406,15 @@ class PluginContext:
                 conn = sqlite3.connect('/Users/dannygomez/.hermes/cerebrum_memory.db')
                 c = conn.cursor()
                 c.execute('''
-                    INSERT INTO tool_call_log (tool_name, success, elapsed_ms, error, timestamp)
-                    VALUES (?, ?, ?, ?, datetime('now'))
-                ''', (tool_name, error is None, int(elapsed * 1000), error))
+                    INSERT INTO tool_call_log (tool_name, status, speed_ms, args, created_at)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (
+                    tool_name, 
+                    'error' if error else 'success', 
+                    int(elapsed * 1000), 
+                    json.dumps(args) if args else '{}',
+                    time.time()
+                ))
                 conn.commit()
                 conn.close()
             except:
@@ -1269,7 +1275,7 @@ def get_pre_tool_call_block_message(
     try:
         import sys
         from pathlib import Path
-        sys.path.insert(0, str(Path(__file__).parent / "subconscious"))
+        # sys.path removed — modules now in hermes-agent
         
         # 1. Memory pressure check
         from memory_cortex_bridge import MemoryCortexBridge

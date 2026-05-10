@@ -36,7 +36,7 @@ def bootstrap():
         
         print("\n[QUICK START]")
         print("  1. python3 hermes_cli/instant_context.py")
-        print("  2. python3 hermes_cli/subconscious/memory_daemon.py --stats")
+        print("  2. python3 agent/memory_daemon.py --stats")
         print("  3. cat CLI_RESUME_COMPLETE_MAY6_2026.md")
         print("=" * 70)
     else:

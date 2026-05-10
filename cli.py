@@ -2394,6 +2394,13 @@ class HermesCLI:
         # Deferred title: stored in memory until the session is created in the DB
         self._pending_title: Optional[str] = None
         
+        # ── SELF-MANAGER: Auto-detect pending handoff ──
+        # Check for handoff from previous session that hit compression threshold
+        _auto_resume = self._check_pending_handoff(resume)
+        if _auto_resume:
+            resume = _auto_resume
+            self._vprint(f"{self.log_prefix}🔄 Auto-resuming from handoff: {resume}", force=True)
+        
         # Session ID: reuse existing one when resuming, otherwise generate fresh
         if resume:
             self.session_id = resume
@@ -4034,6 +4041,44 @@ class HermesCLI:
             )
 
         self._console_print()
+
+    def _check_pending_handoff(self, explicit_resume: str = None) -> str:
+        """Check for pending handoff file and return checkpoint label if found.
+        
+        Called during __init__ before session ID is set. If user explicitly
+        passed --resume, respect that. Otherwise check for auto-handoff.
+        """
+        if explicit_resume:
+            return None  # User explicitly requested a session, don't override
+        
+        import json
+        from pathlib import Path
+        
+        _handoff_file = Path.home() / ".hermes" / "workspace" / "handoff_pending.json"
+        if not _handoff_file.exists():
+            return None
+        
+        try:
+            _handoff = json.loads(_handoff_file.read_text())
+            # Check if handoff is recent (within 24 hours)
+            if time.time() - _handoff.get("timestamp", 0) > 86400:
+                # Stale - archive it
+                _archive = _handoff_file.with_suffix(".archived.json")
+                _handoff_file.rename(_archive)
+                return None
+            
+            _checkpoint_label = _handoff.get("checkpoint_label") or _handoff.get("next_steps", "").replace("Resume from checkpoint ", "")
+            if _checkpoint_label:
+                # Clear the handoff so we don't resume again next time
+                try:
+                    _handoff_file.unlink()
+                except Exception:
+                    pass
+                return _checkpoint_label
+        except Exception:
+            pass
+        
+        return None
 
     def _preload_resumed_session(self) -> bool:
         """Load a resumed session's history from the DB early (before first chat).

@@ -179,7 +179,7 @@ def get_all_systems() -> List[Dict]:
 
 def verify_systems() -> Dict:
     """Verify all systems can be imported and initialized."""
-    sys.path.insert(0, str(SUBCONSCIOUS_DIR))
+    sys.path.insert(0, str(Path.home() / "hermes-agent"))
     
     results = []
     total = 0

@@ -403,7 +403,7 @@ def attack(url: str, use_phantom: bool = False) -> Dict:
     layer = 0
 
     try:
-        sys.path.insert(0, SUBCONSCIOUS_DIR)
+        sys.path.insert(0, str(Path.home() / "hermes-agent"))
         from phantom_extractor import extract as phantom_extract
         result = phantom_extract(url, prefer_tor=True, max_layers=6)
         if result.get("success") and result.get("content"):
