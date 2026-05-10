@@ -20,7 +20,7 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 
-DB_PATH = Path.home() / "hermes-agent" / "training_gym.db"
+DB_PATH = Path.home() / ".hermes" / "training_gym.db"
 
 def get_db():
     db = sqlite3.connect(str(DB_PATH), timeout=10)

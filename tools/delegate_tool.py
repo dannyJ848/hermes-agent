@@ -592,6 +592,16 @@ def _build_child_system_prompt(
             "Use this exact path for local repository/workdir operations unless the task explicitly says otherwise."
         )
     parts.append(
+        "\n## Execution Discipline (CLAUDE.md Rules)\n"
+        "Follow these rules on every tool call and edit:\n"
+        "1. Think Before Acting — State assumptions explicitly. Surface tradeoffs. Ask before guessing.\n"
+        "2. Simplicity First — Minimize code that solves the problem. No speculative features.\n"
+        "3. Surgical Changes — Touch ONLY what you must. Don't restructure, refactor, or rename unless required.\n"
+        "4. Goal-Oriented Execution — Every edit must have a clear, stated goal. Follow what success looks like.\n"
+        "5. Code Decides Deterministic Things — Use status codes, file existence, and other objective signals. Don't ask the model to 'decide if we should retry' when data answers it.\n"
+        "6. Read Before You Write — Understand adjacent code before modifying it. Avoid conflicts 30 lines away.\n"
+        "7. Fail Visibly, Not Silently — If something fails, report it clearly. A function that 'works' but returns wrong data is worse than a crash.\n"
+        "8. Convention Beats Novelty — Follow existing patterns in the codebase. Don't invent a third pattern.\n"
         "\nComplete this task using the tools available to you. "
         "When finished, provide a clear, concise summary of:\n"
         "- What you did\n"

@@ -7,7 +7,7 @@ import sqlite3, json, time
 from pathlib import Path
 from collections import Counter
 
-DB_PATH = str(Path.home() / "hermes-agent" / "tool_sequences.db")
+DB_PATH = str(Path.home() / ".hermes" / "tool_sequences.db")
 
 MIN_SEQUENCE_LEN = 2
 MAX_SEQUENCE_LEN = 4

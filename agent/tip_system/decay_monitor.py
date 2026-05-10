@@ -13,7 +13,7 @@ import time
 from pathlib import Path
 
 CEREBRUM = Path.home() / ".hermes" / "cerebrum_memory.db"
-SNAP_DB = Path.home() / "hermes-agent" / "tip_decay_snapshots.db"
+SNAP_DB = Path.home() / ".hermes" / "tip_decay_snapshots.db"
 
 
 def ensure_snap_db():

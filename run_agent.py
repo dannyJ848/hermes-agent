@@ -2112,17 +2112,9 @@ class AIAgent:
         self.tool_cache = get_tool_cache()
 
         self.compression_enabled = compression_enabled
-        # COGNITIVE SYSTEMS LOADER — Load all cognitive systems from agent/
+        # COGNITIVE SYSTEMS — Loaded via plugin system (cognitive-systems plugin)
+        # Iteration engine and cognitive systems are auto-loaded by plugin manager
         # ═══════════════════════════════════════════════════════════════════════════════
-        try:
-            from agent.subconscious_plugin_loader import init_subconscious_plugins
-            self._subconscious_plugins = init_subconscious_plugins()
-            _sp_count = len(self._subconscious_plugins)
-            if _sp_count > 0:
-                print(f"🧠 Subconscious plugins loaded: {_sp_count} cognitive systems")
-        except Exception as _sp_err:
-            logger.warning("Subconscious plugin loader failed: %s", _sp_err)
-            self._subconscious_plugins = {}
 
         # ── Iteration Engine: experiential learning loop ──────────────────
         try:

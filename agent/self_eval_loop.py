@@ -16,7 +16,7 @@ import sqlite3, time, json, os
 from pathlib import Path
 from collections import defaultdict
 
-DB_PATH = str(Path.home() / "hermes-agent" / "self_eval.db")
+DB_PATH = str(Path.home() / ".hermes" / "self_eval.db")
 
 # 4-axis rubric from AgentEval research
 AXES = {

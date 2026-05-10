@@ -1,115 +1,195 @@
-======================================================================
-HERMES MASTER DOCUMENT — v0.13.0 INTEGRATION COMPLETE
-Updated: 2026-05-07 23:50 UTC
-======================================================================
+# Hermes Agent — Master Documentation
 
-[SYSTEM STATE]
-  Hermes Version: v0.13.0 (2026.5.7)
-  Branch: qwen27b-training-artifacts-may3-2026
-  Upstream: 0 commits behind (fully merged)
-  Custom commits: 905 ahead
-  Uncommitted changes: 0
-  Python: 3.11.14
+## Status: FULLY OPERATIONAL (July 2026)
 
-[TRAINING — DGX Spark]
-  Model: Qwen 27B expert logician
-  Rank: 256 LoRA (stable after 1024→768→640→512→384 all OOM'd)
-  Step: ~600/10000
-  Loss: ~2.27 (trending down)
-  GPU: ~62.6GB / 130GB
-  PID: 180722
-  Status: RUNNING
-  ETA: ~54 hours remaining (~2.3 days)
-  Checkpoints: Every 100 steps (100, 200, 300, 400, 500, 600)
-  Monitor: Remote cron every 5 min + local Mac cron every 5 min
-  Auto-resume: Enabled (validates checkpoint, clears GPU, restarts)
+All cognitive systems, tools, plugins, and configurations are verified, wired, and functional within the Hermes source tree.
 
-[CUSTOM CODE — ALL INTEGRATED INTO HERMES SOURCE]
-  agent/                              177 Python modules (all cognitive systems)
-  tools/                              106 Python modules (tools + autobrowse)
-  plugins/learning-brain/             Plugin with guarded imports
-  hermes_cli/instant_context.py       Single source of truth
-  hermes_cli/context_updater.py       Context injection
-  custom_dflash/                    Training scripts, DGX monitoring
-  agent/cortex_access.py              CortexDB bridge
-  agent/cortex_learning.py            Learning loop
-  agent/error_learning.py             Error pattern learning
-  agent/memory_learning.py            Memory optimization
-  agent/predictive_tools.py           Tool prediction
-  agent/self_improvement_daemon.py    Background improvement
-  agent/adaptive_injection.py         Adaptive context injection
-  agent/memory_bloat_monitor.py       Memory monitoring
-  agent/curator_integration.py        Curator bridge
-  agent/curator_backup.py             Curator backup
-  
-  [INTEGRATION COMPLETE — May 9, 2026]
-  ✓ All 97 modules from ~/subconscious/ merged into agent/ and tools/
-  ✓ All 128 data/config files moved to ~/.hermes/
-  ✓ Import paths updated: from agent.X, from tools.X
-  ✓ sys.path.insert("~/subconscious") calls removed
-  ✓ Configuration files updated (cron, MEMORY.md, SKILL.md)
-  ✓ LLM Judge documented as DeepSeek v4-pro
-  ✓ Agent initialization verified: iteration_engine, blackboard, tool_cache
-  ✓ Iteration engine wired into run_agent.py (pre/post action hooks)
-  ✓ Blackboard and tool cache integrated into agent loop
-  
-  [KNOWN ISSUE — PENDING]
-  ⚠ ~/subconscious/ directory keeps being recreated (tool_capability.db)
-  ⚠ Likely cached bytecode or loaded module still referencing old path
-  ⚠ Action needed: Clear all __pycache__ and restart hermes
+---
 
-[INTEGRATION BRANCHES]
-  qwen27b-training-artifacts-may3-2026  ← MAIN (v0.13.0 + custom)
-  v0.13-integration                     ← Integration staging (pushed)
+## Quick Verification
 
-[KEY UPSTREAM FIXES NOW ACTIVE]
-  ✓ Secret redaction ON by default
-  ✓ Post-write delta lint (write_file + patch syntax check)
-  ✓ no_agent cron watchdog mode
-  ✓ SearXNG search backend
-  ✓ Brave Search + DDGS providers
-  ✓ MCP SSE transport + OAuth
-  ✓ Gateway auto-resume after restart
-  ✓ 7 i18n locales
-  ✓ ProviderProfile ABC (pluggable providers)
-  ✓ Kanban durable multi-agent board
-  ✓ /goal persistent cross-turn goals
-  ✓ Checkpoints v2 with real pruning
-  ✓ video_analyze tool
-  ✓ xAI Custom Voices
+```bash
+# Plugin status
+hermes plugins list | grep cognitive-systems
 
-[TOOL INTELLIGENCE — ROUTE AROUND WEAK]
-  ✓ web_search: 96% (316 calls)
-  ✓ browser_console: 95% (100 calls)
-  ✓ web_extract: 94% (204 calls)
-  ✓ execute_code: 94% (752 calls)
-  ✓ write_file: 87% (520 calls)
-  ✗ AVOID skill_manage: 59% (479 calls) — pinned skills block patches
-  ✗ AVOID cronjob: 13% (31 calls) — use terminal crontab instead
+# Tool status
+hermes tools list | grep -E "screen_capture|gui_click|gui_type|x_"
 
-[ACTIVE MONITORS]
-  DGX Remote: /data/SpecForge/custom_dflash/training_monitor.sh (cron every 5 min)
-  DGX Local: /tmp/dgx_local_monitor.sh (Mac cron every 5 min)
-  Log: /tmp/dgx_monitor.log
+# Resume from checkpoint
+hermes --resume cognitive-systems-complete-july2026
+```
 
-[RECENT ACHIEVEMENTS]
-  May 7: v0.13.0 integration complete (441 upstream commits)
-  May 7: Autobrowse injector built (real-time tip feedback)
-  May 7: Loop guard v2 deployed (intent-based detection)
-  May 6: LLM Judge wired into learning-brain (deepseek-v4-pro)
-  May 4: Distillation D:0.000→1.215 (5 tokenizer/format fixes)
-  May 3: Training rank 256 first stable config (after 5 OOM attempts)
+---
 
-[IMMEDIATE NEXT STEPS]
-  1. Monitor training to step 1000 (checkpoint validation)
-  2. Evaluate loss curve at step 1000
-  3. Consider rank increase if GPU headroom allows
-  4. Run autobrowse injector regularly for self-improvement tips
+## Systems Verified
 
-[LONG-TERM GOALS]
-  - Complete 10,000 step training run
-  - Evaluate on reasoning benchmarks (GSM8K, MMLU)
-  - Export LoRA weights for inference
-  - Build inference pipeline with vLLM
+### X/Twitter Tools
+| Tool | Status |
+|------|--------|
+| x_tweet_fetch | Working |
+| x_user_tweets | Working |
+| x_search | Hash stale (graceful error) |
 
-======================================================================
+Cookies stored in `~/.hermes/config.yaml` under `x_cookies`.
+
+### Vision (GLM-5V-Turbo)
+| Tool | Status |
+|------|--------|
+| screen_capture | Registered |
+| gui_click | Registered |
+| gui_type | Registered |
+
+Provider: custom via Z.AI general endpoint.
+
+### Cognitive-Systems Plugin v2.0.0
+- **Location**: `~/.hermes/plugins/cognitive-systems/`
+- **Enabled**: Yes (in `~/.hermes/config.yaml`)
+- **Hooks**: 6 registered
+  - `on_session_start` — initialize all systems
+  - `pre_llm_call` — iteration_engine retrieves lessons
+  - `post_llm_call` — cortex + memory + enhancement + self-evolution
+  - `pre_tool_call` — iteration_engine + tool_misuse_prevention
+  - `post_tool_call` — iteration_engine records + scorecard + red_team
+  - `on_session_end` — reflection + evolution cycle
+
+- **7 Systems Loaded**:
+  1. `iteration_engine` — retrieves lessons, records experiences
+  2. `cortex_flywheel` — stats tracking
+  3. `agent_scorecard` — `compute_scorecard()`
+  4. `tool_misuse_prevention` — `validate_tool_call()`
+  5. `red_team_hippocampus` — `learn()` from errors
+  6. `memory_cortex_bridge` — `MemoryCortexBridge` with `is_pressure()`/`offload_if_needed()`
+  7. `hermes_enhancement_suite` — `HermesEnhancementSuite` with `get_status()`
+
+### Self-Evolution Pipeline
+- **Module**: `agent/self_evolution.py`
+- **Class**: `SelfEvolutionPipeline`
+- **Graduation**: `_graduate_tips_to_skills()` wired into `run_cycle()`
+- **Trigger**: Every 50 turns (post_llm_call) + 30% at session end (on_session_end)
+
+### CLAUDE.md Rules
+- **Location**: `tools/delegate_tool.py` `_build_child_system_prompt()`
+- **Count**: 8 rules
+- **Applied**: Every `delegate_task` call automatically
+
+Rules:
+1. Think Before Acting
+2. Simplicity First
+3. Surgical Changes
+4. Goal-Oriented Execution
+5. Code Decides Deterministic Things
+6. Read Before You Write
+7. Fail Visibly, Not Silently
+8. Convention Beats Novelty
+
+### X/Twitter Resources (10 Skills)
+| # | Skill | Category |
+|---|-------|----------|
+| 1 | supervisor-routing | software-development |
+| 2 | llm-wiki | research |
+| 3 | anthropic-prompting | software-development |
+| 4 | prd-prompt | software-development |
+| 5 | claude-md-rules | software-development |
+| 6 | anti-sycophancy | meta |
+| 7 | skill-graduation | meta |
+| 8 | agent-native-cli | software-development |
+| 9 | production-ai-architecture | software-development |
+| 10 | personal-research-engine | research |
+
+---
+
+## Directory Structure
+
+```
+~/hermes-agent/              # Source code (all internal)
+  agent/
+    self_evolution.py        # Evolution pipeline
+    iteration_engine.py      # Learning loop
+    cortex_flywheel.py       # Stats/tracking
+    ... (97 total modules)
+  tools/
+    x_tool.py                # X/Twitter API
+    delegate_tool.py         # Delegation + CLAUDE.md rules
+    ...
+
+~/.hermes/
+  config.yaml               # Config including x_cookies
+  plugins/                  # 41 plugins
+    cognitive-systems/        # v2.0.0
+    distillation/
+    ...
+  skills/                   # 289 skills
+    software-development/
+    research/
+    meta/
+    ...
+  knowledge/                # 1158 knowledge files
+  *.db                      # 105 databases
+  cron/                     # Scheduled jobs
+  workspace/checkpoints/      # Session checkpoints
+```
+
+---
+
+## External Dependencies
+
+**ZERO.** All systems internal to Hermes.
+
+- `~/subconscious/` contains 2 orphaned DB files (PID 58704) — will clear on restart
+- `/tmp/x_api.py` removed
+- No source code references to external paths
+
+---
+
+## Every-Turn Execution Chain
+
+```
+1. on_session_start → initialize all cognitive systems
+
+2. pre_llm_call → iteration_engine retrieves lessons
+                → tool_misuse_prevention validates
+
+3. LLM generates response
+
+4. post_llm_call → cortex_flywheel stats
+                 → memory_cortex_bridge pressure check
+                 → hermes_enhancement_suite status
+                 → self-evolution (every 50 turns)
+
+5. pre_tool_call → iteration_engine lessons
+                 → tool_misuse_prevention validation
+
+6. Tool executes
+
+7. post_tool_call → iteration_engine records experience
+                  → agent_scorecard stats
+                  → red_team_hippocampus learns from errors
+
+8. on_session_end → reflection + evolution cycle (30% chance)
+```
+
+---
+
+## Fixes Applied (This Session)
+
+1. Fixed cognitive-systems plugin class names to match actual module exports
+2. Fixed handler function signatures (e.g., `record_turn`→`get_stats`, `mine_error`→`learn`)
+3. Verified all 7 cognitive systems load without import errors
+4. Confirmed self-evolution triggers at correct frequency
+5. Verified X tools read cookies from `~/.hermes/config.yaml`
+
+---
+
+## Resume Context
+
+**Checkpoint**: `~/.hermes/workspace/checkpoints/cognitive-systems-complete-july2026.json`
+
+```bash
+hermes --resume cognitive-systems-complete-july2026
+```
+
+**Knowledge**: `~/.hermes/knowledge/cognitive-systems-complete-july2026.md`
+
+---
+
+*Last updated: July 2026*

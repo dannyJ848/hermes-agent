@@ -6,7 +6,7 @@ Run this to verify all systems are operational:
     python3 subconscious_systems_manifest.py --verify
 
 Or import to get system status:
-    from subconscious_systems_manifest import get_manifest
+    from agent.subconscious_systems_manifest import get_manifest
     print(get_manifest())
 """
 

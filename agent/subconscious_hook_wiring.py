@@ -11,7 +11,7 @@ This module provides complete hook implementations that integrate:
 
 Usage:
     # In model_tools.py or plugins.py:
-    from subconscious_hook_wiring import (
+    from agent.subconscious_hook_wiring import (
         pre_tool_call_full,
         post_tool_call_full,
         pre_llm_call_full,
@@ -34,7 +34,7 @@ logger = logging.getLogger("hermes.subconscious.wiring")
 
 # Lazy imports to avoid circular dependencies
 def _get_memory_bridge():
-    from memory_cortex_bridge import MemoryCortexBridge
+    from agent.memory_cortex_bridge import MemoryCortexBridge
     return MemoryCortexBridge()
 
 def _get_error_miner():
@@ -54,11 +54,11 @@ def _get_quality_gate():
     return DistillationQualityGate()
 
 def _get_intelligence_tracker():
-    from tool_intelligence_tracker import ToolIntelligenceTracker
+    from agent.tool_intelligence_tracker import ToolIntelligenceTracker
     return ToolIntelligenceTracker()
 
 def _get_enhancement_suite():
-    from hermes_enhancement_suite import HermesEnhancementSuite
+    from agent.hermes_enhancement_suite import HermesEnhancementSuite
     return HermesEnhancementSuite()
 
 

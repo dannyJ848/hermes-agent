@@ -259,6 +259,7 @@ _API_KEY_PROVIDER_AUX_MODELS: Dict[str, str] = {
 # "exotic provider" branch checks this before falling back to the main model.
 _PROVIDER_VISION_MODELS: Dict[str, str] = {
     "xiaomi": "mimo-v2.5",
+    "zai": "glm-5v-turbo",
 }
 
 # Providers whose endpoint does not accept image input, even though the

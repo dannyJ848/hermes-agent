@@ -112,7 +112,7 @@ def score_error_recovery(db) -> dict:
     
     # Read from tool_capability.db (the REAL tool stats)
     try:
-        cap_db_path = os.path.expanduser("~/hermes-agent/agent/tool_capability.db")
+        cap_db_path = os.path.expanduser("~/.hermes/tool_capability.db")
         if os.path.exists(cap_db_path):
             cap_db = sqlite3.connect(cap_db_path, timeout=5)
             total_calls = cap_db.execute("SELECT SUM(total_calls) FROM tool_stats").fetchone()[0] or 0

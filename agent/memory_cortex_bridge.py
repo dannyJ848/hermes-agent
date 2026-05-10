@@ -12,7 +12,7 @@ Flow:
   6. Log action for audit
 
 Usage:
-    from memory_cortex_bridge import MemoryCortexBridge
+    from agent.memory_cortex_bridge import MemoryCortexBridge
     bridge = MemoryCortexBridge()
     freed = bridge.offload_if_needed()  # Returns chars freed or 0
 
@@ -396,7 +396,7 @@ def pre_tool_call_hook(agent_state: Dict) -> Dict:
     Checks memory pressure and offloads if needed.
     
     Usage in agent loop:
-        from memory_cortex_bridge import pre_tool_call_hook
+        from agent.memory_cortex_bridge import pre_tool_call_hook
         agent_state = pre_tool_call_hook(agent_state)
     """
     bridge = MemoryCortexBridge()
@@ -415,7 +415,7 @@ def memory_add_hook(key: str, value: str, priority: int = 5) -> bool:
     Ensures space is available before adding.
     
     Usage:
-        from memory_cortex_bridge import memory_add_hook
+        from agent.memory_cortex_bridge import memory_add_hook
         if memory_add_hook("new_key", "new_value"):
             memory.add("new_key", "new_value")
     """

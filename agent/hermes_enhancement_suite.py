@@ -9,12 +9,12 @@ Wires all cognitive systems into Hermes Agent's hook points:
   - post_llm_call: response quality scoring, distillation trigger
 
 Usage:
-    from hermes_enhancement_suite import HermesEnhancementSuite
+    from agent.hermes_enhancement_suite import HermesEnhancementSuite
     suite = HermesEnhancementSuite()
     suite.install_hooks()  # Wires all systems
 
 Or import individual enhancers:
-    from hermes_enhancement_suite import ToolRetryWrapper, CircuitBreaker
+    from agent.hermes_enhancement_suite import ToolRetryWrapper, CircuitBreaker
 """
 
 import sys
@@ -302,7 +302,7 @@ class HermesEnhancementSuite:
             sys.path.insert(0, str(Path.home() / "hermes-agent"))
             
             # Import all subconscious systems
-            from memory_cortex_bridge import MemoryCortexBridge, pre_tool_call_hook
+            from agent.memory_cortex_bridge import MemoryCortexBridge, pre_tool_call_hook
             from error_pattern_miner import ErrorPatternMiner, post_tool_call_hook
             from multi_step_validator import MultiStepValidator, validate_plan_hook
             from context_window_guard import ContextWindowGuard, pre_llm_call_hook

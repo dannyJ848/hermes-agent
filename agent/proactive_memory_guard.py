@@ -9,7 +9,7 @@ Prevents memory from filling up by:
   - Predicting when offload is needed
 
 Usage:
-    from proactive_memory_guard import ProactiveMemoryGuard
+    from agent.proactive_memory_guard import ProactiveMemoryGuard
     guard = ProactiveMemoryGuard()
     
     # Before adding memory:
@@ -45,7 +45,7 @@ class ProactiveMemoryGuard:
         """Get current memory statistics."""
         try:
             sys.path.insert(0, str(Path(__file__).parent))
-            from memory_cortex_bridge import MemoryCortexBridge
+            from agent.memory_cortex_bridge import MemoryCortexBridge
             bridge = MemoryCortexBridge()
             return bridge.get_stats()
         except Exception:
@@ -86,7 +86,7 @@ class ProactiveMemoryGuard:
         Returns result dict with status.
         """
         try:
-            from memory_cortex_bridge import MemoryCortexBridge
+            from agent.memory_cortex_bridge import MemoryCortexBridge
             bridge = MemoryCortexBridge()
             
             # Force offload

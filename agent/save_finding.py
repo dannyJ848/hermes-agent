@@ -12,7 +12,7 @@ import json
 import time
 from pathlib import Path
 
-DB_PATH = str(Path.home() / "hermes-agent" / "knowledge_compiler.db")
+DB_PATH = str(Path.home() / ".hermes" / "knowledge_compiler.db")
 
 def save_finding(source: str, topic: str, raw_text: str, status: str = "saved"):
     conn = sqlite3.connect(DB_PATH, timeout=10)

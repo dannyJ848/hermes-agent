@@ -15,7 +15,7 @@ import json
 import os
 from pathlib import Path
 
-TOOL_DB = Path.home() / "hermes-agent" / "tool_capability.db"
+TOOL_DB = Path.home() / ".hermes" / "tool_capability.db"
 # Daemon writes here (avoid DB lock contention with gateway)
 DAEMON_LOG = Path.home() / "hermes-agent" / "brain_cycles.jsonl"
 

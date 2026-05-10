@@ -1259,9 +1259,6 @@ def get_pre_tool_call_block_message(
 ) -> Optional[str]:
     """Check ``pre_tool_call`` hooks for a blocking directive.
 
-    Also triggers memory pressure check/offload via memory_cortex_bridge
-    before each tool call.
-
     Plugins that need to enforce policy (rate limiting, security
     restrictions, approval workflows) can return::
 
@@ -1271,37 +1268,6 @@ def get_pre_tool_call_block_message(
     directive wins.  Invalid or irrelevant hook return values are
     silently ignored so existing observer-only hooks are unaffected.
     """
-    # Subconscious systems integration — auto-offload, error tracking, intelligence
-    try:
-        import sys
-        from pathlib import Path
-        # sys.path removed — modules now in hermes-agent
-        
-        # 1. Memory pressure check
-        from memory_cortex_bridge import MemoryCortexBridge
-        bridge = MemoryCortexBridge()
-        result = bridge.offload_if_needed()
-        if result.get('status') == 'offloaded':
-            logger.info(
-                "Memory offloaded: %s entries freed, %s chars, now %s%%",
-                result.get('entries_moved'),
-                result.get('chars_freed'),
-                result.get('pressure_pct')
-            )
-        
-        # 2. Tool intelligence tracking
-        from tool_intelligence_tracker import ToolIntelligenceTracker
-        tracker = ToolIntelligenceTracker()
-        tracker.record_call(
-            tool_name=tool_name,
-            success=True,
-            duration_ms=0,
-            context=str(args)[:200]
-        )
-        
-    except Exception:
-        pass  # Fail-open — never block tool calls
-
     hook_results = invoke_hook(
         "pre_tool_call",
         tool_name=tool_name,

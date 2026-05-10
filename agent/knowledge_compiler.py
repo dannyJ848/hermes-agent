@@ -18,7 +18,7 @@ import sqlite3, time, json, re, hashlib
 from pathlib import Path
 from collections import defaultdict
 
-DB_PATH = str(Path.home() / "hermes-agent" / "knowledge_compiler.db")
+DB_PATH = str(Path.home() / ".hermes" / "knowledge_compiler.db")
 CER_PATH = str(Path.home() / ".hermes" / "cerebrum_memory.db")
 
 

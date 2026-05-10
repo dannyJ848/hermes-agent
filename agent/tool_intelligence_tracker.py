@@ -6,7 +6,7 @@ Records every tool call: success/failure, duration, token cost, error type.
 Provides insights for routing decisions and self-improvement.
 
 Usage:
-    from tool_intelligence_tracker import ToolIntelligenceTracker
+    from agent.tool_intelligence_tracker import ToolIntelligenceTracker
     tracker = ToolIntelligenceTracker()
     tracker.record_call("web_search", success=True, duration_ms=1200, tokens=150)
     

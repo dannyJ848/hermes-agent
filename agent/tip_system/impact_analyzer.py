@@ -15,7 +15,7 @@ from pathlib import Path
 from datetime import datetime
 
 CEREBRUM = Path.home() / ".hermes" / "cerebrum_memory.db"
-REWARDS = Path.home() / "hermes-agent" / "skill_rewards.db"
+REWARDS = Path.home() / ".hermes" / "skill_rewards.db"
 
 
 def analyze():

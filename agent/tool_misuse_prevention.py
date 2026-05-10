@@ -10,8 +10,8 @@ import time
 import os
 from pathlib import Path
 
-TOOL_DB = Path.home() / "hermes-agent" / "tool_capability.db"
-BRAIN_DB = Path.home() / "hermes-agent" / "brain.db"
+TOOL_DB = Path.home() / ".hermes" / "tool_capability.db"
+BRAIN_DB = Path.home() / ".hermes" / "brain.db"
 
 FAIL_RATE_DANGER = 0.30
 FAIL_RATE_CAUTION = 0.15

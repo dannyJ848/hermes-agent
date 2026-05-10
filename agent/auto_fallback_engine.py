@@ -15,7 +15,7 @@ Also provides:
   - Session continuity preservation across context death
 
 Usage:
-    from auto_fallback_engine import AutoFallbackEngine
+    from agent.auto_fallback_engine import AutoFallbackEngine
     engine = AutoFallbackEngine()
     result = engine.execute_with_fallback("cronjob", {"action": "list"})
     # Automatically falls back to terminal if cronjob fails
@@ -286,7 +286,7 @@ class ProactiveMemoryManager:
             # Trigger offload
             try:
                 sys.path.insert(0, str(Path(__file__).parent))
-                from memory_cortex_bridge import MemoryCortexBridge
+                from agent.memory_cortex_bridge import MemoryCortexBridge
                 bridge = MemoryCortexBridge()
                 result = bridge.offload_if_needed(force=True)
                 

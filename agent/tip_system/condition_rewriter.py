@@ -20,7 +20,7 @@ def find_dead_tips(min_tool_calls=50):
     db = sqlite3.connect(cer_path, timeout=5)
     
     # Get tool call counts from tool_stats
-    tool_calls_path = str(Path.home() / "hermes-agent" / "tool_stats.db")
+    tool_calls_path = str(Path.home() / ".hermes" / "tool_stats.db")
     active_tools = {}
     if os.path.exists(tool_calls_path):
         tc = sqlite3.connect(tool_calls_path, timeout=5)

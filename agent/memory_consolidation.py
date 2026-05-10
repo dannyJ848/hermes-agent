@@ -11,7 +11,7 @@ from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
 
-DB_PATH = str(Path.home() / "hermes-agent" / "memory_consolidation.db")
+DB_PATH = str(Path.home() / ".hermes" / "memory_consolidation.db")
 CEREBRUM = str(Path.home() / ".hermes" / "cerebrum_memory.db")
 
 
