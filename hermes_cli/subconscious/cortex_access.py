@@ -1,1 +1,0 @@
-/Users/dannygomez/subconscious/cortex_access.py
