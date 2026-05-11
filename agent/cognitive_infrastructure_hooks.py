@@ -17,7 +17,7 @@ from pathlib import Path
 # Ensure hermes-agent is in path for imports
 sys.path.insert(0, str(Path.home() / "hermes-agent"))
 
-from cognitive_infrastructure_v2 import (
+from agent.cognitive_infrastructure_v2 import (
     get_governor_v2, get_credit_assigner, get_session_extractor,
     get_tool_router, get_auto_skill
 )

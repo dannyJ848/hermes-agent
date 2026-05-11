@@ -4,6 +4,12 @@
 
 All cognitive systems, tools, plugins, and configurations are verified, wired, and functional within the Hermes source tree.
 
+### Current Active Project: Qwen 27B Benchmark Evaluation
+- **Status**: In Progress — MMLU complete, GSM8K running
+- **Checkpoint**: `qwen27b-benchmarks-in-progress-may10`
+- **Resume**: `hermes --resume qwen27b-benchmarks-in-progress-may10`
+- **DGX Process**: PID 3233497 (background SSH, survives disconnects)
+
 ---
 
 ## Quick Verification
@@ -192,4 +198,38 @@ hermes --resume cognitive-systems-complete-july2026
 
 ---
 
-*Last updated: July 2026*
+## DGX Spark / Qwen 27B Model Training
+
+### Infrastructure
+- **Host**: spark-85e8.local (10.0.0.171)
+- **User**: djg6228 (SSH key auth, passwordless sudo)
+- **Base Model**: /data/models/Qwen3.6-27B-Uncensored/
+- **Training Dir**: /data/SpecForge/custom_dflash/
+
+### Training Status (May 10 2026)
+| Stage | Status | Details |
+|-------|--------|---------|
+| LoRA+SAE+Distillation | COMPLETE | 10,000/10,000 steps |
+| LoRA Adapter | COMPLETE | checkpoint_step_10000 (7.2GB) |
+| LoRA Merge | COMPLETE | final_model_merged/ (51GB) |
+
+**Merged Model**: /data/SpecForge/custom_dflash/checkpoints/final_model_merged/
+- Format: safetensors (2 shards: 47GB + 3.7GB)
+- Config: config.json, generation_config.json, model.safetensors.index.json
+- LoRA config: r=256, alpha=512, target_modules=all MLP + selective attention
+
+### Merge Recovery Notes
+- **Issue**: Training script's merge_and_unload() failed silently (only config files, no weights)
+- **Fix**: Manual merge script on DGX with proper adapter_config.json placement
+- **Key learning**: checkpoint_step_10000 was missing adapter_config.json — must copy from final_model/ before merge
+- **Warning**: "missing adapter keys" during merge is EXPECTED — config claims all layers have attention LoRA but checkpoint only has it on every 4th layer (layers 3,7,11...63). Merge completes successfully with available weights.
+- **SSH backgrounding**: terminal(background=true) does NOT work over SSH — backgrounding happens on MacBook not DGX. Use nohup over SSH, poll with separate ssh commands.
+
+### Next Steps
+1. Run evaluation benchmark (MMLU, GSM8K) on merged model
+2. Deploy to vLLM if metrics are good
+3. Consider updating adapter_config.json target_modules to match actual trained layers
+
+---
+
+*Last updated: May 10 2026 — Qwen 27B merge complete*
