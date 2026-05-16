@@ -493,3 +493,68 @@ if __name__ == "__main__":
     seed_exercises()
     print("Training gym initialized!")
     print(json.dumps(get_stats(), indent=2))
+
+
+class TrainingGym:
+    """Orchestrator-compatible wrapper for the training gym."""
+    
+    def __init__(self):
+        self._initialized = False
+        self._last_session = 0
+        self._min_interval = 600  # 10 min between sessions
+    
+    def _ensure_initialized(self):
+        if not self._initialized:
+            try:
+                init_db()
+                seed_exercises()
+                self._initialized = True
+            except Exception:
+                pass
+    
+    def get_next_exercise(self, category=None, tier=None):
+        """Get the next exercise to train on."""
+        self._ensure_initialized()
+        try:
+            return get_next_exercise(category, tier)
+        except Exception as e:
+            return {"error": str(e)}
+    
+    def record_attempt(self, exercise_id, score, max_score, **kwargs):
+        """Record a training attempt."""
+        self._ensure_initialized()
+        try:
+            record_attempt(exercise_id, score, max_score, **kwargs)
+            return {"status": "recorded"}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+    
+    def get_gym_stats(self):
+        """Get training statistics."""
+        self._ensure_initialized()
+        try:
+            return get_stats()
+        except Exception as e:
+            return {"error": str(e)}
+    
+    def run_error_focused_training(self):
+        """Run a training session focused on recent errors."""
+        import time
+        now = time.time()
+        if now - self._last_session < self._min_interval:
+            return {"status": "skipped", "reason": "too_soon"}
+        
+        self._ensure_initialized()
+        self._last_session = now
+        
+        # Get an error recovery exercise
+        exercise = self.get_next_exercise(category="error_recovery")
+        if not exercise or "error" in exercise:
+            return {"status": "skipped", "reason": "no_exercises"}
+        
+        return {
+            "status": "ready",
+            "exercise_id": exercise.get("id"),
+            "exercise_name": exercise.get("name"),
+            "tier": exercise.get("tier"),
+        }

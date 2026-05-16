@@ -1675,6 +1675,7 @@ class AIAgent:
         
         # Session logging setup - auto-save conversation trajectories for debugging
         self.session_start = datetime.now()
+        self._session_start_time = time.time()  # For cognitive orchestrator telemetry
         if session_id:
             # Use provided session ID (e.g., from CLI)
             self.session_id = session_id
@@ -2123,6 +2124,24 @@ class AIAgent:
         except Exception as _ie_err:
             logger.warning("Iteration engine init failed: %s", _ie_err)
             self.iteration_engine = None
+
+        # ── COGNITIVE ORCHESTRATOR: Wire all self-improving subsystems ────
+        try:
+            from agent.cognitive_orchestrator import initialize_cognitive_systems
+            self.cognitive_orchestrator = initialize_cognitive_systems(self)
+            _co_status = getattr(self, "cognitive_orchestrator", {})
+            _active = sum(1 for s in (_co_status or {}).values() if s == "active")
+            _total = len(_co_status or {})
+            if _total > 0:
+                print(f"🧠 Cognitive orchestrator ready: {_active}/{_total} subsystems active")
+                for _sub_name, _sub_status in (_co_status or {}).items():
+                    if _sub_status == "active":
+                        print(f"   ✓ {_sub_name}")
+                    elif _sub_status == "failed":
+                        print(f"   ✗ {_sub_name}")
+        except Exception as _co_err:
+            logger.warning("Cognitive orchestrator init failed: %s", _co_err)
+            self.cognitive_orchestrator = None
 
         # Reject models whose context window is below the minimum required
         # for reliable tool-calling workflows (64K tokens).
@@ -10040,11 +10059,24 @@ class AIAgent:
         import time as _time
         _tool_start_time = _time.time()
 
-        # ── Iteration Engine: pre-action lookup ────────────────────────────
+        # ── Iteration Engine + Cognitive Orchestrator: pre-action lookup ───
         _iteration_context = None
+        _cognitive_lessons = None
         if hasattr(self, "iteration_engine") and self.iteration_engine:
             try:
                 _iteration_context = self.iteration_engine.before_action(
+                    action_type=function_name,
+                    detail=json.dumps(function_args, ensure_ascii=False)[:200],
+                )
+            except Exception:
+                pass
+        
+        # Cognitive orchestrator: multi-subsystem pre-action
+        if hasattr(self, "cognitive_orchestrator") and self.cognitive_orchestrator:
+            try:
+                from agent.cognitive_orchestrator import get_orchestrator
+                _co = get_orchestrator()
+                _cognitive_lessons = _co.before_action(
                     action_type=function_name,
                     detail=json.dumps(function_args, ensure_ascii=False)[:200],
                 )
@@ -10127,21 +10159,38 @@ class AIAgent:
                 skip_pre_tool_call_hook=True,
             )
 
-        # ── Iteration Engine + Tool Cache: post-action capture ───────────────
+        # ── Iteration Engine + Tool Cache + Cognitive Orchestrator: post-action ──
+        _tool_end = _time.time()
+        _is_error = "error" in result.lower() or result.startswith("Error")
+        _duration_ms = int((_tool_end - _tool_start_time) * 1000)
+        
         if hasattr(self, "iteration_engine") and self.iteration_engine:
             try:
-                _tool_end = _time.time()
-                _is_error = "error" in result.lower() or result.startswith("Error")
                 self.iteration_engine.after_action(
                     action_type=function_name,
                     detail=json.dumps(function_args, ensure_ascii=False)[:200],
                     result="failure" if _is_error else "success",
                     error=result[:500] if _is_error else "",
-                    speed_ms=int((_tool_end - _tool_start_time) * 1000),
+                    speed_ms=_duration_ms,
                 )
                 # Cache successful tool results
                 if not _is_error and hasattr(self, "tool_cache") and self.tool_cache:
                     self.tool_cache.put(function_name, function_args, result)
+            except Exception:
+                pass
+        
+        # Cognitive orchestrator: multi-subsystem post-action
+        if hasattr(self, "cognitive_orchestrator") and self.cognitive_orchestrator:
+            try:
+                from agent.cognitive_orchestrator import get_orchestrator
+                _co = get_orchestrator()
+                _co.after_action(
+                    action_type=function_name,
+                    detail=json.dumps(function_args, ensure_ascii=False)[:200],
+                    result=result,
+                    duration_ms=_duration_ms,
+                    error=result[:500] if _is_error else "",
+                )
             except Exception:
                 pass
 
@@ -14976,6 +15025,24 @@ class AIAgent:
         # provider before the second message. Actual session-end cleanup is
         # handled by the CLI (atexit / /reset) and gateway (session expiry /
         # _reset_session).
+
+        # ── COGNITIVE ORCHESTRATOR: session end processing ─────────────────
+        try:
+            if hasattr(self, "cognitive_orchestrator") and self.cognitive_orchestrator:
+                from agent.cognitive_orchestrator import get_orchestrator, SessionTelemetry
+                _co = get_orchestrator()
+                _telemetry = SessionTelemetry(
+                    session_id=self.session_id or "unknown",
+                    start_time=getattr(self, '_session_start_time', time.time()),
+                    end_time=time.time(),
+                    model=self.model,
+                    provider=self.provider,
+                )
+                _report = _co.session_end(_telemetry)
+                if _report and _report.get("audit_score"):
+                    logger.info("Session audit score: %.2f", _report["audit_score"])
+        except Exception as _co_end_err:
+            logger.debug("Cognitive session-end failed: %s", _co_end_err)
 
         # Plugin hook: on_session_end
         # Fired at the very end of every run_conversation call.

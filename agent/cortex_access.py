@@ -152,6 +152,7 @@ class CortexDB:
                          provenance, source_ids, metadata, content_md5, embedding,
                          created_at, updated_at)
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s::vector, NOW(), NOW())
+                        ON CONFLICT (content_md5) DO NOTHING
                         RETURNING id
                     """, (node_type, text, domain, confidence, elo,
                           provenance, source_ids_json, metadata_json, md5, vec_str))
@@ -171,7 +172,9 @@ class CortexDB:
                     return result['id'] if self._has_pg else result[0]
                 return None
         except Exception as e:
-            print(f"CortexDB.insert_node error: {e}")
+            # Only log non-duplicate-key errors
+            if "duplicate" not in str(e).lower() and "unique" not in str(e).lower():
+                print(f"CortexDB.insert_node error: {e}")
             return None
     
     def get_node(self, node_id: int) -> Optional[Dict]:
@@ -385,17 +388,18 @@ class CortexDB:
         winner_id = str(node_a_id) if winner == 'a' else (str(node_b_id) if winner == 'b' else None)
         with cortex_cursor(dsn=self.dsn) as cur:
             if self._has_pg:
+                # Use cycle_id as round_id (same semantic, different column name in schema)
                 cur.execute("""
                     INSERT INTO cortex_eval_history 
-                    (round_id, node_id_a, node_id_b, winner_id, judge_id, judge_axis, margin, domain)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                """, (cycle_id or str(uuid.uuid4()), str(node_a_id), str(node_b_id), winner_id, judge_type, 'elo', int(confidence * 100), 'general'))
+                    (node_id_a, node_id_b, winner_id, judge_id, judge_axis, margin, domain)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, (str(node_a_id), str(node_b_id), winner_id, judge_type, 'elo', int(confidence * 100), 'general'))
             else:
                 cur.execute("""
                     INSERT INTO cortex_eval_history 
-                    (round_id, node_id_a, node_id_b, winner_id, judge_id, judge_axis, margin, domain)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """, (cycle_id or str(uuid.uuid4()), str(node_a_id), str(node_b_id), winner_id, judge_type, 'elo', int(confidence * 100), 'general'))
+                    (node_id_a, node_id_b, winner_id, judge_id, judge_axis, margin, domain)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (str(node_a_id), str(node_b_id), winner_id, judge_type, 'elo', int(confidence * 100), 'general'))
             return True
     
     # ========================================================================

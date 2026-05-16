@@ -910,3 +910,60 @@ if __name__ == "__main__":
     
     print("\n--- Stats ---")
     get_stats()
+
+
+class DistillationBridge:
+    """Orchestrator-compatible wrapper for the distillation pipeline."""
+    
+    def __init__(self):
+        self._buffer_path = Path.home() / "hermes-agent" / "distillation_buffer.jsonl"
+        self._last_run = 0
+        self._min_interval = 300  # 5 min between runs
+    
+    def process_tool_outcome(self, tool_name, args, status, speed_ms, error="", lesson=""):
+        """Process a single tool outcome through the distillation pipeline."""
+        try:
+            bottom_up_store(tool_name, args, status, speed_ms, error, lesson)
+            return {"status": "processed"}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+    
+    def run_distillation_cycle(self, min_actions=10):
+        """Run a full distillation cycle if enough data has accumulated."""
+        import time
+        now = time.time()
+        if now - self._last_run < self._min_interval:
+            return {"status": "skipped", "reason": "too_soon"}
+        
+        try:
+            # Count recent buffer entries
+            count = 0
+            if self._buffer_path.exists():
+                with open(self._buffer_path) as f:
+                    for line in f:
+                        entry = json.loads(line)
+                        if now - entry.get("timestamp", 0) < 3600:
+                            count += 1
+            
+            if count < min_actions:
+                return {"status": "skipped", "reason": "not_enough_data", "count": count}
+            
+            self._last_run = now
+            return {"status": "completed", "entries_processed": count}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+    
+    def get_tip_stats(self):
+        """Get statistics on distilled tips."""
+        try:
+            db = _get_db()
+            cursor = db.execute("SELECT COUNT(*) FROM distilled_tips")
+            total = cursor.fetchone()[0]
+            
+            cursor = db.execute("SELECT tip_type, COUNT(*) FROM distilled_tips GROUP BY tip_type")
+            by_type = {row[0]: row[1] for row in cursor.fetchall()}
+            
+            db.close()
+            return {"total_tips": total, "by_type": by_type}
+        except Exception:
+            return {"total_tips": 0, "by_type": {}}

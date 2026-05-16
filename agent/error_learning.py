@@ -105,6 +105,15 @@ class ErrorPatternStore:
     def _ensure_schema(self):
         """Ensure error patterns table exists (SQLite-compatible schema)."""
         with _cortex_cursor() as cur:
+            # Check if table exists with old schema
+            cur.execute("PRAGMA table_info(error_patterns)")
+            existing_cols = {row[1] for row in cur.fetchall()}
+            
+            if existing_cols and 'error_signature' in existing_cols:
+                # Old schema exists — migrate by dropping and recreating
+                cur.execute("DROP TABLE error_patterns")
+                cur.execute("DROP TABLE IF EXISTS error_occurrences")
+            
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS error_patterns (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,

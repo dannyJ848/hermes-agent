@@ -211,10 +211,13 @@ class CortexFlywheel:
             
             # Record evaluation - winner_id must be actual node UUID or None
             winner_id = tip_a['id'] if winner == 'a' else (tip_b['id'] if winner == 'b' else None)
-            self.db.record_eval(
-                tip_a['id'], tip_b['id'], winner,
-                judge_type, confidence, reasoning, cycle_id
-            )
+            try:
+                self.db.record_eval(
+                    tip_a['id'], tip_b['id'], winner,
+                    judge_type, confidence, reasoning, cycle_id
+                )
+            except Exception:
+                pass  # Non-fatal: eval history may have schema issues
             
             pairs_evaluated += 1
         

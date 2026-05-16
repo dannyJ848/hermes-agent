@@ -328,6 +328,45 @@ def install_all_hooks():
     return hook_map
 
 
+class SubconsciousHookWiring:
+    """Orchestrator-compatible wrapper for subconscious hook wiring."""
+    
+    def __init__(self):
+        self._installed = False
+        self._call_count = 0
+    
+    def install_hooks(self):
+        """Install all subconscious hooks."""
+        try:
+            self._hooks = install_all_hooks()
+            self._installed = True
+            return {"status": "installed", "hooks": len(self._hooks)}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+    
+    def pre_tool_call(self, tool_name, args, session_id=""):
+        """Run pre-tool-call hook."""
+        if not self._installed:
+            return None
+        try:
+            return pre_tool_call_full(tool_name, args, session_id=session_id)
+        except Exception:
+            return None
+    
+    def post_tool_call(self, tool_name, args, result, session_id="", duration_ms=0):
+        """Run post-tool-call hook."""
+        if not self._installed:
+            return
+        try:
+            post_tool_call_full(tool_name, args, result, session_id=session_id, duration_ms=duration_ms)
+        except Exception:
+            pass
+    
+    def get_stats(self):
+        """Get hook statistics."""
+        return {"installed": self._installed, "call_count": self._call_count}
+
+
 if __name__ == "__main__":
     import argparse
     
