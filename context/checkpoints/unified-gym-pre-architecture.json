@@ -1,0 +1,28 @@
+{
+  "label": "unified-gym-pre-architecture",
+  "context": "MASSIVE PROJECT: Merge training gym + Hindsight KG + cerebrum into a single unified PostgreSQL-backed system.\n\nCURRENT STATE (fully audited):\n1. CEREBRUM SQLite (~/.hermes/cerebrum_memory.db, 13MB): 80+ tables, 1,869 distilled tips, 1,131 Elo-rated (tip_elo), 213 kg_nodes, 539 kg_edges, 1,080 semantic_facts, 838 experiences, 5,251 predictions, 34,146 token_usage rows, 651 tool_call_log, etc.\n\n2. HINDSIGHT Postgres (port 5432, pid 50151, alive since Apr 10): 9,945 memory_units, 398K memory_links, 4,156 entities, 23,686 unit_entities, 6,414 documents, 5,427 chunks, 10,352 entity_cooccurrences. Embeddings: BAAI/bge-small-en-v1.5. Reranker: ms-marco-MiniLM-L-6-v2. Config at ~/.hermes/hindsight/config.json.\n\n3. SUBCONSCIOUS MODULES: 180+ .py files, 72+ .db files (many small SQLite DBs). Key modules: brain.py (42KB), parallel_brain.py (45KB), eval_flywheel.py (29KB), controller.py (42KB), distillation_bridge.py (38KB), distillation_v2.py (34KB), etc.\n\n4. PLUGINS: 37 plugins in ~/.hermes/plugins/. Main one: distillation (3,077 lines). Also evey-tool-intelligence (1,525 lines), evey-eyes (1,013 lines).\n\n5. KNOWLEDGE FILES: 965 files in ~/.hermes/knowledge/ (Qdrant-indexed).\n\nGOAL: Single PostgreSQL-backed unified system. All training data, KG, tips, experiences, predictions, Elo ratings, documents, embeddings in ONE Postgres database. Autonomous flywheel built in. No scattered SQLite DBs. Self-sustaining.\n\nKEY DESIGN DECISIONS NEEDED:\n- Migrate all cerebrum tables to Postgres (or keep SQLite for hot-path + Postgres for durable?)\n- Merge Hindsight memory_units with cerebrum distilled_tips/kg_nodes\n- Unify the 72 scattered subconscious SQLite DBs into Postgres schemas\n- Wire the eval flywheel to use Postgres directly\n- Make the cron-driven training cycle fully autonomous\n- Embeddings: use pgvector extension in Postgres instead of separate vector stores",
+  "active_tasks": [
+    "Design unified PostgreSQL schema for training gym",
+    "Migrate cerebrum tables to Postgres",
+    "Merge Hindsight memory_units with training data",
+    "Consolidate 72 subconscious SQLite DBs",
+    "Wire eval flywheel to Postgres",
+    "Make autonomous flywheel self-sustaining"
+  ],
+  "decisions": [
+    "Full audit complete — all schemas mapped",
+    "Postgres already running on port 5432 with 9,945 nodes",
+    "72 scattered SQLite DBs need consolidation",
+    "Key bottleneck: distillation plugin reads from cerebrum SQLite",
+    "Need backward-compatible migration (plugin reads Postgres instead of SQLite)"
+  ],
+  "files_modified": [
+    "/tmp/schema_audit.py"
+  ],
+  "next_steps": "1. Design the unified Postgres schema (cortex_unified)\n2. Build migration scripts for cerebrum → Postgres\n3. Merge Hindsight tables into unified schema\n4. Build new unified_access.py module\n5. Wire distillation plugin to Postgres\n6. Test end-to-end",
+  "timestamp": "2026-04-13T19:03:23Z",
+  "unix_time": 1776107003.641154,
+  "task_id": "20260413_135506_962792",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,10 @@
+{
+  "label": "pre-gateway-restart-checkpoint-v2",
+  "context": "Completed checkpoint system v2 rewrite and repetition bug fix. Plugin at ~/.hermes/plugins/evey-session-guard/ rewritten with decisions, files_modified, next_steps fields. Killed 8 echo facts from semantic_facts. 327 cron checkpoints pruned. Gateway restart needed to activate new plugin. Distillation audit (12 tasks) still pending \u2014 was doing task 1 (architecture mapping) when Danny asked about session checks.",
+  "active_tasks": [
+    "Gateway restart for v2 checkpoint plugin",
+    "Resume distillation audit after restart"
+  ],
+  "timestamp": "2026-04-06T07:10:30Z",
+  "task_id": "20260405_193236_c8c810"
+}

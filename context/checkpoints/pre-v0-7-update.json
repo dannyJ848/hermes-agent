@@ -1,0 +1,11 @@
+{
+  "label": "pre-v0.7-update",
+  "context": "Preparing for Hermes v0.6.0 -> v0.7.0 update. Current: v2026.3.30-227, target: v2026.4.3. 8 commits behind on release tag but 66 on main. Need to check custom patches that will be overwritten.",
+  "active_tasks": [
+    "Update Hermes to v0.7.0",
+    "Analyze breakage pre-update",
+    "Configure native memory provider post-update"
+  ],
+  "timestamp": "2026-04-05T06:29:39Z",
+  "task_id": "20260404_215806_7e676d"
+}

@@ -1,0 +1,13 @@
+{
+  "label": "semantic-tool-hints-live",
+  "context": "Semantic tool selector WIRED into tool-intelligence plugin pre_llm_call. 85 tools indexed. Injects top-3 relevant tools as hints before every model decision. Synced to all squad profiles. AGI cycle 16+. Danny sleeping. All healthy.",
+  "active_tasks": [
+    "Monitor semantic tool hints in actual use",
+    "Continue AGI cron cycles",
+    "Ground mid-trust facts",
+    "Set HERMES_CRON_TIMEOUT=300 (needs restart)",
+    "Build visual diff detection"
+  ],
+  "timestamp": "2026-04-05T07:26:57Z",
+  "task_id": "20260404_215806_7e676d"
+}

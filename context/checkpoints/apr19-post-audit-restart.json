@@ -1,0 +1,27 @@
+{
+  "label": "apr19-post-audit-restart",
+  "context": "Comprehensive launch day audit completed. Found and fixed CRITICAL bug: ngram speculative decoding is BROKEN on Qwen3.6 GDN hybrid (vLLM #39273, silently corrupts output). Removed ngram from all 4 scripts, wired DFlash as default ON with no-spec safe fallback. Also fixed shell comment bugs in docker commands (spark-day1.sh 2x, deploy-spark-day1.sh 2x earlier). All 4 scripts pass 13/13 GDN safety checks. Disabled Tirith security scanner in config.yaml (tirith_enabled: false). Now restarting gateway per user request.",
+  "active_tasks": [
+    "DGX Spark launch day scripts audit — COMPLETE"
+  ],
+  "decisions": [
+    "Ngram speculative decoding REMOVED from all scripts — BROKEN on GDN hybrid (vLLM #39273)",
+    "DFlash set as default ON in spark-day1.sh, deploy-spark-day1.sh, superqwen3-super.sh",
+    "No-spec is safe fallback (not ngram)",
+    "Tirith scanner disabled",
+    "MTP stays disabled (vLLM #38182 still open)"
+  ],
+  "files_modified": [
+    "~/dgx-spark-prep/spark-day1.sh",
+    "~/dgx-spark-prep/deploy-spark-day1.sh",
+    "~/dgx-spark-prep/superqwen3-super.sh",
+    "~/.hermes/config.yaml",
+    "~/.hermes/skills/devops/dgx-spark-qwen3-deployment/references/gotchas-89-94.md"
+  ],
+  "next_steps": "Resume after restart. All scripts ready for launch day.",
+  "timestamp": "2026-04-20T03:20:39Z",
+  "unix_time": 1776655239.36808,
+  "task_id": "20260419_160251_5f2584",
+  "source": "manual",
+  "version": 2
+}

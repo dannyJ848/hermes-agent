@@ -1,0 +1,27 @@
+{
+  "label": "r274-pre-restart",
+  "context": "Training gym R274+ autonomous session. 1,869 tips in cerebrum, 1,124 Elo-rated (60%), Elo range 1127-1288, spread 162, avg 1200. 5-judge eval panel (3x Phi-3 + Llama-8B + DeepSeek V3.1 cloud via Featherless). ALL APIs WIRED AND TESTED: Brave Search (OK), Gemini Flash (OK), Featherless DeepSeek V3.1 (OK), Firecrawl (OK), Jina Reader (OK with proper UA), 4 local servers UP. Background eval proc_8092f60709fe running tg-12 sweep on 7 domains. 24/7 training baseline cron d9d790021dd1 every 2h. 11 tips from tg-14b inserted (EvoSkill, SkillRL, REMem, MemRL, SSGM). Hindsight: 9,945 nodes, 398K links, 6,319 docs. Git: d872abc (R274). Priority: continue training gym flywheel. analyzed gkisokoy's multi-agent orchestration diagram — stealable pattern: failure-triggered tip repair for low-Elo tips.",
+  "active_tasks": [
+    "tg-12. Eval sweep on new tips — background proc_8092f60709fe may have completed",
+    "tg-14. Research scan — next frontier batch",
+    "Failure-triggered tip repair (from gkisokoy analysis)"
+  ],
+  "decisions": [
+    "All 6 API integrations confirmed working — Brave, Gemini, Featherless, Firecrawl, Jina (needs UA header), 4 local servers",
+    "Jina Reader needs User-Agent header (Mozilla/5.0) — urllib default gets 403",
+    "vision_analyze tool fails on local files — use local_vision.py analyze instead (GLM-5V-turbo)",
+    "gkisokoy stealable pattern: QA failure → fix PRD → loop back. Our version: low-Elo tip → analyze losses → rewrite → re-evaluate"
+  ],
+  "files_modified": [
+    "~/subconscious/insert_tips_tg14b.py",
+    "/tmp/test_apis.py",
+    "/tmp/check_gym.py",
+    "/tmp/test_jina.py"
+  ],
+  "next_steps": "1. Check if background eval proc_8092f60709fe completed (poll it)\n2. Continue training gym flywheel — focus on 735 unrated tips (329 empty domain, 95 tool_usage, 86 training)\n3. Implement failure-triggered tip repair: identify low-Elo tips, analyze losses, rewrite, re-evaluate\n4. Research→distill→eval cycle continues\n5. Monitor training baseline cron d9d790021dd1",
+  "timestamp": "2026-04-13T18:51:55Z",
+  "unix_time": 1776106315.917182,
+  "task_id": "20260412_231834_f61c83",
+  "source": "manual",
+  "version": 2
+}

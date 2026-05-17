@@ -1,0 +1,19 @@
+{
+  "label": "r125-complete-apr8",
+  "context": "R125 complete. 550 tips, avg conf 0.830. Added 6 tips: SAGE Skill-Integrated Reward (gap-proportional bonus, low-conf tips get higher reward), AgentPRM Chain Position (credit for tips in successful chains), Condition-Aware Voting (3-tier match: generic/error-only/keyword, prevents noisy signal), Connection Pooling (thread-local + WAL + retry), FadeMem Verified Decay (-0.0124/50 calls, ~40 cycles to prunable), Reality Gap Awareness (self-assessed vs measured, 3-DB drift signal). Round 125. ~06:25 AM. Danny sleeping. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R125 complete — 550 tips, 0.830 — continuing growth"
+  ],
+  "decisions": [
+    "550-tip milestone. Condition-aware voting dramatically improves feedback signal quality."
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (6 new tips)"
+  ],
+  "next_steps": "R126: Continue growth.",
+  "timestamp": "2026-04-08T09:43:54Z",
+  "unix_time": 1775641434.701518,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

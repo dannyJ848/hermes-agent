@@ -1,0 +1,11 @@
+{
+  "label": "skill-effectiveness-tracker-v1",
+  "context": "Built and tested ~/subconscious/skill_effectiveness_tracker.py \u2014 a SkillEffectivenessTracker class that: (1) scans all 213 installed skills from ~/.hermes/skills/, (2) ingests skill-related experiences from the iteration engine's experiences table, (3) calculates rolling 30-day success rates, (4) flags skills below 60% success rate for archival, (5) generates comprehensive reports. Integrated into learning_bootstrap.py so it runs on session start. Currently only 1 skill has iteration engine data \u2014 the tracker will become more useful as more skill usage is recorded. Next: add observation recording to skill_view/skill_manage hooks, or enrich data from delegation_stats.",
+  "active_tasks": [
+    "skill_effectiveness_tracker built and tested",
+    "integrated into learning_bootstrap.py",
+    "needs: more data sources for skill observations"
+  ],
+  "timestamp": "2026-04-05T03:30:18Z",
+  "task_id": "d32152bd-d175-493c-be3a-a6faee572e49"
+}

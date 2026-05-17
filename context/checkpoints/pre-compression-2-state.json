@@ -1,0 +1,20 @@
+{
+  "label": "pre-compression-2-state",
+  "context": "TRAINING GYM SESSION STATE at compression #2 boundary:\n  18 rounds complete (R1-R18)\n  19 modules built (17 wired + 2 stored)\n  Plugin: 3,549 lines\n  118 tips distilled to Cortex\n  14 research papers incorporated\n  \n  ALL WIRED MODULES: R168 self_critic, R169 reasoning_discover, R170 task_frontier, R171 uncertainty_reward, R172 tool_adaptor, R173 meta_reasoner, R174 reflection_synth, R175 curriculum, R176 tool_router, R177 heuristic_matcher, R178 recovery_selector, R179 confidence_estimator, R180 task_decomposer, R181 interaction_logger, R182 exec_tracer, R183 skill_gap_detector, R184 prompt_optimizer\n  STORED: context_governor\n  \n  WIRING PATTERN: try/except blocks with from module import get_instance, using os.environ.get(\"HERMES_SESSION_ID\", \"default\"). Module import path: ~/subconscious/\n  \n  COMPRESSIONS REMAINING: 2 of 4 (hard limit). After 4th: save checkpoint + give restore command.\n  \n  Checkpoints saved: r1 through r18.",
+  "active_tasks": [
+    "R19: Build next module after compression #2",
+    "STOP after compression #4: save checkpoint + give restore command"
+  ],
+  "decisions": [
+    "4-compression hard limit",
+    "After 4th compression: checkpoint + restore command",
+    "18 rounds in this CLI session so far"
+  ],
+  "files_modified": [],
+  "next_steps": "Continue R19 after compression #2. Stop and hand off after compression #4.",
+  "timestamp": "2026-04-14T21:52:16Z",
+  "unix_time": 1776203536.774517,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

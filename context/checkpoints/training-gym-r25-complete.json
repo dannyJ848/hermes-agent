@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r25-complete",
+  "context": "Training Gym R22-R25 completed. 16/16 exercises pass with real pytest verification.\n\nR25 RESULTS (all 10/10):\n1. sort-001 (T5) - Merge sort, quicksort (4 pivots), heap sort. 32 parametrized tests.\n2. retry-001 (T4) - Retry decorator with exponential backoff + jitter. 8 tests.\n3. rate-001 (T5) - Token bucket rate limiter, thread-safe. 9 tests.\n4. circuit-001 (T5) - Circuit breaker with 3 states + decorator. 11 tests.\n\nDB: 176 exercises, 339 attempts, avg 9.8",
+  "active_tasks": [
+    "R22-R25 complete",
+    "R26 next"
+  ],
+  "decisions": [
+    "Token bucket pattern: refill = elapsed * rate, capped at capacity",
+    "Circuit breaker: HALF_OPEN requires success_threshold consecutive successes to close",
+    "Quicksort: use list comprehensions for partition, configurable pivot"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R26 exercises. Consider: observer pattern, command pattern, template method, strategy pattern - GoF patterns.",
+  "timestamp": "2026-04-08T17:12:04Z",
+  "unix_time": 1775668324.252874,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

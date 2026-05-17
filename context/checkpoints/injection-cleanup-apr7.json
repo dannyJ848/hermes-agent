@@ -1,0 +1,24 @@
+{
+  "label": "injection-cleanup-apr7",
+  "context": "CONTEXT INJECTION CLEANUP (Apr 7):\n\nThree changes saved on disk, all need gateway restart + new terminal:\n\n1. distillation_bridge.py — killed [ITERATION LESSONS], [AGI CONTEXT], [MEMORY HEALTH] sections from top_down_recall(). Added guards in bottom_up_store() to reject \"From research:\" tips and tips with fake tool names (not real Hermes tools). Memory prune still runs silently, just doesn't inject admin text.\n\n2. research_to_distillation.py — disabled entirely with early return. Was seeding 188+ speculative \"From research: X\" tips from wiki content into distilled_tips table on every cycle.\n\n3. distilled_tips DB — purged from 277 to 29 clean tips. Deleted: 198+ research speculation, 11 generic \"Check error message\" tips, 18 empty tool_name tips, 195 fake tool name tips (general, distillation, memory, VISION, REASONING, etc.).\n\nMYTHOS FIXES from earlier session also saved: cycle info bug, behavior calibration bug, duplicate storage bug — all fixed in mythos_enhancements.py + __init__.py.\n\nFILES MODIFIED:\n- ~/subconscious/distillation_bridge.py (disabled 3 injection sections + added tip rejection guards)\n- ~/subconscious/research_to_distillation.py (disabled research tip seeding)\n- ~/.hermes/plugins/distillation/__init__.py (mythos hook simplification from earlier)\n- ~/.hermes/plugins/distillation/mythos_enhancements.py (3 bug fixes from earlier)\n- ~/.hermes/cerebrum_memory.db (purged 248 junk tips, 29 remain)\n\nALL PYCACHE CLEARED. Gateway restart + new terminal needed.",
+  "active_tasks": [
+    "Restart gateway + new terminal to activate all fixes"
+  ],
+  "decisions": [
+    "Disabled research_to_distillation.py entirely — wiki tips were speculative not operational",
+    "Added _REAL_TOOLS whitelist guard in bottom_up_store to reject fake tool names",
+    "Memory health prune runs silently but doesn't inject admin text into agent context"
+  ],
+  "files_modified": [
+    "~/subconscious/distillation_bridge.py",
+    "~/subconscious/research_to_distillation.py",
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/.hermes/plugins/distillation/mythos_enhancements.py"
+  ],
+  "next_steps": "After restart + new terminal, verify injection is clean by checking what appears in [DISTILLED TOOL RULES] and [ACTIONABLE TIPS] sections. Should only see real tools, no ITERATION LESSONS/AGI CONTEXT/MEMORY HEALTH.",
+  "timestamp": "2026-04-07T22:08:39Z",
+  "unix_time": 1775599719.896794,
+  "task_id": "20260407_164324_ffa23c",
+  "source": "manual",
+  "version": 2
+}

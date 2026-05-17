@@ -1,0 +1,106 @@
+{
+  "scan_date": "2026-04-20T21:04:00Z",
+  "source": "X/Twitter AI News Scanner",
+  "queries": [
+    "AI agents autonomous",
+    "AI agent framework new",
+    "Claude Code agents",
+    "MCP AI tools",
+    "open source AI agent"
+  ],
+  "total_tweets_scanned": 25,
+  "top_findings": [
+    {
+      "rank": 1,
+      "priority": "HIGH",
+      "category": "Hermes Agent mention",
+      "author": "@coreyganim",
+      "author_name": "Corey Ganim",
+      "tweet_link": "https://x.com/coreyganim/status/2043110597621866975",
+      "time": "2026-04-11T23:35:00.000Z",
+      "engagement": {"likes": "202", "retweets": "23"},
+      "summary": "Corey Ganim posted a thread explaining 'The 80/20 of Hermes Agent for non-technical people' — describing it as an open-source AI agent that runs 24/7 on a $5 server and messages through Telegram, Discord, or WhatsApp. He compares Hermes with OpenClaw, noting Hermes adds a learning loop where every ~15 actions it reflects and improves. This is significant visibility for Hermes Agent.",
+      "flags": ["Hermes Agent mention", "community education", "competitive comparison with OpenClaw"]
+    },
+    {
+      "rank": 2,
+      "priority": "normal",
+      "category": "New AI agent framework / repo",
+      "author": "@tom_doerr",
+      "author_name": "Tom Dörr",
+      "tweet_link": "https://x.com/tom_doerr/status/2046285035976749425",
+      "time": "2026-04-20T17:49:05.000Z",
+      "engagement": {"likes": "32", "retweets": "2"},
+      "summary": "New open-source local AI desktop agent called 'Accomplish' launched. GitHub: github.com/accomplish-ai/accomplish. Represents a new entrant in the local AI agent space, competing with OpenClaw and similar frameworks.",
+      "urls": ["https://t.co/Mv5qI9qXKO"],
+      "flags": ["new framework", "open source", "local agent"]
+    },
+    {
+      "rank": 3,
+      "priority": "normal",
+      "category": "Important open source repo",
+      "author": "@RoundtableSpace",
+      "author_name": "0xMarioNawfal",
+      "tweet_link": "https://x.com/RoundtableSpace/status/2043098014466650600",
+      "time": "2026-04-11T22:45:00.000Z",
+      "engagement": {"likes": "170", "retweets": "17"},
+      "summary": "Someone open sourced a full Claude Code stack with 27 agents, 64 skills, and 33 commands. Includes planning, reviews, fixes, token optimization, and built-in security checks. This is a major acceleration of the Claude Code ecosystem and raises the bar for agent framework completeness.",
+      "flags": ["Claude Code", "major repo", "27 agents", "64 skills"]
+    },
+    {
+      "rank": 4,
+      "priority": "normal",
+      "category": "Novel AI agent application",
+      "author": "@hasantoxr",
+      "author_name": "Hasan Toor",
+      "tweet_link": "https://x.com/hasantoxr/status/2041450833112641935",
+      "time": "2026-04-07T09:39:41.000Z",
+      "engagement": {"likes": "1.1K", "retweets": "190"},
+      "summary": "AI-Trader is an open source marketplace where AI agents publish trading signals, debate strategies with each other, and execute trades across 7 asset classes fully autonomously. OpenClaw agents can join with one command. Very high engagement (1.1K likes) suggests strong community interest in autonomous multi-agent marketplaces.",
+      "flags": ["multi-agent marketplace", "OpenClaw integration", "finance/trading", "high engagement"]
+    },
+    {
+      "rank": 5,
+      "priority": "normal",
+      "category": "New product from major AI lab",
+      "author": "@futureradar_FR",
+      "author_name": "FutureRadar",
+      "tweet_link": "https://x.com/futureradar_FR/status/2042134744092045422",
+      "time": "2026-04-09T06:57:18.000Z",
+      "engagement": {"likes": "126", "retweets": "19"},
+      "summary": "Anthropic announced 'Claude Managed Agents' — positioning it as a major developer productivity play that eliminates complex infrastructure and months of setup. Described as making 'months of work obsolete for developers.' This is Anthropic's formal entry into the managed agent space, competing with self-hosted solutions like Hermes and OpenClaw.",
+      "flags": ["Anthropic", "Claude Managed Agents", "managed service", "competitive threat"]
+    }
+  ],
+  "other_notable_mentions": [
+    {
+      "author": "@Shruti_0810",
+      "summary": "claude-code-best-practice repo hit 19.7K stars and #1 trending on GitHub. 84 battle-tested tactics from Anthropic insiders.",
+      "link": "https://x.com/Shruti_0810/status/2045517713100116176"
+    },
+    {
+      "author": "@WesRoth",
+      "summary": "MiniMax introduced MaxClaw — merges OpenClaw agent framework with MiniMax infrastructure and M2.5 AI model.",
+      "link": "https://x.com/WesRoth/status/2026900033648603192"
+    },
+    {
+      "author": "@rohanpaul_ai",
+      "summary": "Multiple agent-related posts: OpenClaw smart speaker dev kit from @openhome, KISS Multi Agent Evolutionary Framework, Google's ReasoningBank memory breakthrough for agents.",
+      "link": "https://x.com/rohanpaul_ai"
+    },
+    {
+      "author": "@Zai_org",
+      "summary": "ComputerRL framework for autonomous desktop intelligence. API-GUI paradigm unifies programmatic API calls and direct GUI interaction.",
+      "link": "https://x.com/Zai_org/status/1958175133706891613"
+    },
+    {
+      "author": "@cyrilXBT",
+      "summary": "MCP (Model Context Protocol) awareness thread — 325 likes. Messaging that 'MCP is the most slept on thing in AI right now' and connecting Claude to real tools via MCP servers.",
+      "link": "https://x.com/cyrilXBT/status/2042979353718387098"
+    }
+  ],
+  "hermes_mentions": 1,
+  "teknium_mentions": 0,
+  "nous_research_mentions": 0,
+  "scan_method": "Playwright with injected Chrome Profile 2 cookies (chrome_x_bridge AppleScript JS disabled)"
+}

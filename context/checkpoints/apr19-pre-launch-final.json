@@ -1,0 +1,27 @@
+{
+  "label": "apr19-pre-launch-final",
+  "context": "Session complete. All tasks done for launch day prep.\n\nSUMMARY OF TODAY:\n1. Qwen3.6 config audit — 13 patches, 1 bug found+fixed (DeepGEMM in spark-day1.sh)\n2. Hermes deep dive — found v0.10.0 had 542 commits of fixes we were missing\n3. Hermes update — clean merge, 0 conflicts, local patches preserved\n4. Config migrated v17->v19\n\nKEY FIXES NOW ACTIVE:\n- Cloudflare 403 Codex/Z.AI fix\n- Context bursting cooldown (#11529)\n- Per-provider request_timeout_seconds\n- Thinking block stripping for Qwen3.6\n- Terminal hang fix for backgrounded children\n\nLAUNCH DAY TOMORROW:\nSequence: (1) macbook-transfer-helper.sh --enable-ssh, (2) spark-day1.sh --macbook <IP> --usb, (3) spark-maxperf.sh, (4) wire-spark-to-hermes.sh <SPARK_IP>, (5) spark-quality chat, (6) superqwen3-super.sh\n\nPATCH BACKUP: ~/dgx-spark-prep/hermes-local-patches/",
+  "active_tasks": [
+    "DGX Spark launch scripts: ALL GREEN, 0 bugs",
+    "Hermes agent: updated to HEAD, config v19, all critical fixes active"
+  ],
+  "decisions": [
+    "Updated hermes to HEAD before launch",
+    "All 12 DGX Spark scripts verified green"
+  ],
+  "files_modified": [
+    "~/dgx-spark-prep/spark-day1.sh (DeepGEMM fix)",
+    "~/dgx-spark-prep/spark-maxperf.sh",
+    "~/dgx-spark-prep/superqwen3-super.sh",
+    "~/dgx-spark-prep/deploy-spark-day1.sh",
+    "~/dgx-spark-prep/spark-grpo-train.sh",
+    "~/hermes-agent (542 upstream commits merged)",
+    "~/.hermes/config.yaml (v17->v19)"
+  ],
+  "next_steps": "LAUNCH DAY. DGX Spark arrives tomorrow. Run spark-day1.sh first.",
+  "timestamp": "2026-04-19T19:21:04Z",
+  "unix_time": 1776626464.8762949,
+  "task_id": "20260419_133215_4ffc00",
+  "source": "manual",
+  "version": 2
+}

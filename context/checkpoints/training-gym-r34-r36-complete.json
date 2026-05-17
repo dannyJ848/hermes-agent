@@ -1,0 +1,13 @@
+{
+  "label": "training-gym-r34-r36-complete",
+  "context": "## Training Gym — R34-R36 COMPLETE\n\n### Infrastructure Fixes (before rounds):\n1. Domain normalization: Rewrote fn_normalize_domain() trigger to map to correct 13 canonical domains. Fixed 493+ tips and 600+ experiences that were using non-canonical domains (agent_memory, strategy, etc.).\n2. Deduplication: Removed 387 duplicate nodes (118 md5 collision groups) from cortex_nodes.\n3. KG Quality Audit: 4,557 tips (91% embedded), 20,319 experiences. 77% at Elo 1000-1050 (near seed quality). 4,510 deep-rated (10+ matches). Only 441 tips above Elo 1200.\n\n### Rounds Completed:\n- R34: EvolveR (arXiv 2510.16079) — principle_scorer.py. Bayesian quality scoring s(p) = (c_succ+1)/(c_use+2), semantic dedup, guiding/cautionary principle separation. 5 tips inserted.\n- R35: OPRL (arXiv 2509.19199) — outcome_credit_tracker.py. Temporal discount credit assignment, per-tool credit tracking, two-level advantage fusion. 5 tips inserted (4 rl_training, 1 tool_use).\n- R36: Reliability Science (arXiv 2603.29231) — meltdown_detector.py. Entropy-based MOP detection (threshold 1.711 bits), loop detection (3 repeats in 6 steps), GDS partial credit, VAF insight. 5 tips inserted (3 agent_evaluation, 1 self_improvement, 1 planning).\n\n### Module Status:\n- principle_scorer: R34, post_tool_call (record) + pre_llm_call (injection priority 2)\n- outcome_credit_tracker: R35, post_tool_call (record) + pre_llm_call (injection priority 2)\n- meltdown_detector: R36, post_tool_call (record) + pre_llm_call (injection priority 0 — critical alert)\n\n### Plugin: 1,358 lines\n\n### Key Files:\n- ~/subconscious/principle_scorer.py\n- ~/subconscious/outcome_credit_tracker.py\n- ~/subconscious/meltdown_detector.py\n- ~/.hermes/plugins/distillation/__init__.py (1358 lines)\n- ~/subconscious/testing_gym.py (1768 lines)\n- /tmp/baseline_r33.json\n\n### Daemon: PID 96805, running (flywheel + training_gym threads active)\n### Cortex: localhost:5432/cortex, 30,195 nodes after dedup, 13 canonical domains, 0 non-canonical\n### DB trigger fixed: fn_normalize_domain() now maps to correct 13 canonical domains",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Continue R37+ training rounds. Also: run testing gym tasks THROUGH the agent to measure real baseline performance, not just synthetic scores. Domain gaps: rl_training 37 tips, research 42, planning 54 — could use more high-quality tips.",
+  "timestamp": "2026-04-15T23:37:28Z",
+  "unix_time": 1776296248.211831,
+  "task_id": "20260415_182132_b231ae",
+  "source": "manual",
+  "version": 2
+}

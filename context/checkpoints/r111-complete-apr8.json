@@ -1,0 +1,19 @@
+{
+  "label": "r111-complete-apr8",
+  "context": "R111 complete. 415 tips, avg conf 0.831. Added Adaptive Test-Time Compute tip (use PRM-guided adaptive allocation not uniform scaling. Step-level PRM scores guide pruning/expansion within iterations. Trajectory rewards select across iterations. Concentrate compute on high-utility paths. Several-fold improvement on hard benchmarks). Domain: test-time-compute. Round 111. ~05:00 AM. Danny sleeping. Cron a81e43404f79 safety net. Training gym healthy and accelerating past 400.",
+  "active_tasks": [
+    "R111 complete — 415 tips, 0.831 — ready for R112"
+  ],
+  "decisions": [
+    "Adaptive PRM-guided compute allocation >> uniform test-time scaling"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R112: Continue. Push into new frontier territory.",
+  "timestamp": "2026-04-08T09:15:20Z",
+  "unix_time": 1775639720.420118,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

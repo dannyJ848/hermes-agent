@@ -1,0 +1,10 @@
+{
+  "label": "cerebrum-provider-confirmed-working",
+  "context": "Confirmed: cerebrum memory provider loads correctly in new agent instances. The 'Unknown tool' error was because this session's agent was created before the config had memory.provider: cerebrum. New sessions (cron jobs, new Telegram messages) will get cerebrum correctly. Cleaned up all init-time diagnostic patches; kept the dispatch-time safety net (emergency re-registration). Gateway restarted with clean code. Max iterations bumped from 60 to 200.",
+  "active_tasks": [
+    "Verify cerebrum works in next new session (cron at 7am or new Telegram message)",
+    "Clean up /tmp/cerebrum_diag.log and /tmp/cerebrum_direct_test.log"
+  ],
+  "timestamp": "2026-04-03T06:06:33Z",
+  "task_id": "20260403_004337_4ad69f"
+}

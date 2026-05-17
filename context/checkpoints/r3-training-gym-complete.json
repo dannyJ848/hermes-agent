@@ -1,0 +1,23 @@
+{
+  "label": "r3-training-gym-complete",
+  "context": "R3 Training Gym Round COMPLETE. Built task_frontier.py (Tool-R0 inspired) + wired into plugin + distilled 7 tips.\n\nCOMPLETED:\n1. RESEARCH: Explored ADAS (2408.08435), ToolMaker (2502.11705), Tool-R0 (2602.21320). Tool-R0 selected as build target — Generator-Solver co-evolution at competence frontier.\n2. BUILD: task_frontier.py (~300 lines) — 30 tools with difficulty tiers, 5-zone competence classification (mastery/strong/frontier/weak/incompetent), sliding window tracking (50 outcomes per tool), template-based task generation with 5 difficulty tiers, frontier detection (50-70% success rate = training sweet spot), Cortex-backed task persistence.\n3. WIRE: R170 in distillation plugin at lines 740-747 (post_tool_call — record tool outcomes) and lines 3016-3026 (pre_llm_call — inject training targets every 20th call).\n4. DISTILL: 7 tips covering Generator-Solver separation, 5-zone competence, sliding windows, difficulty tiers, periodic injection, fallback strategy, template-based generation.\n5. ACTIVATE: Syntax checked, pycache cleared, gateway restarted PID 86684.\n\nSYSTEM STATE:\n- Plugin: 3,331 lines (grew from 3,304)\n- New module: ~/subconscious/task_frontier.py (R170)\n- Modules wired this session: R169 reasoning_discover + R170 task_frontier\n- Gateway PID: 86684\n\nKEY INSIGHT FROM TOOL-R0: The Generator should target the competence FRONTIER (50-70% success), not the weakest tools. This is the zone of proximal development — challenging but achievable.",
+  "active_tasks": [
+    "R4: Next training gym round — potential targets: ToolMaker (2502.11705), ADAS Meta Agent Search, or cross-domain synthesis"
+  ],
+  "decisions": [
+    "Tool-R0's Generator-Solver co-evolution is the highest-impact R3 build — directly enables self-directed training",
+    "Template-based task generation (not LLM-based) keeps generation cost at zero and output deterministic",
+    "5-zone competence classification provides finer-grained training targeting than binary competent/incompetent",
+    "Sliding window (50 outcomes) prevents ancient history from masking regressions"
+  ],
+  "files_modified": [
+    "~/subconscious/task_frontier.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "Start R4 training gym round. Potential targets: ToolMaker (auto-create tools from research code), ADAS Meta Agent Search (evolve agent programs), or cross-domain synthesis between our modules.",
+  "timestamp": "2026-04-14T20:55:44Z",
+  "unix_time": 1776200144.320703,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

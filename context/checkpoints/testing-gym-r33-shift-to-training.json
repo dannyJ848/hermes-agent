@@ -1,0 +1,21 @@
+{
+  "label": "testing-gym-r33-shift-to-training",
+  "context": "## Testing Gym V2 — R33 COMPLETE, SHIFTING TO TRAINING GYM\n\n### Testing Gym Final State:\n- 1768 lines, 40 tasks (L1-L4), 5 domains\n- L4 Mythos-tier baseline: 9.0/10 overall\n- L4 scores: coding 9.2, planning 9.6, reasoning 9.3, search 8.8, tool_use 8.1\n- All scoring wired: adversarial, synthesis, compilation, cross-file, quantitative, tool aliases\n- Regression detection: L4 threshold -0.5, others -1.0\n- Cortex integration: benchmark_result nodes stored in Postgres\n- Plugin R270 wired in distillation __init__.py\n\n### Training Gym Next Steps:\n1. Run Hindsight KG quality audit (8,886 nodes, avg Elo 1419)\n2. Tip evolution: 421 tips plateaued — need fresh extraction + Elo tournament\n3. Run testing gym benchmarks THROUGH the agent to measure real performance\n4. Distillation pipeline: check if daemon is running (PID may be stale)\n5. Decision: restart daemon, run flywheel cycle, evaluate improvement\n\n### Key Files:\n- ~/subconscious/testing_gym.py (1768 lines)\n- ~/.hermes/plugins/distillation/__init__.py (1284 lines)\n- ~/subconscious/cortex_daemon.py\n- ~/subconscious/cortex_access.py\n- /tmp/baseline_r33.json (all baseline scores)\n- Cortex DB: localhost:5432/cortex (user: hindsight), ~8,886 nodes\n\n### Daemon State:\n- Last known PID 96805 (may be stale — verify on startup)\n- Restart: touch ~/subconscious/DAEMON_STOP; pkill cortex_daemon; sleep 3; rm STOP; nohup python3 ~/subconscious/cortex_daemon.py >> /tmp/cortex_daemon.log 2>&1 &\n- Key gotcha: must touch DAEMON_STOP before kill or supervisory loop auto-restarts it",
+  "active_tasks": [],
+  "decisions": [
+    "Shift from testing gym to training gym — diminishing returns on scoring tweaks vs real agent improvement needed",
+    "Testing gym is in good shape at 9.0/10 L4 baseline — ready to serve as evaluation framework for training loops"
+  ],
+  "files_modified": [
+    "/Users/dannygomez/subconscious/testing_gym.py",
+    "/tmp/baseline_r33.json",
+    "/tmp/l4_baseline_v2.json",
+    "/tmp/l4_baseline_scores.json"
+  ],
+  "next_steps": "1. Verify daemon is running, restart if needed\n2. Run Hindsight KG health audit\n3. Run flywheel cycle to generate fresh tips\n4. Run testing gym benchmarks through the agent to measure real baseline\n5. Begin training gym evolution cycles",
+  "timestamp": "2026-04-15T23:16:39Z",
+  "unix_time": 1776294999.733212,
+  "task_id": "20260415_174839_f68c7d",
+  "source": "manual",
+  "version": 2
+}

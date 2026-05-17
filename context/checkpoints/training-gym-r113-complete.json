@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r113-complete",
+  "context": "Training Gym R113 completed! ALL 4 PASS!\n\nR113 RESULTS (all 10/10):\n1. meeting-rooms-001 (T6) - Sort intervals. Check end[i] > start[i+1].\n2. meeting-rooms-ii-001 (T8) - Sweep line. Sort starts and ends separately. Two pointers.\n3. merge-k-sorted-lists-001 (T9) - Min-heap of (val, idx, node). Pop min, push next.\n4. course-schedule-ii-001 (T8) - Kahn's BFS. Return order if count==n.\n\nDB: 415 exercises, 691 attempts, avg 9.92, 96.2% perfect. 366 passed. Tier 9+ = 102, Tier 10 = 57.\n79+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R113 complete",
+    "R114 next"
+  ],
+  "decisions": [
+    "Meeting rooms: sort by start, check adjacent overlap.",
+    "Meeting rooms II: sweep line with sorted starts/ends. s<ends[j] means need new room.",
+    "Merge K lists: min-heap with (val, idx, node) tuples. idx breaks ties.",
+    "Course schedule II: Kahn's BFS, return order array. Empty if cycle."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R114: Continue. Try: Insert Interval, Non-overlapping Intervals, Clone Graph, or Number of Provinces.",
+  "timestamp": "2026-04-08T23:04:16Z",
+  "unix_time": 1775689456.0041192,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

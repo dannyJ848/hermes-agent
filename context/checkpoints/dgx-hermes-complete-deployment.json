@@ -1,0 +1,40 @@
+{
+  "label": "dgx-hermes-complete-deployment",
+  "context": "COMPLETE DGX SPARK HERMES DEPLOYMENT SESSION - Full distillation ready for new CLI.\n\n## What Was Accomplished\n\n### 1. vLLM DFlash Deployment (Option 2)\n- Deployed Qwen3.6-27B-Uncensored with DFlash speculative decoding on DGX Spark\n- Draft model: Qwen3.5-27B-DFlash (public, 3.3GB) - fallback after z-lab/Qwen3.6-27B-DFlash was gated (403)\n- Achieved ~16.2 tok/s single-stream (2.45x baseline of 6.6 tok/s)\n- Tuned num_speculative_tokens=5 for best balance (16.9 tok/s, 34.3% acceptance)\n- Key flags: FP8 weights, prefix caching OFF, batch tokens 32768\n- Trade-off: KV cache 966K→499K tokens, max concurrency 7.4x→3.8x at 131K context\n- Deploy script: /tmp/deploy_vllm_dflash.sh\n- Systemd service: vllm-dflash.service (auto-start on boot)\n\n### 2. EAGLE-3 Investigation (Blocked)\n- vLLM 0.20.2 supports EAGLE-3 for Llama/Qwen-VL but NOT Qwen3 text models\n- Community model Dogacel/specdrift-qwen3.6-27b-eagle3 failed config validation (hidden_size/n_heads non-integer)\n- Conclusion: Requires custom draft training or waiting for native Qwen3 support\n\n### 3. Cognitive Orchestrator Integration (CRITICAL FIX)\n- Problem: DGX Hermes only showed iteration engine (7 subsystems), not full 20-subsystem orchestrator\n- Root cause: run_agent.py only initialized iteration engine; no CognitiveOrchestrator call\n- Also: hermes_cli.plugins was shadowing plugins/ directory in sys.modules, breaking plugins.memory import\n\n### 4. Module Shadowing Fix (plugins import)\n- Added early import of plugins package at top of run_agent.py using importlib.util\n- This prevents hermes_cli.plugins from registering as non-package in sys.modules\n- Fixed memory provider initialization failure\n- KEYWORDS: cognitive_orchestrator, module_shadowing, plugins_import_fix\n\n### 5. Subsystem Synchronization\n- Created wrapper classes for function-only modules: DistillationBridge, TrainingGym, SubconsciousHookWiring\n- Synced 8 missing cognitive modules from local MacBook to DGX:\n  adaptive_context_sculptor.py, epistemic_trust_scorer.py, unified_intelligence_engine.py,\n  predictive_failure_prevention.py, autonomous_experimentation.py, cross_domain_transfer.py,\n  attention_context_prioritizer.py, self_evaluation_gate.py\n- Result: 20/20 subsystems active\n\n### 6. Final Verification\n- All 20 cognitive subsystems: ACTIVE\n- Memory provider (holographic): ACTIVE with 2 tools\n- Cortex flywheel: 13 sessions recorded, 10.1% avg error rate\n- Model connection: local-dgx responding\n- 97 tools loaded\n- vLLM health: OK, container up 2+ hours\n\n## Files Modified on DGX\n- /data/SpecForge/hermes-agent/run_agent.py (plugins pre-import fix + cognitive orchestrator init)\n- /data/SpecForge/hermes-agent/agent/distillation_bridge.py (wrapper class)\n- /data/SpecForge/hermes-agent/agent/training_gym.py (wrapper class)\n- /data/SpecForge/hermes-agent/agent/subconscious_hook_wiring.py (wrapper class)\n- 8 new cognitive modules synced to agent/\n\n## Key Decisions\n- Reverted context length from 262k to 131k due to throughput drop\n- Deferred FP8 KV cache to preserve output quality\n- Restored Hermes safety guardrails after accidental removal\n- DFlash num_speculative_tokens=5 chosen over 16 for better acceptance rate\n\n## Next Steps for New CLI\n1. Verify DFlash still running: curl http://localhost:8000/health\n2. Test Option 3 (EAGLE-3) if vLLM updates with Qwen3 support\n3. Test Option 4 (FP8 KV cache) if quality acceptable\n4. Consider training custom EAGLE-3 draft model\n5. Monitor production metrics vs synthetic benchmarks",
+  "active_tasks": [
+    "Memory update with DGX facts",
+    "Skill update for vllm-dgx-deployment",
+    "Skill update for hermes-agent plugins fix",
+    "Knowledge base save",
+    "SOUL.md update",
+    "Git commit",
+    "Verify persistence layers"
+  ],
+  "decisions": [
+    "Pre-import plugins package before hermes_cli.plugins to avoid module shadowing",
+    "All 20 cognitive subsystems must be active on all machines",
+    "DFlash num_speculative_tokens=5 for production (not 16)",
+    "Context length 131k for optimal throughput",
+    "FP8 KV cache deferred for quality preservation"
+  ],
+  "files_modified": [
+    "/data/SpecForge/hermes-agent/run_agent.py",
+    "/data/SpecForge/hermes-agent/agent/distillation_bridge.py",
+    "/data/SpecForge/hermes-agent/agent/training_gym.py",
+    "/data/SpecForge/hermes-agent/agent/subconscious_hook_wiring.py",
+    "/data/SpecForge/hermes-agent/agent/adaptive_context_sculptor.py",
+    "/data/SpecForge/hermes-agent/agent/epistemic_trust_scorer.py",
+    "/data/SpecForge/hermes-agent/agent/unified_intelligence_engine.py",
+    "/data/SpecForge/hermes-agent/agent/predictive_failure_prevention.py",
+    "/data/SpecForge/hermes-agent/agent/autonomous_experimentation.py",
+    "/data/SpecForge/hermes-agent/agent/cross_domain_transfer.py",
+    "/data/SpecForge/hermes-agent/agent/attention_context_prioritizer.py",
+    "/data/SpecForge/hermes-agent/agent/self_evaluation_gate.py"
+  ],
+  "next_steps": "1. Update all persistence layers (memory, skills, knowledge, SOUL.md)\n2. Git commit changes on DGX\n3. Verify new CLI can load checkpoint and resume",
+  "timestamp": "2026-05-16T04:14:15Z",
+  "unix_time": 1778904855.559412,
+  "task_id": "20260515_115320_46fb4e",
+  "source": "manual",
+  "version": 2
+}

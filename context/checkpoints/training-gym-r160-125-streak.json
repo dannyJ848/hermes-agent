@@ -1,0 +1,31 @@
+{
+  "label": "training-gym-r160-125-streak",
+  "context": "Training Gym R158-R160 completed! ALL 10/10!\n\nR158: symmtree(T8), invtree(T8), buildtree(T10), flatten(T9)\nR159: mergek(T10), minwin(T10), diatree(T9), binwatch(T8)\nR160: pathsum3(T10), sortlist(T9), rob2(T9), gas(T8)\n\nDB: 517 exercises, 888 attempts, avg 9.94, 97.1% perfect. 468 passed. Tier 9+ = 181, Tier 10 = 84.\n125 consecutive rounds all 10/10!",
+  "active_tasks": [
+    "R160 125-streak milestone complete",
+    "R161 next"
+  ],
+  "decisions": [
+    "Symmetric tree: recursive mirror check. Compare left of left with right of right.",
+    "Invert tree: swap left/right recursively.",
+    "Build tree from preorder+inorder: map inorder to indices. Preorder gives root. Split inorder.",
+    "Flatten tree: post-order. Move left subtree to right, find tail, attach old right.",
+    "Merge K lists: min-heap with (val, index, node). Pop min, push next.",
+    "Min window substring: sliding window. Expand right, contract left when all chars found.",
+    "Diameter tree: DFS. Track max(left+right). Return depth.",
+    "Binary watch: enumerate hours 0-11, minutes 0-59. Count bits.",
+    "Path sum III: prefix sum DFS with hash map. Count += prefix[current-target].",
+    "Sort list: merge sort. Find mid with slow/fast pointers. Recursively sort halves.",
+    "House robber II: circular. Two runs: [0..n-2] and [1..n-1].",
+    "Gas station: if total gas < total cost, impossible. Otherwise track tank, reset start when negative."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R161: Continue. Try: Count Primes, Top K Frequent, Kth Largest Element.",
+  "timestamp": "2026-04-09T00:48:46Z",
+  "unix_time": 1775695726.8738718,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

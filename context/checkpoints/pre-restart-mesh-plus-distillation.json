@@ -1,0 +1,25 @@
+{
+  "label": "pre-restart-mesh-plus-distillation",
+  "context": "Two plugin fixes need gateway restart to take effect:\n1. Mesh plugin: Added register(ctx) with 4 tool registrations to ~/.hermes/plugins/evey-mesh/__init__.py. Plugin had tools but no register() entry point.\n2. Distillation plugin: Cleared stale __pycache__ and updated plugin.yaml to declare both hooks. pre_tool_call hook was not loading due to stale .pyc cache.\nBoth caches cleared. After restart, new sessions will have mesh tools (mesh_status, mesh_message, mesh_task, mesh_lock) and bidirectional distillation (post_tool_call + pre_tool_call).",
+  "active_tasks": [
+    "Gateway restart needed for mesh + distillation plugins",
+    "Verify both plugins load in gateway.log after restart"
+  ],
+  "decisions": [
+    "Added register() with ctx.register_tool() for 4 mesh tools",
+    "Cleared all __pycache__ dirs for both plugins",
+    "Updated both plugin.yaml files to correctly declare provides_hooks"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/evey-mesh/__init__.py",
+    "~/.hermes/plugins/evey-mesh/plugin.yaml",
+    "~/.hermes/plugins/distillation/plugin.yaml",
+    "~/.hermes/plugins/distillation/__pycache__/ (deleted)"
+  ],
+  "next_steps": "Restart gateway, check gateway.log for 'Mesh plugin: all 4 tools registered' and 'Distillation plugin: pre_tool_call hook registered (top-down)'. Then start a new session and verify mesh_status tool works.",
+  "timestamp": "2026-04-06T21:12:44Z",
+  "unix_time": 1775509964.302753,
+  "task_id": "20260406_160108_7494c4",
+  "source": "manual",
+  "version": 2
+}

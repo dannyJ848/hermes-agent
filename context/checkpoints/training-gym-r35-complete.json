@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r35-complete",
+  "context": "Training Gym R35 completed. All 4 exercises 10/10 (2 required bug fixes).\n\nR35 RESULTS (all 10/10):\n1. fenwick-001 (T6) - Fenwick Tree (BIT) for prefix sums with O(n) build. 6 tests.\n2. rope-001 (T7) - Rope data structure for efficient string ops (split, concat, insert, delete). 7 tests. Bug: __getitem__ slice took wrong side of second split.\n3. persistent-dsu-001 (T7) - Persistent Union-Find with snapshot/rollback. 5 tests.\n4. lru-callback-001 (T6) - LRU Cache with eviction callbacks and stats via OrderedDict. 7 tests. Bug: test had get(2) which was actually a hit, not a miss.\n\nKEY PATTERNS:\n- Fenwick: LSB trick i&(-i), 1-indexed internally, range_sum = prefix(r) - prefix(l-1)\n- Rope: recursive split returns (left_node, right_node), for slice take LEFT of second split\n- Persistent DSU: NO path compression, push (child, old_parent, parent, old_size, old_count) before each union\n- LRU: OrderedDict.move_to_end on get, popitem(last=False) for LRU eviction\n\nDB: 214 exercises, 379 attempts, avg 9.86",
+  "active_tasks": [
+    "R35 complete",
+    "R36 next"
+  ],
+  "decisions": [
+    "Rope slice: split(start) then split(stop-start) on right part, take LEFT of second split",
+    "Persistent UF: skip path compression entirely, union by size still works",
+    "LRU stats: verify test assertions match actual behavior (get existing key = hit, not miss)",
+    "Fenwick O(n) build: initialize tree[1..n]=arr[0..n-1], then for each i, tree[i+(i&-i)] += tree[i]"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R36 exercises. Continue with advanced topics: Suffix Array, AVL Tree, LFU Cache, or Disjoint Set with path splitting.",
+  "timestamp": "2026-04-08T18:28:26Z",
+  "unix_time": 1775672906.430005,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

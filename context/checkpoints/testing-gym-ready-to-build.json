@@ -1,0 +1,26 @@
+{
+  "label": "testing-gym-ready-to-build",
+  "context": "TESTING GYM — the second half of training gym. Danny's key insight: we have 30 modules and 4150 tips but ZERO proof any improve actual performance. We measured construction output, not capability.\n\nARCHITECTURE DECIDED:\n  Single agent runs both BUILD and TEST phases:\n  1. Run standardized benchmark tasks → baseline scores\n  2. Training gym round (research + build + wire module)\n  3. Re-run SAME benchmarks → compare scores\n  4. Improved = module works. Same/worse = module is noise.\n\nBENCHMARK DESIGN (in progress, from General AgentBench arXiv:2602.18998):\n  Domains: search, coding, reasoning, tool-use\n  Need 10 standardized tasks with scoring rubrics\n  Must be deterministic/reproducible so scores are comparable across runs\n\nSTATE:\n  R27-R32 complete (30 modules wired in plugin)\n  Plugin: ~3,800 lines  \n  Cortex: ~4,150 tips, avg Elo 1089, max 2329\n  Multi-agent 'training-gym' profile exists but STOPPED (killed tmux session)\n  Danny's exam: ~2 days. All focus on self-improvement.\n\nANOTHER CLI SESSION fixed port hang issues (zero-downtime-patches-applied checkpoint).\n\nKEY FILES:\n  ~/subconscious/ — 234 .py modules\n  ~/.hermes/plugins/distillation/__init__.py — 3,800 lines, all R-modules wired\n  /tmp/training-gym-status.md — round log (R27-R32 complete)\n  ~/Desktop/cortex_architecture.html — last diagram\n\nGLM-5V vision: base64 images to https://api.z.ai/api/paas/v4/chat/completions, key from ~/.hermes/.env GLM_API_KEY",
+  "active_tasks": [
+    "Build Testing Gym — standardized benchmark suite with pre/post scoring",
+    "Run baseline benchmarks before next training gym round",
+    "Continue training gym rounds WITH benchmark validation"
+  ],
+  "decisions": [
+    "Killed separate training-gym profile — single agent stays active",
+    "Adding testing gym: benchmarks to prove modules actually improve performance",
+    "Every training round must show measurable improvement on benchmarks"
+  ],
+  "files_modified": [
+    "~/subconscious/memory_consolidator_r31.py",
+    "~/subconscious/agent_protocol_r32.py",
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/.hermes/profiles/training-gym/SOUL.md"
+  ],
+  "next_steps": "1. Design 10 standardized benchmark tasks across domains (research, debugging, planning, tool use, code)\n2. Build testing_gym.py with scoring rubric (0-10 per task)\n3. Run baseline benchmark — get starting scores\n4. Continue training gym R33+ WITH benchmark validation after each round",
+  "timestamp": "2026-04-15T03:16:06Z",
+  "unix_time": 1776222966.817725,
+  "task_id": "20260414_202742_dcd051",
+  "source": "manual",
+  "version": 2
+}

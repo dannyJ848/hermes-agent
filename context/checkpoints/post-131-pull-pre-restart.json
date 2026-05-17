@@ -1,0 +1,25 @@
+{
+  "label": "post-131-pull-pre-restart",
+  "context": "Pulled 131 commits from NousResearch/hermes-agent upstream. Fast-forward merge, zero conflicts. All local patches survived: (1) cli.py restore-context injection, (2) gateway/run.py distillation recall + mesh context injection, (3) plugins/distillation/ custom plugin. SAFETY_NET/ directory deleted (200+ old checkpoints). Dependencies reinstalled in venv. pycache cleared. Imports verified clean.\n\nNEW KEY FEATURES: LLM Wiki (Karpathy knowledge base builder), Structured /v1/runs SSE API, Google AI Studio provider, Firecrawl cloud, Discord slash commands, Slack thread replies, Feishu, MCP OAuth 2.1 PKCE, skill config interface, Manim+p5.js skills, shared thread sessions, centralized logging, delegate_task ACP override.\n\nBACKUPS at /tmp/: cli-local.patch, run-local.patch, distillation-backup/, cli.py.backup, run.py.backup\n\nTeknium tweeted about the LLM Wiki skill — 250 likes. Nous Research retweeted. This is the AGI multiplier — compounding knowledge base that auto-cross-references.",
+  "active_tasks": [
+    "verify-plugins: Restart gateway and verify plugins load",
+    "launch-agi: Launch 1000-cycle AGI run with LLM Wiki as knowledge multiplier"
+  ],
+  "decisions": [
+    "Fast-forward merge (no rebase needed)",
+    "Nuked SAFETY_NET/ — old checkpoint garbage",
+    "Using venv Python at ~/hermes-agent/venv/bin/python3 for all ops"
+  ],
+  "files_modified": [
+    "cli.py",
+    "gateway/run.py",
+    "plugins/distillation/__init__.py",
+    "plugins/distillation/plugin.yaml"
+  ],
+  "next_steps": "Restart gateway with new code. Then set up LLM Wiki config (wiki.path in ~/.hermes/config.yaml). Then launch 1000-cycle AGI run that uses /llm-wiki to build compounding knowledge base across cycles.",
+  "timestamp": "2026-04-07T05:20:07Z",
+  "unix_time": 1775539207.99946,
+  "task_id": "20260406_193318_f8f2c8",
+  "source": "manual",
+  "version": 2
+}

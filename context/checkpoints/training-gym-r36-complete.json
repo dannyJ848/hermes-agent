@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r36-complete",
+  "context": "Training Gym R36 completed. All 4 exercises 10/10 (1 required bug fix in AVL).\n\nR36 RESULTS (all 10/10):\n1. avl-001 (T7) - AVL Tree with insert/delete/rebalancing. 6 tests. Bug: recursive successor delete counted as extra deletion. Fixed with dummy flag.\n2. suffix-array-001 (T7) - Suffix Array with doubling algorithm, LCP via Kasai, binary search pattern matching. 6 tests.\n3. lfu-001 (T7) - LFU Cache O(1) get/put with freq_map+OrderedDict. 6 tests.\n4. sliding-window-001 (T6) - Monotonic deque for max/min, prefix sum, variable window two-pointer. 7 tests.\n\nKEY PATTERNS:\n- AVL delete successor: use dummy [False] list to avoid double-counting size\n- Suffix Array doubling: sort by (rank[i], rank[i+k]) pairs, double k each iteration\n- LFU: freq_map[freq]=OrderedDict of keys, min_freq tracks eviction target, popitem(last=False) for LRU tie-break\n- Monotonic deque: maintain indices in decreasing (max) or increasing (min) order of values\n\nDB: 218 exercises, 383 attempts, avg 9.86",
+  "active_tasks": [
+    "R36 complete",
+    "R37 next"
+  ],
+  "decisions": [
+    "AVL delete: use dummy found flag for successor deletion to avoid size double-count",
+    "LFU min_freq: only increment when freq_map[min_freq] becomes empty",
+    "Suffix array search: binary search for leftmost, then scan right for all matches",
+    "Monotonic deque: remove from front if out of window, from back if dominated"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R37 exercises. Continue with: Disjoint Set with path splitting, Bloom Filter counting, KMP string matching, or Top-K Frequent.",
+  "timestamp": "2026-04-08T18:33:23Z",
+  "unix_time": 1775673203.689354,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

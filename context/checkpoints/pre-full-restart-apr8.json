@@ -1,0 +1,26 @@
+{
+  "label": "pre-full-restart-apr8",
+  "context": "STATE: 1154 distilled tips at 0.8528 avg confidence. 24 functional chains. 128 tools covered.\n\nCRITICAL FIX APPLIED (not yet active in running session):\n- post_tool_call hook was NEVER called from run_agent.py\n- Added invoke_hook(\"post_tool_call\", ...) to BOTH tool execution paths:\n  1. Concurrent path: run_agent.py L6248\n  2. Sequential path: run_agent.py L6559\n- This fix activates the ENTIRE feedback loop: SAGE reward, condition-aware voting, mythos cycle detection, behavior calibration, trajectory metrics\n\nALREADY WORKING:\n- pre_llm_call (tip injection) — confirmed 10 real injections\n- post_api_request (API tracking) — confirmed 7742 entries\n\nGATEWAY PID: 15865 (listening on localhost:8642)\nCAFFEINATE PID: 82351\nDanny going to take test. Training continues after restart.\n\nBUILD-ACTIVATE-TEST-GROW RULE: After ANY plugin code change, MUST clear __pycache__ + restart gateway + start NEW CLI session. Code on disk = useless until activated. ALL 3 must happen: build, activate (restart), test (verify hooks fire).",
+  "active_tasks": [
+    "1154 tips, 0.8528 avg, 24 chains",
+    "post_tool_call hook patched in run_agent.py (L6248 + L6562) — needs new CLI session",
+    "All plugin pycache cleared",
+    "Keep training after restart"
+  ],
+  "decisions": [
+    "Danny enforced Build-Activate-Test-Grow cycle",
+    "post_tool_call was the missing piece — entire feedback loop was blind",
+    "Must verify hooks fire with real data before moving on"
+  ],
+  "files_modified": [
+    "~/hermes-agent/run_agent.py (post_tool_call hook added L6248, L6559)",
+    "~/.hermes/plugins/ — all __pycache__ cleared",
+    "~/.hermes/cerebrum_memory.db (1154 tips)"
+  ],
+  "next_steps": "1. Danny does full kill + restart\n2. New CLI session loads patched run_agent.py\n3. Verify post_tool_call fires by making tool calls and checking mythos/SAGE DBs\n4. Continue training gym — measure improvement with active feedback loop",
+  "timestamp": "2026-04-08T19:34:13Z",
+  "unix_time": 1775676853.308924,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

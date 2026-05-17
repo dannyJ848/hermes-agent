@@ -1,0 +1,21 @@
+{
+  "label": "r10-training-gym-complete",
+  "context": "R10 COMPLETE. Built tool_router.py (Select-then-Solve paradigm routing, arXiv 2604.06753). Classifies task type from keywords, flags weak tools (<40% success) with alternatives. Only injects when relevant. Wired as R176 in pre_llm_call. 3 tips distilled.\n\n11-MODULE COMPLETE STACK (9 wired + 2 stored):\n  WIRED: R168 self_critic, R169 reasoning_discover, R170 task_frontier, R171 uncertainty_reward, R172 tool_adaptor, R173 meta_reasoner, R174 reflection_synth, R175 curriculum, R176 tool_router\n  STORED: context_governor\n  \n  Plugin: 3,431 lines. 75 total tips this session (R1-R10). 9 modules wired.\n  \n  COMPRESSIONS: 1 of 16. ~124K tokens used of 200K.",
+  "active_tasks": [
+    "R11: Continue training gym"
+  ],
+  "decisions": [
+    "Tool router only injects for task types with weak tools — medical tasks get no injection",
+    "Three permanently weak tools: browser_navigate(29%), knowledge_search(16%), cached_delegate(0%)"
+  ],
+  "files_modified": [
+    "~/subconscious/tool_router.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "R11: Continue. Find next frontier paper and build module.",
+  "timestamp": "2026-04-14T21:20:07Z",
+  "unix_time": 1776201607.463243,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

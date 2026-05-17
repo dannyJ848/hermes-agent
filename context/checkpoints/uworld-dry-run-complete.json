@@ -1,0 +1,13 @@
+{
+  "label": "uworld-dry-run-complete",
+  "context": "## Session: UWorld→Anki Dry Run + CSS Fixes + Port Fix\n\n### What was done:\n1. **CSS fixes**: Cloze model updated — desktop front 28px→16px (matches back at 1.0rem), mobile unchanged (15px/1.0rem perfect)\n2. **Port conflict fixed**: Killed stale `python3 -m http.server 8765` (running since Tuesday, hijacking AnkiConnect via IPv6)\n3. **UWorld dry run**: Full E2E pipeline verified via Chrome CDP:\n   - Chrome CDP on :9222 → extract auth (JWT + apiSubKey from sessionStorage)\n   - UWorld API via CDP fetch() (NOT Python requests — CORS blocked)\n   - GetTestRecords → GetTestRecordDetails → getTestByQuestionIndexes (PascalCase, STRING TestRecordId)\n   - correctAnswer STRING→INT conversion, Cloze card building, AnkiConnect addNotes\n   - Demo card created: tag:dry_run_demo (Allergy & Immunology, Drug allergy, note ID 1776310265679)\n4. **websocket-client** installed in hermes venv (was missing)\n\n### Key gotchas reinforced:\n- UWorld API MUST go through Chrome CDP Runtime.evaluate fetch(), NOT Python requests\n- f-strings can't have backslashes in expression parts — pre-escape body strings\n- AnkiConnect modelStyling: use `model={'name':'Cloze', 'css':...}` not `modelName=`\n- AnkiConnect modelStyling GET uses `modelName='Cloze'` (different from update!)\n\n### Chrome CDP:\n- Running on port 9222, UWorld logged in at apps.uworld.com\n- websocket URL: ws://127.0.0.1:9222/devtools/browser/c3d94e5b-b367-4481-a315-daff8c3495cc\n- JWT expires ~1hr from extraction, refresh via location.reload() in CDP\n\n### Existing deck:\n- 1,822 cards in \"UWorld Weak Subtopics\" (all from previous batch runs)\n- All weak-system questions already covered — duplicates on re-run is expected",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "If Danny wants more UWorld cards, use the phase1/phase2 broad scripts. For new questions not yet covered, would need to find test records with questions outside the current 1,822. Chrome CDP still up on :9222 if needed.",
+  "timestamp": "2026-04-16T03:31:32Z",
+  "unix_time": 1776310292.593288,
+  "task_id": "20260415_205415_473e89",
+  "source": "manual",
+  "version": 2
+}

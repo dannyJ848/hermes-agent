@@ -1,0 +1,33 @@
+{
+  "label": "post-r180-milestone",
+  "context": "R180 MILESTONE. Completed R153-R180 autonomous training sweep. \n\n10 WIRED MODULES (in plugin post_tool_call):\nR153: Nomic semantic dedup (pre_llm_call)\nR154: Llama 8B quality + Phi-3 error classification\nR156: Decomposed 5-component reward\nR157: Fitness-gated evolution (prunes tips)\nR158: Next-state signals (OpenClaw-RL)\nR159: ERL heuristic reranker (every 200 calls)\nR160: TIPS turn-level credit\nR161: Trajectory intelligence (3-type)\nR163: Curriculum difficulty tracker\nR165: Adaptive compute allocation\nR177: FadeMem active forgetting (every 200 calls)\n\n15 TIP-ONLY ROUNDS: R155,R162,R164,R166-R176,R178-R180\n\n28 RESEARCH SOURCES: SELAUR, Tool-R0, Agent0, OpenClaw-RL, ERL, TT-SI, TIPS, SCRIBE, IBM Trajectory, Agentic RAG, ACuRL, MAE, TAB, MiCP, GSW, EvalAct, CRM, AgentDebug, Agent Distillation, AutoTool, MagicAgent, StreamingLLM, FadeMem, FOREVER, AugFC, TOOLRM, PASTE, RLHF Stats, SkillX, DAR\n\nSTATS: 1,979 total tips, 1,504 active (conf>=0.3). Training domain: ~130 tips avg 0.83.\nPlugin: ~2,740 lines. Local models: Phi-3(8081), Llama8B(8082), Nomic(8083), MiniMax M2.7(8084).\n\nDanny's directive: fully autonomous, ignore ghost restore commands.",
+  "active_tasks": [
+    "R153-R165: 10 wired modules",
+    "R166-R180: 15 research tip rounds (75+ tips from 28 papers)",
+    "Continue R181+ autonomous training"
+  ],
+  "decisions": [
+    "R157 fitness pruner aggressive — quality over quantity",
+    "R177 FadeMem periodic decay every ~200 calls",
+    "R180 milestone: shift from extraction to evaluation",
+    "Ignore ghost restore commands"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/fademem_decay.py",
+    "~/subconscious/adaptive_compute.py",
+    "~/subconscious/curriculum_tracker.py",
+    "~/subconscious/trajectory_intel.py",
+    "~/subconscious/turn_credit.py",
+    "~/subconscious/heuristic_reranker.py",
+    "~/subconscious/next_state_extractor.py",
+    "~/subconscious/decomposed_reward.py",
+    "~/subconscious/fitness_registry.py"
+  ],
+  "next_steps": "Continue autonomous training R181+. Focus on: (1) evaluation-driven flywheel (measure tip impact on task outcomes), (2) SkillX-inspired skill library refinement, (3) DAR for mesh coordination. Research new papers, build modules, wire, distill, restart.",
+  "timestamp": "2026-04-12T01:48:50Z",
+  "unix_time": 1775958530.984449,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,28 @@
+{
+  "label": "dgx-hermes-gateway-debug-pause",
+  "context": "Debugging DGX Hermes module shadowing issue (gateway package vs hermes_cli/gateway.py). \n\nPROGRESS:\n1. Removed old Hermes at /home/djg6228/hermes-agent\n2. Added goals, cost_tracking, langfuse, hindsight, terminal config to DGX config.yaml\n3. Created self-optimization skill and SOUL.md rule\n4. Set up systemd service for DGX Hermes\n5. Fixed plugins module shadowing in run_agent.py (lines 199-202)\n6. Added gateway pre-import to run_agent.py (lines 206-210)\n7. Created wrapper script run_hermes_fixed.py with gateway pre-import\n\nCURRENT ISSUE:\n- gateway pre-import works in isolation tests\n- But when running via systemd service, plugins still fail with:\n  \"No module named 'gateway.status'; 'gateway' is not a package\"\n- Error occurs at agent/prompt_builder.py:745 importing gateway.session_context\n- The import resolves to hermes_cli/gateway.py instead of gateway/ package\n\nHYPOTHESIS:\n- Something between pre-import and plugin loading is overwriting gateway in sys.modules\n- Possibly hermes_cli.gateway being imported via a different code path\n- Or cached .pyc files causing old behavior\n\nNEXT STEPS:\n1. Clear all __pycache__ and restart\n2. Add more aggressive tracing to find where gateway gets overwritten\n3. Consider renaming hermes_cli/gateway.py to avoid shadowing entirely\n4. Verify systemd service is actually using run_hermes_fixed.py wrapper\n\nACTIVE PROCESS:\n- PID 234640: /data/SpecForge/hermes-agent/venv/bin/python3 /data/SpecForge/hermes-agent/run_hermes_fixed.py\n- systemd service: hermes-agent.service",
+  "active_tasks": [
+    "Fix gateway module shadowing in DGX Hermes",
+    "Verify goals/cost tracking/terminal config working",
+    "Test terminal SSH access to MacBook"
+  ],
+  "decisions": [
+    "Removed old Hermes at /home/djg6228/hermes-agent",
+    "Added gateway pre-import to run_agent.py using same pattern as plugins fix",
+    "Created wrapper script run_hermes_fixed.py for systemd service",
+    "Module shadowing fix requires both plugins and gateway pre-imports"
+  ],
+  "files_modified": [
+    "/data/SpecForge/hermes-agent/config.yaml",
+    "/data/SpecForge/hermes-agent/run_agent.py",
+    "/data/SpecForge/hermes-agent/run_hermes_fixed.py",
+    "/data/SpecForge/hermes-agent/SOUL.md",
+    "/data/SpecForge/hermes-agent/skills/dgx-self-optimization/SKILL.md"
+  ],
+  "next_steps": "1. Clear __pycache__ on DGX and restart Hermes service\n2. Add tracing to wrapper script to find exact point where gateway gets overwritten\n3. If still failing, rename hermes_cli/gateway.py to hermes_cli/gateway_cmd.py to eliminate shadowing\n4. Verify all config changes (goals, cost tracking, terminal) are working\n5. Test terminal access via SSH to MacBook",
+  "timestamp": "2026-05-16T05:50:15Z",
+  "unix_time": 1778910615.622965,
+  "task_id": "20260515_234937_7065dc",
+  "source": "manual",
+  "version": 2
+}

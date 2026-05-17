@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r53-complete",
+  "context": "Training Gym R53 completed! ALL 4 CLEAN ON FIRST TRY!\n\nR53 RESULTS (all 10/10, all clean):\n1. tarjan-scc-001 (T7) - Tarjan's SCC with disc/low arrays, stack, on_stack. O(V+E).\n2. fenwick-001 (T6) - Fenwick Tree (BIT) with LSB trick. Prefix sum + range query + point update. O(n) build from array.\n3. segment-tree-001 (T7) - Segment Tree with array representation. Range sum query + point update.\n4. rabin-karp-001 (T6) - Rolling hash string matching, base=256, mod=10^9+7. Verified with overlapping patterns.\n\nMILESTONE: 200 exercises passed!\nDB: 265 exercises, 451 attempts, avg 9.88, 94.2% perfect.\n17+ consecutive rounds all 10/10.\n\nKey algorithms learned this round:\n- Tarjan's SCC: disc/low tracking, stack for SCC candidate set, root when low==disc\n- Fenwick Tree: 1-indexed, LSB trick i&-i for navigation. O(n) build: tree[i+1]=arr[i], propagate to parent\n- Segment Tree: power-of-2 size, array at [size+i], bottom-up build. Query: l odd→add, r even→add\n- Rabin-Karp: rolling hash (hash - old*base^(m-1))*base + new, always verify actual match",
+  "active_tasks": [
+    "R53 complete",
+    "R54 next"
+  ],
+  "decisions": [
+    "Tarjan: low[v]=min(low[v], index[w]) not low[w] for back edges (on_stack check)",
+    "Fenwick: 1-indexed internally, convert with i+1 for 0-indexed API",
+    "Segment tree: power-of-2 size, query uses l%2==1 (right child) and r%2==0 (left child)",
+    "Rabin-Karp: precompute h=base^(m-1) for O(1) removal, always verify hash matches"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R54 exercises. Try: Trie with insert/search/startsWith, Union-Find with path compression + union by rank, KMP string matching, or binary lifting for LCA.",
+  "timestamp": "2026-04-08T20:05:09Z",
+  "unix_time": 1775678709.8485298,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

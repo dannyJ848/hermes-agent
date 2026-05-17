@@ -1,0 +1,13 @@
+{
+  "label": "testing-gym-r13-l4-complete",
+  "context": "## Testing Gym V2 — R13 Complete: L4 Mythos-Tier Hardening\n\n### What was done:\n1. **10 L4 Mythos-tier tasks added** (5 domains × 2 baseline/holdout)\n   - search_l4: alignment pipeline evolution (RLHF→CAI→RLAIF) + SSM vs Transformer debate\n   - coding_l4: MCP server (production-grade) + CRDT library\n   - reasoning_l4: vector clock causality analysis + Bayesian alarm problem\n   - tool_use_l4: multi-source health monitor + API reverse engineering\n   - planning_l4: HPC Slurm→K8s migration + multi-region DR architecture\n2. **L4-aware scoring enhancements**:\n   - `_code_oracle_score`: 6-component scoring (imports, handling, features, length, compiles, file) with L4 weights shifted to compilation (25%) + file verification (20%)\n   - Search behavioral oracle: synthesis scoring + output_file verification + JSON validity check\n   - Invariant oracle: `requires_quantitative` flag (0.05-0.15 bonus for numbers in plans)\n   - Invariant matching: L4 requires 2+ words from multi-word invariants (not just first word)\n   - Tool_use oracle: `extra_files` + `cross_check` verification (7-weight scoring for L4)\n3. **L4 baseline established**: 8.7/10 overall (reasoning 10.0, planning 10.0, search 8.6, coding 7.9, tool_use 7.2)\n4. **Regression detection tightened**: L4 tasks use -0.5 threshold vs -1.0 for others\n5. **Cortex integration working**: 7 benchmark_result nodes in Postgres (including 5 L4)\n\n### File stats:\n- `~/subconscious/testing_gym.py`: 1657 lines (was 1507), 40 tasks (was 30)\n- `~/.hermes/plugins/distillation/__init__.py`: 1284 lines, R270 wired\n\n### L4 baseline files:\n- `/tmp/alignment_evolution.json` — search L4 output\n- `/tmp/mcp_server.py` — coding L4 output (compiles OK, 24KB)\n- `/tmp/health_agent_report.json` + `.md` — tool_use L4 output\n- `/tmp/hpc_migration_plan.md` — planning L4 output\n- `/tmp/l4_baseline_scores.json` — all 5 L4 scores",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "1. Next round: R14+ scoring refinement (tool_use 7.2 and coding 7.9 are weakest L4 corners)\n2. Fix minimax-paid direct API routing (400 error on delegate_with_model)\n3. Run holdout L4 baselines to complete the full 40-task baseline\n4. Decide: continue gym rounds or pivot to other priorities",
+  "timestamp": "2026-04-15T23:10:32Z",
+  "unix_time": 1776294632.506926,
+  "task_id": "20260415_174839_f68c7d",
+  "source": "manual",
+  "version": 2
+}

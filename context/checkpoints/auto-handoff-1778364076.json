@@ -1,0 +1,103 @@
+{
+  "label": "auto-handoff-1778364076",
+  "timestamp": 1778364076.198806,
+  "context": {
+    "timestamp": 1778364076.126677,
+    "memory": {},
+    "knowledge": {
+      "recent_docs": [
+        "enhancement-cycle-7-cron-elimination.md",
+        "hermes-harness-v2.1-enhancement-cycle-3.md",
+        "hermes-apparatus-audit-2026-05-09.md",
+        "autobrowse-hook-signature-fix.md",
+        "qwen27b-training-session-update-may8-2290.md"
+      ]
+    },
+    "db_stats": {
+      "distilled_tips": 1912,
+      "rapid_learnings": 24,
+      "tip_survival": 1902,
+      "prompt_fragments": 12
+    },
+    "files_active": [],
+    "tools_built": [
+      "hermes_manual_triggers.py",
+      "hermes_skill_generator.py",
+      "hermes_hands.py",
+      "hermes_harness_v2.py",
+      "hermes_context_gauge.py",
+      "hermes_self_manager.py",
+      "hermes_health_daemon.py",
+      "hermes_unified_daemon.py",
+      "hermes_plan_executor.py",
+      "hermes_self_diagnostic.py",
+      "hermes_dashboard.py",
+      "hermes_cli_resume.py",
+      "hermes_tool_logger.py"
+    ],
+    "next_steps": [],
+    "recent_learnings": [
+      {
+        "lesson": "Manual triggers system: 8 on-demand commands replacing former cron jobs.",
+        "category": "infrastructure",
+        "confidence": 0.9,
+        "source": "enhancement_cycle_7"
+      },
+      {
+        "lesson": "Unified daemon pattern: self-looping Python process with SIGTERM handler, log rotation, 5min interval.",
+        "category": "infrastructure",
+        "confidence": 0.92,
+        "source": "enhancement_cycle_7"
+      },
+      {
+        "lesson": "Eliminated all 54 cron jobs - replaced with unified daemon and manual triggers. Cron had 16% success rate.",
+        "category": "infrastructure",
+        "confidence": 0.95,
+        "source": "enhancement_cycle_7"
+      },
+      {
+        "lesson": "Use patch instead of write_file for surgical material fixes in large HTML files. Preserves structure and reduces write overhead.",
+        "category": "code",
+        "confidence": 7.0,
+        "source": "session_2026-05-09_heart_simulator"
+      },
+      {
+        "lesson": "Check playwright installation with 'which playwright' before using browser tools. If missing, install with 'npx playwright install chromium'.",
+        "category": "browser",
+        "confidence": 7.0,
+        "source": "session_2026-05-09_heart_simulator"
+      },
+      {
+        "lesson": "browser_navigate blocks file:// URLs. Always serve local HTML files via 'python3 -m http.server <port>' before attempting browser navigation.",
+        "category": "browser",
+        "confidence": 9.0,
+        "source": "session_2026-05-09_heart_simulator"
+      },
+      {
+        "lesson": "Hermes expects chromium_headless_shell-1217 but 'playwright install chromium' may install a different build. Use 'npx playwright install' to match the version in hermes's playwright dependency.",
+        "category": "browser",
+        "confidence": 9.0,
+        "source": "session_2026-05-09_heart_simulator"
+      },
+      {
+        "lesson": "Headless chromium cannot render MeshPhysicalMaterial (three.js r128). Use MeshPhongMaterial or MeshLambertMaterial for WebGL compatibility in browser_vision screenshots.",
+        "category": "browser",
+        "confidence": 8.0,
+        "source": "session_2026-05-09_heart_simulator"
+      },
+      {
+        "lesson": "Repeated error 'id confusion' occurred 2 times. Add to error_patterns_predictive.",
+        "category": "repeated_error",
+        "confidence": 0.5,
+        "source": "session_end_extractor"
+      },
+      {
+        "lesson": "cat >> file << 'EOF' is reliable for appending multi-line content. Use 'EOF' (quoted) to prevent variable expansion.",
+        "category": null,
+        "confidence": 0.95,
+        "source": null
+      }
+    ]
+  },
+  "session_id": "unknown"
+}

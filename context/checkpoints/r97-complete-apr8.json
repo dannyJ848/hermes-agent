@@ -1,0 +1,20 @@
+{
+  "label": "r97-complete-apr8",
+  "context": "R97 complete. 353 tips, avg conf 0.826. Added robustness tip (stress-test under 4 circumstances: partial observability, dynamic environments, noisy signals, dynamic agent state. Clean-interface evaluations overestimate readiness. Weaker models beat stronger ones when strategy matches uncertainty). New domain: agent-robustness. Round 97. ~04:10 AM. Danny sleeping. Loop continues. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R97 complete — 353 tips, 0.826 — ready for R98"
+  ],
+  "decisions": [
+    "Clean-interface evaluations are insufficient for deployment readiness",
+    "Model rankings are unstable across uncertainty regimes — strategy matters more than model size"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R98: Continue. Push into agent reasoning or chain-of-thought optimization.",
+  "timestamp": "2026-04-08T08:48:28Z",
+  "unix_time": 1775638108.726526,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

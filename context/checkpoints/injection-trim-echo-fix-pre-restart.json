@@ -1,0 +1,26 @@
+{
+  "label": "injection-trim-echo-fix-pre-restart",
+  "context": "Trimmed massive context injection bloat from distillation plugin. Disabled 11 noise injection blocks (stats/duplicates/low-value) saving ~83 lines. Trimmed tip counts (ERL 4->2, weakest 3->2, failures 3->2). Plugin now 1916 lines. Echo bug fix v3 also deployed (explicit [STALE PASTE DETECTED] warning). R140 advantage_estimator built and wired. DB has 1741 tips. Local inference: llama.cpp built with Metal, 3 models downloaded (phi-3-mini 2.2GB, llama-3.1-8b 4.6GB, nomic-embed 80MB) but llama-server hung during test. Hardware: Hostinger KVM 2 decided (~$15/mo). Danny studying Apr-May, fully autonomous.",
+  "active_tasks": [
+    "Echo bug fix v3 + noise trim deployed — needs gateway restart",
+    "Local inference: llama.cpp built, models downloaded, llama-server hung during test",
+    "Training gym: R140 complete, DB=1741 tips, needs R141+",
+    "Hostinger KVM 2 setup pending"
+  ],
+  "decisions": [
+    "Disabled 11 noise injection blocks to reduce context bloat ~40%",
+    "Trimmed tip counts: ERL 4->2 (conf>=0.6), weakest 3->2 (1 tip each), failures 3->2",
+    "Kept 12 genuinely useful injection blocks active",
+    "Echo bug fix: explicit warning instead of empty string, expanded signals, lower threshold"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py (disabled 11 blocks, trimmed limits)",
+    "~/subconscious/advantage_estimator.py (new R140 module)"
+  ],
+  "next_steps": "Restart gateway to apply all changes. Then debug llama-server (hung on Phi-3 loading). Then continue training gym R141+.",
+  "timestamp": "2026-04-10T21:23:51Z",
+  "unix_time": 1775856231.2165298,
+  "task_id": "20260409_133802_fc4fc7",
+  "source": "manual",
+  "version": 2
+}

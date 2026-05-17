@@ -1,0 +1,27 @@
+{
+  "label": "training-gym-r150-milestone",
+  "context": "Training Gym R149-R150 completed! All 10/10! R150 was milestone round!\n\nR149: meetrooms(T8), rotimg(T8), anagrams(T8), medstream(T10)\nR150: narycodec(T10), sticks(T9), reorg(T9), longseq(T8)\n\nDB: 485 exercises, 839 attempts, avg 9.94, 96.9% perfect. 437 passed. Tier 9+ = 159, Tier 10 = 76.\n116+ consecutive rounds all 10/10. Approaching 500 exercises!",
+  "active_tasks": [
+    "R150 milestone complete",
+    "R151 next"
+  ],
+  "decisions": [
+    "Meeting rooms II: sort starts/ends separately. Two pointers. Increment rooms when start < end.",
+    "Rotate image: transpose then reverse each row.",
+    "Group anagrams: sort string as key. defaultdict(list).",
+    "Median from data stream: two heaps. lo=max-heap, hi=min-heap. Balance sizes.",
+    "N-ary tree serialize: level-order with null delimiters between children groups.",
+    "Connect sticks: min-heap. Pop 2 smallest, push combined.",
+    "Reorganize string: max-heap by count. Pop top 2. If max > (n+1)//2 impossible.",
+    "Longest consecutive: set-based. Only start from sequence beginnings (n-1 not in set)."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R151: Continue. Try: LRU Cache, Design Twitter, or Text Justification.",
+  "timestamp": "2026-04-09T00:25:12Z",
+  "unix_time": 1775694312.192842,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

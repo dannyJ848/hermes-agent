@@ -1,0 +1,11 @@
+{
+  "label": "context-rot-fix-deployed",
+  "context": "CONTEXT ROT FIX DEPLOYED. Compression threshold lowered from 70% to 40%. Target ratio 0.25. Protect last 20 turns. AGI cron updated with max 5 tool calls per cycle and self-termination rules. context_health_guard.py created. Key research: Chroma found all 18 frontier models degrade continuously. Critical threshold 40-60%. Fix is SHORTER SESSIONS not better compression. Cron cycles should be 3-5 tools max.",
+  "active_tasks": [
+    "Verify compression settings took effect",
+    "Monitor cron for degradation",
+    "Research more context health techniques"
+  ],
+  "timestamp": "2026-04-05T17:05:48Z",
+  "task_id": "20260404_215806_7e676d"
+}

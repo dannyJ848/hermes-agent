@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r55-complete",
+  "context": "Training Gym R55 completed! ALL 4 CLEAN ON FIRST TRY!\n\nR55 RESULTS (all 10/10, all clean):\n1. sparse-table-001 (T7) - Sparse Table for O(1) RMQ. table[k][i] = min of arr[i..i+2^k-1]. O(n log n) build, O(1) query.\n2. binary-heap-001 (T6) - Binary min-heap from scratch. Array repr, sift_up/sift_down, O(n) heapify.\n3. weighted-union-find-001 (T8) - Weighted UF with diff[] tracking. Path compression accumulates diffs. Union maintains weight(x,y)=w invariant.\n4. knapsack-001 (T6) - 0/1 Knapsack DP. O(W) 1D optimization for value-only. 2D for item tracing.\n\nDB: 270 exercises, 459 attempts, avg 9.88, 94.3% perfect. 207 passed.\n21+ consecutive rounds all 10/10.\n\nKey learning: Weighted UF is the hardest — diff[x] tracks weight from x to parent[x], path compression must accumulate diffs, union must solve the offset equation so that diff_x - diff_y = w in the merged tree.",
+  "active_tasks": [
+    "R55 complete",
+    "R56 next"
+  ],
+  "decisions": [
+    "Sparse table: K = floor(log2(n)), table[k][i] = min(table[k-1][i], table[k-1][i+2^(k-1)])",
+    "Heap: heapify from last non-leaf (n//2-1) down, sift_down each",
+    "Weighted UF: diff[x] = weight from x to parent[x]. find accumulates diff. union solves offset equation.",
+    "Knapsack: iterate w backwards (capacity to weights[i]) for 1D. Trace back with 2D: if dp[i][w]!=dp[i-1][w] then item included"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R56 exercises. Try: AVL tree, Red-Black tree, B-tree, skip list, or interval tree.",
+  "timestamp": "2026-04-08T20:14:17Z",
+  "unix_time": 1775679257.594781,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

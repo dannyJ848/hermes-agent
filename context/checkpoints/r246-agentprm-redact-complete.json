@@ -1,0 +1,19 @@
+{
+  "label": "r246-agentprm-redact-complete",
+  "context": "R245-R246 complete. SBSLocator, CBR for LLM Agents, AgentPRM, ReDAct. 22 tips. Total active: 2,083.\n\nPlugin: 3012 lines. Gateway running.\nKEY INSIGHTS: (1) SBSLocator: causal inference for failure attribution — 36% step accuracy vs 15% correlation. (2) CBR: tips ARE cases — condition=problem, recommendation=solution. (3) AgentPRM: process reward per tool call — promise + progress. (4) ReDAct: 15% deferral to large model matches 100% large model quality.\n\nPapers distilled R214-R246: 68 papers, 330+ tips across 33 rounds.",
+  "active_tasks": [
+    "R247: Continue autonomous training"
+  ],
+  "decisions": [
+    "CBR formalizes cerebrum tips as cases — condition=problem, recommendation=solution, rationale=reasoning",
+    "ReDAct validates Hermes delegation strategy — free default + paid fallback on complexity",
+    "AgentPRM process rewards applicable to per-tool-call tip scoring"
+  ],
+  "files_modified": [],
+  "next_steps": "R247: Continue autonomous loop. 2,083 tips.",
+  "timestamp": "2026-04-12T13:46:18Z",
+  "unix_time": 1776001578.061981,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

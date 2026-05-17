@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r28-complete",
+  "context": "Training Gym R22-R28 completed. 28/28 exercises pass with real pytest verification.\n\nR28 RESULTS (all 10/10):\n1. ring-001 (T4) - Ring buffer with overwrite, peek, __iter__. 10 tests.\n2. func-001 (T4) - curry, compose, pipe, partial, memoize. Fixed memoize dual-form decorator. 15 tests.\n3. validate-001 (T4) - Schema validation library with 7 types. 17 tests.\n4. actor-001 (T5) - Actor model with tell/ask, threading, drain. 6 tests.\n\nKEY FIXES:\n- memoize: needed dual-form decorator pattern (fn=None, key_fn=None) to support both @memoize and @memoize(key_fn=...)\n- AddTextCommand (R26): position computed at execute() time not init()\n\nDB: 188 exercises, 351 attempts, avg 9.8",
+  "active_tasks": [
+    "R22-R28 complete",
+    "R29 next"
+  ],
+  "decisions": [
+    "Decorator dual-form: def deco(fn=None, **opts): if fn: return wrap(fn); return wrap",
+    "Actor ask: use reply Queue + tuple message encoding",
+    "Schema validation: path-based error tracking for nested structures"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R29 exercises. Focus on: parsing/compilers (tokenizer, AST), or networking (TCP echo, HTTP parser).",
+  "timestamp": "2026-04-08T17:30:41Z",
+  "unix_time": 1775669441.960115,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

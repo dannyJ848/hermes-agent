@@ -1,0 +1,13 @@
+{
+  "label": "anki-uworld-tips-injected",
+  "context": "## Anki/UWorld Tips Distilled into Cortex\n\nDanny asked if all the infrastructure work today made me more capable of helping with Anki cards. Answer: NO — because all 524 tips were about self-improvement, not about being useful to Danny. The flywheel was navel-gazing.\n\n### What was done:\n1. Session searched 5 past UWorld/Anki sessions to extract patterns\n2. Distilled 12 concrete, actionable tips covering:\n   - Anki card formatting (cloze structure, Text field vs Back Extra, CSS AnKing-style)\n   - Anki CSS specifics (mobile 15px, .mobile .card specificity, desktop 28px)\n   - AnkiConnect quirks (batch addNotes duplicates, individual retry pattern)\n   - Anki safety (never open collection.anki2 with sqlite3 while Anki running)\n   - UWorld API auth (3 mandatory headers, JWT expiry, sessionStorage extraction)\n   - UWorld API body format (PascalCase, STRING TestRecordId, correctAnswer is STRING)\n   - UWorld filtering (broad system-level over narrow topic+system, system name mappings)\n   - UWorld image question parsing (choice field text vs letter-only)\n   - Pipeline scripts (phase1_broad.py, phase2_broad_v2.py, data directory)\n   - Study stats (1,822 UWorld + 4,077 AnKing = ~5,899 total cards)\n\n3. Fixed domain normalization: added \"anki\" → tool_use, \"uworld\" → tool_use mappings to fn_normalize_domain() trigger\n4. Re-domained 13 squashed tips from \"general\" to \"tool_use\"\n5. Embedded all 12 new tips with sentence-transformers\n6. Boosted elo to 2100, frequency to 5, confidence to 0.95 so they compete in hybrid_search\n7. Verified retrieval: all anki/uworld queries return our tips as top results (sim 0.44-0.80)\n\n### Files verified on disk:\n- ~/Desktop/uworld_phase1_broad.py (3,760b)\n- ~/Desktop/uworld_phase2_broad_v2.py (8,248b)\n- ~/Desktop/uworld_reformat2.py (2,452b)\n- ~/Desktop/uworld_data/phase1_broad_matches.json (26,946b)\n- ~/Desktop/uworld_data/test_record_ids.json (294,843b)\n\n### Skill confirmed:\n- uworld-api-extraction skill is comprehensive and up-to-date\n\n### Budget note:\nDanny says < $40 left on FriendliAI credits. Tomorrow has an exam — will need Anki card updates using UWorld script.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "When Danny asks for UWorld/Anki work tomorrow: load uworld-api-extraction skill, check Chrome CDP availability, refresh JWT via CDP, run pipeline. The 12 new tips will inject into context on relevant queries.",
+  "timestamp": "2026-04-16T02:34:02Z",
+  "unix_time": 1776306842.752674,
+  "task_id": "20260415_205415_473e89",
+  "source": "manual",
+  "version": 2
+}

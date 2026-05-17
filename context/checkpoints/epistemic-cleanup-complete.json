@@ -1,0 +1,7 @@
+{
+  "label": "epistemic-cleanup-complete",
+  "context": "Mass epistemic cleanup completed. Deleted 3,281 speculative facts from semantic memory (was 3,845, now 564). All remaining facts are 100% grounded (trust >= 0.6). Patched parallel_brain.py to STOP storing connections, syntheses, and model-generated research in semantic_facts. Created epistemic_policy table with trust ceilings by source. Brain cycles no longer pollute the knowledge base.\n\nFiles changed:\n- parallel_brain.py: 3 patches removing INSERT INTO semantic_facts for connections/syntheses/research\n- cerebrum_memory.db: 3,281 facts deleted, remaining 564 boosted to proper trust levels\n- epistemic_policy table created with 11 rules\n\nTrust hierarchy: episodic_consolidation (0.94) > profile-migration (0.85) > honcho/migration (0.75) > knowledge-migration (0.73)",
+  "active_tasks": [],
+  "timestamp": "2026-04-05T03:10:52Z",
+  "task_id": "20260404_215806_7e676d"
+}

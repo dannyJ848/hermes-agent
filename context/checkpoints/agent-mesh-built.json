@@ -1,0 +1,29 @@
+{
+  "label": "agent-mesh-built",
+  "context": "AGENT MESH — Multi-agent coordination layer for Hermes. Built and tested. Files:\\n\\n1. ~/.hermes/plugins/evey-mesh/mesh_db.py — Shared SQLite DB with WAL mode. Tables: presence, activity_stream, file_locks, task_board, messages. All tested.\\n\\n2. ~/.hermes/plugins/evey-mesh/__init__.py — Plugin providing 4 tools: mesh_status, mesh_message, mesh_task, mesh_lock. Hooks: agent:start, agent:step, agent:end.\\n\\n3. ~/.hermes/plugins/evey-mesh/plugin.yaml — Plugin manifest.\\n\\n4. ~/.hermes/hooks/agent-mesh/HOOK.yaml + handler.py — Hook handler that registers presence, heartbeats, logs tool calls, deregisters on end.\\n\\n5. ~/hermes-agent/gateway/run.py (line 2299-2322) — Mesh context injection. When other agents are active, injects their activity, locks, messages, and tasks into the session context.\\n\\nTested features:\\n- Two agents see each other's presence\\n- File lock conflict detection (Agent 2 denied when Agent 1 holds lock)\\n- Cross-agent messaging with read tracking\\n- Shared task board with create/claim/complete\\n- Activity stream showing other agents' tool calls\\n- Auto-expiring locks (TTL-based)\\n\\nGATEWAY RESTART NEEDED to activate all of this.",
+  "active_tasks": [
+    "Agent Mesh plugin built — needs gateway restart to activate",
+    "Mesh DB tested and working",
+    "Context injection wired into run.py"
+  ],
+  "decisions": [
+    "SQLite with WAL mode for coordination — no external broker needed, local-only, zero dependencies",
+    "Mesh context only injected when other agents are detected — solo agents see nothing",
+    "File locks are TTL-based with auto-expiry — prevents deadlocks from crashed agents",
+    "Hook handler uses lazy-load to avoid import errors on gateway startup"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/evey-mesh/mesh_db.py",
+    "~/.hermes/plugins/evey-mesh/__init__.py",
+    "~/.hermes/plugins/evey-mesh/plugin.yaml",
+    "~/.hermes/hooks/agent-mesh/HOOK.yaml",
+    "~/.hermes/hooks/agent-mesh/handler.py",
+    "~/hermes-agent/gateway/run.py"
+  ],
+  "next_steps": "Restart gateway with safe-restart.sh to activate mesh. Then open two hermes sessions and test live coordination.",
+  "timestamp": "2026-04-06T20:29:28Z",
+  "unix_time": 1775507368.919824,
+  "task_id": "20260406_150326_55934a",
+  "source": "manual",
+  "version": 2
+}

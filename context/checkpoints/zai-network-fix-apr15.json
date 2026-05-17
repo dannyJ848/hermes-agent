@@ -1,0 +1,26 @@
+{
+  "label": "zai-network-fix-apr15",
+  "context": "Session started Apr 14 ~10:54PM. Work done:\n\n1. Z.AI API KEY EXPIRED — Danny reported 401 errors on other CLI sessions. Updated main key in ~/.hermes/.env to new key: 15e9252c363241a8b58ccf06575a58f1.zSCBZA5YQuJhfU56\n\n2. VISION KEY ALSO EXPIRED — Old key 3239ea7b...PvNTiCdtHfHcw9mq returned 401 on Model API endpoint. Updated config.yaml vision block to use new key on api/paas/v4/ endpoint. NOTE: The coding API (api/coding/paas/v4) does NOT have glm-5v-turbo — vision must stay on Model API (api/paas/v4/).\n\n3. REVERTED AGGRESSIVE KEEPALIVE TUNING — run_agent.py was reverted from backup (run_agent.py.bak.pre-zero-downtime, Apr 14 22:04). Changes reverted:\n   - TCP_KEEPALIVE: 15s → 30s idle\n   - TCP_KEEPINTVL: 5s → 10s interval  \n   - HERMES_STREAM_STALE_TIMEOUT: 45s → 90s\n   - HERMES_STREAM_READ_TIMEOUT: 45s → 90s (was 120s in backup)\n   The aggressive v3 tuning was likely causing Z.AI's LB to drop connections as abusive.\n\n4. CLEANED UP DEAD CONNECTIONS — Killed stale processes (PID 50070, 30907, 4992). Restarted gateway to flush CLOSE_WAIT sockets. Went from 34→23 CLOSE_WAIT. Remaining flush via OS reclamation.\n\n5. FULL NETWORK DIAGNOSTIC — No VPN, no proxy, no firewall, no competing gateways interfering. IPv6 latency to Z.AI: 72-85ms stable. DNS resolves fine via Comcast. No env var overrides. 31 CLOSE_WAIT was the main socket issue (now 23).",
+  "active_tasks": [
+    "Z.AI network fix — COMPLETE",
+    "Vision key update — COMPLETE",
+    "Dead socket cleanup — COMPLETE",
+    "Training gym R-rounds — PAUSED (was at R181 before this session)"
+  ],
+  "decisions": [
+    "Reverted to UWorld-era network settings (30s keepalive, 90s timeouts) — aggressive tuning was counterproductive",
+    "Vision stays on Model API endpoint (api/paas/v4/) NOT coding API — coding API doesn't have glm-5v-turbo",
+    "Same new API key works for both coding and model API endpoints"
+  ],
+  "files_modified": [
+    "~/.hermes/.env (GLM_API_KEY updated)",
+    "~/.hermes/config.yaml (vision base_url + api_key updated)",
+    "~/hermes-agent/run_agent.py (reverted to backup)"
+  ],
+  "next_steps": "Start a fresh CLI session to verify all fixes work end-to-end. Then resume training gym R-rounds or continue UWorld card creation — whichever Danny directs.",
+  "timestamp": "2026-04-15T04:18:03Z",
+  "unix_time": 1776226683.769791,
+  "task_id": "20260414_225432_0b5f43",
+  "source": "manual",
+  "version": 2
+}

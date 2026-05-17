@@ -1,0 +1,24 @@
+{
+  "label": "r195-agentrr-wired",
+  "context": "Training gym R195 complete. Researched 4 papers: AgentGym (2406.04151), Self-Rewarding LM (2401.10020), Memory Survey (2404.13501), AgentRR (2505.17716). Distilled 12 tips. Built AgentRR record/replay module at ~/subconscious/agent_rr.py. Wired into plugin post_tool_call. Plugin: 2779 lines. Tips: ~1283 active (conf>=0.3). Gateway running. All R186-R195 modules operational. New DB: agent_rr.db.\n\nMODULE INVENTORY (built + wired):\n- R186 paste_executor.py (control+data flow patterns)\n- R187 tooltree_planner.py (dual-feedback MCTS scoring)\n- R188 empirical_mcts_peemp.py (Borda ranking)\n- R189 imcts_introspective.py (introspective tree expansion)\n- R193a dgm_version_archive.py (evolutionary version tracking)\n- R193b speculative_actions.py (tool transition prediction)\n- R194 memory_consolidation.py (episodic→semantic→procedural)\n- R195 agent_rr.py (record & replay experiences)",
+  "active_tasks": [
+    "R196: Continue autonomous training — research + build + wire cycle"
+  ],
+  "decisions": [
+    "PASTE triggers 10% of calls for pattern mining",
+    "ToolTree dual-evaluate runs every call",
+    "PE-EMP at 5%, I-MCTS at 5%",
+    "DGM snapshots at 0.2%, Speculative Actions every call",
+    "Memory Consolidation at 0.3%, AgentRR every call"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/agent_rr.py"
+  ],
+  "next_steps": "R196: Continue autonomous loop. Find more frontier papers on agent improvement. Build more modules. Consider: self-rewarding evaluation module, AgentEvol-inspired trajectory evolution, multi-environment benchmark scoring.",
+  "timestamp": "2026-04-12T06:32:23Z",
+  "unix_time": 1775975543.8837628,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

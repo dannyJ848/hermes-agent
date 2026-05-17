@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r33-complete",
+  "context": "Training Gym R33 completed. All 4 exercises 10/10.\n\nR33 RESULTS (all 10/10):\n1. bellman-ford-001 (T6) - Bellman-Ford shortest path with negative weight handling and cycle detection. 6 tests.\n2. huffman-001 (T5) - Huffman coding compression/decompression with tree building. 6 tests.\n3. eventloop-001 (T7) - Cooperative event loop with timer heap and generator-based coroutines. 6 tests.\n4. interval-001 (T6) - Interval Tree (augmented BST) for point and overlap queries. 6 tests.\n\nKEY PATTERNS:\n- Bellman-Ford: relax n-1 times, early stop if no update, detect cycle with one extra pass\n- Huffman: min-heap merge, single-char edge case needs left-only child, decode via tree walk\n- Event loop: timer heap + task list, advance current_time to next event, process timers before tasks\n- Interval tree: BST by start, max_end augmentation prunes branches, half-open intervals [start, end)\n\nDB: 206 exercises, 371 attempts, avg 9.86",
+  "active_tasks": [
+    "R33 complete",
+    "R34 next"
+  ],
+  "decisions": [
+    "Bellman-Ford: track only reachable vertices in dist dict to handle sparse graphs",
+    "Huffman single-char: create tree with left child only, code is '0'",
+    "Event loop: separate timer heap from task list, advance time to min of both",
+    "Interval tree: BST key=start, max_end pruning: if query.start >= node.max_end, skip subtree"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R34 exercises. Focus on: Floyd-Warshall, Suffix Array, B-Tree, or coroutine scheduler.",
+  "timestamp": "2026-04-08T18:18:26Z",
+  "unix_time": 1775672306.241065,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

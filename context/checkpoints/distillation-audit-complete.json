@@ -1,0 +1,27 @@
+{
+  "label": "distillation-audit-complete",
+  "context": "DISTILLATION LINE-BY-LINE LOGIC AUDIT — COMPLETED April 6, ~1:35PM\n\nAudited ~4100 lines across 6 files in ~/subconscious/:\n- distillation_bridge.py (731 lines)\n- controller.py (988 lines)\n- parallel_brain.py (1051 lines)\n- brain_daemon.py (201 lines)\n- iteration_engine.py (671 lines)\n- epistemic_guard.py (510 lines)\n\n10 bugs found, 6 fixed, 1 false alarm (SQL injection was already parameterized), 3 documented.\n\nFIXES APPLIED:\n1. gateway/run.py (~line 2254): Added distillation recall injection — top 5 distilled tips + 3 meta-insights from cerebrum_memory.db now injected into EVERY agent session context. Previously these 903 tips + 29 meta-insights were invisible to the agent (top_down_recall was dead code).\n\n2. parallel_brain.py synthesize(): Fixed double-set of facts_validated=0. Was setting it twice with no logic between, meaning zero facts were ever validated.\n\n3. parallel_brain.py: Added _cycle_num integer counter. The cycle_id was a string timestamp being used with modulo (% 10, % 20) which would crash if RED_TEAM_AVAILABLE ever became True. Now uses integer counter.\n\n4. controller.py merge_brain_cycles(): Changed from write_text(\"\") to rename-then-delete pattern. Old approach could lose data if process crashed between db.commit() and file clear.\n\n5. parallel_brain.py _count(): Added whitelist of allowed table names to prevent SQL injection via f-string table names.\n\nCRON FIXES:\n- SOMA Dojo cron (54efd7ef8bf6): Simplified prompt from heavy analysis to quick 3-step check. Removed autonomous-curiosity skill dependency. Was timing out at 5min.\n\nCURRENT SYSTEM STATE:\n- Controller cron IS running (last audit 13:03, score F/1.8, engineering success 7.2%)\n- AGI Continuous Loop: running every 3min, healthy, cycle 217/1000\n- 903 distilled tips in DB, 29 meta-insights\n- 6653 entries in distillation_buffer.jsonl (1.4MB)\n- Audit score trend: consistently F/1.8 across all recent audits\n\nIMPORTANT: Gateway must be RESTARTED for the run.py distillation injection to take effect. The current running gateway process (PID 40276, started 12:54PM) has the OLD code.\n\nFILES MODIFIED:\n- ~/hermes-agent/gateway/run.py (distillation recall injection at line ~2254)\n- ~/subconscious/parallel_brain.py (synthesize fix, _cycle_num, _count whitelist)\n- ~/subconscious/controller.py (crash-safe merge)\n- ~/subconscious/AUDIT_2026-04-06.md (full audit document)\n\nDANNY'S PRIORITY ORDER:\n1. DONE — Distillation audit\n2. NEXT — 100-cycle validation\n3. Black hat extraction\n4. AGI cycles",
+  "active_tasks": [
+    "Distillation audit COMPLETE — 6 bugs fixed",
+    "SOMA Dojo cron simplified",
+    "Gateway restart NEEDED to activate run.py changes",
+    "Next: 100-cycle validation, then black hat extraction"
+  ],
+  "decisions": [
+    "top_down_recall dead code fixed via direct DB injection in run.py instead of wiring the function (simpler, fewer integration points)",
+    "Controller cron was NOT broken — misdiagnosed from stale context notes. It runs hourly and last ran successfully at 13:03",
+    "bottom_up_store NOT wired into live agent tool hooks — deferred. Only controller cron processes buffer (~1hr delay). Not critical."
+  ],
+  "files_modified": [
+    "~/hermes-agent/gateway/run.py",
+    "~/subconscious/parallel_brain.py",
+    "~/subconscious/controller.py",
+    "~/subconscious/AUDIT_2026-04-06.md"
+  ],
+  "next_steps": "Restart gateway to activate run.py distillation injection, then begin 100-cycle validation to track engineering success rate improvement from the fixes",
+  "timestamp": "2026-04-06T19:54:04Z",
+  "unix_time": 1775505244.4089222,
+  "task_id": "20260406_131556_ba8c6f",
+  "source": "manual",
+  "version": 2
+}

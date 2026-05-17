@@ -1,0 +1,24 @@
+{
+  "label": "r146-1046-tips-mia-apr8",
+  "context": "R146. Continued growth with MIA paper (arXiv:2604.04503).\n\nKey achievements this round:\n- MIA: bidirectional parametric↔non-parametric memory loop — validates our distillation pipeline\n- MIA: test-time learning during inference — our plugin already does this\n- MIA: Manager-Planner-Executor architecture — matches our separation\n- MIA: alternating RL to prevent collapse — new insight for stable optimization\n- Trajectory compression: merge tips with >80% condition overlap\n\nTip DB: 1046 tips, 0.8488 avg, 0.7 floor\nKnowledge: 13 findings\nPapers this session: 12+ (TRACE, MatClaw, AgentGL, SkillX, Deep Researcher, COSMO-Agent, YC-Bench, MemMachine, SoK, AT2QA, MemMachine retrieval, MIA)\n\nSystem: gateway PID 28336, caffeinate PID 82351, disk 5%\nDanny at daylong test. Fully autonomous.",
+  "active_tasks": [
+    "R146 COMPLETE — 1046 tips, 0.8488 avg, MIA paper integrated"
+  ],
+  "decisions": [
+    "MIA validates our architecture — distillation = bidirectional memory loop",
+    "Add utility tracking: success ≠ usefulness",
+    "Never change tips + retrieval simultaneously (alternating RL)",
+    "Merge tips with >80% condition overlap for efficiency"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1046 tips, 0.8488 avg)",
+    "~/.hermes/knowledge/mia-memory-intelligence-agent-apr2026.md",
+    "~/.hermes/knowledge/memmachine-retrieval-optimization-apr2026.md"
+  ],
+  "next_steps": "R147: Continue research. Look at agent self-play, process reward models, or tool composition papers. Keep growing.",
+  "timestamp": "2026-04-08T17:18:19Z",
+  "unix_time": 1775668699.301596,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

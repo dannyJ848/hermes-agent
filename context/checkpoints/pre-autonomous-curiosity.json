@@ -1,0 +1,11 @@
+{
+  "label": "pre-autonomous-curiosity",
+  "context": "Danny is going dark for ~1 month to study. Need to build autonomous curiosity skill for 24/7 self-directed operation. Current state: 5 crons healthy, TS 0 errors, ZAnatomyLoader refactored, research pipeline active.",
+  "active_tasks": [
+    "Build autonomous-curiosity skill",
+    "Test the skill loop",
+    "Update crons to align with curiosity framework"
+  ],
+  "timestamp": "2026-04-02T22:24:13Z",
+  "task_id": "20260402_152751_4b5e7b"
+}

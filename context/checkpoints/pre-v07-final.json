@@ -1,0 +1,13 @@
+{
+  "label": "pre-v07-final",
+  "context": "Pre-update checkpoint. Hermes v0.6.0 (v2026.3.30) -> v0.7.0 (v2026.4.3). All patches saved to ~/subconscious/hermes_v06_patches.diff. 5 files need re-patching: scheduler.py, run_agent.py, checkpoint_manager.py, file_operations.py, utils.py. Gateway PID 65032, brain daemon PIDs 61997+61994. Cerebrum provider is custom (not in v0.7 release). All custom plugins in ~/.hermes/plugins/ safe. Cron jobs in jobs.json safe.",
+  "active_tasks": [
+    "Update Hermes v0.6->v0.7",
+    "Re-apply 5 patches after update",
+    "Verify Cerebrum provider works on v0.7",
+    "Restart gateway + brain daemon",
+    "Re-sync plugins to squad profiles"
+  ],
+  "timestamp": "2026-04-05T06:35:23Z",
+  "task_id": "20260404_215806_7e676d"
+}

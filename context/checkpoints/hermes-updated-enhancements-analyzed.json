@@ -1,0 +1,12 @@
+{
+  "label": "hermes-updated-enhancements-analyzed",
+  "context": "Updated Hermes to latest (cc2b56b2, 20 commits ahead of v0.7.0). All 8 custom patches re-applied cleanly. Analyzed 43 features across v0.4-v0.7 + latest commits. Most Teknium-shared features are native code we just updated to. Key native features to ENABLE: Exa search (EXA_API_KEY), MCP server mode (hermes mcp serve), ACP protocol (already loaded). Our custom stack (Cerebrum, Fusion, Tool Intelligence, Brain daemon) goes beyond upstream. X/Twitter access is the gap -- need fresh cookies or working Browserbase.",
+  "active_tasks": [
+    "Enable Exa search (needs EXA_API_KEY)",
+    "Set up MCP server mode",
+    "Test ACP protocol",
+    "Fix Browserbase CDP for X/Twitter access"
+  ],
+  "timestamp": "2026-04-05T19:27:20Z",
+  "task_id": "20260404_215806_7e676d"
+}

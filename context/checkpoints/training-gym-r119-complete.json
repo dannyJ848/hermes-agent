@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r119-complete",
+  "context": "Training Gym R119 completed! ALL 4 PASS including T10 LFU Cache!\n\nR119 RESULTS (all 10/10):\n1. lru-cache-001 (T8) - OrderedDict. Pop+reinsert on get to move to end. Pop first on eviction.\n2. lfu-cache-001 (T10) - Freq buckets with OrderedDict. Track min_freq. Evict from min_freq bucket.\n3. insert-delete-getrandom-o1-001 (T8) - Dict+list. Swap with last on remove. Random choice.\n4. design-twitter-001 (T9) - Heap for news feed merge. Follow/unfollow with sets.\n\nDB: 427 exercises, 715 attempts, avg 9.93, 96.4% perfect. 379 passed. Tier 9+ = 111, Tier 10 = 58.\n85+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R119 complete",
+    "R120 next"
+  ],
+  "decisions": [
+    "LRU: dict preserves insertion order. get() pops+reinserts. Evict = pop first item.",
+    "LFU: key_to_val_freq + freq_to_keys (OrderedDict per freq). get bumps freq. Evict from min_freq bucket.",
+    "RandomizedSet: dict for index, list for values. Remove = swap with last + pop.",
+    "Twitter: heap merge for feed. timestamp descending. follow/unfollow with sets."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R120: Continue. Try: Course Schedule II, Pacific Atlantic Water Flow, Word Break II, or Min Cost to Connect Points.",
+  "timestamp": "2026-04-08T23:18:14Z",
+  "unix_time": 1775690294.6289668,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

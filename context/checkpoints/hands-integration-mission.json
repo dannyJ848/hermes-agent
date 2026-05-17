@@ -1,0 +1,13 @@
+{
+  "label": "hands-integration-mission",
+  "context": "Danny's mission: Build the brain AROUND tool usage. The endpoint is 100% accuracy, 100% speed, 100% reasoning in tool use. Currently the brain (1174 facts, 3.3x parallel speedup) is disconnected from hands (1 engineering experience tracked, 0 fixes, 3% lesson extraction). Score: 1.6/10 (F). Controller built and running but the distillation layer is weak. Need to: (1) intercept every tool call, (2) feed outcomes back to brain, (3) distill brain knowledge into actionable tool improvements, (4) make the whole loop self-iterating. Danny studying for ~1 month, fully autonomous.",
+  "active_tasks": [
+    "DEEP DIVE: Build brain-hands integration apparatus",
+    "Research how top agent systems learn from tool calls",
+    "Study Hermes telemetry/learner plugin hooks",
+    "Design and implement tool-call learning loop",
+    "Wire controller as hourly cron"
+  ],
+  "timestamp": "2026-04-04T03:04:14Z",
+  "task_id": "20260403_134459_9fb996"
+}

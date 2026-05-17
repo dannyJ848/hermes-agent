@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r96-complete",
+  "context": "Training Gym R96 completed! ALL 4 PASS ON FIRST TRY!\n\nR96 RESULTS (all 10/10):\n1. validate-bst-001 (T8) - Recursive with min/max bounds. Each node must be in (lo, hi) range.\n2. sort-colors-001 (T7) - Dutch National Flag. low/mid/high. 0→swap low, 2→swap high, 1→mid++.\n3. product-except-self-001 (T8) - Two passes. Left pass: cumulative left product. Right pass: multiply by cumulative right.\n4. group-anagrams-001 (T8) - sorted(s) as key. defaultdict(list).\n\nDB: 376 exercises, 623 attempts, avg 9.91, 95.8% perfect. 327 passed. Tier 9+ = 94, Tier 10 = 53.\n62+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R96 complete",
+    "R97 next"
+  ],
+  "decisions": [
+    "BST validation: pass (lo, hi) bounds recursively. Node must be in exclusive range. Inf for unbounded.",
+    "Dutch flag: three regions [0..low-1]=0s, [low..mid-1]=1s, [mid..high]=unknown, [high+1..end]=2s.",
+    "Product except self: left pass stores prefix, right pass multiplies suffix. O(1) extra space.",
+    "Group anagrams: sorted string as key. O(n*k*log(k)) where k=max string length."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R97: Continue. Try: Longest Palindromic Substring, Permutations, or Unique Paths.",
+  "timestamp": "2026-04-08T22:20:05Z",
+  "unix_time": 1775686805.517938,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

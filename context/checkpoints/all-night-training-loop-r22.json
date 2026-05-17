@@ -1,0 +1,25 @@
+{
+  "label": "all-night-training-loop-r22",
+  "context": "Training gym all-night loop. Cron-triggered session.\n\nCOMPLETED ROUNDS:\n- Rounds 0-2: 272 attempts (avg score 9.9)\n- Round 3: 5 exercises, avg 8.8\n- Round 4: 5 exercises, avg 8.4\n- Round 5: 5 exercises: ALL 10/10 = avg 10.0\n- Round 6: 5 exercises: ALL 10/10 = avg 10.0\n- Round 7: 5 exercises, avg 9.4 [10, 7, 10, 10, 10]\n  - r7-001 (debug hermes-agent test): 10/10 - found file lock contention from cron daemon\n  - r7-002 (lock-free counter): 7/10 - CAS slower than Lock in CPython, batch was 70x faster\n  - r7-003 (mini ORM): 10/10 - all 5 features including select_related, fixed metaclass registry bug\n  - r7-004 (tiny compiler): 10/10 - full pipeline lexer/parser/typechecker/evaluator/REPL\n  - r7-005 (semantic diff): 10/10 - all 5 features with hunks, word diff, function detection\n\nTOTALS: 293 attempts, 905 tips distilled, cumulative avg 9.86\n\nDB STATE:\n- ~/subconscious/training_gym.db: 293 attempts\n- ~/.hermes/cerebrum_memory.db: 905 distilled tips\n\nTRAINING HAS BEEN RUNNING MANY ROUNDS. Rounds 5-7 are at the harder difficulty.\nRound 8 should push even further with real-world integration challenges.",
+  "active_tasks": [
+    "Design Round 8 exercises (higher difficulty)",
+    "Continue training loop indefinitely"
+  ],
+  "decisions": [
+    "Rounds 5-7 consistently scoring 9-10/10 — need harder exercises",
+    "r7-002 showed CAS is slower than Lock in CPython — important practical insight"
+  ],
+  "files_modified": [
+    "/tmp/test_debug.md",
+    "/tmp/lockfree_counter.py",
+    "/tmp/mini_orm.py",
+    "/tmp/tiny_compiler.py",
+    "/tmp/semantic_diff.py"
+  ],
+  "next_steps": "Design Round 8 exercises with real-world integration challenges: API client with retry logic, event sourcing system, plugin loader with hot reload, WebSocket handler, or distributed task queue.",
+  "timestamp": "2026-04-08T14:13:12Z",
+  "unix_time": 1775657592.433731,
+  "task_id": "4adec0e1-ccef-4d9b-bae4-ed7894fddbe3",
+  "source": "manual",
+  "version": 2
+}

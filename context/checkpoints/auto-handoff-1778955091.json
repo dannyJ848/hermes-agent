@@ -1,0 +1,14 @@
+{
+  "label": "auto-handoff-1778955091",
+  "timestamp": 1778955091.046852,
+  "context": {
+    "timestamp": 1778955091.0468118,
+    "session_id": "20260515_234937_7065dc",
+    "compression_count": 5,
+    "message_count": 284,
+    "model": "kimi-for-coding",
+    "system_prompt_preview": "You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and in",
+    "todo_snapshot": "[Your active task list was preserved across context compression]\n- [>] 1. Seed self-improvement goals for DGX Hermes (in_progress)\n- [ ] 2. Fix Hindsight/PostgreSQL connection (pending)\n- [ ] 3. Set up cost tracking / Langfuse (pending)\n- [ ] 4. Verify cron jobs are scheduled (pending)\n- [ ] 5. Test web search with actual query (pending)"
+  },
+  "session_id": "20260515_234937_7065dc"
+}

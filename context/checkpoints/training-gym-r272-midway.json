@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r272-midway",
+  "context": "Training gym eval flywheel session. Deep sweep (proc_330261d43a8b) running ~210 rounds across 26 domains to push Elo-rated tips from 426 toward 800+. Currently at 546 rated after ~12 min of ~30 min total.\n\nSYSTEM STATE:\n- 1,780 tips in cerebrum_memory.db distilled_tips table\n- 546 Elo-rated via tip_elo table (range 1139-1258, spread 119, mean 1200)\n- 100% synced to Hindsight KG (9,945 nodes, 6,302 docs)\n- All 4 inference servers UP (Phi-3:8081, Llama-8B:8082, Nomic:8083, MiniMax:8084)\n- Deep sweep running in background\n\nRESEARCH COMPLETED THIS SESSION:\n- 20 new tips distilled from April 2026 papers: ERL, AgentHER, MT-GRPO, Agent-as-Annotators, Trace2Skill, MemMachine, Synapse, FLCOA\n- Key themes: experience replay for agents, reward calibration, memory architecture, teacher model selection\n- All synced to Hindsight\n\nTODO STATUS:\n- tg-1: Deep sweep (in_progress, 546/800+)\n- tg-2: Research round (completed)\n- tg-3: Distill + sync (completed, 20 tips)\n- tg-4: Eval on new tips (completed, covered by deep sweep)\n- tg-5: Analyze Elo differentiation (pending)\n\nFILES:\n- ~/.hermes/cerebrum_memory.db - main DB (distilled_tips + tip_elo tables)\n- ~/subconscious/eval_flywheel.py - EvalFlywheel class with run_tournament(domain, n_rounds)\n- ~/subconscious/elo_analysis.py - analysis script\n- ~/subconscious/run_sweep.py - sweep runner",
+  "active_tasks": [
+    "tg-1: Deep Elo sweep (in_progress)",
+    "tg-5: Analyze Elo differentiation (pending)"
+  ],
+  "decisions": [
+    "100% Hindsight sync confirmed - auto-sync flywheel working",
+    "New tips from ERL/AgentHER/MT-GRPO/etc inserted and syncing automatically",
+    "Deep sweep targeting 210 rounds across 26 domains for broader coverage"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db"
+  ],
+  "next_steps": "Wait for deep sweep (proc_330261d43a8b) to complete (~18 min remaining), then check final Elo stats. If rated tips < 800, run another sweep. Then do Elo differentiation analysis (tg-5) to push spread beyond 120. Consider another research-distill-eval cycle.",
+  "timestamp": "2026-04-13T15:49:03Z",
+  "unix_time": 1776095343.471422,
+  "task_id": "20260412_231834_f61c83",
+  "source": "manual",
+  "version": 2
+}

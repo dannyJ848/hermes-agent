@@ -1,0 +1,22 @@
+{
+  "label": "m27-integration-complete-ssh-tunnel",
+  "context": "Completed M2.7 (MiniMax) integration into the training gym and set up persistent SSH tunnel from Mac to VPS.\n\nM2.7 FIXES:\n1. Fixed thinking tag parsing bug in ~/subconscious/local_inference.py — the closing tag `</think\\>` (with backslash) didn't match actual M2.7 output `</think\\n>` (with newline). Replaced with robust approach: find `</think` then find `>` after it.\n2. Fixed max_tokens too small — tip scoring used 300 (thinking consumed all tokens), bumped to 800. Reward scoring used 200, bumped to 600.\n\nM2.7 FUNCTIONS TESTED AND WORKING:\n- m27_analyze('What is 2+2?') → '4' (thinking properly stripped)\n- m27_score_tip(condition, recommendation, rationale) → {'overall': 6.0, 'novelty': 3.0, 'actionability': 9.0, 'specificity': 8.0}\n- m27_reward_step(tool_name='web_search', ...) → {'reward': 0.85, 'tool_fitness': 1.0, 'execution_quality': 0.9, 'outcome_quality': 0.85}\n\nWIRED INTO DISTILLATION PLUGIN (R142):\n- Added M2.7 deep reward scoring in post_tool_call hook (~line 742)\n- Only runs on successful tool calls (not errors, not skip list tools)\n- Records M2.7 reward components (tool_fitness, execution_quality, outcome_quality) into reward_shaping\n- Plugin at ~/.hermes/plugins/distillation/__init__.py now ~2245 lines\n\nSSH TUNNEL (persistent):\n- LaunchAgent at ~/Library/LaunchAgents/com.hermes.ssh-tunnel.plist\n- Reverse tunnels: VPS localhost:8081→Mac:8081 (Phi-3), :8082→Mac:8082 (Llama), :8083→Mac:8083 (Nomic)\n- Auto-restarts via launchd KeepAlive=true, RunAtLoad=true\n- Verified all 3 models accessible from VPS",
+  "active_tasks": [],
+  "decisions": [
+    "M2.7 thinking tag uses robust find </think + find > approach instead of exact string match",
+    "M2.7 max_tokens bumped to 800/600 for tip scoring/reward scoring respectively",
+    "R142 wired into distillation plugin post_tool_call for successful calls only",
+    "SSH tunnel uses launchd for persistence with auto-restart"
+  ],
+  "files_modified": [
+    "~/subconscious/local_inference.py",
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/Library/LaunchAgents/com.hermes.ssh-tunnel.plist"
+  ],
+  "next_steps": "Decide what to work on next — check autonomous_decide or continue with training gym improvements (e.g., wire VPS Hindsight to use local models through tunnel, continue distillation rounds).",
+  "timestamp": "2026-04-11T05:15:09Z",
+  "unix_time": 1775884509.26579,
+  "task_id": "20260410_231220_230a8b",
+  "source": "manual",
+  "version": 2
+}

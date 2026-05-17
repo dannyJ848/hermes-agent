@@ -1,0 +1,24 @@
+{
+  "label": "local-inference-operational-r141-ready",
+  "context": "Local inference fully operational. 3 models running via llama.cpp with Metal on M2 Air 24GB: Phi-3 Mini (42 tok/s, port 8081), Llama 3.1 8B (19 tok/s, port 8082), Nomic Embed (768-dim, port 8083). Bridge module at ~/subconscious/local_inference.py with helper functions: phi3_classify, llama8b_score, embed_text, score_tip_quality, classify_error, score_trajectory. Context injection trimmed: 11 noise blocks disabled, tip counts reduced, plugin 1999->1916 lines. Echo bug fix v3: explicit [STALE PASTE DETECTED] warning, 13 signals, threshold 1+ in pastes >1000 chars. Training gym: R140 complete, DB=1741 tips, 1916-line plugin, 11 subconscious modules. Next: R141 — wire local inference into scoring/reward modules, continue autonomous training loop.",
+  "active_tasks": [
+    "R141: Wire local inference into training gym + continue autonomous loop",
+    "Trim tip counts in distillation plugin (DONE, deployed)",
+    "Echo bug fix v3 (DONE, deployed)"
+  ],
+  "decisions": [
+    "Local inference bridge: phi3_classify for fast scoring (0.24s), llama8b_score for quality eval (2.7s), embed_text for semantic search (0.16s)",
+    "Context injection: 11 noise blocks disabled, ~40% reduction",
+    "Hardware: Hostinger KVM 2 ($15/mo) for 24/7 agent, M2 Air for local inference"
+  ],
+  "files_modified": [
+    "~/subconscious/local_inference.py (new bridge module)",
+    "~/.hermes/plugins/distillation/__init__.py (11 blocks disabled, tips trimmed)"
+  ],
+  "next_steps": "Wire local inference into training gym: (1) integrate phi3_classify into error_predictor for faster classification, (2) integrate llama8b_score into reward_shaping for better reward signals, (3) integrate embed_text into knowledge_retrieval for semantic search. Then continue R141+ autonomous loop: research → distill → build.",
+  "timestamp": "2026-04-10T21:36:34Z",
+  "unix_time": 1775856994.3037188,
+  "task_id": "20260409_133802_fc4fc7",
+  "source": "manual",
+  "version": 2
+}

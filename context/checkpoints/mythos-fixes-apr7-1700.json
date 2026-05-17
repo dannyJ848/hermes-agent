@@ -1,0 +1,22 @@
+{
+  "label": "mythos-fixes-apr7-1700",
+  "context": "MYTHOS ENHANCEMENTS BUG FIXES (Apr 7, 17:00):\n\nThree bugs found and fixed in ~/.hermes/plugins/distillation/mythos_enhancements.py:\n\nBUG 1: Cycle info never reached pre_llm_call. on_pre_llm_call_enhanced() called build_adaptive_context(user_message) without passing cycle_info. The _last_cycle_info stored on the module by post_tool_call was never read by pre_llm_call.\nFIX: on_pre_llm_call_enhanced now reads _last_cycle_info from both function attr and module attr, passes to build_adaptive_context.\n\nBUG 2: Behavior calibration only persisted non-productive calls. Productive calls just incremented in-memory counter that resets each session. behavior_calibration table stayed empty.\nFIX: Productive calls now sampled (~50% via hash prefix check) and recorded to behavior_calibration table.\n\nBUG 3: Duplicate cycle info storage in __init__.py was conflicting with internal storage.\nFIX: Simplified __init__.py hook to just call on_post_tool_call_enhanced() — the module now handles all state internally.\n\nALL THREE FIXES VERIFIED with end-to-end test showing:\n- Cycle detection → intervention injection working\n- Behavior calibration recording all 3 types (productive/insufficient/redundant)\n- Adaptive context showing both cycle alerts and behavior corrections\n\nFILES MODIFIED:\n- ~/.hermes/plugins/distillation/mythos_enhancements.py (3 patches)\n- ~/.hermes/plugins/distillation/__init__.py (simplified mythos hook)\n- __pycache__ cleared\n\nNEEDS: Gateway restart to activate in live plugin.",
+  "active_tasks": [
+    "Mythos bug fixes applied, needs gateway restart"
+  ],
+  "decisions": [
+    "Moved cycle info storage into mythos_enhancements module itself instead of relying on hook caller",
+    "Sample productive calls at ~50% to avoid DB bloat",
+    "Kept adaptive injection event-driven — only injects when issues detected"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/mythos_enhancements.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "Restart gateway to activate mythos fixes. Then continue with next priority task.",
+  "timestamp": "2026-04-07T21:37:14Z",
+  "unix_time": 1775597834.774847,
+  "task_id": "20260407_162932_6b98e5",
+  "source": "manual",
+  "version": 2
+}

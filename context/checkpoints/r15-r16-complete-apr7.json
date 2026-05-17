@@ -1,0 +1,28 @@
+{
+  "label": "r15-r16-complete-apr7",
+  "context": "R15-R16 training gym completed in this session.\n\nKEY ACHIEVEMENTS:\n1. CONDITION-AWARE VOTING FIX: Modified _update_tip_confidence in distillation plugin\n   at ~/.hermes/plugins/distillation/__init__.py (line ~622). Previously voted on ALL\n   tips for a tool regardless of condition match. Now uses 3-tier matching: generic\n   conditions always match, error conditions only on errors, specific conditions need\n   keyword match in args. Call site at line 388 updated to pass args dict.\n\n2. TIP CONSOLIDATION: 113 → 33 tips. Deleted 62 \"reasoning\" tips (non-tool), merged\n   18 exact-duplicate conditions. Engagement rate went from 22% to 58%.\n\n3. NEW TOOLS BUILT:\n   - ~/subconscious/tip_health_monitor.py\n   - ~/subconscious/tip_condition_rewriter.py\n   - ~/subconscious/tip_feedback_validator.py\n   - ~/subconscious/pre_condition_aware_snapshot.json (baseline snapshot)\n\n4. PYCACHE CLEARED for distillation plugin.\n\nSTILL PENDING:\n- Gateway restart to activate condition-aware voting (pycache already cleared)\n- Post-restart validation with tip_feedback_validator\n- R17 exercises with browser, web_research, delegate tools\n\nGRAND TOTALS: R1-R16, ~128 exercises, ~1275/1280 points\n\nDISTILLATION PLUGIN STATE: v2.2 with condition-aware voting, 33 tips, 5 hooks\n(post_tool_call, pre_llm_call, post_api_request, mythos enhancements).",
+  "active_tasks": [
+    "Gateway restart to activate condition-aware voting",
+    "R17: Post-restart validation",
+    "R17: New domain exercises"
+  ],
+  "decisions": [
+    "Condition-aware voting is the real fix for dead tips (not generalization)",
+    "Deleted all 62 reasoning tips (not a real tool, not actionable)",
+    "Target 30-50 high-quality tips, not 100+ noisy ones"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/tip_health_monitor.py",
+    "~/subconscious/tip_condition_rewriter.py",
+    "~/subconscious/tip_feedback_validator.py",
+    "~/subconscious/pre_condition_aware_snapshot.json",
+    "~/subconscious/tip_feedback_loop_analysis.txt"
+  ],
+  "next_steps": "Either (1) do gateway restart to activate condition-aware voting, then run R17 validation exercises, or (2) continue R17 exercises without restart and restart at end of session.",
+  "timestamp": "2026-04-08T03:15:32Z",
+  "unix_time": 1775618132.223256,
+  "task_id": "20260407_171527_b7e3d6",
+  "source": "manual",
+  "version": 2
+}

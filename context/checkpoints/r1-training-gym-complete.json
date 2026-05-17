@@ -1,0 +1,24 @@
+{
+  "label": "r1-training-gym-complete",
+  "context": "R1 training gym round COMPLETE. All 6 priority items done.\n\nCOMPLETED THIS SESSION:\n1. Restored checkpoint llm-judge-3-provider-ensemble-apr15\n2. Recovered original 6-item priority list (items 3-5 never done)\n3. #3: Full UWorld+AnKing project reflection written to /tmp/uworld_project_reflection.md\n4. #3b: 10 reflection tips distilled into Cortex (silent failures, API safety, batch safety, filter verification, etc.)\n5. #4: Built api_type_validator.py (~500 lines) — catches STRING vs INT and filter coverage gaps\n6. #5: Full system check — all subsystems GO (daemon healthy, DB clean, inference servers alive)\n7. R1 Training Gym Round:\n   - RESEARCH: 3 parallel tasks — self-evolving agents, metacognition, tool learning\n   - BUILD: self_critic.py (~500 lines) — 4-axis self-critique (IsRel, IsSup, IsUse, IsEff), silent failure detection, per-tool health tracking, death spiral detection\n   - DISTILL: 8 tips inserted into Cortex\n   - INTEGRATE: Wired into plugin at lines 718 (post_tool_call) and 2976 (pre_llm_call), syntax verified\n\nSYSTEM STATE:\n- Cortex DB: 23,344 nodes, 369K edges, 448MB, 332 active tips, Elo avg=1325\n- Daemon: PID 50070, healthy\n- Plugin: 3,297 lines, syntax OK\n- New modules: api_type_validator.py, self_critic.py (both in ~/subconscious/)\n- 5 stuck flywheel entries cleared, daemon restarted\n\nPENDING:\n- Gateway restart needed for R168 self_critic to take effect (kills this session)\n- R2 training round ready to start after restart\n- Swap at 91% — functional but tight",
+  "active_tasks": [
+    "R2: Next training gym round — pick next research frontier",
+    "Gateway restart needed to activate R168 self_critic wiring"
+  ],
+  "decisions": [
+    "Self-RAG reflection pattern is the highest-impact R1 build — addresses our most dangerous bug class (silent failures)",
+    "4-axis critique (relevance, sufficiency, usefulness, efficiency) maps to multi-factor reward shaping from ToolRL",
+    "Death spiral detection (3+ consecutive failures) prevents the repeated cached_delegate failures we see in tool intelligence"
+  ],
+  "files_modified": [
+    "~/subconscious/self_critic.py",
+    "~/subconscious/api_type_validator.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "Restart gateway to activate R168 self_critic wiring, then start R2 training round. R2 research frontier: could explore CREATOR/TroVE (tool creation/evolution) or SelfDiscover (reasoning structure composition) or ADAS (meta-agent architecture search).",
+  "timestamp": "2026-04-14T20:41:54Z",
+  "unix_time": 1776199314.259218,
+  "task_id": "20260414_145941_c9011e",
+  "source": "manual",
+  "version": 2
+}

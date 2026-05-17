@@ -1,0 +1,27 @@
+{
+  "label": "training-gym-r145-complete",
+  "context": "Training Gym R144-R145 completed! All 10/10!\n\nR144: btreecodec(T10), mergek(T9), sudoku(T10), decode(T8)\nR145: revbits(T8), hamweight(T8), singlenum2(T9), cntbits(T8)\n\nDB: 476 exercises, 819 attempts, avg 9.94, 96.8% perfect. 428 passed. Tier 9+ = 148, Tier 10 = 72.\n111+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R145 complete",
+    "R146 next"
+  ],
+  "decisions": [
+    "Serialize binary tree: level-order BFS. null markers. Strip trailing nulls.",
+    "Merge K sorted: min-heap of ListNodes. Need __lt__ on ListNode.",
+    "Sudoku: backtracking with row/col/box sets. Pre-compute empty cells.",
+    "Decode ways: DP. dp[i] += dp[i-1] if valid single, dp[i-2] if valid pair.",
+    "Reverse bits: shift and OR 32 times.",
+    "Hamming weight: n &= n-1 clears lowest set bit.",
+    "Single number II: ones/twos state machine. XOR + mask.",
+    "Counting bits: bits[i] = bits[i>>1] + (i&1)."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R146: Continue. Try: Trap Rain Water, Largest Rectangle Histogram, or Jump Game II.",
+  "timestamp": "2026-04-09T00:14:04Z",
+  "unix_time": 1775693644.6881258,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

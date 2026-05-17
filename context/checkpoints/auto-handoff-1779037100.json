@@ -1,0 +1,14 @@
+{
+  "label": "auto-handoff-1779037100",
+  "timestamp": 1779037100.616595,
+  "context": {
+    "timestamp": 1779037100.6165252,
+    "session_id": "20260516_150530_58a475",
+    "compression_count": 8,
+    "message_count": 388,
+    "model": "kimi-for-coding",
+    "system_prompt_preview": "You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and in",
+    "todo_snapshot": null
+  },
+  "session_id": "20260516_150530_58a475"
+}

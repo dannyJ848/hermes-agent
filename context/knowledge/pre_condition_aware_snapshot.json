@@ -1,0 +1,100 @@
+{
+  "timestamp": 1775617735.85044,
+  "total_tips": 113,
+  "by_tool": {
+    "browser_navigate": {
+      "count": 1,
+      "avg_conf": 0.698,
+      "total_up": 2,
+      "total_down": 1
+    },
+    "delegate_parallel": {
+      "count": 1,
+      "avg_conf": 0.715,
+      "total_up": 5,
+      "total_down": 0
+    },
+    "execute_code": {
+      "count": 29,
+      "avg_conf": 0.893,
+      "total_up": 3128,
+      "total_down": 136
+    },
+    "patch": {
+      "count": 1,
+      "avg_conf": 0.831,
+      "total_up": 103,
+      "total_down": 2
+    },
+    "read_file": {
+      "count": 4,
+      "avg_conf": 0.963,
+      "total_up": 319,
+      "total_down": 3
+    },
+    "reasoning": {
+      "count": 62,
+      "avg_conf": 0.868,
+      "total_up": 62,
+      "total_down": 0
+    },
+    "save_finding": {
+      "count": 1,
+      "avg_conf": 0.72,
+      "total_up": 45,
+      "total_down": 0
+    },
+    "search_files": {
+      "count": 4,
+      "avg_conf": 0.785,
+      "total_up": 20,
+      "total_down": 0
+    },
+    "terminal": {
+      "count": 5,
+      "avg_conf": 0.94,
+      "total_up": 3099,
+      "total_down": 261
+    },
+    "vision_analyze": {
+      "count": 1,
+      "avg_conf": 0.78,
+      "total_up": 3,
+      "total_down": 0
+    },
+    "web_extract": {
+      "count": 3,
+      "avg_conf": 0.924,
+      "total_up": 386,
+      "total_down": 24
+    },
+    "write_file": {
+      "count": 1,
+      "avg_conf": 0.735,
+      "total_up": 48,
+      "total_down": 0
+    }
+  },
+  "by_type": {
+    "recovery": 14,
+    "strategy": 7,
+    "optimization": 3,
+    "training_gym_r15": 2,
+    "training_gym_r13": 5,
+    "training_gym_r14": 3,
+    "training_gym_r5": 8,
+    "training_gym_r7": 8,
+    "training_gym_r9": 8,
+    "training_gym_r4": 8,
+    "training_gym_r6": 8,
+    "training_gym_r8": 8,
+    "training_gym": 4,
+    "training_gym_r11": 8,
+    "training_gym_r12": 8,
+    "training_gym_r10": 8,
+    "r12_cross_cutting": 3
+  },
+  "high_conf": 35,
+  "mid_conf": 76,
+  "low_conf": 2
+}

@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r107-complete",
+  "context": "Training Gym R107 completed! ALL 4 PASS ON FIRST TRY!\n\nR107 RESULTS (all 10/10):\n1. top-k-frequent-001 (T7) - Counter.most_common(k).\n2. number-of-connected-components-001 (T8) - Union-Find with path compression + rank.\n3. graph-valid-tree-001 (T8) - Union-Find. Tree = n-1 edges + no cycle.\n4. find-median-stream-001 (T9) - Two heaps. max_heap lower, min_heap upper. Balance after each add.\n\nDB: 405 exercises, 667 attempts, avg 9.92, 96.1% perfect. 356 passed. Tier 9+ = 105, Tier 10 = 58.\n73+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R107 complete",
+    "R108 next"
+  ],
+  "decisions": [
+    "Top K frequent: Counter.most_common(k). Pythonic one-liner.",
+    "Connected components: Union-Find with path compression + union by rank. Count distinct roots.",
+    "Valid tree: n-1 edges (necessary) + no cycle during union (sufficient).",
+    "Median stream: two heaps. Push max_heap, pop to min_heap. Rebalance so max_heap >= min_heap."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R108: Continue. Try: Course Schedule (topo sort), Min Stack, Decode Ways, or Combination Sum.",
+  "timestamp": "2026-04-08T22:46:31Z",
+  "unix_time": 1775688391.180243,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

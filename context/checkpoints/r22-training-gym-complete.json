@@ -1,0 +1,17 @@
+{
+  "label": "r22-training-gym-complete",
+  "context": "TRAINING GYM SESSION at R22:\n  22 rounds, 23 modules (20 wired + 3 stored), 131 tips\n  Plugin: ~3,600 lines. Compressions: 1 of 4.\n  \n  ALL WIRED (R168-R188): self_critic, reasoning_discover, task_frontier, uncertainty_reward, tool_adaptor, meta_reasoner, reflection_synth, curriculum, tool_router, heuristic_matcher, recovery_selector, confidence_estimator, task_decomposer, interaction_logger, exec_tracer, skill_gap_detector, prompt_optimizer, reward_evolver, context_budget, adaptation_speed, tool_diversity\n  STORED: context_governor\n  \n  Research: 15 papers (SelfDiscover, Tool-R0, SELAUR, DRAFT, ARES, Externalization, GVU, E2H, Select-then-Solve, ERL, PALADIN, Confidence-First, AgentTrace, Co-Evolution)",
+  "active_tasks": [
+    "R23: Continue building until 4th compression"
+  ],
+  "decisions": [
+    "4-compression hard limit"
+  ],
+  "files_modified": [],
+  "next_steps": "R23+. Stop after compression #4.",
+  "timestamp": "2026-04-14T22:06:15Z",
+  "unix_time": 1776204375.67797,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

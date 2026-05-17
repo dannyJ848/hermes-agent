@@ -1,0 +1,25 @@
+{
+  "label": "greeting-echo-triple-fix-apr7-1310",
+  "context": "Danny pointed out the greeting echo is still pervasive — the \"Hey Danny. What's up?\" response was still happening. Diagnosed the REAL root cause: context injection bloat. Every turn (even \"hi\") gets slammed with TOOL INTELLIGENCE, ACTIVE INFERENCE, PERSPECTIVE DIVERSITY, TOKEN TRACKER, SELF-DEBUG, META-INSIGHTS, AGI CONTEXT, MEMORY HEALTH — all priming the model to keep working autonomously. THREE-layer fix applied: (1) Greeting break at run_agent.py L7224 breaks main while loop for CLI after 2 iterations. (2) evey-tool-intelligence on_pre_llm_call returns None for throwaway greetings — no injection. (3) distillation plugin _on_pre_llm_call returns \"\" for greetings. Gateway restarted, all hooks verified loaded.",
+  "active_tasks": [
+    "Fix greeting echo — triple layer fix COMPLETE",
+    "Wire MCTR dual-level metacognition",
+    "Research next frontier paper"
+  ],
+  "decisions": [
+    "Context injection bloat was the real echo enabler, not aggressive_continue",
+    "Skip ALL plugin injection for throwaway greetings",
+    "Three independent layers of protection"
+  ],
+  "files_modified": [
+    "/Users/dannygomez/hermes-agent/run_agent.py",
+    "/Users/dannygomez/.hermes/plugins/evey-tool-intelligence/__init__.py",
+    "/Users/dannygomez/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "Wait for Danny to confirm the fix works. Then continue with MCTR dual-level metacognition wiring.",
+  "timestamp": "2026-04-07T18:10:45Z",
+  "unix_time": 1775585445.2299242,
+  "task_id": "20260406_193318_f8f2c8",
+  "source": "manual",
+  "version": 2
+}

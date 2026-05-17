@@ -1,0 +1,370 @@
+{
+  "execute_code": [
+    {
+      "condition": "When using execute_code for multi-step tool logic that requires structured output",
+      "recommendation": "Use execute_code (not terminal) for Python with tool calls. Import from hermes_tools.",
+      "confidence": 0.94,
+      "upvotes": 1231,
+      "frequency": 943
+    },
+    {
+      "condition": "When writing long Python functions in execute_code",
+      "recommendation": "Break into smaller functions. Use write_file first, then import/execute.",
+      "confidence": 0.92,
+      "upvotes": 378,
+      "frequency": 190
+    },
+    {
+      "condition": "When connecting to services from execute_code",
+      "recommendation": "Check if service is running (docker ps, ps aux). Verify port and URL.",
+      "confidence": 0.92,
+      "upvotes": 416,
+      "frequency": 39
+    }
+  ],
+  "terminal": [
+    {
+      "condition": "When calling terminal with large payloads",
+      "recommendation": "Use pagination, reduce output size, or split into smaller calls [CAUTION: 70 failures recorded — verify applicability]",
+      "confidence": 0.92,
+      "upvotes": 649,
+      "frequency": 14
+    },
+    {
+      "condition": "When accessing files with terminal",
+      "recommendation": "Verify path exists before directory navigation/creation. Use Path.home() not ~ in Python.",
+      "confidence": 0.92,
+      "upvotes": 385,
+      "frequency": 1
+    },
+    {
+      "condition": "When reading file contents via terminal",
+      "recommendation": "Use read_file instead of cat/head/tail — it has pagination and line numbers. [CAUTION: 70 failures recorded — verify applicability]",
+      "confidence": 0.9,
+      "upvotes": 780,
+      "frequency": 165
+    }
+  ],
+  "web_extract": [
+    {
+      "condition": "When web_extract takes >5s on a URL",
+      "recommendation": "Use max_chars=3000 to limit response. For 403 errors, switch to web_research instead.",
+      "confidence": 0.92,
+      "upvotes": 104,
+      "frequency": 144
+    },
+    {
+      "condition": "When fetching from restricted URLs with web_extract",
+      "recommendation": "Switch to web_research for the same topic. 403 = anti-bot protection, retrying won't help.",
+      "confidence": 0.9,
+      "upvotes": 296,
+      "frequency": 193
+    },
+    {
+      "condition": "When parsing documents efficiently with OCR",
+      "recommendation": "AgenticOCR: Parse only what you need. Instead of full OCR on entire documents: (1) Identify target sections from layout analysis; (2) Parse only relevant sections; (3) Skip headers, footers, boilerplate. This reduces OCR cost by 60-80% while maintaining extraction accuracy for the target information.",
+      "confidence": 0.88,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "web_research": [
+    {
+      "condition": "When searching the web for current information",
+      "recommendation": "Web research optimization: (1) Use specific queries — broad queries return noise; (2) max_results=5 is usually sufficient; (3. Categories: general, science, it, news; (4) Returns titles, URLs, snippets; (5) For full content, use web_extract on promising URLs. Search first, extract second — saves time.",
+      "confidence": 0.87,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When using AI-powered search for information retrieval",
+      "recommendation": "AI Search paradigm: Traditional search is query → rank → retrieve. AI search adds understanding: (1) Query understanding — what does the user actually want?; (2) Multi-source retrieval — search across different data types; (3) Answer synthesis — combine results into coherent answer; (4) Citation — link claims to sources. AI search replaces 10 blue links with synthesized answers.",
+      "confidence": 0.86,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When web_research finds relevant results for tool-use optimization",
+      "recommendation": "Follow up with web_extract on the top 2 URLs, then use execute_code to synthesize findings into distilled tips. This triple (research→extract→synthesize) accounts for 80% of tip extraction workflows.",
+      "confidence": 0.85,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "delegate_with_model": [
+    {
+      "condition": "When selecting models for cost-performance tradeoffs",
+      "recommendation": "CASTER: Breaking cost-performance barrier in multi-agent systems. Route tasks by complexity: (1) Simple tasks (summarization, formatting) → cheapest model; (2) Medium tasks (analysis, coding) → mid-tier model; (3) Hard tasks (reasoning, debugging) → best model. This routing achieves 90% of top-model quality at 30% of cost.",
+      "confidence": 0.88,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When delegating research tasks to models via delegate_with_model",
+      "recommendation": "Free models (nemotron-free, qwen-coder-free, mimo-v2-pro) handle 80% of tasks. Only escalate to paid models when: (1) task requires complex reasoning >3 steps, (2) code generation >50 lines, (3) domain expertise needed. Always try free first.",
+      "confidence": 0.87,
+      "upvotes": 1,
+      "frequency": 1
+    },
+    {
+      "condition": "When routing agents based on learned skills",
+      "recommendation": "SkillOrchestra: Learn fine-grained skills from execution experience. (1) Each agent develops skill profiles from past runs; (2) Router matches tasks to agents by skill profile; (3) Skills transfer across domains when decomposed into primitives. This outperforms end-to-end routing by learning transferable skills.",
+      "confidence": 0.87,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "delegate_task": [
+    {
+      "condition": "When delegating a task to a subagent",
+      "recommendation": "Keep parent context lean — delegate entire workflows, not individual steps. Sub-agent architecture shows >90% context token reduction when parent delegates full tasks vs micro-managing. The parent should orchestrate, not execute.",
+      "confidence": 0.89,
+      "upvotes": 1,
+      "frequency": 1
+    },
+    {
+      "condition": "When spawning subagents for parallel isolated work",
+      "recommendation": "Subagent delegation: (1) Subagents have NO memory — pass ALL context via context parameter; (2. Subagents CANNOT call: delegate_task, clarify, memory, send_message, execute_code; (3) Each gets its own terminal session; (4) Results are always summaries — intermediate data doesn't pollute parent context; (5) Max 3 parallel tasks — more causes conflicts. Isolation = reliability.",
+      "confidence": 0.88,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When coordinating multiple agents with self-evolving protocols",
+      "recommendation": "SECP (Self-Evolving Coordination Protocol): Agents can evolve their own coordination protocols. (1) Start with basic rules; (2) Evaluate coordination outcomes; (3) Modify rules that lead to failures; (4) Reinforce rules that lead to successes. This produces task-specific protocols that outperform fixed coordination schemes.",
+      "confidence": 0.87,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "delegate_parallel": [
+    {
+      "condition": "When using delegate_parallel for research tasks that requires structured output",
+      "recommendation": "Give each parallel task a UNIQUE id and self-contained context. Subagents have ZERO shared memory — each must receive ALL information it needs independently. Missing context in one subagent corrupts its entire output.",
+      "confidence": 0.89,
+      "upvotes": 1,
+      "frequency": 1
+    },
+    {
+      "condition": "When identifying parallelizable subtasks for concurrent execution",
+      "recommendation": "Parallel task identification: (1) Two subtasks are parallelizable if they share NO dependencies; (2) Read-only operations are always parallelizable; (3) Write operations to different resources are parallelizable; (4) When in doubt, serialize — correctness > speed; (5) Use the dependency graph to find the critical path and optimize it.",
+      "confidence": 0.87,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When orchestrating multi-agent workflows as DAGs",
+      "recommendation": "Model agentic workflows as DAGs: (1) Nodes = agent tasks; (2) Edges = data dependencies; (3) Parallel execution for independent nodes; (4) Sequential for dependent nodes. DAG-based orchestration naturally identifies parallelism opportunities and prevents deadlock.",
+      "confidence": 0.87,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "read_file": [
+    {
+      "condition": "When read_file fails with 'file not found'",
+      "recommendation": "Verify path with search_files first. Use Path.home() not ~. Check case sensitivity.",
+      "confidence": 0.92,
+      "upvotes": 93,
+      "frequency": 2
+    },
+    {
+      "condition": "When reading large files",
+      "recommendation": "Use offset and limit parameters. Read in chunks of 200-500 lines. Don't read entire files.",
+      "confidence": 0.92,
+      "upvotes": 93,
+      "frequency": 2
+    },
+    {
+      "condition": "When reading files efficiently without overwhelming context",
+      "recommendation": "File reading optimization: (1) ALWAYS use offset and limit for large files; (2) Read in chunks of 200-500 lines; (3) Use search_files first to find relevant sections; (4) 1-indexed line numbers — offset=1 starts from beginning; (5. Files over 100K chars are rejected — always paginate. Never cat an entire file.",
+      "confidence": 0.87,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "write_file": [
+    {
+      "condition": "When using write_file for large or multi-part generated content",
+      "recommendation": "Always verify the write succeeded by reading back the first and last few lines with read_file. write_file OVERWRITES completely — if content generation was truncated, the file will be corrupted without any error.",
+      "confidence": 0.89,
+      "upvotes": 1,
+      "frequency": 1
+    },
+    {
+      "condition": "When using write_file for: write: plugin.yaml that requires structured output",
+      "recommendation": "write_file auto-creates parent directories — no need for mkdir first",
+      "confidence": 0.88,
+      "upvotes": 49,
+      "frequency": 1
+    },
+    {
+      "condition": "When writing files that will be read by other agents or processes",
+      "recommendation": "File writing for agent consumption: (1) Include a header comment explaining the file's purpose; (2) Use consistent formatting — other agents parse more reliably; (3) Add section markers for long files; (4) Include metadata (author, date, version) when files are shared between agents; (5) Keep files under 500 lines — split if needed.",
+      "confidence": 0.85,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "patch": [
+    {
+      "condition": "When making targeted edits to existing files",
+      "recommendation": "Use patch(mode='replace') with enough context lines for unique matching. Include 3+ surrounding lines.",
+      "confidence": 0.92,
+      "upvotes": 103,
+      "frequency": 36
+    },
+    {
+      "condition": "When debugging code generated by AI agents",
+      "recommendation": "AI code debugging methodology: (1) Reproduce the error — run the failing test; (2) Read the error message carefully — 80% of fixes are obvious from the error; (3) Check the most recent change — errors usually come from latest edits; (4) Use binary search — comment out half the code, see if error persists; (5) Fix the root cause, not the symptom.",
+      "confidence": 0.89,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When patch fails to find the old_string in a file",
+      "recommendation": "Read the file first to get the EXACT text including whitespace. The fuzzy matcher handles minor differences but NOT structural changes. If the file was reformatted, the old_string may no longer match any variant.",
+      "confidence": 0.88,
+      "upvotes": 1,
+      "frequency": 1
+    }
+  ],
+  "search_files": [
+    {
+      "condition": "When searching file contents or finding files by name",
+      "recommendation": "Search files mastery: (1) target='content' for regex inside files; (2) target='files' for glob patterns; (3. Use file_glob to filter by extension; (4) Use output_mode: 'content' (default), 'files_only', 'count'; (5) Ripgrep-backed — faster than grep/find/rg. This is the ONLY way to search files.",
+      "confidence": 0.87,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When navigating unfamiliar codebases effectively",
+      "recommendation": "Codebase navigation strategy: (1) Start from entry points (main, index, app); (2) Follow the call graph from there; (3) Use grep/search to find specific patterns; (4) Read tests to understand expected behavior; (5) Check imports to understand dependencies. Don't read files top-to-bottom — navigate by purpose.",
+      "confidence": 0.86,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When redefining retrieval evaluation for agent search tools",
+      "recommendation": "LLM-era retrieval evaluation: Traditional metrics (MRR, NDCG) don't capture whether retrieved info was actually USEFUL. New evaluation: (1) Answer correctness — did the retrieved info lead to a correct answer?; (2) Citation accuracy — are cited sources actually relevant?; (3) Completeness — did retrieval cover all needed aspects?; (4) Efficiency — was the minimal retrieval sufficient?",
+      "confidence": 0.85,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "memory": [
+    {
+      "condition": "When managing agent memory across sessions with growing state",
+      "recommendation": "Implement dual-layer memory: (1) Active layer — high-recency, high-frequency items with slow decay; (2) Archive layer — older items with faster decay. FadeMem shows this achieves 45% storage reduction while improving multi-hop reasoning. Use Ebbinghaus-inspired exponential decay modulated by access frequency.",
+      "confidence": 0.9,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When designing agent memory architectures for long-term use",
+      "recommendation": "Agent memory types (from 𝕋ℝ𝑀𝑒𝑚): (1) Semantic — facts and concepts (like our distilled tips); (2) Episodic — specific past experiences (like session logs); (3) Procedural — learned skills and workflows (like our skills). All three are needed. Semantic alone is insufficient — procedural memory lets agents improve HOW they do things, not just WHAT they know.",
+      "confidence": 0.89,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When designing multi-layer memory for long-term agent persistence",
+      "recommendation": "Multi-layered memory architecture: Layer 1 (Working) — current conversation, in-context; Layer 2 (Episodic) — specific past interactions, time-stamped; Layer 3 (Semantic) — generalized knowledge facts; Layer 4 (Procedural) — skills and tips. Bridge transient short-term with long-term semantic through episodic indexing.",
+      "confidence": 0.89,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "session_search": [
+    {
+      "condition": "When retrieving episodic memory from past sessions",
+      "recommendation": "Episodic memory is the missing piece: Semantic memory knows 'what', but episodic memory knows 'when and how'. For agents, store: (1) Task context — what was being done; (2) Outcome — success or failure; (3) User reaction — satisfaction signal; (4) Time context — when it happened. Retrieval should be relevance-ranked by task similarity.",
+      "confidence": 0.88,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When searching conversation history for relevant past context",
+      "recommendation": "Conversation history search: (1) Use broad keywords with OR for recall; (2) Narrow with AND for precision; (3) Search by tool name to find relevant interactions; (4) Check the last 3 sessions first — most relevant context is recent; (5) Save important findings to memory to avoid re-searching.",
+      "confidence": 0.86,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When using recursive summarization for long-term memory",
+      "recommendation": "Recursive summarization: For very long conversations: (1) Summarize every N messages; (2) Periodically summarize the summaries; (3) Keep the most recent messages in full. This creates a hierarchical memory: detailed recent → summarized mid-range → high-level long-term. Retrieval searches all levels.",
+      "confidence": 0.86,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "skill_manage": [
+    {
+      "condition": "When designing reusable skills for agent systems",
+      "recommendation": "7 design patterns for agentic skills: (1) Metadata-driven disclosure — skills declare capabilities; (2) Code-as-skill — executable scripts; (3) Workflow enforcement — structured sequences; (4) Self-evolving libraries — auto-improve; (5) Hybrid NL+Code macros; (6) Meta-skills — skills about skills; (7) Plugin/marketplace distribution. Match pattern to use case.",
+      "confidence": 0.9,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When building and managing agentic skills beyond simple tool use",
+      "recommendation": "SoK: Agentic Skills — Skills go beyond tool use. Tool use = call an API. Skill = reusable workflow combining multiple tools with domain knowledge. Architecture: (1) Skill definition — trigger condition + steps + expected outcome; (2) Skill acquisition — learn from experience or instruction; (3) Skill execution — reliable multi-step workflow; (4) Skill transfer — apply to new domains.",
+      "confidence": 0.89,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When managing skill security and trust",
+      "recommendation": "ClawHavoc case study: 1,200 malicious skills infiltrated a marketplace, exfiltrating API keys and credentials. Apply trust tiers: (1) Verified — from trusted source; (2) Community — peer-reviewed; (3) Untrusted — sandbox only. Never execute untrusted skills with access to credentials or file system.",
+      "confidence": 0.89,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "validate_output": [
+    {
+      "condition": "When validating delegation results before trusting them",
+      "recommendation": "Output validation: (1) ALWAYS validate after delegate_with_model; (2) Checks: hallucination signals, contradictions, confidence; (3) Returns 0-10 confidence score; (4) Issues found = specific problems to address; (5) Recommendation tells you what to do next. Unvalidated delegation results are dangerous — always verify.",
+      "confidence": 0.89,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When evaluating agent performance across diverse tasks",
+      "recommendation": "Apply the 5-level evaluation taxonomy: L1=Agentic Skills (tool use), L2=Domain-Agent (domain performance), L3=Cross-Model (model comparison), L4=Protocol-Centric (agent-environment interface), L5=General Agent (cross-domain adaptability). Most evaluations stop at L2.",
+      "confidence": 0.89,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When detecting hallucinations in LLM agent outputs",
+      "recommendation": "Hallucination detection best practices: (1) Cross-reference claims against multiple sources; (2) Check for internal contradictions within the output; (3) Verify specific numbers, dates, and names — these hallucinate most; (4) Look for hedging language ('might', 'possibly') as uncertainty signal; (5) Compare output consistency across paraphrases.",
+      "confidence": 0.88,
+      "upvotes": 0,
+      "frequency": 1
+    }
+  ],
+  "context": [
+    {
+      "condition": "When managing agent context window across long sessions",
+      "recommendation": "By turn 30, input tokens per call can be 5-10x what they were at turn 1. Most of those tokens are stale. Implement aggressive context pruning after every 10 turns.",
+      "confidence": 0.84,
+      "upvotes": 0,
+      "frequency": 1
+    },
+    {
+      "condition": "When the agent context window is 50%+ full and approaching limits",
+      "recommendation": "Aggressively compress completed work into summary lines. Keep only: (1) the current task, (2) the last tool result, (3) key decisions. Delete all intermediate reasoning that led to completed tasks. Think of it as garbage collection for context.",
+      "confidence": 0.8,
+      "upvotes": 1,
+      "frequency": 1
+    },
+    {
+      "condition": "When managing reasoning token costs in agent loops",
+      "recommendation": "Use a Shifted Thinking Window approach: cap reasoning tokens per turn and strip think tags from context. Train the model to adapt reasoning depth to problem complexity — simple problems get minimal reasoning, complex ones get more. Z1 shows 70% token reduction with no quality loss.",
+      "confidence": 0.72,
+      "upvotes": 1,
+      "frequency": 1
+    }
+  ]
+}

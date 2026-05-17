@@ -1,0 +1,12 @@
+{
+  "label": "delegation-fix-and-x-scanner",
+  "context": "SESSION March 31/April 1, 2026 (Part 2):\n\nCOMPLETED:\n1. hermes-repo-tracker skill \u2014 daily cron at 8am, auto-updates agent, synced to all 3 profiles\n2. Pydantic-ai deep dive \u2014 saved to knowledge base (16K stars, built by Pydantic/FastAPI team)\n\nIN PROGRESS:\n3. X/Twitter AI news scanning cron \u2014 scanner script at /tmp/x_ai_scanner.py built, but SearchTimeline endpoint returns 404. HomeLatestTimeline and UserTweets work fine. Need to pivot scanner to use those endpoints.\n4. Delegation fix \u2014 patched ~/.hermes/config.yaml to point delegation to GLM/ZAI, but needs full Hermes restart to take effect. The config change:\n   - delegation.model: '' -> 'glm-5.1'\n   - delegation.provider: '' -> 'zai'  \n   - delegation.base_url: '' -> 'https://api.z.ai/api/coding/paas/v4'\n   - delegation.api_key_env: '' -> 'GLM_API_KEY'\n   Direct API test with python requests confirmed the endpoint works (200 response).\n\nNOT YET STARTED:\n5. Build out more X API endpoints (search, profile, tweet detail) \u2014 have all GQL hashes extracted\n6. Self-improvement: search everywhere for latest AI research, repos, techniques\n\nX API HASHES (extracted from main.fa9bab6a.js):\n- SearchTimeline: GcXk9vN_d1jUfHNqLacXQA (404s, might need different variable structure)\n- UserTweets: FOlovQsiHGDls3c0Q_HaSQ (works) / E3opETHurmVJflFsUBVuUQ (works, old)\n- HomeTimeline: xhYBF94fPSp8ey64FfYXiA\n- HomeLatestTimeline: 0vp2Au9doTKsbn2vIk48Dg (confirmed working)\n- UserByScreenName: IGgvgiOx4QZndDHuD3x9TQ\n- TweetDetail: CysGzLIZa76UzZ3WTe-Bhg\n- UserByRestId: VQfQ9wwYdk6j_u2O4vt64Q\n\nTELEGRAM NOTE: No home channel configured \u2014 telegram_status/telegram_card format but don't deliver. Need to configure Telegram home channel.\n\nFREE MODELS: All free delegation models broken with \"unknown url type: '/chat/completions'\" \u2014 LiteLLM routing issue, not rate limit.",
+  "active_tasks": [
+    "Restart Hermes to activate delegation config + 12K memory limit",
+    "Fix X scanner to use HomeLatestTimeline instead of SearchTimeline",
+    "Build out more X API endpoints with extracted hashes",
+    "Self-improvement deep dives"
+  ],
+  "timestamp": "2026-04-01T02:55:57Z",
+  "task_id": "20260331_212105_6f302c"
+}

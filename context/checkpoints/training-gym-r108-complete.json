@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r108-complete",
+  "context": "Training Gym R108 completed! ALL 4 PASS ON FIRST TRY!\n\nR108 RESULTS (all 10/10):\n1. course-schedule-001 (T8) - Kahn's BFS topo sort. Count reachable == num_courses.\n2. min-stack-001 (T7) - Parallel mins stack. push min(val, mins[-1]).\n3. decode-ways-001 (T8) - DP. Single digit if != '0'. Two digits if 10-26.\n4. combination-sum-001 (T8) - Backtracking with start index. Unlimited reuse.\n\nDB: 405 exercises, 671 attempts, avg 9.92, 96.1% perfect. 358 passed. Tier 9+ = 105, Tier 10 = 58.\n74+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R108 complete",
+    "R109 next"
+  ],
+  "decisions": [
+    "Course schedule: Kahn's BFS. Track in_degree. Count processed == n means no cycle.",
+    "Min stack: parallel mins array. Each push records current min.",
+    "Decode ways: dp[i] += dp[i-1] if s[i-1]!='0', dp[i] += dp[i-2] if 10<=int(s[i-2:i])<=26.",
+    "Combination sum: backtrack with start index. Unlimited reuse = pass same i."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R109: Continue. Try: Maximum Subarray, Product of Array, or Longest Palindromic Substring.",
+  "timestamp": "2026-04-08T22:48:44Z",
+  "unix_time": 1775688524.019572,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

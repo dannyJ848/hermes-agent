@@ -1,0 +1,13 @@
+{
+  "label": "r34-baseline-established",
+  "context": "R34 COMPLETE — Baseline benchmark established + Code Debug Policy module.\n\nBASELINE RESULTS (10 tasks, 5 domains):\n- Overall: 6.7/10\n- Search: 8.3 (strong), Planning: 7.5 (good), Tool Use: 7.1 (good)\n- Reasoning: 6.0 (moderate), Coding: 4.8 (weak)\n\nR34 MODULE: ~/subconscious/code_debug_policy.py (~450 lines)\n- TGPR (arXiv 2510.06878) Thompson Sampling-guided debug strategy\n- 10 error patterns with Beta distribution tracking\n- Hybrid reward: CodeBLEU + test pass rate\n- Streak-based escalation (3+ failures → force alternate strategy)\n- Wired as R34 in both post_tool_call (recording) and pre_llm_call (strategy hints)\n\nPOST-R34 BENCHMARK: Delta +0.0 (expected — module needs real debug sessions to learn. Thompson Sampling starts uninformed)\n\nPLUGIN: 3,895 lines. Syntax/import OK. Gateway restarted.\n\nKEY FILES:\n- ~/subconscious/testing_gym.py (R33 benchmark framework)\n- ~/subconscious/code_debug_policy.py (R34 debug policy)\n- /tmp/baseline_results.json (10 baseline task results)\n- ~/.hermes/plugins/distillation/__init__.py (R33+R34 wired)\n\nFRIENDLIAI MIGRATION:\n- Tool count: 90 (from ~103)\n- 7 plugins disabled, 3 LCM tools trimmed\n- Injection governor 1500 chars, MEMORY.md trimmed to 3K",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "R35: Continue training gym. Priority targets: coding domain (4.8/10 baseline), reasoning L2 (0/10 outcome). Research frontier technique for one of these weak areas, build module, wire, re-benchmark.",
+  "timestamp": "2026-04-15T16:21:14Z",
+  "unix_time": 1776270074.9357219,
+  "task_id": "20260415_105546_b5199b",
+  "source": "manual",
+  "version": 2
+}

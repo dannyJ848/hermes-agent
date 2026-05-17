@@ -1,0 +1,13 @@
+{
+  "label": "heuristic-judge-v2-85pct",
+  "context": "## Heuristic Judge V2 Calibrated to ~85% LLM Alignment\n\nStarted at 38%, iteratively tuned to 85%+ alignment with gemini-2.5-flash as ground truth.\n\n### 7 Scoring Signals (in order of addition):\n1. **Confidence** (x2): (confidence - 0.5) * 2\n2. **Elo** (1.2 sigmoid@1800): 1.2 / (1 + exp(-(elo-1800)/200)) — accumulated win record\n3. **Frequency** (min(x/10, 1.0)): how often tip appears in evaluations\n4. **Vote ratio**: (upvotes - downvotes) / total\n5. **Text quality**: length + specificity keywords + IF-THEN structure bonus (0.3 for IF+THEN, 0.15 for IF-only)\n6. **Domain** (0.3): non-general domain bonus\n7. **Actionability** (NEW): hermes tool names (0.3 each, max 0.9) + backtick-wrapped values (0.2 each, max 0.6) - vagueness penalty (0.2 each for hedging phrases)\n\n### Key Tuning:\n- Tie threshold: 0.02 (was 0.1 — too many ties destroyed discriminative power)\n- Elo weight: 1.2 (was 1.5 — too dominant, overrode content quality; was 0.8 — too weak, let uncertain tips win)\n\n### Alignment Progression:\n- Original: 38% (5/8 ties — couldn't decide anything)\n- +IF-THEN bonus: 50%\n- +Elo signal: 75%\n- +Actionability + Elo tune: 80%\n- +Better regex: 82%\n- Final (Elo 1.2, tie 0.02): 85-97% depending on sample\n\n### Remaining ~15% Gap:\nHeuristic picks higher-Elo tips, LLM picks more actionable/contextually relevant ones. The Elo signal correctly represents past quality but sometimes overrides current content signals. Embedding cosine similarity could close this gap as a tiebreaker.\n\n### Files Modified:\n- ~/subconscious/cortex_flywheel.py — heuristic_judge() function (lines 49-151)\n- ~/.hermes/skills/devops/llm-judge-ensemble/SKILL.md — description updated to ~85%\n\n### Architecture:\n- Heuristic: FREE, runs every 2h via cron flywheel, processes all tip pairs\n- LLM calibration: weekly spot-check ($0.25/mo), 3 judges (MiniMax-M2.7, gemini-2.5-flash, gpt-4.1-mini)\n- eval_history table records both heuristic and LLM decisions for drift detection\n\n### Pycache:\nCleared after all changes. No daemon (disabled .DISABLED). Cron jobs run standalone scripts.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Run a 50-pair validation test for tighter confidence interval. Consider adding embedding similarity tiebreaker for the ~15% disagreement cases. Continue with training gym R54-R83 if requested.",
+  "timestamp": "2026-04-16T02:26:29Z",
+  "unix_time": 1776306389.752922,
+  "task_id": "20260415_205415_473e89",
+  "source": "manual",
+  "version": 2
+}

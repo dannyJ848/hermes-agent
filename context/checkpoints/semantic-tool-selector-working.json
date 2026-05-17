@@ -1,0 +1,13 @@
+{
+  "label": "semantic-tool-selector-working",
+  "context": "Semantic Tool Selector working. 24 tools indexed with Ollama nomic-embed-text. Cosine similarity selects top-3 relevant tools for queries. Needs wiring into tool-intelligence plugin pre_llm_call. AGI cycle 14+. All healthy. Danny sleeping.",
+  "active_tasks": [
+    "Wire semantic tool selector into pre_llm_call",
+    "Improve tool descriptions for better matching",
+    "Continue AGI cron cycles",
+    "Ground mid-trust facts",
+    "Set HERMES_CRON_TIMEOUT=300"
+  ],
+  "timestamp": "2026-04-05T07:23:49Z",
+  "task_id": "20260404_215806_7e676d"
+}

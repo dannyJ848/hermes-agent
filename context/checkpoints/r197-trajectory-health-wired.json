@@ -1,0 +1,22 @@
+{
+  "label": "r197-trajectory-health-wired",
+  "context": "Training gym R197 complete. Researched AgentPRM (2511.08325) and Agentic Confidence Calibration/HTC (2601.15778). Distilled 10 tips. Built trajectory_health.py — holistic trajectory health monitor with macro progress (success rate trend) + micro stability (confidence variance) + health scoring + auto-alerts. Wired into plugin post_tool_call.\n\nMODULE COUNT: 162 modules total (R153-R197). Plugin: 2819 lines. Tips: 1420 active (conf>=0.3). Gateway running.\n\nNEW: trajectory_health.db in ~/subconscious/. Tracks step outcomes per trajectory, computes health scores, generates alerts for declining/unstable trajectories.",
+  "active_tasks": [
+    "R198: Continue autonomous training — more research + build + wire"
+  ],
+  "decisions": [
+    "Trajectory health assessed every 5th tool call to avoid overhead",
+    "Health score = 0.4*success_rate + 0.3*progress_trend + 0.3*stability",
+    "Alerts generated for health<0.3 (critical), progress<-0.3 (declining), stability<0.3 (unstable)"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/trajectory_health.py"
+  ],
+  "next_steps": "R198: Continue autonomous loop. Research more frontier papers on agent improvement. Build modules from AgentPRM (step-level reward) or process supervision. Consider: process reward scorer, step-level advantage calculator.",
+  "timestamp": "2026-04-12T07:00:12Z",
+  "unix_time": 1775977212.273358,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

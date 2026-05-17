@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r29-complete",
+  "context": "Training Gym R22-R29 completed. 32 exercises all 10/10.\n\nR29 RESULTS (all 10/10):\n1. base64-001 (T4) - Base64 encode/decode with URL-safe variant. 8 tests.\n2. csv-001 (T4) - CSV parser: quotes, escaped quotes, newlines in fields, custom delimiter. 9 tests.\n3. query-001 (T4) - URL query parser/builder: array syntax, nested keys, URL encoding. 13 tests.\n4. json-002 (T5) - Full recursive-descent JSON parser from scratch. 19 tests.\n\nKEY LESSONS:\n- CSV test escaping: use write_file for test files with tricky string quoting, not heredoc in execute_code\n- JSON parser: recursive descent with pos tracking, separate _parse_value dispatch\n- Query parser: array syntax key[]=val, nested key[sub]=val pattern\n\nDB: 192 exercises, 355 attempts, avg 9.9",
+  "active_tasks": [
+    "R22-R29 complete",
+    "R30 next"
+  ],
+  "decisions": [
+    "Recursive descent parsers: parse_value() dispatch + skip_ws() pattern",
+    "CSV: state machine with in_quotes flag, handle doubled-quote escapes",
+    "Query strings: detect [] and [key] suffixes for array/nested dispatch"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R30 exercises. Consider: regex engine basics, template engine, or rate limiter.",
+  "timestamp": "2026-04-08T17:38:44Z",
+  "unix_time": 1775669924.9505951,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

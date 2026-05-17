@@ -1,0 +1,27 @@
+{
+  "label": "training-gym-r138-complete",
+  "context": "Training Gym R137-R138 completed! All 10/10!\n\nR137: add_ops(T10), strob(T9), rem_parens(T10), meeting2(T8)\nR138: dijkstra(T9), max_rect(T10), part_eq(T8), islands(T8)\n\nDB: 464 exercises, 791 attempts, avg 9.93, 96.7% perfect. 416 passed. Tier 9+ = 142, Tier 10 = 71.\n104+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R138 complete",
+    "R139 next"
+  ],
+  "decisions": [
+    "Add operators: backtrack with prev for multiplication precedence.",
+    "Strobogrammatic: recursive build from pairs. Filter leading zeros.",
+    "Remove invalid parens: BFS level-by-level. Stop when found valid.",
+    "Meeting rooms II: sort starts and ends separately. Two pointers.",
+    "Dijkstra: min-heap. Skip stale entries.",
+    "Maximal rectangle: histogram per row + monotonic stack.",
+    "Partition equal subset: DP target=sum/2. Reverse iterate.",
+    "Islands: DFS mark visited by setting to '0'."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R139: Continue. Try: Pacific Atlantic Water Flow, Cheapest Flights, or Accounts Merge.",
+  "timestamp": "2026-04-09T00:00:16Z",
+  "unix_time": 1775692816.623605,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

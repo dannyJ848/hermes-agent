@@ -1,0 +1,70 @@
+{
+  "scan_date": "2026-04-22T02:00:00Z",
+  "source": "X/Twitter AI News Scanner - twitter_bridge.py",
+  "total_new_tweets": 14,
+  "top_5_findings": [
+    {
+      "rank": 1,
+      "priority": "HIGH",
+      "category": "Hermes Agent architecture breakthrough",
+      "author": "@Teknium",
+      "tweet_link": "https://x.com/Teknium/status/204667518098...",
+      "time": "2026-04-21T21:54:45Z",
+      "engagement": {"likes": 317, "retweets": 34},
+      "summary": "Hermes Agent now supports scaling both DEPTH and WIDTH with subagents. Teknium uncapped sub-agent spawn width and enabled spawn depth so sub-agents can recursively spawn more sub-agents. This is a major architectural breakthrough for complex multi-agent workflows.",
+      "flags": ["Hermes/Nous mention", "Teknium", "sub-agent architecture", "major update"]
+    },
+    {
+      "rank": 2,
+      "priority": "HIGH",
+      "category": "Hermes Agent product integration",
+      "author": "@NousResearch",
+      "tweet_link": "https://x.com/NousResearch/status/204659...",
+      "time": "2026-04-21T20:53:39Z",
+      "engagement": {"likes": 546, "retweets": 30},
+      "summary": "GPT Image 2.0 is now available natively in Hermes Agent. Users can run update and select their image generation tool model. Official product integration from Nous Research.",
+      "flags": ["Hermes/Nous mention", "product update", "GPT Image 2.0", "image generation"]
+    },
+    {
+      "rank": 3,
+      "priority": "HIGH",
+      "category": "Hermes Agent ecosystem - native macOS GUI",
+      "author": "@QingQ77 / @awizemann",
+      "tweet_link": "https://x.com/QingQ77/status/...",
+      "time": "2026-04-21T23:30:30Z",
+      "engagement": {"likes": "?", "retweets": 15},
+      "summary": "Scarf - a native macOS GUI for Hermes AI agent built in Swift. Supports managing multiple local and remote Hermes servers simultaneously, with real-time visualization of agent activity, sessions, configuration and system status. GitHub: https://github.com/awizemann/scarf",
+      "flags": ["Hermes ecosystem", "macOS GUI", "Scarf", "community project"]
+    },
+    {
+      "rank": 4,
+      "priority": "HIGH",
+      "category": "Hermes Agent hardware/platform expansion",
+      "author": "@AIatAMD",
+      "tweet_link": "https://x.com/AIatAMD/status/...",
+      "time": "2026-04-22T00:47:55Z",
+      "engagement": {"likes": "?", "retweets": 8},
+      "summary": "AMD officially promoting Hermes Agent from NousResearch running locally on AMD Ryzen AI Max+ processors and Radeon GPUs using LMStudio. Major hardware vendor endorsement expanding Hermes beyond Apple Silicon and NVIDIA.",
+      "flags": ["Hermes mention", "AMD", "local inference", "hardware partnership", "LMStudio"]
+    },
+    {
+      "rank": 5,
+      "priority": "normal",
+      "category": "Hermes Agent architecture insight",
+      "author": "@novasarc01",
+      "tweet_link": "https://x.com/novasarc01/status/...",
+      "time": "2026-04-22T00:33:22Z",
+      "engagement": {"likes": "?", "retweets": 3},
+      "summary": "Hermes architecture integrates with the Atropos framework. The Hermes agent runtime has deep integration with Atropos, revealing more about the internal architecture and how sub-agent orchestration works at the framework level.",
+      "flags": ["Hermes mention", "Atropos framework", "architecture", "technical insight"]
+    }
+  ],
+  "other_notable": [
+    {"author": "@saraareynolds", "summary": "Very impressed with NousResearch maintaining the hermes agent repo. Over 3k PRs. This is open source class.", "flags": ["community signal", "repo health"]},
+    {"author": "@ActuallyIsaak", "summary": "Started with Teknium Hermes Agent and loves it. Just let it write a full novel book.", "flags": ["user story", "creative use case"]},
+    {"author": "@macbethAI", "summary": "Hermes now assisting in creating music with Strudel.", "flags": ["creative use case", "music"]},
+    {"author": "@an_engineer_log", "summary": "Hermes Agent Web-UI alternative to OpenClaw buggy/slow web chat. Chat history, workspaces.", "flags": ["community project", "Web UI"]},
+    {"author": "@ChuckSRQ", "summary": "You don't need Claude, showing wonderful things you can create with Hermes and Open Source software.", "flags": ["advocacy", "open source"]}
+  ],
+  "high_priority_hermes_nous_mentions": 9
+}

@@ -1,0 +1,27 @@
+{
+  "label": "vllm-dflash-deployed",
+  "context": "DGX Spark vLLM deployment with DFlash speculative decoding is COMPLETE and RUNNING.\n\nWhat was accomplished:\n- Option 1 (n-gram speculative): Deployed and tested, ~6.5 tok/s single-stream\n- Option 2 (DFlash draft model): Deployed and RUNNING, 18.4 tok/s (2.8x baseline)\n  - Target: Qwen3.6-27B-Uncensored\n  - Draft: Qwen3.5-27B-DFlash (custom trained via SpecForge)\n  - Config: FP8 weights, prefix caching OFF, batch tokens 32768, max seqs 128\n  - Quality: No degradation observed\n  - Trade-off: KV cache reduced 966K→499K tokens\n\nKey files:\n- Deploy script: /tmp/deploy_vllm_dflash.sh\n- DFlash model: /data/models/Qwen3.5-27B-DFlash\n- LoRA adapter: /data/SpecForge/custom_dflash/checkpoints/final_model/\n- Benchmark script: /tmp/bench_vllm.sh\n\nCurrent state:\n- vLLM server is running on DGX Spark with DFlash\n- All persistence layers updated (memory, skill, knowledge, SOUL.md)\n- Checkpoints created for both Option 1 and Option 2\n\nNext options to explore:\n- Option 3: EAGLE-3 speculative decoding (more aggressive, harder to set up)\n- Option 4: FP8 KV cache (memory savings, may help batch size)\n- Option 5: Qwen3.7 when released\n\nUser asked about creating a systemd service file for auto-start on boot.",
+  "active_tasks": [
+    "vllm-dflash-deployment: complete",
+    "systemd-service-file: pending user decision",
+    "next-optimization: pending (EAGLE-3 or FP8 KV)"
+  ],
+  "decisions": [
+    "Use DFlash as primary speculative decoding method (2.8x speedup, stable)",
+    "Disable prefix caching for hybrid Mamba models (0% hit rate)",
+    "Keep FP8 weights for memory efficiency",
+    "Do NOT use --enable-prefix-caching with Qwen3.6 hybrid Mamba"
+  ],
+  "files_modified": [
+    "/tmp/deploy_vllm_dflash.sh",
+    "~/.hermes/skills/vllm-dgx-qwen36-dflash-deployment/SKILL.md",
+    "~/.hermes/knowledge/vllm-dgx-qwen36-optimization.md",
+    "~/.hermes/SOUL.md"
+  ],
+  "next_steps": "1. Create systemd service file for vLLM DFlash deployment if user wants auto-start\n2. Verify DFlash is still running and responding\n3. Optionally test Option 3 (EAGLE-3) or Option 4 (FP8 KV cache)\n4. Monitor for any stability issues with DFlash over time",
+  "timestamp": "2026-05-15T16:53:55Z",
+  "unix_time": 1778864035.5587468,
+  "task_id": "20260515_115320_46fb4e",
+  "source": "manual",
+  "version": 2
+}

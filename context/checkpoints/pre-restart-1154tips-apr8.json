@@ -1,0 +1,23 @@
+{
+  "label": "pre-restart-1154tips-apr8",
+  "context": "Danny caught that I was building plugin code without ever restarting to activate it. Restarting NOW.\n\nWhat's being activated:\n- Distillation plugin v2.2 with SAGE reward, condition-aware voting, ERL retrieval, FadeMem decay, AgentPRM, Mythos 5-module enhancements\n- All __pycache__ cleared across all plugins\n\nTip DB state: 1154 tips, 0.8528 avg, 128 tools covered, 24 functional chains, 0.7 floor enforced\n\nGateway PID: 28336\nCaffeinate PID: 82351\nDanny at daylong test, just checked in.\n\nRESTART RULE: After ANY plugin code change, MUST clear __pycache__ + restart gateway. Code on disk = useless until activated.",
+  "active_tasks": [
+    "1154 tips, 0.8528 avg, 128 tools, 24 chains",
+    "RESTARTING GATEWAY to activate ALL plugin enhancements"
+  ],
+  "decisions": [
+    "Danny enforced restart rule — never skip this again",
+    "All plugin enhancements from past sessions going live NOW",
+    "Tips in DB don't need restart, but plugin code does"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1154 tips)",
+    "~/.hermes/plugins/ — all __pycache__ cleared"
+  ],
+  "next_steps": "1. Gateway restart (kills this session)\n2. Cron safety net (a81e43404f79) will pick up\n3. Verify plugin hooks are active after restart\n4. Continue training gym — measure if activated plugins improve tool success rates",
+  "timestamp": "2026-04-08T17:48:59Z",
+  "unix_time": 1775670539.141431,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,10 @@
+{
+  "label": "soma-3d-anatomy-research-complete",
+  "context": "Completed deep research into all 10 domains needed for Complete Anatomy-level 3D visualization: GLSL shaders (SSS, Fresnel, stencil caps), clipping planes, dual-scene X-ray reveal, BVH raycasting, post-processing outlines, radial menu with Motion animations, layer toggle system, video-first education, asset pipeline (Z-Anatomy + Blender + gltf-transform). Saved as skill 'soma-3d-anatomy-complete-blueprint' and 3 knowledge files. All synced to squad profiles.",
+  "active_tasks": [
+    "Continue 3D anatomy shader research",
+    "Build prototype when ready"
+  ],
+  "timestamp": "2026-04-02T18:50:22Z",
+  "task_id": "20260401_211730_3985be"
+}

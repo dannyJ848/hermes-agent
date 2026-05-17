@@ -1,0 +1,43 @@
+{
+  "label": "subconscious-integration-complete-july2026",
+  "context": "Subconscious integration fully complete. All 97 cognitive modules migrated from ~/subconscious/ to agent/ (177 files) and tools/ (106 files). Iteration engine wired into run_agent.py at lines 10053-10154 (before_action/after_action hooks). Cognitive systems plugin registered at ~/.hermes/plugins/cognitive-systems/ with 6 hooks (pre/post tool_call, pre/post llm_call, session start/end). Self-evolution pipeline built with Elo tournaments, tip evolution, auto-distillation, reflection engine. Vision system built (screen_capture, gui_click, gui_type). 3 databases healthy (cerebrum_memory, skill_rewards, distillation_buffer). ~/subconscious/ directory will clear on restart (currently held by running process PID 50383). Source fully cleaned of old references. 2 minor gaps: pre_tool_call and post_tool_call hooks registered in plugin but not invoked by run_agent.py (iteration engine handles this instead).",
+  "active_tasks": [
+    "phase0: Fix subconscious_plugin_loader.py",
+    "phase1: Wire iteration engine into run_agent.py",
+    "phase2: Wire cognitive systems via plugin",
+    "phase3: Fix corrupted databases",
+    "phase4: Build autobrowse/vision system",
+    "phase5: Build self-evolution pipeline",
+    "phase6: Full integration test"
+  ],
+  "decisions": [
+    "Cognitive systems load via Hermes plugin system, not standalone loader",
+    "Iteration engine hooks wired directly into run_agent.py tool invocation",
+    "Self-imports in agent/ modules fixed to use agent. prefix",
+    "Dead subconscious code removed from hermes_cli/plugins.py",
+    "Old init_subconscious_plugins() call removed from run_agent.py"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/cognitive-systems/__init__.py",
+    "~/.hermes/plugins/cognitive-systems/plugin.yaml",
+    "~/hermes-agent/agent/vision_loop.py",
+    "~/hermes-agent/agent/vision_tools.py",
+    "~/hermes-agent/agent/self_evolution.py",
+    "~/hermes-agent/agent/subconscious_plugin_loader.py",
+    "~/hermes-agent/hermes_cli/plugins.py",
+    "~/hermes-agent/run_agent.py",
+    "~/hermes-agent/agent/memory_cortex_bridge.py",
+    "~/hermes-agent/agent/subconscious_hook_wiring.py",
+    "~/hermes-agent/agent/auto_fallback_engine.py",
+    "~/hermes-agent/agent/hermes_enhancement_suite.py",
+    "~/hermes-agent/agent/proactive_memory_guard.py",
+    "~/hermes-agent/agent/tool_intelligence_tracker.py",
+    "~/hermes-agent/agent/subconscious_systems_manifest.py"
+  ],
+  "next_steps": "Restart hermes to fully clear ~/subconscious/ and load cognitive-systems plugin. Then verify plugin registration with `hermes plugins list`.",
+  "timestamp": "2026-05-10T05:27:05Z",
+  "unix_time": 1778390825.67976,
+  "task_id": "20260509_223333_783cf4",
+  "source": "manual",
+  "version": 2
+}

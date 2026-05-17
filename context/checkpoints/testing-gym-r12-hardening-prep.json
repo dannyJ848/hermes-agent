@@ -1,0 +1,17 @@
+{
+  "label": "testing-gym-r12-hardening-prep",
+  "context": "## Testing Gym V2 — R12 Complete, Pre-Hardening\n\n### Current State\n- `~/subconscious/testing_gym.py` — 1507 lines, 30 tasks (5 domains × 2 tasks × 3 levels)\n- `~/.hermes/plugins/distillation/__init__.py` — 1284 lines, wired with R270 benchmark hooks\n- Baseline: 9.5/10 overall (coding 8.8, planning 10.0, reasoning 10.0, search 9.1, tool_use 9.5)\n\n### Rounds R1-R12 Summary\n| Round | Change | Impact |\n|-------|--------|--------|\n| R1 | Domain-aware tool_use oracle | tool_use: 8.1→9.6 |\n| R2 | must_output slash fix + compile score | coding_l2: 7.6→8.9 |\n| R3 | 10 L3 tasks added | 20→30 tasks |\n| R5 | Invariant prefix matching (replaced regex hack) | cleaner |\n| R6 | invariant+include weighted avg | planning/reasoning→10.0 |\n| R7 | L3 prose-only code scoring | coding_l3: 7.6→8.2 |\n| R8 | Graduated time scoring | fairer eval |\n| R9 | Near-miss exact_match credit | better holdout |\n| R12 | Case-insensitive invariant matching | reasoning_l2 regression fixed |\n\n### Next Priority (Danny's direction)\n1. **HARDER BENCHMARKS** — competitive with Claude Mythos tier\n2. **Cortex integration** — benchmark_result nodes in Postgres\n3. **30 more rounds** of scoring refinement\n4. Decision point: return to training gym or keep iterating\n\n### Scoring Architecture (key line numbers in testing_gym.py)\n- Lines 615-800: outcome_score (exact_match, behavioral/code-aware, invariant, state_diff)\n- Lines 782-807: efficiency_score (graduated 4-tier)\n- Lines 815-829: tool_selection_score (F1-based)\n- Lines 766-773: invariant+include weighted avg\n- Lines 748-758: multi-strategy invariant matching\n- Lines 629-642: near-miss exact_match ranges\n\n### Plugin Wiring\n- Import after R261, BENCHMARK at INJECTION_PRIORITY priority 3\n- Step recording in _on_post_tool_call (R270)\n- Injection in _on_pre_llm_call\n- Regression alert at priority 0\n\n### Key Gotchas\n- Cronjob tool: 5% success — use execute_code/write_file instead\n- patch tool: needs all 3 params (path, old_string, new_string) — exact match required\n- Complex scripts: write to /tmp/ files, NOT inline terminal\n- After plugin changes: rm -rf __pycache__/",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [
+    "/Users/dannygomez/subconscious/testing_gym.py",
+    "/Users/dannygomez/.hermes/plugins/distillation/__init__.py",
+    "/tmp/gym_baseline_r12.json"
+  ],
+  "next_steps": "1. Restart gateway (save state first!) 2. Continue with harder benchmarks (L4 Mythos-tier tasks) 3. Cortex integration for benchmark_result nodes 4. 30 more rounds of refinement",
+  "timestamp": "2026-04-15T22:48:17Z",
+  "unix_time": 1776293297.522701,
+  "task_id": "20260415_171642_f58e77",
+  "source": "manual",
+  "version": 2
+}

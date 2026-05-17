@@ -1,0 +1,25 @@
+{
+  "label": "training-cycle-r1-pre-restart",
+  "context": "TRAINING CYCLE R1 — Research → Distill → Build → Adapt phase.\n\nRESEARCH DONE: 3 parallel delegations on agent memory, tool use optimization, self-improvement. Key findings: CoALA dual-store memory, hierarchical tool selection, DAG-scheduled parallel calls, RPPCO failure-mode taxonomy, shaped tool rewards, classifier-gated invocation.\n\nDISTILLATION DONE: 12 new tips inserted (1154→1166). New domains: tool_use (5), self_improve (3), memory (4). Saved finding to knowledge library.\n\nBUILD DONE: Enhanced distillation plugin with:\n1. RPPCO failure-mode taxonomy (_RPPCO_FIX_MAP) — 8 failure stages mapped to fix strategies\n2. Failure patches now enriched with RPPCO fix hints and failure_stage in source metadata\n3. Tip quality scoring function (_tip_quality_score) — 4-component composite (signal, confidence, recency, validation)\n4. Periodic tip maintenance (_run_tip_maintenance) — every 200th tool call, prunes low-quality old tips, boosts high-quality underconfident ones\n\nCHANGES IN distillation/__init__.py:\n- Added _RPPCO_FIX_MAP dict (8 entries) before _classify_failure_stage\n- Enhanced _classify_failure_stage docstring\n- Enhanced Polaris experience patch generation with RPPCO fix hints + failure_stage metadata\n- Added _tip_quality_score() function\n- Added _run_tip_maintenance() function  \n- Wired _run_tip_maintenance into FadeMem decay counter (% 200)\n\nTESTING: Need gateway restart (PID 94953) to activate plugin changes, then verify hooks fire correctly.",
+  "active_tasks": [
+    "R1 research done",
+    "R1 distillation done (12 tips)",
+    "R1 build done (RPPCO + quality scoring)",
+    "R1 test: restart gateway + verify",
+    "R1 integrate: checkpoint + next round"
+  ],
+  "decisions": [
+    "RPPCO 5-mode taxonomy enhances EvoTool 4-stage classifier",
+    "Quality scoring: 0.3*signal + 0.3*confidence + 0.2*recency + 0.2*validation",
+    "Maintenance runs every 200th tool call to avoid overhead"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "Restart gateway (kill PID 94953, hermes gateway run --replace), verify plugin loads with RPPCO enhancement, test with a tool call to confirm hooks fire.",
+  "timestamp": "2026-04-09T04:14:12Z",
+  "unix_time": 1775708052.5023239,
+  "task_id": "20260408_220858_c2e2e3",
+  "source": "manual",
+  "version": 2
+}

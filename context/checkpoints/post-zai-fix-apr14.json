@@ -1,0 +1,21 @@
+{
+  "label": "post-zai-fix-apr14",
+  "context": "Post-restart state. Gateway restarted with Z.AI freeze patches applied (90s stale timeout, 90s read timeout, transport-level fallback in _force_close_tcp_sockets). All three fixes live in run_agent.py (10962 lines).\n\nTRAINING GYM: R24 complete, 25 modules (R168-R190), 136 tips distilled. R25 was started in the OTHER CLI session (checkpoint: training-gym-r25-vision-loop) which is now running and healthy.\n\nThis CLI session was used to:\n1. Debug the Z.AI freeze — root cause identified (dead TCP socket + 180s stale timeout + socket walk failing on SSE wrapper)\n2. Apply three patches to run_agent.py\n3. Kill 9 orphaned browser daemon processes\n4. Restart gateway\n\nCRON ISSUES: \"Unknown Model\" errors (code 1211) on cron sessions — non-critical, auxiliary context summary only. Not fixed.\n\nSYSTEM STATE: Gateway running (PID rebuilt after restart). Other CLI session active with training gym. Cortex: 22,954 nodes, 315 rated tips, avg Elo 1404. Plugin: 3,597 lines.",
+  "active_tasks": [
+    "Training gym R25+ — continue in other CLI session"
+  ],
+  "decisions": [
+    "Z.AI freeze: 90s stale+read timeout is the right balance between false kills and dead socket detection",
+    "Transport-level close is the nuclear fallback for SSE wrapper socket access failures",
+    "Cron 1211 errors skipped — non-critical"
+  ],
+  "files_modified": [
+    "~/hermes-agent/run_agent.py"
+  ],
+  "next_steps": "Resume training gym in other CLI. This session can be used for parallel work or monitoring.",
+  "timestamp": "2026-04-14T23:38:33Z",
+  "unix_time": 1776209913.602674,
+  "task_id": "20260414_180235_a6772d",
+  "source": "manual",
+  "version": 2
+}

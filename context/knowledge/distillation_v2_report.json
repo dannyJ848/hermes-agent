@@ -1,0 +1,79 @@
+{
+  "version": "v2",
+  "baseline": {
+    "total_tips": 26,
+    "noise_total": 2,
+    "noise_ratio": 0.077,
+    "actionable": 24,
+    "actionable_ratio": 0.923,
+    "recovery_with_fix": 15,
+    "strategy_with_context": 5,
+    "optimization_tips": 4,
+    "tools_covered": 9,
+    "meta_insights": 7,
+    "meta_noise": 0,
+    "avg_upvotes": 27.3,
+    "avg_frequency": 34.3
+  },
+  "final": {
+    "total_tips": 50,
+    "noise_total": 2,
+    "noise_ratio": 0.04,
+    "actionable": 48,
+    "actionable_ratio": 0.96,
+    "recovery_with_fix": 19,
+    "strategy_with_context": 20,
+    "optimization_tips": 9,
+    "tools_covered": 13,
+    "meta_insights": 11,
+    "meta_noise": 0,
+    "avg_upvotes": 15.1,
+    "avg_frequency": 18.8
+  },
+  "final_by_type": {
+    "optimization": 9,
+    "recovery": 21,
+    "strategy": 20
+  },
+  "final_by_tool": {
+    "browser_navigate": 1,
+    "delegate_with_model": 4,
+    "execute_code": 16,
+    "patch": 3,
+    "read_file": 2,
+    "save_finding": 1,
+    "search_files": 1,
+    "terminal": 7,
+    "tool_selection": 1,
+    "top_down_recall": 8,
+    "web_extract": 4,
+    "web_research": 1,
+    "write_file": 1
+  },
+  "bottom_up": {
+    "cycles": 50,
+    "added": 16,
+    "upvoted": 32,
+    "noise_filtered": 2,
+    "skipped": 0,
+    "throughput_pct": 96.0
+  },
+  "top_down": {
+    "cycles": 50,
+    "relevant": 37,
+    "relevance_pct": 74.0,
+    "empty": 0,
+    "has_tips": 42,
+    "has_meta": 50,
+    "has_facts": 0,
+    "has_lessons": 50,
+    "has_agi": 50,
+    "avg_quality": 0.37
+  },
+  "gates": {
+    "passed": 7,
+    "total": 7,
+    "all_passed": true
+  },
+  "timestamp": 1775511841.807673
+}

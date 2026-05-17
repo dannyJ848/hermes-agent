@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r78-complete",
+  "context": "Training Gym R78 completed! ALL 4 PASS ON FIRST TRY! Two Tier 9 problems conquered!\n\nR78 RESULTS (all 10/10):\n1. merge-k-sorted-001 (T8) - Min-heap of (val, list_idx, elem_idx). Pop min, push next from same list.\n2. median-two-sorted-001 (T9) - Binary search on smaller array. Partition both so left has (m+n+1)//2. Check cross-conditions.\n3. dp-longest-increasing-subseq-001 (T9) - Patience sorting: bisect_left on tails. Append or replace. Track prev for reconstruction.\n4. two-pointer-techniques-001 (T8) - Container: move shorter. 3Sum: sort+fix+2ptr+skip dups. Rain water: 2ptr from ends, track max.\n\nDB: 316 exercises, 551 attempts, avg 9.9, 95.3% perfect. 267 passed. Tier 9+ = 67.\n44+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R78 complete",
+    "R79 next"
+  ],
+  "decisions": [
+    "Merge K sorted: heap of (val, list_idx, elem_idx). O(N log K) where N=total elements, K=lists.",
+    "Median 2 sorted: binary search partition on smaller array. half=(m+n+1)//2. Check maxLeft<=minRight.",
+    "LIS O(n log n): patience sorting. tails array, bisect_left. Track prev indices for reconstruction.",
+    "Two pointers: container=max(min(l,r)*(r-l)), move shorter. 3Sum: sort+skip dups. Rain: track left_max/right_max."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R79: Continue. Try: Trie data structure, Sliding Window, or more Tier 9 problems.",
+  "timestamp": "2026-04-08T21:32:05Z",
+  "unix_time": 1775683925.7499242,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

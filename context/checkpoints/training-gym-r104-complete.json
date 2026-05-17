@@ -1,0 +1,24 @@
+{
+  "label": "training-gym-r104-complete",
+  "context": "Training Gym R104 COMPLETE. Research→Distill→Build→Activate→Test→Integrate.\n\nRESEARCH: Cross-session learning (hierarchical prioritized experience replay, episodic-to-semantic consolidation E2S-Consol, compressive replay with VQ-VAE, dual-index FAISS retrieval) + reward shaping (LLM-as-Reward-Model, constitutional AI reward, E3D intrinsic reward, METRA skill discovery, adaptive curriculum with frontier sampling).\n\nDISTILL: 8 tips inserted (1206→1214) across cross-session-learning, reward-shaping domains.\n\nBUILD: Cross-Session Experience Replay (CSER).\n- experience_replay.py in ~/subconscious/ — 15.1KB\n- Pattern recording from tool uses with frequency tracking\n- Rule mining: PREFER COMBO from success patterns, AVOID from failure patterns\n- Relevance scoring via keyword overlap with current context\n- Cached injection for pre_llm_call (1h TTL)\n- Tables: session_patterns, extracted_rules, replay_cache\n\nWIRED INTO:\n- post_tool_call: records every tool use as pattern (line ~625)\n- pre_llm_call: injects relevant cross-session rules (line ~1282)\n\nACTIVATE: Plugin 1484 lines, gateway PID 8885.\n\nTEST: All systems pass — 5 modules (cascade_recovery, plan_monitor, confidence_tracker, experience_replay), 5 databases, 1214 tips.\n\nSUBCONSCIOUS STACK: R100 (arg feedback), R101 (cascade recovery), R102 (plan monitor), R103 (confidence tracker), R104 (experience replay). Each module ~10-15KB, fully wired into pre/post hooks.",
+  "active_tasks": [
+    "R104 complete, starting R105"
+  ],
+  "decisions": [
+    "R104: Built experience replay instead of Ebbinghaus decay — more immediately actionable",
+    "Used simple hash-based deduplication for pattern storage",
+    "Confidence formula uses total_freq * 0.15, capped at 0.95",
+    "WAL mode for all DBs to avoid gateway lock conflicts"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/experience_replay.py",
+    "~/subconscious/experience_replay.db"
+  ],
+  "next_steps": "Start R105. Next high-impact builds: (1) Ebbinghaus memory decay for stale tips, (2) Skill quality scoring with usage tracking, (3) Automatic curriculum for self-improvement. Continue all-night loop.",
+  "timestamp": "2026-04-09T07:33:57Z",
+  "unix_time": 1775720037.779443,
+  "task_id": "20260408_220858_c2e2e3",
+  "source": "manual",
+  "version": 2
+}

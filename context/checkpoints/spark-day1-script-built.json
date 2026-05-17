@@ -1,0 +1,13 @@
+{
+  "label": "spark-day1-script-built",
+  "context": "Built spark-day1.sh (1251 lines) — fully automated Day-1 deployment for DGX Spark. Handles: hardware verify, system setup (apt+Docker+NVIDIA toolkit+venv), parallel data acquisition (318GB MacBook rsync-pull, 106GB Qwen3.6 models, 203GB Nemotron, Docker images, 13 HF kernels, Atropos), SM121 CMake patches (fallback), vLLM deployment (BF16 :8000, FP8 :8001), perf verification, HermesAgent-20 eval, health check. Features: --resume, --macbook IP, --usb, --skip-nemotron, --skip-transfer, --fp8-only, interactive IP prompt, error recovery per-step. Companion: macbook-transfer-helper.sh, QUICKREF.md. Skill patched. NEXT: pull hermes-agent upstream (~500 commits), verify patches, save final checkpoint.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Pull hermes-agent upstream commits, verify our patches still work (prompt_builder.py AGENTS.md gate, run_agent.py agent loop patches, hindsight engine), save final checkpoint with resume command for Spark launch day.",
+  "timestamp": "2026-04-18T03:03:41Z",
+  "unix_time": 1776481421.416914,
+  "task_id": "20260417_215727_387de3",
+  "source": "manual",
+  "version": 2
+}

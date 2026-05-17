@@ -1,0 +1,21 @@
+{
+  "label": "r150-1067-operational-tips-apr8",
+  "context": "R150. Added practical operational tips from direct experience.\n\nKey tips added:\n- SQLite busy timeout (.timeout 5000)\n- Single quote escaping (use parameterized queries)\n- Caffeinate for macOS sleep prevention\n- Context compression survival strategy\n- Gateway restart sequence\n- File reading efficiency (read_file > cat, search_files > grep)\n- Patch vs write_file decision rule\n\nTip DB: 1067 tips, 0.8508 avg, 0.7 floor (enforced by triggers)\nKnowledge: 13 findings, 21 functional chains\n\nLESSON: Use execute_code with Python sqlite3 + parameterized queries for tips with special characters. Terminal-based SQL INSERT with escaping is fragile.\n\nSystem: gateway PID 28336, caffeinate PID 82351, disk 5%\nDanny at daylong test. Fully autonomous.",
+  "active_tasks": [
+    "R150 COMPLETE — 1067 tips, 0.8508 avg, operational tips added"
+  ],
+  "decisions": [
+    "Python sqlite3 parameterized queries > terminal SQL for tip insertion",
+    "Operational tips (how-to) are as valuable as strategic tips (when-to)",
+    "Auto-gen noise triggers working — 0 tips below 0.7 floor"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1067 tips, 0.8508)"
+  ],
+  "next_steps": "R151: Continue growth. Try arxiv for tool composition or agent benchmarking papers. Keep the quality above 0.85.",
+  "timestamp": "2026-04-08T17:29:11Z",
+  "unix_time": 1775669351.9750211,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

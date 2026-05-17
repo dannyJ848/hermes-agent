@@ -1,0 +1,21 @@
+{
+  "label": "r108-400tips-milestone-apr8",
+  "context": "R108 MILESTONE. 400 TIPS, avg conf 0.830, 77 domains. Added 4 tips: ERL (heuristics > trajectories for transfer, ICLR 2026), TDAD (graph-based impact analysis reduces regressions 70%, TDD instructions WORSEN regressions without context), Self-Evolving Release Engineering (frame self-evolution as release eng with version control + validation gates), AgentArk (hierarchical distillation Level 1-3, match level to model capability). Training gym R87-R108 produced 94 tips across 20+ new domains. ~04:45 AM. Danny sleeping. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R108 complete — 400 TIPS MILESTONE, 0.830, 77 domains — ready for R109+"
+  ],
+  "decisions": [
+    "400 tips milestone — training gym producing consistent high-quality tips",
+    "Heuristics > trajectories for transfer learning",
+    "TDD procedural instructions without context WORSEN regressions — context > process"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (4 new tips)"
+  ],
+  "next_steps": "R109: Continue. Training gym accelerating. Push into new frontier.",
+  "timestamp": "2026-04-08T09:09:30Z",
+  "unix_time": 1775639370.210164,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

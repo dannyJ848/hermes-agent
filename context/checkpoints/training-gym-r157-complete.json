@@ -1,0 +1,35 @@
+{
+  "label": "training-gym-r157-complete",
+  "context": "Training Gym R154-R157 completed! ALL 10/10!\n\nR154: lettercombo(T8), genparen(T9), nextperm(T9), divint(T10)\nR155: rotsearch(T9), findmin(T8), combsum(T9), spiral(T8)\nR156: coursesched(T9), wordbreak(T9), decways(T8), uniqobs(T9)\nR157: levelord(T8), maxdepth(T8), valbst(T9), lcabst(T9)\n\nDB: 508 exercises, 876 attempts, avg 9.94, 97.0% perfect. 459 passed. Tier 9+ = 174, Tier 10 = 80.\n122+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R157 complete",
+    "R158 next"
+  ],
+  "decisions": [
+    "Letter combos phone: backtracking with digit-to-letter map.",
+    "Generate parentheses: backtrack with open/close count. Only add ( if open < n. Only add ) if close < open.",
+    "Next permutation: find first decrease from right, swap with next greater, reverse suffix.",
+    "Divide two ints: bit shifting exponential search. Handle INT_MIN edge case.",
+    "Search rotated sorted: modified binary search. Check if left half is sorted, then decide.",
+    "Find min rotated: binary search comparing mid with right.",
+    "Combination sum: backtrack with start index. Reuse same candidate.",
+    "Spiral matrix: layer by layer. Top right bottom left.",
+    "Course schedule: topological sort. BFS with in-degree.",
+    "Word break: DP. dp[i] = any(dp[j] and s[j:i] in set).",
+    "Decode ways: DP similar to climbing stairs. Check 1-digit and 2-digit validity.",
+    "Unique paths with obstacles: 1D DP. Set to 0 on obstacle.",
+    "Level order: BFS with queue. Process level by level.",
+    "Max depth: recursive DFS. 1 + max(left, right).",
+    "Validate BST: recursive with min/max bounds.",
+    "LCA BST: use BST property. If both on same side, go there. Otherwise current is LCA."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R158: Continue. Try: Symmetric Tree, Invert Tree, Build Tree from Preorder+Inorder.",
+  "timestamp": "2026-04-09T00:42:16Z",
+  "unix_time": 1775695336.71937,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,14 @@
+{
+  "label": "auto-handoff-1778951365",
+  "timestamp": 1778951365.3309062,
+  "context": {
+    "timestamp": 1778951365.330837,
+    "session_id": "20260515_225419_a0d3f0",
+    "compression_count": 9,
+    "message_count": 259,
+    "model": "kimi-for-coding",
+    "system_prompt_preview": "You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and in",
+    "todo_snapshot": "[Your active task list was preserved across context compression]\n- [>] 1. Update MEMORY.md with cerebrum schema fix details (in_progress)\n- [ ] 2. Update SOUL.md with current system state (pending)\n- [ ] 3. Update skills (hermes-agent, cortex-flywheel-diagnostics) (pending)\n- [ ] 4. Save new skill for cerebrum schema recovery (pending)\n- [ ] 5. Update goals and archive completed ones (pending)\n- [ ] 6. Update knowledge base with findings (pending)\n- [ ] 7. Verify all persistence layers synced (pending)"
+  },
+  "session_id": "20260515_225419_a0d3f0"
+}

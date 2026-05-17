@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r84-complete",
+  "context": "Training Gym R84 completed! ALL 4 PASS ON FIRST TRY! 50+ consecutive perfect rounds!\n\nR84 RESULTS (all 10/10):\n1. combination-sum-001 (T8) - Backtracking. I: reuse allowed (pass i not i+1). II: sort, skip dups (i>start and nums[i]==nums[i-1]).\n2. subsets-generation-001 (T8) - Backtracking. Add current subset at each step. With dups: sort, skip.\n3. word-search-001 (T9) - DFS on grid. Mark visited with '#'. Restore after backtrack. 4 directions.\n4. top-k-frequent-001 (T7) - Counter + bucket sort by frequency. Iterate from highest bucket.\n\nDB: 335 exercises, 575 attempts, avg 9.91, 95.5% perfect. 286 passed. Tier 9+ = 75, Tier 10 = 46.\n50+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R84 complete",
+    "R85 next"
+  ],
+  "decisions": [
+    "Combination Sum I: reuse allowed → pass i (not i+1) to backtrack. II: sort, skip if i>start and nums[i]==nums[i-1].",
+    "Word Search: DFS + mark visited with '#'. Must restore board[r][c] after recursion. Early exit if idx==len(word).",
+    "Top K Frequent: bucket sort. buckets[freq] = [nums]. Iterate from end.",
+    "Subsets with dup: sort, skip i>start and nums[i]==nums[i-1]. Same dedup pattern as combination sum 2."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R85: Continue. Try: Graph BFS/DFS, Pacific Atlantic Water Flow, or Course Schedule.",
+  "timestamp": "2026-04-08T21:47:58Z",
+  "unix_time": 1775684878.765054,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,13 @@
+{
+  "label": "qwen27b-merge-complete-may2026",
+  "context": "Qwen 27B LoRA merge COMPLETE. Full session context to resume:\n\nINFRASTRUCTURE:\n- DGX Spark: spark-85e8.local (10.0.0.171), user djg6228, SSH key auth\n- Base model: /data/models/Qwen3.6-27B-Uncensored/\n- Training: /data/SpecForge/custom_dflash/\n\nTRAINING STATUS:\n- LoRA+SAE+Teacher distillation: 10,000/10,000 steps complete\n- LoRA adapter: checkpoint_step_10000/ (adapter_model.bin 4.8GB, optimizer.pt 2.4GB)\n- LoRA config: r=256, alpha=512, dropout=0.05\n- Target modules: MLP on all 64 layers, attention on every 4th layer (3,7,11...63)\n\nMERGE STATUS:\n- First attempt (PID 2878766): FAILED — missing adapter_config.json in checkpoint\n- Fix: Copied adapter_config.json from final_model/ to checkpoint_step_10000/\n- Second attempt (PID 2885584): SUCCESS — completed in ~3.5 minutes\n- Merged model: /data/SpecForge/custom_dflash/checkpoints/final_model_merged/ (51GB)\n  - model-00001-of-00002.safetensors (47GB)\n  - model-00002-of-00002.safetensors (3.7GB)\n  - config.json, generation_config.json, model.safetensors.index.json\n\nKEY LEARNINGS:\n1. checkpoint_step_10000 lacked adapter_config.json — must copy from final_model/ before merge\n2. \"Missing adapter keys\" warning during merge is EXPECTED — config claims all layers have attention LoRA but checkpoint only has it on 16 layers. Peft warns but merges successfully.\n3. SSH backgrounding: use nohup on DGX directly, NOT terminal(background=true) which backgrounds on MacBook\n4. Training script's merge_and_unload() failed silently — manual merge is reliable fallback\n\nHERMES SYSTEMS STATUS:\n- Cognitive systems: FULLY OPERATIONAL (7 systems, 6 hooks)\n- X/Twitter tools: Partial (x_tweet_fetch, x_user_tweets working; x_search hash stale)\n- Vision: GLM-5V-Turbo via Z.AI general endpoint\n- CLAUDE.md: 8 rules injected into delegate_task\n- 10 X-thread skills created\n\nFILES MODIFIED:\n- ~/hermes-agent/MASTER_DOC.md — Added DGX/Qwen section\n- ~/.hermes/memory — Updated with merge completion\n- ~/.hermes/knowledge/qwen27b-lora-merge-complete.md — Full technical reference\n- ~/.hermes/skills/mlops/lora-merge-recovery/SKILL.md — New skill\n\nNEXT STEPS:\n1. Run evaluation benchmark (MMLU, GSM8K) on merged model\n2. Deploy to vLLM if metrics good\n3. Consider updating adapter_config.json target_modules to match actual trained layers\n",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Run evaluation benchmark on merged Qwen 27B model at /data/SpecForge/custom_dflash/checkpoints/final_model_merged/",
+  "timestamp": "2026-05-10T22:43:58Z",
+  "unix_time": 1778453038.489898,
+  "task_id": "20260510_004218_2e42b6",
+  "source": "manual",
+  "version": 2
+}

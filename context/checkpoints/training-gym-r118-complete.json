@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r118-complete",
+  "context": "Training Gym R118 completed! ALL 4 PASS ON FIRST TRY! 3 T10s + 1 T9!\n\nR118 RESULTS (all 10/10):\n1. largest-rectangle-histogram-001 (T10) - Monotonic increasing stack. Pop when lower. Width = i or i-stack[-1]-1.\n2. binary-tree-max-path-sum-001 (T10) - DFS. Return max(left,right)+val (single branch). Track left+right+val as global max.\n3. sliding-window-maximum-001 (T9) - Monotonic decreasing deque. Pop smaller from right. Pop expired from left.\n4. median-of-two-sorted-arrays-001 (T10) - Binary search partition on smaller array. left_max<=right_min.\n\nDB: 425 exercises, 711 attempts, avg 9.93, 96.3% perfect. 376 passed. Tier 9+ = 110, Tier 10 = 57.\n84+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R118 complete",
+    "R119 next"
+  ],
+  "decisions": [
+    "Largest rect histogram: stack indices. Append sentinel 0 at end to flush stack. Width calculation varies by stack empty.",
+    "Max path sum: DFS returns single branch max(0, left, right)+val. Global tracks left+val+right.",
+    "Sliding window max: monotonic deque of indices. Pop smaller, pop expired. Front is always max.",
+    "Median two sorted: binary search partition on smaller array. Check left<=right cross condition."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R119: Continue. Try: Design questions - LRU Cache, LFU Cache, or system design.",
+  "timestamp": "2026-04-08T23:15:53Z",
+  "unix_time": 1775690153.512149,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,24 @@
+{
+  "label": "subconscious-integration-fully-complete",
+  "context": "Subconscious integration FULLY COMPLETE. All 97 modules integrated into agent/ (162 .py files) and tools/ (84 .py files). Git commit 0390d936d on branch qwen27b-training-artifacts-may3-2026. ~/subconscious/ directory successfully eradicated after killing old process 98882 and clearing all __pycache__. Source code paths all updated to use ~/hermes-agent/ instead of ~/subconscious/.",
+  "active_tasks": [
+    "Hermes restart to finalize"
+  ],
+  "decisions": [
+    "All subconscious modules committed to git as agent/ and tools/",
+    "Old hermes_cli/subconscious/ deleted",
+    "Path references updated to ~/hermes-agent/"
+  ],
+  "files_modified": [
+    "agent/ (162 .py files)",
+    "tools/ (84 .py files)",
+    "run_agent.py",
+    "MASTER_DOC.md"
+  ],
+  "next_steps": "Hermes restart recommended to load fresh code without any cached ~/subconscious/ references. After restart, verify tool_capability.db is created in ~/hermes-agent/ not ~/subconscious/.",
+  "timestamp": "2026-05-10T03:27:30Z",
+  "unix_time": 1778383650.2698529,
+  "task_id": "20260509_222020_f674a3",
+  "source": "manual",
+  "version": 2
+}

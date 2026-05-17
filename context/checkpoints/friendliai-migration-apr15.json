@@ -1,0 +1,20 @@
+{
+  "label": "friendliai-migration-apr15",
+  "context": "Token Bloat Audit COMPLETE. All 6 optimizations applied and verified for FriendliAI migration.\n\nOPTIMIZATIONS APPLIED:\n1. MEMORY.md trimmed: 23,136 -> 3,077 chars (~5,265 tokens saved)\n2. AGENTS.md disabled: prompt_builder.py env gate HERMES_LOAD_AGENTS_MD (~5,214 tokens)\n3. 7 plugins disabled in config.yaml: evey-mesh/moltbook/mqtt/sandbox/wallet/eyes/honcho (15 tools, ~3,000 tokens)\n4. LCM tools trimmed: 6->3 in engine.py get_tool_schemas() - removed lcm_describe, lcm_status, lcm_doctor (~600 tokens)\n5. R169 reasoning_discover.py: removed repeated \"For this X task:\" phrases, compact templates with task_hint header (~116 tokens/turn)\n6. Cost-aware injection governor: _INJECTION_MAX_CHARS=1500 + priority triage added to distillation __init__.py\n\nTOTAL SAVINGS: ~14,000 tokens/session + ~116 tokens/turn. Prefix caching saves $10.28 per 100-turn session.\n\nKEY FILES MODIFIED:\n- ~/.hermes/config.yaml (plugins.disabled list added)\n- ~/hermes-agent/agent/prompt_builder.py (AGENTS.md env gate)\n- ~/hermes-agent/plugins/context_engine/lcm/engine.py (3 tools instead of 6)\n- ~/subconscious/reasoning_discover.py (compact templates)\n- ~/.hermes/plugins/distillation/__init__.py (injection governor)\n\nPROVIDER: FriendliAI GLM-5.1 (api.friendli.ai/serverless/v1), $50 credit, prefix caching at $0.26/M cached.\nAll __pycache__ cleared. Syntax checks passed on all modified files.",
+  "active_tasks": [
+    "All token bloat audit items completed"
+  ],
+  "decisions": [
+    "Disabled 7 evey plugins (mesh/moltbook/mqtt/sandbox/wallet/eyes/honcho) - safe to re-enable in config.yaml",
+    "AGENTS.md gated behind HERMES_LOAD_AGENTS_MD=1 env var",
+    "LCM diagnostic tools (describe/status/doctor) removed from schema but handlers still exist in engine",
+    "Injection governor hard cap at 1500 chars/12 lines with priority triage"
+  ],
+  "files_modified": [],
+  "next_steps": "Restart gateway to pick up plugin/tool changes, then verify tool count dropped from 103 to ~83",
+  "timestamp": "2026-04-15T15:54:58Z",
+  "unix_time": 1776268498.22113,
+  "task_id": "20260415_100919_db0d13",
+  "source": "manual",
+  "version": 2
+}

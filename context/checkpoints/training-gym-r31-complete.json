@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r31-complete",
+  "context": "Training Gym R22-R31 completed. 40 exercises all 10/10.\n\nR31 RESULTS (all 10/10):\n1. merkle-001 (T5) - Merkle tree: SHA-256, layers, get_proof, verify_proof, odd leaves (duplicate last). 9 tests.\n2. bloom-001 (T5) - Bloom filter: optimal m/k calculation, double hashing technique, false positive rate validation. 8 tests.\n3. consistent-001 (T5) - Consistent hashing: virtual nodes, binary search on ring, minimal redistribution verified. 7 tests.\n4. pubsub-001 (T5) - Pub/sub: fnmatch wildcard matching, once subscriptions, topics list. 8 tests.\n\nKEY PATTERNS:\n- Double hashing for bloom filters: h1 + i*h2 for i hash functions\n- Consistent hashing: MD5 ring + virtual nodes + binary search\n- Merkle proof: track (sibling_hash, direction) pairs up the tree\n- fnmatch for wildcard topic matching in pub/sub\n\nDB: 200 exercises, 363 attempts, avg 9.9",
+  "active_tasks": [
+    "R22-R31 complete",
+    "R32 next"
+  ],
+  "decisions": [
+    "Double hashing: h1+i*h2 gives k independent hash positions from 2 base hashes",
+    "Consistent hashing: vnode per node on sorted ring, binary search for key placement",
+    "Merkle proof direction: 'left' means sibling is left, concat sibling+current"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R32 exercises. Focus on: design patterns (observer, strategy, state machine) or algorithms (topological sort, union-find).",
+  "timestamp": "2026-04-08T17:50:03Z",
+  "unix_time": 1775670603.028393,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

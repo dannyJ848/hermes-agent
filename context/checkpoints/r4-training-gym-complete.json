@@ -1,0 +1,22 @@
+{
+  "label": "r4-training-gym-complete",
+  "context": "R4 Training Gym Round COMPLETE. Built uncertainty_reward.py (SELAUR-inspired) + wired into plugin + distilled 6 tips.\n\nCOMPLETED:\n1. RESEARCH: Found SELAUR (2602.21158) — uncertainty-aware reward shaping for self-evolving agents. Uses entropy + least-confidence + margin to compute combined uncertainty, then shapes rewards.\n2. BUILD: uncertainty_reward.py (~280 lines) — 3 uncertainty metrics (Shannon entropy, least-confidence, margin), combined uncertainty, reward shaping with α=0.4, trajectory-level reward with trend detection (improving/stable/declining), Cortex persistence every 50 calls.\n3. WIRE: R171 in distillation plugin at lines 748-758 (post_tool_call — compute shaped reward) and lines 3036-3046 (pre_llm_call — inject trajectory reward every 15th call).\n4. DISTILL: 6 tips covering uncertainty shaping, 3-metric combination, trend detection, R168-R171 pipeline architecture, alpha tuning, persistence optimization.\n5. ACTIVATE: Syntax checked, gateway restarted.\n\nCRITICAL INSIGHT: R168-R171 form a COMPLETE self-improvement pipeline:\n  R168 self_critic → detects failures and critiques outcomes\n  R169 reasoning_discover → composes task-specific reasoning structures\n  R170 task_frontier → generates training tasks at competence frontier\n  R171 uncertainty_reward → shapes reward signals from uncertainty\n\nSYSTEM STATE:\n- Plugin: 3,351 lines\n- New module: ~/subconscious/uncertainty_reward.py (R171)\n- 4 modules wired this session: R169 + R170 + R171 (+ R168 from prior session)\n- Gateway: freshly restarted",
+  "active_tasks": [
+    "R5: Next training gym round — potential: ToolMaker (2502.11705), ADAS code search, or integration testing of R168-R171 pipeline"
+  ],
+  "decisions": [
+    "SELAUR uncertainty-aware reward is the GLUE connecting self_critic to task_frontier",
+    "alpha=0.4 produces meaningful frontier vs mastery reward differentiation",
+    "R168-R171 pipeline is now complete: detect → reason → target → reward"
+  ],
+  "files_modified": [
+    "~/subconscious/uncertainty_reward.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "R5 options: (1) Integration test the R168-R171 pipeline end-to-end, (2) ToolMaker auto-create tools from research code, (3) ADAS code-level agent search. Integration testing may be highest-value — verify the pipeline actually works as a coherent unit.",
+  "timestamp": "2026-04-14T21:00:08Z",
+  "unix_time": 1776200408.0328808,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

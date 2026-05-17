@@ -1,0 +1,25 @@
+{
+  "label": "pre-gateway-restart-apr7-1222",
+  "context": "Session started from Danny saying \"hi\" at 12:22. Discovered and fixed the GREETING ECHO BUG for real this time — root cause was NOT aggressive_continue but the main while loop at L7213 in run_agent.py. For CLI sessions, the model kept making tool calls autonomously (88/90 iterations) because there was no greeting break in the main loop. Fixed by adding greeting break at L7224 that checks if platform is NOT autonomous AND first user msg is throwaway -> break after api_call_count >= 2. Also: ERL + AutoAgent patches are in distillation plugin v2.2, syntax verified, pycache cleared. Just need gateway restart to activate.",
+  "active_tasks": [
+    "Fix greeting echo bug - main loop break for CLI sessions",
+    "ERL + AutoAgent in distillation plugin v2.2 - code patched",
+    "Clear pycache and restart gateway",
+    "Wire MCTR dual-level metacognition",
+    "Research next frontier paper"
+  ],
+  "decisions": [
+    "Greeting echo root cause = main while loop, not aggressive_continue",
+    "Added greeting break at L7224 for CLI sessions only",
+    "Does not affect autonomous sessions (cron/gateway/telegram)"
+  ],
+  "files_modified": [
+    "/Users/dannygomez/hermes-agent/run_agent.py"
+  ],
+  "next_steps": "Restart gateway to activate distillation plugin v2.2 + greeting break fix. Then continue with MCTR dual-level metacognition wiring and next frontier paper research.",
+  "timestamp": "2026-04-07T17:24:52Z",
+  "unix_time": 1775582692.6121259,
+  "task_id": "20260406_193318_f8f2c8",
+  "source": "manual",
+  "version": 2
+}

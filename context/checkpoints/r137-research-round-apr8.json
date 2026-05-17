@@ -1,0 +1,21 @@
+{
+  "label": "r137-research-round-apr8",
+  "context": "R137. 943 tips, 0.834 avg. Researched AgentGL (arXiv:2604.05846, ACL 2026): search-constrained thinking, curriculum RL for long-horizon tasks, topology-aware navigation. Saved 3 findings total: TRACE, MatClaw, AgentGL. All tips grounded in real papers or real tool errors. Both web_search and web_research are down — using arxiv direct extraction as fallback. Danny at daylong test. 57 tips from 1000 milestone. Quality-first organic growth mode. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R137 RESEARCH ROUND — 943 tips, 0.834 — 57 from 1000"
+  ],
+  "decisions": [
+    "AgentGL search-constrained thinking → pre-filter tips before injection",
+    "Curriculum RL → progressive training complexity"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (+5 tips)",
+    "~/.hermes/knowledge/agentgl-graph-learning-rl-apr2026.md"
+  ],
+  "next_steps": "R138: Continue organic growth. Focus on generating tips from real task execution, not just research.",
+  "timestamp": "2026-04-08T16:38:31Z",
+  "unix_time": 1775666311.298007,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,12 @@
+{
+  "label": "delegation-plugin-fixed-glm",
+  "context": "SESSION March 31/April 1, 2026 (Part 3):\n\nCOMPLETED:\n1. hermes-repo-tracker skill (daily cron at 8am)\n2. Pydantic-ai deep dive saved to knowledge base\n3. Delegation plugin fix \u2014 ROOT CAUSE: ~/.hermes/plugins/evey-delegate-model/__init__.py was reading OPENAI_BASE_URL and OPENAI_API_KEY env vars (both empty). Fixed to use ZHIPU_API_KEY and ZAI base URL. Updated all model routing to GLM: glm-5.1 (primary), glm-5-turbo (fallback), glm-4-flash (last resort). Hermes restart needed to pick up plugin changes.\n\nIN PROGRESS:\n4. X/Twitter AI news scanner \u2014 HomeLatestTimeline works, SearchTimeline 404s\n5. Build out more X API endpoints (have all GQL hashes)\n\nNOT YET STARTED:\n6. Self-improvement deep dives\n\nKEY FILES MODIFIED:\n- ~/.hermes/plugins/evey-delegate-model/__init__.py (env var fix + GLM routing)\n\nX API HASHES (extracted from main.fa9bab6a.js):\n- SearchTimeline: GcXk9vN_d1jUfHNqLacXQA (404s)\n- UserTweets: E3opETHurmVJflFsUBVuUQ (works)\n- HomeLatestTimeline: 0vp2Au9doTKsbn2vIk48Dg (confirmed working)\n- HomeTimeline: xhYBF94fPSp8ey64FfYXiA\n- UserByScreenName: IGgvgiOx4QZndDHuD3x9TQ\n- TweetDetail: CysGzLIZa76UzZ3WTe-Bhg\n- UserByRestId: VQfQ9wwYdk6j_u2O4vt64Q\n\nTELEGRAM: No home channel configured \u2014 messages format but don't deliver.\nFREE MODELS: All broken via OpenRouter/LiteLLM \u2014 was env var issue, now fixed to use ZAI directly.",
+  "active_tasks": [
+    "Restart Hermes to test delegation fix",
+    "Fix X scanner to use HomeLatestTimeline",
+    "Build out more X API endpoints",
+    "Self-improvement deep dives"
+  ],
+  "timestamp": "2026-04-01T03:06:41Z",
+  "task_id": "20260331_215627_bc1ae0"
+}

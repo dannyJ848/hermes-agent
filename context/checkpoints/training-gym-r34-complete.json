@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r34-complete",
+  "context": "Training Gym R34 completed. All 4 exercises 10/10.\n\nR34 RESULTS (all 10/10):\n1. floyd-warshall-001 (T6) - All-pairs shortest path with path reconstruction and negative cycle detection. 6 tests.\n2. btree-001 (T7) - B-Tree with configurable degree t, insert with node splitting, search. 6 tests.\n3. segment-001 (T6) - Segment Tree for range sum queries and point updates. 6 tests.\n4. tarjan-001 (T7) - Tarjan's SCC algorithm with lowlink tracking and stack-based component extraction. 6 tests.\n\nKEY PATTERNS:\n- Floyd-Warshall: next-hop table for path reconstruction, diagonal check for negative cycles\n- B-Tree: split full child BEFORE descending, median promotes to parent, keys=[t-1] splits at position t-1\n- Segment Tree: 4*n allocation, node 2i+1 and 2i+2 for children, lazy-free point updates\n- Tarjan SCC: lowlink[v]=min(index of nodes reachable from subtree), pop stack until v for SCC extraction\n\nDB: 210 exercises, 375 attempts, avg 9.86",
+  "active_tasks": [
+    "R34 complete",
+    "R35 next"
+  ],
+  "decisions": [
+    "Floyd-Warshall: use next-hop matrix nxt[i][j] updated when shorter path found via k",
+    "B-Tree split: keys[t-1] is median, left gets keys[:t-1], right gets keys[t:]",
+    "Segment Tree: store both arr and tree, update modifies both",
+    "Tarjan SCC: sort output by (-len, min_vertex) for deterministic ordering"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R35 exercises. Focus on: Fenwick Tree (BIT), Trie with delete, LRU with callbacks, or Rope data structure.",
+  "timestamp": "2026-04-08T18:22:23Z",
+  "unix_time": 1775672543.304537,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

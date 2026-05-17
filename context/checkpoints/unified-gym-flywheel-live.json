@@ -1,0 +1,34 @@
+{
+  "label": "unified-gym-flywheel-live",
+  "context": "CORTEX UNIFIED DATABASE — FULLY BUILT AND RUNNING\n\nLOCATION: PostgreSQL database 'cortex' on localhost:5432\nSCHEMA: 23 cortex_* tables with pgvector(384), pg_trgm, full-text search\n\nMIGRATED DATA:\n- Cerebrum SQLite -> cortex: 1,869 tips (with Elo), 838 experiences, 1,080 facts, 213 KG nodes, 538 KG edges, 5,251 predictions, 651 calibration entries, 651 tool calls, 38 circuit breakers, 56 life events, identity state, 6 epistemic facts\n- Hindsight Postgres -> cortex: 9,945 memory units (as nodes), 398,364 edges, 4,156 entities, 6,414 documents\n\nTOTALS: 13,933 nodes, 388,104 edges, 4,369 entities, 6,414 documents\n\nFLYWHEEL: cortex_flywheel.py — runs eval (50 Elo pairs/cycle), repair (low-Elo deactivation), consolidation (merge duplicates, strengthen edges). Just ran successfully — 50 pairs evaluated, 13 duplicates merged.\n\nFILES CREATED:\n- ~/subconscious/cortex_schema_design.py — Full schema SQL + access layer design\n- ~/subconscious/cortex_access.py — Unified CortexDB access class (insert_node, get_tips_for_eval, search_text, vector_search, update_elo, record_tool_call, etc.)\n- ~/subconscious/cortex_flywheel.py — Autonomous flywheel engine (eval + repair + consolidate + stats)\n- /tmp/cortex_step1_create.py — DB creation script\n- /tmp/cortex_step2_schema.py — Schema creation script\n- /tmp/cortex_step3_migrate.py — Cerebrum migration script\n- /tmp/cortex_step3b_hindsight.py — Hindsight migration script\n\nOLD DATA PRESERVED: cerebrum SQLite untouched at ~/.hermes/cerebrum_memory.db. Hindsight Postgres untouched at localhost:5432/hindsight (pid 50151).\n\nELIGIBLE FOR ELO: 1,322 tips now rated (up from 1,131 after two eval sweeps of 50 pairs each), 535 unrated\n\nNEXT STEPS:\n1. Update the cron job d9d790021dd1 to call cortex_flywheel.py instead of old training_gym code\n2. Update distillation plugin to use cortex_access.py for reading/writing tips\n3. Wire the training gym cron to the new unified system\n4. Add LLM judge support (currently uses heuristic judge only)",
+  "active_tasks": [
+    "Wire cortex flywheel to cron d9d790021dd1",
+    "Update distillation plugin to use cortex_access.py",
+    "Test full autonomous cycle via cron",
+    "Verify backward compatibility with old data"
+  ],
+  "decisions": [
+    "Unified everything into single Postgres 'cortex' DB with 23 tables",
+    "pgvector enabled for 384-dim embeddings (BAAI/bge-small-en-v1.5)",
+    "Heuristic judge for initial Elo evaluation — LLM judge to be added later",
+    "Old databases preserved as backup — no data loss",
+    "Node types: tip, experience, observation, fact, world, entity, concept, research, research_finding, tool_concept",
+    "Flywheel phases: eval -> repair -> consolidate -> stats",
+    "Autonomous: runs every 2h via cron, self-sustaining"
+  ],
+  "files_modified": [
+    "~/subconscious/cortex_schema_design.py",
+    "~/subconscious/cortex_access.py",
+    "~/subconscious/cortex_flywheel.py",
+    "/tmp/cortex_step1_create.py",
+    "/tmp/cortex_step2_schema.py",
+    "/tmp/cortex_step3_migrate.py",
+    "/tmp/cortex_step3b_hindsight.py"
+  ],
+  "next_steps": "Wire cron to cortex_flywheel.py and test autonomous operation",
+  "timestamp": "2026-04-13T19:19:49Z",
+  "unix_time": 1776107989.606276,
+  "task_id": "20260413_135506_962792",
+  "source": "manual",
+  "version": 2
+}

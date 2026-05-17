@@ -1,0 +1,16 @@
+{
+  "label": "r112-complete-apr9",
+  "context": "Training Gym completed R100-R112 (12 rounds) in one marathon session. Danny confirmed results are showing. Gateway restarted to activate R112 changes.\n\nKEY METRICS:\n- 1266 tips in cerebrum (from ~1154 start)\n- 1582-line distillation plugin (from ~1300)\n- 11 subconscious modules: cascade_recovery, plan_monitor, confidence_tracker, experience_replay, reward_shaping, think_budget, knowledge_retrieval, knowledge_compiler, memory_selector, tip_inserter, skill_versioner\n- 32 subconscious databases\n- All modules wired into plugin hooks (post_tool_call + pre_llm_call)\n\nCRITICAL LEARNING: Never kill gateway PID to unlock DB — it kills Hermes itself. Use nohup bash retry loop for tip insertion while gateway is running. The BG process successfully inserted R112 tips on attempt 1.\n\nR112 BUILD: Skill Version Manager — tracks per-skill success rates, auto-promotes at >85%, demotes at <60%, rolls back at <40%. Based on Voyager/GitAgent/Godel Agent research.\n\nINJECTION LAYERS (firing on every turn):\nR100: Arg Feedback Cache (past fixes for tool errors)\nR101: Cascade Recovery (failure taxonomy + strategies)\nR102: Plan Monitor (dead-end detection + replan signals)\nR103: Confidence Tracker (per-tool confidence warnings)\nR104: Cross-Session Experience Replay (DO/AVOID rules)\nR105: Reward Shaping (tool rankings + retirement)\nR106: ThinkBudget (adaptive reasoning allocation)\nR107: Corrective Knowledge Retrieval (multi-index routing)\nR108: Knowledge Compiler (research→structured rules)\nR109: Memory Architecture Selector (vector vs graph routing)\nR110: Think Budget Manager (complexity-based budget tiers)\nR112: Skill Version Health (promotion/demotion/rollback)",
+  "active_tasks": [
+    "R112 COMPLETE — skill versioner wired in",
+    "R113 NEXT — continue training gym"
+  ],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Continue training gym from R113. Use nohup approach for all DB writes. Focus on high-impact builds that improve actual agent capability.",
+  "timestamp": "2026-04-09T19:11:23Z",
+  "unix_time": 1775761883.21246,
+  "task_id": "20260409_133802_fc4fc7",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,32 @@
+{
+  "label": "apr19-densemixer-minp-wired",
+  "context": "Wired 5 findings from Reddit/X/Twitter research into all DGX Spark scripts for launch day tomorrow.\n\nFINDINGS WIRED:\n1. DenseMixer (pip install densemixer, DENSEMIXER_ENABLED=1) — precise MoE router gradients via STE, +2-4% on Qwen3 MoE. Added to spark-lora-train.sh (pip install + env var + Python heredoc import) and spark-grpo-train.sh (same in SFT warmstart + GRPO training sections).\n2. min_p=0.2 + top_k=40 via --override-generation-config — fixes Qwen3.6 infinite thinking loop bug. Added to ALL vLLM serve commands: spark-maxperf.sh (BF16+FP8), superqwen3-super.sh (restart_serving BF16+FP8), deploy-spark-day1.sh (BF16+FP8), spark-grpo-train.sh (GRPO vLLM serve).\n3. vLLM LoRA bug #38520 — confirmed our merge strategy bypasses it entirely (no LoRA loaded into vLLM, we merge first).\n4. DFlash accept rate only 5-7.2 (not dramatic speedup, keep wired, validation catches issues).\n5. FP8 port :8001 for agent inference (208 tok/s on Blackwell), BF16 :8000 for quality/training only.\n\nBONUS BUG FIX: `export UNSLOTH_MOE_BACKEND=grouped_mm` inside python3 -c doesn't work (shell export, not Python). Changed to os.environ['UNSLOTH_MOE_BACKEND'] = 'grouped_mm' in both GRPO Python sections.\n\nALSO: Qwen3.6-Plus is 32.5B DENSE but API-only closed source. Can't install on Spark. The only open-weight Qwen3.6 is 35B-A3B (3B active MoE). Training IS the answer — the Super pipeline teaches the router to use all 256 experts surgically.\n\nFiles modified: spark-lora-train.sh, spark-grpo-train.sh, spark-maxperf.sh, superqwen3-super.sh, deploy-spark-day1.sh, gotchas-84-88.md\nAll 7 patches verified via grep.\nTotal gotchas: 88 across 9 files.\nHermes-agent: 0 commits behind upstream. 17 reasoning datasets.",
+  "active_tasks": [
+    "DenseMixer wired into training scripts",
+    "min_p=0.2 loop fix wired into all serve commands",
+    "Gotchas 84-88 written",
+    "All patches verified green",
+    "Launch day ready"
+  ],
+  "decisions": [
+    "DenseMixer is worth the extra forward-pass cost during training — router quality is the #1 MoE bottleneck",
+    "min_p=0.2 is the right fix for thinking loops (not disabling thinking)",
+    "FP8 port :8001 for agent inference, BF16 :8000 for quality validation only",
+    "DFlash stays wired despite low accept rate — zero risk on 119GB GH200, may improve as model trains",
+    "Merge strategy confirmed correct by vLLM LoRA bug #38520"
+  ],
+  "files_modified": [
+    "~/dgx-spark-prep/spark-lora-train.sh",
+    "~/dgx-spark-prep/spark-grpo-train.sh",
+    "~/dgx-spark-prep/spark-maxperf.sh",
+    "~/dgx-spark-prep/superqwen3-super.sh",
+    "~/dgx-spark-prep/deploy-spark-day1.sh",
+    "~/.hermes/skills/devops/dgx-spark-qwen3-deployment/references/gotchas-84-88.md"
+  ],
+  "next_steps": "Launch day tomorrow. Run: session_restore label=\"apr19-densemixer-minp-wired\". Then execute launch sequence: (1) macbook-transfer-helper.sh --enable-ssh, (2) spark-day1.sh --macbook <IP> --usb, (3) spark-maxperf.sh, (4) wire-spark-to-hermes.sh <SPARK_IP>, (5) spark-quality chat, (6) superqwen3-super.sh.",
+  "timestamp": "2026-04-19T18:13:31Z",
+  "unix_time": 1776622411.310838,
+  "task_id": "20260419_124733_53b28c",
+  "source": "manual",
+  "version": 2
+}

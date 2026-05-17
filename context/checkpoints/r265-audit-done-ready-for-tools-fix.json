@@ -1,0 +1,28 @@
+{
+  "label": "r265-audit-done-ready-for-tools-fix",
+  "context": "R265 audit done. Danny wants: (1) fix tools via new CLI session, (2) run eval flywheel, (3) R265 distillation. Shelved Qwen local and Gemini/MiMo.\n\nAUDIT SUMMARY:\n- Cerebrum: 1,696 tips, avg conf 0.89\n- Gateway: PID 47649, zero errors, 19MB RAM\n- Hindsight: LOCAL ✓ + VPS ✓\n- All 4 inference servers UP\n- 180 subconscious modules\n\nBROKEN (fix in new CLI):\n- browser_navigate: CAMOFOX_URL cached in CLI process env\n- cached_delegate: missing evey_utils module\n- knowledge_search: 11% success\n\nNEW THIS SESSION:\n- ~/subconscious/local_vision.py — screen capture + GLM-5V-turbo (WORKING, tested)\n\nFIXES ALREADY ON DISK:\n- ~/.hermes/.env line 24: #CAMOFOX_URL=http://localhost:9377 (commented)\n- ~/.hermes/config.yaml: cloud_provider: browserbase\n\nKEY FILES:\n- ~/subconscious/eval_flywheel.py — 27KB, 3-judge Elo panel, needs tournament run\n- ~/subconscious/trajectory_splicer.py — wired, working\n- ~/subconscious/intrinsic_metacognition.py — wired\n- ~/subconscious/twitter_vision_bridge.py — cron every 4h\n- ~/subconscious/local_vision.py — NEW, working\n- ~/hermes-agent/plugins/distillation/__init__.py — 158 lines, 2 hooks",
+  "active_tasks": [
+    "1. [NEXT] New CLI session → fix browser_navigate + cached_delegate + knowledge_search",
+    "2. Run eval_flywheel tournament (Elo rate recent tips)",
+    "3. R265 distillation — fresh research → new tips",
+    "4. [SHELVED] Qwen 3.5 local deploy",
+    "5. [SHELVED] MiMo V2 Pro / Gemini 3 Flash (needs API keys)"
+  ],
+  "decisions": [
+    "Focus order: fix tools → eval flywheel → R265 distillation",
+    "Shelved Qwen 3.5 local and MiMo/Gemini API integrations",
+    "Local vision confirmed working with GLM-5V-turbo",
+    "Delegation stays on GLM-5.1/zai (OpenRouter has no credits)"
+  ],
+  "files_modified": [
+    "~/.hermes/config.yaml",
+    "~/.hermes/.env",
+    "~/subconscious/local_vision.py"
+  ],
+  "next_steps": "After new CLI session: (1) test browser_navigate to confirm fix, (2) test cached_delegate, (3) test knowledge_search, then run eval_flywheel tournament, then create R265 distillation script with fresh research.",
+  "timestamp": "2026-04-13T03:28:19Z",
+  "unix_time": 1776050899.339906,
+  "task_id": "20260412_191932_edf6e1",
+  "source": "manual",
+  "version": 2
+}

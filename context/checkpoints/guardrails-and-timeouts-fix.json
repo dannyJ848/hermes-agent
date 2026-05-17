@@ -1,0 +1,11 @@
+{
+  "label": "guardrails-and-timeouts-fix",
+  "context": "Stripped Hermes write guardrails in file_operations.py to only irrecoverable files (SSH keys, GPG, /etc/sudoers, /etc/passwd, /etc/shadow, /etc/systemd). Removed .env, shell configs, package configs, cloud configs from deny list. Applied Z.AI timeout fix (STREAM_READ=180, STREAM_STALE=300, API=2400) to all 4 .env files. Cleared .pyc cache \u2014 Danny needs to restart Hermes for changes to take effect. After restart, verify patch/write_file works on .env files.",
+  "active_tasks": [
+    "Verify write_file works on .env after restart",
+    "Continue SOMA 3D shader work (SSS, clipping planes)",
+    "SAGA Cycle 1 execution"
+  ],
+  "timestamp": "2026-04-02T19:36:25Z",
+  "task_id": "20260401_211730_3985be"
+}

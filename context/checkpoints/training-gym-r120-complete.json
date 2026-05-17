@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r120-complete",
+  "context": "Training Gym R120 completed! ALL 4 PASS ON FIRST TRY! 3 T9 + 1 T8!\n\nR120 RESULTS (all 10/10):\n1. course-schedule-ii-001 (T8) - Kahn's BFS topological sort. In-degree tracking.\n2. pacific-atlantic-water-flow-001 (T9) - BFS from both oceans inward. Intersect reachable.\n3. word-break-ii-001 (T9) - DFS+memo. Try each prefix in dict. Build sentences recursively.\n4. min-cost-connect-points-001 (T9) - Prim's MST with min-heap.\n\nDB: 430 exercises, 719 attempts, avg 9.93, 96.4% perfect. 382 passed. Tier 9+ = 114, Tier 10 = 58.\n86+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R120 complete",
+    "R121 next"
+  ],
+  "decisions": [
+    "Topological sort: Kahn's BFS. Track in-degree. Enqueue zero-degree. Process in order.",
+    "Pacific Atlantic: BFS from ocean borders INWARD (height >= current). Intersect both reachable sets.",
+    "Word Break II: DFS+memo on start index. For each valid prefix, recurse on suffix. Cache results.",
+    "MST Prim's: start from any node. Add edges to heap. Pick min edge to unvisited. O(E log V)."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R121: Continue. Try: Regular Expression Matching, Burst Balloons, or Count Islands variations.",
+  "timestamp": "2026-04-08T23:20:37Z",
+  "unix_time": 1775690437.9494772,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

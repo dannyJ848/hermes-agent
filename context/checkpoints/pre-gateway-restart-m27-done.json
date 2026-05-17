@@ -1,0 +1,17 @@
+{
+  "label": "pre-gateway-restart-m27-done",
+  "context": "Session completed M2.7 integration + SSH tunnel. All tasks done. Gateway restart requested.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [
+    "~/subconscious/local_inference.py",
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/Library/LaunchAgents/com.hermes.ssh-tunnel.plist"
+  ],
+  "next_steps": "Verify gateway is back up after restart.",
+  "timestamp": "2026-04-11T12:49:27Z",
+  "unix_time": 1775911767.954315,
+  "task_id": "20260410_231220_230a8b",
+  "source": "manual",
+  "version": 2
+}

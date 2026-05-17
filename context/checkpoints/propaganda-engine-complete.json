@@ -1,0 +1,22 @@
+{
+  "label": "propaganda-engine-complete",
+  "context": "Completed 'The Lens' propaganda demystification engine experiment. Built full pipeline: multi-persona X feed scanner (left/center/right/personal lenses), digest generator with narrative analysis, static site generator with dark theme, and bot distribution (Mastodon/Bluesky/Newsletter). Key files at ~/propaganda-demystifier/. Dataset migration to DGX complete (tier2 + tier3 transferred, 283GB freed locally). User wants to pivot to Reddit project on fresh CLI session. Current state: all pipeline components functional, cron job set for daily 6AM runs, site generates at ~/propaganda-demystifier/site/index.html.",
+  "active_tasks": [
+    "Propaganda engine - complete",
+    "Dataset migration - complete",
+    "Reddit project - pending (new session)"
+  ],
+  "decisions": [
+    "Use write_file instead of terminal heredocs for scripts with special chars",
+    "Type-check JSON fields before string operations",
+    "Modular pipeline architecture proven effective",
+    "Browser tools unreliable for scraping - prefer APIs/cookies"
+  ],
+  "files_modified": [],
+  "next_steps": "1) Start fresh CLI session for Reddit project. 2) User will likely want similar architecture adapted for Reddit scraping. 3) Consider lessons from X project: cookie-based auth, modular pipeline, static site output.",
+  "timestamp": "2026-05-16T16:18:59Z",
+  "unix_time": 1778948339.039574,
+  "task_id": "20260515_225419_a0d3f0",
+  "source": "manual",
+  "version": 2
+}

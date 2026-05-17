@@ -1,0 +1,27 @@
+{
+  "label": "training-gym-r140-complete",
+  "context": "Training Gym R139-R140 completed! All 10/10!\n\nR139: surround(T8), acct_merge(T9), pac_atl(T9), cheap_flight(T9)\nR140: course2(T8), nge(T8), daily_t(T8), alien_dict(T10)\n\nDB: 467 exercises, 799 attempts, avg 9.93, 96.7% perfect. 419 passed. Tier 9+ = 144, Tier 10 = 72.\n106+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R140 complete",
+    "R141 next"
+  ],
+  "decisions": [
+    "Surrounded regions: DFS from border O's. Mark safe with 'S'. Flip remaining O->X, S->O.",
+    "Accounts merge: Union-Find on emails. Group by root.",
+    "Pacific Atlantic: DFS from both ocean borders. Return intersection.",
+    "Cheapest flights: Bellman-Ford for k+1 iterations.",
+    "Course Schedule II: Kahn's topological sort. In-degree tracking.",
+    "Next Greater Element: monotonic stack on nums2. Map to results.",
+    "Daily temperatures: monotonic decreasing stack. Store indices.",
+    "Alien Dictionary: build graph from adjacent word diffs. Topological sort. Detect invalid prefix."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R141: Continue. Try: Median of Two Sorted Arrays, N-Queens, or Serialize/Deserialize BST.",
+  "timestamp": "2026-04-09T00:05:19Z",
+  "unix_time": 1775693119.0294359,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

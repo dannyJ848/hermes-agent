@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r93-complete",
+  "context": "Training Gym R93 completed! ALL 4 PASS ON FIRST TRY! 3 TIER 10 PROBLEMS!\n\nR93 RESULTS (all 10/10):\n1. serialize-deserialize-btree-001 (T9) - BFS with null markers. Trim trailing nulls. Deserialize with queue.\n2. median-two-sorted-arrays-001 (T10) - Binary search on smaller array. Partition so max_left <= min_right.\n3. binary-search-rotated-001 (T8) - Check which half is sorted. If left sorted and target in range: go left. Else right.\n4. dp-regex-matching-001 (T10) - DP. '*' = zero (dp[i][j-2]) or one+ (dp[i-1][j] if match). '.' matches any.\n\nDB: 366 exercises, 611 attempts, avg 9.91, 95.7% perfect. 317 passed. Tier 9+ = 91, Tier 10 = 51.\n59+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R93 complete",
+    "R94 next"
+  ],
+  "decisions": [
+    "Median two sorted arrays: binary search on smaller array. half=(total+1)//2. i=partition in nums1, j=half-i. Check max_left<=min_right.",
+    "Rotated search: one half always sorted. nums[left]<=nums[mid] means left sorted. Check target range.",
+    "Regex matching DP: dp[0][j] handles a* matching empty. For *: zero=dp[i][j-2], one_or_more=dp[i-1][j] if char matches.",
+    "Serialize tree: BFS with null markers. Deserialize: queue + index. Trim trailing nulls for cleaner output."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R94: Continue. Try: Merge K Sorted Lists, N-Queens, or Minimum Path Sum.",
+  "timestamp": "2026-04-08T22:12:29Z",
+  "unix_time": 1775686349.402016,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,27 @@
+{
+  "label": "training-gym-r130-complete",
+  "context": "Training Gym R129-R130 completed! All 10/10 first try!\n\nR129: missing_pos(T9), sudoku(T10), median_two(T10), jump2(T8)\nR130: lfu_cache(T10), merge_int(T8), insert_int(T8), non_overlap(T9)\n\nDB: 450 exercises, 759 attempts, avg 9.93, 96.6% perfect. 402 passed. Tier 9+ = 131, Tier 10 = 65.\n96+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R130 complete",
+    "R131 next"
+  ],
+  "decisions": [
+    "First missing positive: cyclic sort. Place nums[i] at nums[i]-1 index.",
+    "Sudoku: backtrack with row/col/box validity check.",
+    "Median two sorted: binary search partition. left_max <= right_min.",
+    "Jump game II: greedy BFS. Track farthest per level.",
+    "LFU cache: freq_to_keys as OrderedDict dict. Track min_freq. Evict LRU from min_freq.",
+    "Merge intervals: sort by start. Extend if overlap.",
+    "Insert interval: three phases - before, merge, after.",
+    "Non-overlap: sort by end. Count overlaps (start < last_end)."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R131: Continue. Try: Skyline Problem, Russian Doll Envelopes, or Count Primes.",
+  "timestamp": "2026-04-08T23:43:07Z",
+  "unix_time": 1775691787.217314,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

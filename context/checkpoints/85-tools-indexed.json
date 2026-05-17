@@ -1,0 +1,13 @@
+{
+  "label": "85-tools-indexed",
+  "context": "Semantic Tool Selector: 85 tools indexed with Ollama nomic-embed-text. Cosine similarity selects top-3 for queries. Best matches: telegram_status=0.852, claude_bridge_task=0.754. Needs wiring into pre_llm_call and better descriptions. AGI cycle 16/1000. All healthy. Danny sleeping.",
+  "active_tasks": [
+    "Wire semantic tool selector into pre_llm_call plugin",
+    "Improve tool descriptions for better matching",
+    "Continue AGI cron cycles (VISION domain)",
+    "Ground mid-trust facts (342 remaining)",
+    "Set HERMES_CRON_TIMEOUT=300 (needs restart)"
+  ],
+  "timestamp": "2026-04-05T07:25:54Z",
+  "task_id": "20260404_215806_7e676d"
+}

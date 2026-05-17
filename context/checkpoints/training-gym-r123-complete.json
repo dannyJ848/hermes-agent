@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r123-complete",
+  "context": "Training Gym R123 completed! ALL 4 PASS ON FIRST TRY! 3 T9 + 1 T8!\n\nR123 RESULTS (all 10/10):\n1. longest-consecutive-sequence-001 (T8) - Set. Only start counting if num-1 not in set.\n2. basic-calculator-001 (T9) - Stack for signs. Track sign * num. Parens push/pop sign.\n3. swim-in-rising-water-001 (T9) - Dijkstra. Priority queue with max(height, time).\n4. merge-k-sorted-lists-001 (T9) - Min-heap of (val, idx, node). Pop min, push next.\n\nDB: 441 exercises, 731 attempts, avg 9.93, 96.4% perfect. 393 passed. Tier 9+ = 123, Tier 10 = 63.\n89+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R123 complete",
+    "R124 next"
+  ],
+  "decisions": [
+    "Longest consecutive: set. Only start sequences (num-1 not in set). Scan forward.",
+    "Basic calculator: stack of signs. On '(' push current sign. On ')' pop. Accumulate sign*num.",
+    "Swim in water: Dijkstra variant. Cost = max(current_cost, grid[nr][nc]).",
+    "Merge K lists: heap with (val, list_idx, node). Pop min, advance that list."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R124: Continue. Try: Expression Add Operators, Text Justification, or Candy.",
+  "timestamp": "2026-04-08T23:26:49Z",
+  "unix_time": 1775690809.294982,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

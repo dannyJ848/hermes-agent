@@ -1,0 +1,302 @@
+{
+  "label": "post_restart",
+  "timestamp": 1775619249.268557,
+  "tips": [
+    {
+      "id": 1159,
+      "tool": "browser_navigate",
+      "condition": "When browser_navigate fails with connection error",
+      "conf": 0.698,
+      "up": 2,
+      "down": 1
+    },
+    {
+      "id": 1158,
+      "tool": "delegate_parallel",
+      "condition": "When delegate_parallel returns all failures",
+      "conf": 0.715,
+      "up": 5,
+      "down": 0
+    },
+    {
+      "id": 1,
+      "tool": "execute_code",
+      "condition": "When writing Python in execute_code",
+      "conf": 1.0,
+      "up": 447,
+      "down": 23
+    },
+    {
+      "id": 1004,
+      "tool": "execute_code",
+      "condition": "When using execute_code for multi-step tool logic",
+      "conf": 1.0,
+      "up": 1055,
+      "down": 23
+    },
+    {
+      "id": 1007,
+      "tool": "execute_code",
+      "condition": "When parsing JSON responses from execute_code",
+      "conf": 1.0,
+      "up": 418,
+      "down": 23
+    },
+    {
+      "id": 1010,
+      "tool": "execute_code",
+      "condition": "When connecting to services from execute_code",
+      "conf": 1.0,
+      "up": 416,
+      "down": 23
+    },
+    {
+      "id": 1119,
+      "tool": "execute_code",
+      "condition": "When writing long Python functions in execute_code",
+      "conf": 1.0,
+      "up": 378,
+      "down": 23
+    },
+    {
+      "id": 1166,
+      "tool": "execute_code",
+      "condition": "When accessing files with execute_code",
+      "conf": 1.0,
+      "up": 292,
+      "down": 17
+    },
+    {
+      "id": 1794,
+      "tool": "execute_code",
+      "condition": "When using execute_code for complex operations",
+      "conf": 0.75,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1808,
+      "tool": "execute_code",
+      "condition": "When using execute_code for creation",
+      "conf": 0.88,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1894,
+      "tool": "execute_code",
+      "condition": "When using execute_code",
+      "conf": 0.9,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1896,
+      "tool": "execute_code",
+      "condition": "When using execute_code for design work",
+      "conf": 0.85,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1901,
+      "tool": "execute_code",
+      "condition": "When debugging a system that seems to work but produces wron",
+      "conf": 0.92,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1902,
+      "tool": "execute_code",
+      "condition": "When a fix seems obvious but doesn't help",
+      "conf": 0.9,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1903,
+      "tool": "execute_code",
+      "condition": "When execute_code encounters errors during: Python code usin",
+      "conf": 0.5,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1904,
+      "tool": "execute_code",
+      "condition": "When building a self-improvement pipeline",
+      "conf": 0.85,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1905,
+      "tool": "execute_code",
+      "condition": "When designing cross-domain learning",
+      "conf": 0.88,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1006,
+      "tool": "patch",
+      "condition": "When making targeted edits to existing files",
+      "conf": 0.831,
+      "up": 103,
+      "down": 2
+    },
+    {
+      "id": 1008,
+      "tool": "read_file",
+      "condition": "When accessing files with read_file",
+      "conf": 0.953,
+      "up": 132,
+      "down": 1
+    },
+    {
+      "id": 1156,
+      "tool": "read_file",
+      "condition": "When read_file fails with 'file not found'",
+      "conf": 1.0,
+      "up": 93,
+      "down": 1
+    },
+    {
+      "id": 1157,
+      "tool": "read_file",
+      "condition": "When reading large files",
+      "conf": 1.0,
+      "up": 93,
+      "down": 1
+    },
+    {
+      "id": 1793,
+      "tool": "read_file",
+      "condition": "When using read_file to read files",
+      "conf": 0.9,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1117,
+      "tool": "save_finding",
+      "condition": "When save_finding takes >15s to complete",
+      "conf": 0.72,
+      "up": 45,
+      "down": 0
+    },
+    {
+      "id": 1125,
+      "tool": "search_files",
+      "condition": "When accessing files with search_files",
+      "conf": 0.54,
+      "up": 17,
+      "down": 0
+    },
+    {
+      "id": 1791,
+      "tool": "search_files",
+      "condition": "When using search_files to search",
+      "conf": 0.85,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1801,
+      "tool": "search_files",
+      "condition": "When using search_files for design work",
+      "conf": 0.87,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1849,
+      "tool": "search_files",
+      "condition": "When using search_files",
+      "conf": 0.88,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1002,
+      "tool": "terminal",
+      "condition": "When reading file contents via terminal",
+      "conf": 0.9,
+      "up": 769,
+      "down": 70
+    },
+    {
+      "id": 1003,
+      "tool": "terminal",
+      "condition": "When searching file contents via terminal",
+      "conf": 0.9,
+      "up": 1188,
+      "down": 70
+    },
+    {
+      "id": 1118,
+      "tool": "terminal",
+      "condition": "When calling terminal with large payloads",
+      "conf": 0.9,
+      "up": 649,
+      "down": 70
+    },
+    {
+      "id": 1167,
+      "tool": "terminal",
+      "condition": "When accessing files with terminal",
+      "conf": 1.0,
+      "up": 385,
+      "down": 39
+    },
+    {
+      "id": 1404,
+      "tool": "vision_analyze",
+      "condition": "Using free-text anatomy queries in SOMA",
+      "conf": 0.78,
+      "up": 3,
+      "down": 0
+    },
+    {
+      "id": 1001,
+      "tool": "web_extract",
+      "condition": "When fetching from restricted URLs with web_extract",
+      "conf": 0.986,
+      "up": 282,
+      "down": 12
+    },
+    {
+      "id": 1005,
+      "tool": "web_extract",
+      "condition": "When web_extract takes >5s on a URL",
+      "conf": 0.986,
+      "up": 104,
+      "down": 12
+    },
+    {
+      "id": 1792,
+      "tool": "web_extract",
+      "condition": "When using web_extract to extract content",
+      "conf": 0.8,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1906,
+      "tool": "web_research",
+      "condition": "When researching agent techniques",
+      "conf": 0.82,
+      "up": 1,
+      "down": 0
+    },
+    {
+      "id": 1132,
+      "tool": "write_file",
+      "condition": "When using write_file for: write: plugin.yaml",
+      "conf": 0.735,
+      "up": 48,
+      "down": 0
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "label": "apr19-comprehensive-audit-complete\"",
+  "context": "Comprehensive audit of all launch day scripts. 3 phases completed.\n\nPHASE 1 — SYNTAX: All 8 shell scripts + 4 Python scripts pass. Zero errors.\n\nPHASE 2 — CROSS-SCRIPT CONSISTENCY:\nAll 9 required flags present in all 5 serve scripts:\n  - reasoning-parser qwen3 ✓\n  - presence_penalty=1.5 ✓ (replaced min_p=0.2)\n  - top_k=20 ✓ (replaced top_k=40)\n  - language-model-only ✓ (NEW — skips vision encoder)\n  - kv-cache-dtype fp8_e5m2 ✓\n  - max-num-seqs 512 ✓\n  - preserve_thinking ✓\n  - enable_thinking ✓\n  - tool-call-parser qwen3_coder ✓ (all except GRPO — correct, GRPO doesn't need tools)\n\nDocker env vars:\n  - VLLM_MARLIN_USE_ATOMIC_ADD=1 ✓ (all 5)\n  - PYTORCH_TUNABLEOP_TUNING=1 ✓ (all 5)\n  - HF_ENABLE_PARALLEL_LOADING=1 ✓ (all 5)\n  - VLLM_USE_DEEP_GEMM=1 ✓ (all 5 — FIXED in spark-day1.sh)\n  - DEEPGEMM_HOME mount ✓ (all 5 — FIXED in spark-day1.sh)\n\nBANNED PATTERNS: All clean. No min_p, no calculate-kv-scales, no bare fp8, no wrong max-num-seqs, no NVFP4 (just comment), no ngram.\n\nPHASE 3 — TRAINING ARG WIRING:\n  - superqwen3-super.sh → spark-lora-train.sh: 10 args passed, all 10 accepted ✓\n  - superqwen3-super.sh → spark-grpo-train.sh: 2 args passed, both accepted ✓\n\nPHASE 3b — TRAINING FEATURES:\n  - spark-lora-train.sh: all 8 features present (grouped_mm, DenseMixer, liger, uma_eager_load, gate, ThinkingAwareCollator, packing, save_pretrained_merged)\n  - spark-grpo-train.sh: all 4 features present (DenseMixer, gate, liger, uma_eager_load)\n\nBUG FOUND + FIXED DURING AUDIT:\n  - spark-day1.sh BF16 container: missing VLLM_USE_DEEP_GEMM=1, DEEPGEMM_HOME env var, and /opt/deepgemm mount. Added all 3.\n  - spark-day1.sh FP8 container: same missing DeepGEMM setup. Added all 3. Also fixed indentation corruption from first patch attempt.\n\nFILES MODIFIED THIS SESSION:\n  - spark-maxperf.sh (2 patches: BF16 + FP8)\n  - superqwen3-super.sh (2 patches: BF16 + FP8)\n  - deploy-spark-day1.sh (2 patches: BF16 + FP8)\n  - spark-grpo-train.sh (1 patch: GRPO vLLM)\n  - spark-day1.sh (4 patches: BF16 override + language-model-only, FP8 override + language-model-only, BF16 DeepGEMM, FP8 DeepGEMM)\n\nTOTAL PATCHES THIS SESSION: 13\nTOTAL AUDITS THIS SESSION: 1 syntax + 1 consistency + 1 arg wiring + 1 feature check = 4\n\nLAUNCH DAY STATE: ALL GREEN. 0 known bugs.",
+  "active_tasks": [
+    "All 8 shell scripts: SYNTAX OK",
+    "All 4 Python scripts: COMPILE OK",
+    "Cross-script consistency: ALL FLAGS PRESENT",
+    "Training arg wiring: ALL ACCEPTED",
+    "Banned patterns: ALL CLEAN",
+    "DeepGEMM env vars fixed in spark-day1.sh"
+  ],
+  "decisions": [
+    "presence_penalty=1.5 replaces min_p=0.2 (official Qwen3.6 fix)",
+    "top_k=20 replaces top_k=40 (official Qwen3.6 setting)",
+    "--language-model-only on all serve ports (saves ~2-3GB VRAM)",
+    "DeepGEMM must have env vars + mount in every Docker container",
+    "tool-call-parser not needed for GRPO (generates rollouts, not tools)"
+  ],
+  "files_modified": [
+    "~/dgx-spark-prep/spark-maxperf.sh",
+    "~/dgx-spark-prep/superqwen3-super.sh",
+    "~/dgx-spark-prep/deploy-spark-day1.sh",
+    "~/dgx-spark-prep/spark-grpo-train.sh",
+    "~/dgx-spark-prep/spark-day1.sh"
+  ],
+  "next_steps": "LAUNCH DAY. Sequence: (1) macbook-transfer-helper.sh --enable-ssh, (2) spark-day1.sh --macbook <IP> --usb, (3) spark-maxperf.sh, (4) wire-spark-to-hermes.sh <SPARK_IP>, (5) spark-quality chat, (6) superqwen3-super.sh. Download Qwen3.6-35B-A3B-FP8 official checkpoint from HF on Spark.",
+  "timestamp": "2026-04-19T19:04:50Z",
+  "unix_time": 1776625490.633316,
+  "task_id": "20260419_133215_4ffc00",
+  "source": "manual",
+  "version": 2
+}

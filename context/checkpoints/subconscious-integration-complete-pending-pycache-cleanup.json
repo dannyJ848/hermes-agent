@@ -1,0 +1,26 @@
+{
+  "label": "subconscious-integration-complete-pending-pycache-cleanup",
+  "context": "Subconscious integration completed May 9, 2026. All 97 modules and 128 data files from ~/subconscious/ merged into ~/hermes-agent/agent/ (177 files) and tools/ (106 files). Iteration engine wired into run_agent.py with pre/post action hooks. Blackboard and tool cache integrated. Pending: clear __pycache__ and restart hermes to fully eradicate ~/subconscious/ directory recreation (tool_capability.db created by cached bytecode).",
+  "active_tasks": [
+    "Clear __pycache__ directories",
+    "Verify no cached bytecode references ~/subconscious/",
+    "Restart hermes to complete eradication"
+  ],
+  "decisions": [
+    "All subconscious modules integrated into hermes source code",
+    "Standalone scripts in ~/subconscious/ are prototypes only - must be integrated into hermes core",
+    "Use execute_code for bulk file operations instead of terminal loops"
+  ],
+  "files_modified": [
+    "~/hermes-agent/agent/ (177 files)",
+    "~/hermes-agent/tools/ (106 files)",
+    "~/hermes-agent/run_agent.py",
+    "~/hermes-agent/MASTER_DOC.md"
+  ],
+  "next_steps": "Clear all __pycache__ directories in ~/hermes-agent/, verify no cached bytecode references ~/subconscious/, then restart hermes to complete the eradication.",
+  "timestamp": "2026-05-10T03:20:52Z",
+  "unix_time": 1778383252.327592,
+  "task_id": "20260509_222020_f674a3",
+  "source": "manual",
+  "version": 2
+}

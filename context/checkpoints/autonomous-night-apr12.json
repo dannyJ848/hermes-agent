@@ -1,0 +1,23 @@
+{
+  "label": "autonomous-night-apr12",
+  "context": "Danny going to bed. FULL AUTONOMOUS MODE. Ignore browser stuff (Browserbase key expired, deal another day).\n\nCURRENT STATE:\n- Cerebrum: 1,711 tips, avg conf 0.89, 34 types\n- Eval flywheel: 120 tips Elo-rated (range 1161-1239), ~9s per matchup, Phi-3 judge on localhost:8081\n- 4 inference servers UP (Phi-3:8081, Llama:8082, Nomic:8083, MiniMax:8084)\n- Hindsight at localhost:8890\n- Gateway PID stable, 180 subconscious modules\n- cached_delegate fix in evey_utils.py (needs new CLI session to activate)\n- eval_flywheel.py fixed (domain query now matches tip_type too)\n\nMISSION FOR AUTONOMOUS SESSION:\nPhase 1 -- EVAL FLYWHEEL DEEP RUNS\n- Run many more tournament rounds to get deeper Elo differentiation\n- Target: 300+ tips rated (up from 120)\n- Sweep all domains, not just a few\n- Log results\n\nPhase 2 -- TRAINING GYM CONTINUOUS\n- After eval flywheel saturates, transition to training gym continuous cycle\n- Research -> distill -> evaluate -> evolve loop\n- Use delegate_parallel for research streams\n- Insert distilled tips into cerebrum\n- Run another eval tournament pass on new tips\n- Keep cycling through the night\n\nKEY FILES:\n- ~/subconscious/eval_flywheel.py -- the tournament runner\n- ~/.hermes/plugins/evey_utils.py -- cached_delegate fix (already applied)\n- ~/subconscious/cerebrum_memory.db -- tip storage\n- ~/subconscious/training_gym.py -- continuous training loop\n\nAVOID: browser_navigate (broken), cached_delegate (needs new session). USE: delegate_parallel, web_research, execute_code, terminal, read_file.\n\nDanny is sleeping. No proactive messages unless something critical breaks.",
+  "active_tasks": [
+    "Phase 1: Eval flywheel deep runs (300+ tips rated)",
+    "Phase 2: Training gym continuous cycles through the night"
+  ],
+  "decisions": [
+    "Browser stuff deferred to another day",
+    "Full autonomous mode until morning",
+    "Focus eval flywheel first, then training gym"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/evey_utils.py",
+    "~/subconscious/eval_flywheel.py"
+  ],
+  "next_steps": "1. Run eval_flywheel.py tournament sweep across all domains to rate 300+ tips\n2. Review results, identify weak/strong patterns\n3. Transition to training gym: research -> distill -> evaluate loop\n4. Keep cycling autonomously through the night",
+  "timestamp": "2026-04-13T04:17:37Z",
+  "unix_time": 1776053857.762638,
+  "task_id": "20260412_222857_4c4d1e",
+  "source": "manual",
+  "version": 2
+}

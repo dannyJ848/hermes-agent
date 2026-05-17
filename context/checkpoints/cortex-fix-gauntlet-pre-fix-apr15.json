@@ -1,0 +1,27 @@
+{
+  "label": "cortex-fix-gauntlet-pre-fix-apr15",
+  "context": "Fixing ALL 8 known bugs in the Cortex unified DB system (identified Apr 13 audit marathon), then running 10+ audit gauntlet.\n\nCURRENT STATE: I've read the ENTIRE cortex_compat_shim.py (870 lines) and confirmed the cortex_nodes schema. Ready to start writing patches.\n\nFIX 1 (shim WHERE/SELECT bugs) — 4 sub-bugs identified:\n  Bug A: WHERE clauses with `=` on distilled_tips columns fail. The _col_remap at lines 506-518 replaces column names in SELECT but does NOT handle WHERE clauses properly. When SQL is \"SELECT * FROM distilled_tips WHERE condition = ?\", the regex replaces `condition` everywhere including WHERE — making it \"WHERE COALESCE(metadata->>'condition', '') = ?\" which returns empty strings instead of actual data because condition/recommendation were MERGED into `text` during migration. Fix: For WHERE on condition/recommendation, map to text column instead.\n\n  Bug B: INSERT-then-SELECT can't find row. INSERT via _insert_to_cortex() commits (line 303), but SELECT may use different cursor or stale data. Actually looking at code, both use self._pg_cur which is the same cursor. The issue is likely that after INSERT commits, a new SELECT creates a new CortexCursor with same PG conn — should work. Need to test.\n\n  Bug C: predictions table queries return NoneType. cortex_predictions col remap (lines 521-537) remaps columns but WHERE domain=? becomes WHERE task_type=? which may not match actual data in the predictions table.\n\n  Bug D: metadata JSONB extraction for condition/recommendation returns empty. Lines 506-508 use COALESCE(metadata->>'condition', '') but these fields were merged into `text` during migration. The COALESCE returns '' (empty string) not None — callers expecting actual content get empty.\n\nCORTEX_NODES SCHEMA (confirmed live):\n  id(uuid), text(text), node_type(text), domain(text), parent_id(uuid), source_doc_id(uuid), embedding(vector), elo(real), elo_matches(int), elo_wins(int), elo_losses(int), confidence(real), upvotes(int), downvotes(int), frequency(int), salience(real), trust(real), metadata(jsonb), tags(ARRAY), source_ids(text), created_at(tz), updated_at(tz), last_accessed(tz), last_evaluated(tz), last_consolidated(tz), access_count(int), consolidation_count(int), is_active(boolean), provenance(text)\n\nFIXES 2-8 (not started):\n  fix2: VACUUM cortex_nodes + cortex_edges (837 dead tuples, 154MB bloat)\n  fix3: Clean 2 stale idle-in-transaction-aborted connections\n  fix4: Fix f-string SQL injection at lines 300, 319, 358, 371, 408 — use sql.Identifier\n  fix5: chmod 600 on shim file (currently 644)\n  fix6: Enable log_lock_waits in Postgres\n  fix7: Extend Elo evaluation beyond tips (76% unrated)\n  fix8: Generate embeddings for ~14K uncovered nodes (11.7% coverage)\n  \nFIX 9: audit-gauntlet — run 10+ audits after all fixes\n\nKEY FILES:\n  ~/subconscious/cortex_compat_shim.py — 870 lines, the universal SQLite→Postgres proxy shim\n  ~/subconscious/cortex_daemon.py — 4-thread daemon\n  PostgreSQL cortex DB: postgresql://hindsight:hindsight@localhost:5432/cortex\n\nDB STATS (from Apr 13): ~15,815 nodes, 24 tables, 1,572 active tips, 3,003 deactivated tips\n  Elo: tips avg 1200.4, range 1030-1774, 26.3% high-elo\n  Embedding coverage: 11.7% (1,854/15,815)\n  533 cortex_flywheel entries stuck at status=running",
+  "active_tasks": [
+    "fix1-shim-where (IN PROGRESS) — Fix 4 shim SELECT/WHERE bugs",
+    "fix2-vacuum — VACUUM cortex_nodes + cortex_edges",
+    "fix3-stale-conns — Clean stale idle-aborted DB connections",
+    "fix4-sql-injection — Fix f-string SQL injection in shim",
+    "fix5-permissions — Tighten shim file permissions 644→600",
+    "fix6-log-locks — Enable log_lock_waits in Postgres",
+    "fix7-elo-extend — Extend Elo beyond tips (76% unrated)",
+    "fix8-embeddings — Generate embeddings for ~14K uncovered nodes",
+    "audit-gauntlet — Run 10+ audits on fixed system"
+  ],
+  "decisions": [
+    "condition/recommendation were merged into `text` during SQLite→PG migration, NOT stored in metadata JSONB — so COALESCE(metadata->>'condition','') always returns ''",
+    "cortex_nodes has 29 columns confirmed via live schema query",
+    "Shim architecture: CortexCursor.execute() routes by SQL verb (INSERT/UPDATE/DELETE/SELECT) with table-specific handlers"
+  ],
+  "files_modified": [],
+  "next_steps": "Start writing patches for Fix 1 (shim WHERE/SELECT bugs). The main fix needed: for distilled_tips SELECT queries, when WHERE clause references condition/recommendation, map to `text` column instead of COALESCE(metadata->>'field', ''). Also fix the _col_remap to return `text` for condition/recommendation since they were merged during migration. Then continue with fixes 2-8 and audit gauntlet.",
+  "timestamp": "2026-04-14T19:16:41Z",
+  "unix_time": 1776194201.357418,
+  "task_id": "20260414_134505_6cd910",
+  "source": "manual",
+  "version": 2
+}

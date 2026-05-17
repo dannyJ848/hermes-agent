@@ -1,0 +1,22 @@
+{
+  "label": "r210-reliability-tracker-wired",
+  "context": "R210 milestone audit + reliability science complete. \n\nAUDIT RESULTS: 2,138 active tips (avg conf 0.699), 166 Python modules, 69 DBs, 2940-line plugin.\nKey: optimization type has 946 tips at 0.503 confidence (noise). High-signal: REASONING (171, 0.865), meta (70, 0.882).\n\nResearched Reliability Science Framework (2603.29231) and Speculative Actions (2510.04371). Distilled 10 tips (total 2181). Built reliability_tracker.py — tracks success rate decay, variance amplification factor, meltdown onset detection. Wired into plugin post_tool_call.\n\nCRITICAL INSIGHTS: (1) Memory scaffolds HURT at long horizons. (2) Task decomposition > model upgrades for reliability. (3) Capability rank ≠ reliability rank. (4) Frontier models melt down MORE because they attempt harder tasks.\n\nPlugin: 2954 lines. Tips: 2181 active. Gateway running.",
+  "active_tasks": [
+    "R211: Continue autonomous training"
+  ],
+  "decisions": [
+    "Reliability tracker records every tool call outcome for decay analysis",
+    "VAF threshold 2.5 triggers meltdown detection",
+    "Recommended actions: decompose (rate>0.3) or abort_retry (rate<0.3)"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/reliability_tracker.py"
+  ],
+  "next_steps": "R211: Continue autonomous loop. Research frontier topics. Consider cleaning up low-confidence optimization tips.",
+  "timestamp": "2026-04-12T09:22:24Z",
+  "unix_time": 1775985744.9004958,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

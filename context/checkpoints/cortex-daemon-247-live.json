@@ -1,0 +1,30 @@
+{
+  "label": "cortex-daemon-247-live",
+  "context": "CORTEX UNIFIED DB — 24/7 DAEMON RUNNING\n\nDAEMON: ~/subconscious/cortex_daemon.py — 4 persistent threads:\n1. flywheel_loop: eval 100 pairs + repair + consolidate every 30s\n2. training_gym_loop: rate unrated tips + quality sweep every 60s\n3. perf_monitor_loop: benchmarks every 5 min\n4. heartbeat: writes PID + cycle count every 30s\n\nPID file: ~/subconscious/cortex_daemon.pid\nLog: ~/subconscious/cortex_daemon.jsonl\nHeartbeat: ~/subconscious/cortex_daemon.heartbeat\n\nPERFORMANCE AUDIT RESULTS:\n- Fetch by UUID:    0.09ms\n- FTS search:       0.9ms\n- ILIKE search:     1.0ms\n- Edge traversal:   0.1ms\n- Eval 100 pairs:   1061ms (11ms/pair)\n- Repair sweep:     43ms\n- Consolidation:    56ms (was 65s before md5 fix!)\n- Full cycle:       1.2s\n- Max throughput:   ~3105 cycles/hr, ~3393 pairs/hr\n\nLEARNING STATE:\n- 1,857 tips ALL rated (0 unrated)\n- Elo: avg=1200.1, spread=31.5 (was 21.8), range=1097-1319\n- Tiers: 91 excellent, 842 good, 808 mediocre, 119 poor\n- 4,333 total matches played, avg 2.3/tip\n\nINDEXES: 19 created across cortex_nodes, cortex_edges, cortex_entities, cortex_predictions, cortex_flywheel, cortex_eval_history, cortex_tool_calls. Including GIN for FTS and pg_trgm, covering indexes for eval queries, md5 hash for dedup.\n\nCONSOLIDATION FIX: Changed from similarity() join (65s) to md5 hash dedup (56ms) — 1000x speedup. K-factor raised from 32 to 40 for faster Elo spread.\n\nCRON JOBS STILL ACTIVE: d9d790021dd1 (every 2h), ece3733a111c (daily 4am), 54efd7ef8bf6 (daily 3am), fca05291425c (every 2h) — all wired to cortex. Cron acts as backup for daemon.\n\nDISTILLATION PLUGIN: Fully integrated. Dual-write via cortex_compat.py at all write points. Read path uses Cortex with SQLite fallback.",
+  "active_tasks": [
+    "24/7 cortex daemon running (PID auto-managed)",
+    "Flywheel: 100 pairs/cycle @ 11ms/pair",
+    "Training gym: continuous rating + quality sweep",
+    "Performance monitor: benchmarks every 5 min"
+  ],
+  "decisions": [
+    "24/7 daemon instead of cron-only — 3 persistent threads + heartbeat",
+    "md5 hash dedup replaces similarity() join — 1000x faster consolidation",
+    "K=40 Elo (up from 32) for faster convergence",
+    "19 Postgres indexes for all hot paths",
+    "Perf monitor thread runs continuous benchmarks"
+  ],
+  "files_modified": [
+    "~/subconscious/cortex_daemon.py",
+    "~/subconscious/cortex_flywheel.py",
+    "~/subconscious/cortex_access.py",
+    "~/subconscious/cortex_compat.py",
+    "~/subconscious/cortex_schema_design.py"
+  ],
+  "next_steps": "Monitor daemon for stability over next few hours. Add LLM judge for better Elo discrimination. Consider vector similarity for tip dedup.",
+  "timestamp": "2026-04-13T20:22:21Z",
+  "unix_time": 1776111741.7481432,
+  "task_id": "20260413_135506_962792",
+  "source": "manual",
+  "version": 2
+}

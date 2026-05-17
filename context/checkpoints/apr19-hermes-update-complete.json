@@ -1,0 +1,26 @@
+{
+  "label": "apr19-hermes-update-complete",
+  "context": "Updated hermes-agent from 542 commits behind to HEAD. Clean merge, zero conflicts.\n\nLOCAL PATCHES PRESERVED:\n- AGENTS.md env gate (HERMES_LOAD_AGENTS_MD) in agent/prompt_builder.py line ~956\n- Hindsight context engine plugin in plugins/context_engine/hindsight/__init__.py\n\nUPSTREAM FIXES NOW ACTIVE:\n1. Cloudflare 403 fix for Codex/Z.AI provider — in auxiliary_client.py\n2. Context bursting bug (#11529) — cooldown guard in context_compressor.py\n3. Per-provider/per-model request_timeout_seconds — hermes_cli/timeouts.py\n4. Thinking block stripping — run_agent.py\n5. Terminal hang fix for backgrounded children\n6. HTTP_PROXY respect in custom httpx transport\n7. Compression language-aware summaries\n8. Skills prompt cache refresh when disabled skills change\n\nNEW FEATURES AVAILABLE:\n- xurl skill (replaces xitter)\n- maps skill (OSM, no API key)\n- baoyu-infographic skill\n- NVIDIA NIM provider\n- Discord server introspection tool\n- Browser CDP passthrough\n- Cron wakeAgent gate\n- Configurable cron approval mode\n- Pixel art skills\n\nCONFIG: Migrated v17 -> v19 via hermes doctor --fix\n\nFILES: Patch backup at ~/dgx-spark-prep/hermes-local-patches/\n\nPROFILES: spark-quality, spark-speed, training-gym all intact.\nOrphan aliases (soma-coder/tester/researcher) are cosmetic — references in skill files only.\n\nKNOWN REMAINING: MiniMax API 404 (their endpoint), browser npm vulnerability (low priority), tinker-atropos not installed (not needed for launch day).",
+  "active_tasks": [
+    "hermes update: DONE — 0 commits behind",
+    "config migration: v17 -> v19",
+    "local patches preserved: AGENTS.md env gate + hindsight context engine",
+    "all critical upstream fixes verified in code",
+    "orphan soma aliases: cosmetic only, in skill files"
+  ],
+  "decisions": [
+    "Updated hermes-agent to HEAD before launch day",
+    "Preserved local patches via clean merge (no conflicts)",
+    "Config migrated v17 -> v19"
+  ],
+  "files_modified": [
+    "~/hermes-agent (542 upstream commits merged)",
+    "~/.hermes/config.yaml (migrated v17->v19)"
+  ],
+  "next_steps": "LAUNCH DAY TOMORROW. Sequence: (1) macbook-transfer-helper.sh --enable-ssh, (2) spark-day1.sh --macbook <IP> --usb, (3) spark-maxperf.sh, (4) wire-spark-to-hermes.sh <SPARK_IP>, (5) spark-quality chat, (6) superqwen3-super.sh. Download Qwen3.6-35B-A3B-FP8 from HF on Spark.",
+  "timestamp": "2026-04-19T19:19:53Z",
+  "unix_time": 1776626393.097503,
+  "task_id": "20260419_133215_4ffc00",
+  "source": "manual",
+  "version": 2
+}

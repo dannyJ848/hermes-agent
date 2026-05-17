@@ -1,0 +1,27 @@
+{
+  "label": "training-gym-r136-complete",
+  "context": "Training Gym R135-R136 completed! All 10/10!\n\nR135: burst_balloons(T10), pal_part(T9), word_break(T8), comb_sum(T8)\nR136: itinerary(T9), longest_valid_parens(T10), regex_match(T10), spiral(T8)\n\nDB: 461 exercises, 783 attempts, avg 9.93, 96.7% perfect. 413 passed. Tier 9+ = 141, Tier 10 = 70.\n102+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R136 complete",
+    "R137 next"
+  ],
+  "decisions": [
+    "Burst balloons: interval DP. dp[left][right] = max over last balloon k to burst.",
+    "Palindrome partition: backtracking + palindrome check.",
+    "Word break: DP. dp[i] = True if dp[j] and s[j:i] in set.",
+    "Combination sum: backtracking with remaining target.",
+    "Itinerary: Hierholzer's. Sort adj, pop(0) in post-order DFS.",
+    "Longest valid parens: stack with index. Push -1 initially.",
+    "Regex match: DP. dp[i][j-2] for 0 match, dp[i-1][j] for 1+ match.",
+    "Spiral: boundary tracking. top++, right--, bottom--, left++."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R137: Continue. Try: Expression Add Operators, Minimum Window Substring variant, or Meeting Rooms.",
+  "timestamp": "2026-04-08T23:56:13Z",
+  "unix_time": 1775692573.0434182,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

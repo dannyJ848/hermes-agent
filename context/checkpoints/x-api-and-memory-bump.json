@@ -1,0 +1,13 @@
+{
+  "label": "x-api-and-memory-bump",
+  "context": "SESSION SUMMARY March 31/April 1, 2026:\n\n1. X/TWITTER API ACCESS (WORKING):\n   - Cookie-based auth works via Python requests. Module at /tmp/x_api.py\n   - Danny grabbed cookies from Safari DevTools > Storage tab (auth_token, ct0, twid)\n   - UserTweets GraphQL endpoint works (hash: E3opETHurmVJflFsUBVuUQ)\n   - Browser login still blocked by anti-bot (even with Browserbase residential proxies)\n   - curl returns empty responses from X API, but Python requests with proper headers returns full data\n   - SearchTimeline hash not found in current main.js bundle - need to extract fresh hashes or use web_research as fallback\n   - READ-ONLY - never post, like, retweet, or interact\n\n2. MEMORY BUMP (DONE):\n   - Changed memory_char_limit from 4400 to 12000 in ~/.hermes/config.yaml\n   - Needs gateway restart to take effect (that's what we're about to do)\n\n3. BROWSERBASE (confirmed working):\n   - cloud_provider: browserbase in config.yaml\n   - Proxies active (stealth_features showed \"proxies\" in browser session)\n   - X login still blocked despite proxies (anti-bot JS fingerprinting)\n\n4. PENDING TASKS:\n   - Restart gateway to activate 12K memory limit\n   - Set up X/Twitter cron for AI agent news scanning using /tmp/x_api.py\n   - Retry pydantic-ai deep-dive (timed out twice in previous session)\n   - Build out more X API endpoints (search, user profile, tweet detail)\n   - Continue self-improvement and research learning\n\n5. CRON JOBS (all running):\n   - soma-dev-loop (every 120m, last OK)\n   - soma-progress-report (every 240m, last OK)\n   - daily-intelligence-scan (daily 7am, not yet run)",
+  "active_tasks": [
+    "Restart gateway to activate 12K memory limit",
+    "Set up X/Twitter AI news scanning cron using cookie auth",
+    "Retry pydantic-ai deep-dive",
+    "Build out more X API endpoints (search, profile, tweet detail)",
+    "Continue research and self-improvement"
+  ],
+  "timestamp": "2026-04-01T02:20:36Z",
+  "task_id": "20260331_204223_3e93cd"
+}

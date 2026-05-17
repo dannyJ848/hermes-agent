@@ -1,0 +1,13 @@
+{
+  "label": "ready-for-anki-tomorrow",
+  "context": "## Session Complete - Ready for Tomorrow\n\nDanny has an exam tomorrow and will need UWorld/Anki card updates. All systems ready.\n\n### Today's Work Summary:\n1. **Heuristic Judge V2** — calibrated from 38% to ~85% LLM alignment. 7 signals in ~/subconscious/cortex_flywheel.py\n2. **Anki/UWorld tips injected** — 12 tips distilled from 5 past sessions into cortex. Domain trigger updated (anki/uworld → tool_use). Embedded, boosted, verified retrieval.\n3. **Anki CSS updated** — Cloze model styling:\n   - Desktop front: 28px → 16px (matches back side at 1.0rem)\n   - Desktop back: 0.85rem → 1.0rem (~16px, matches front)\n   - Mobile front: 15px (unchanged, perfect)\n   - Mobile back: 1.0rem (matches front on mobile too)\n4. **Killed stale http.server** on port 8765 (was since Tuesday, blocking AnkiConnect)\n\n### For Tomorrow:\n- Scripts on disk: ~/Desktop/uworld_phase1_broad.py, ~/Desktop/uworld_phase2_broad_v2.py\n- Skill: uworld-api-extraction (comprehensive)\n- Chrome CDP port 9222 needed for JWT refresh\n- AnkiConnect on localhost:8765\n- Budget: <$40 left on FriendliAI credits — be efficient",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Load uworld-api-extraction skill, check Chrome CDP, refresh JWT, run UWorld pipeline as Danny requests. Be budget-conscious with <$40 remaining.",
+  "timestamp": "2026-04-16T02:50:40Z",
+  "unix_time": 1776307840.022274,
+  "task_id": "20260415_205415_473e89",
+  "source": "manual",
+  "version": 2
+}

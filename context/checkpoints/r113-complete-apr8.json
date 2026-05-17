@@ -1,0 +1,19 @@
+{
+  "label": "r113-complete-apr8",
+  "context": "R113 complete. 425 tips, avg conf 0.830. Added CoT Selective Application tip (CoT helps mainly on math/logic/symbolic tasks. On MMLU direct ≈ CoT unless symbolic operations. Solver tools > CoT for symbolic. Apply CoT selectively, save inference cost. ICLR 2025). Domain: reasoning-strategy. Round 113. ~05:10 AM. Danny sleeping. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R113 complete — 425 tips, 0.830 — ready for R114"
+  ],
+  "decisions": [
+    "CoT should be applied selectively — strong for math/logic, weak for other tasks"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R114: Continue. Training gym healthy past 425 tips.",
+  "timestamp": "2026-04-08T09:19:24Z",
+  "unix_time": 1775639964.5490031,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

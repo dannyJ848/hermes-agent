@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r114-complete",
+  "context": "Training Gym R114 completed! ALL 4 PASS ON FIRST TRY!\n\nR114 RESULTS (all 10/10):\n1. insert-interval-001 (T7) - Three phase: before, merge, after. Extend new_interval bounds.\n2. non-overlapping-intervals-001 (T8) - Greedy sort by end. Keep if start >= last_end.\n3. clone-graph-001 (T7) - BFS with hashmap {original: copy}. Create on first visit.\n4. number-of-provinces-001 (T7) - DFS count components.\n\nDB: 417 exercises, 695 attempts, avg 9.92, 96.3% perfect. 368 passed. Tier 9+ = 102, Tier 10 = 57.\n80+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R114 complete",
+    "R115 next"
+  ],
+  "decisions": [
+    "Insert interval: three phase. Before (end < new.start), merge (start <= new.end), after.",
+    "Non-overlapping: sort by end time. Greedy keep earliest end. Count removals.",
+    "Clone graph: BFS with {orig: copy} map. Create on discovery, append neighbors.",
+    "Provinces: DFS from each unvisited city. Count components."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R115: Continue. Try: Graph Valid Tree, Cheapest Flights K Stops, or Longest Increasing Path in Matrix.",
+  "timestamp": "2026-04-08T23:06:50Z",
+  "unix_time": 1775689610.205141,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

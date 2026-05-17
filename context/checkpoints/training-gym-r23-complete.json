@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r23-complete",
+  "context": "Training Gym R22-R23 completed. 8/8 exercises pass with real pytest verification.\n\nR22 RESULTS (all 10/10):\n1. graph-001 (T5) - Directed graph: topo sort, cycle detection, BFS, Dijkstra. 13 tests.\n2. typ-001 (T5) - EventEmitter with generics. 9 tests.\n3. err-001 (T4) - Error chain tracer. 8 tests. Fixed nested try/except scope.\n4. async-001 (T4) - AsyncTaskRunner. 7 tests.\n\nR23 RESULTS (all 10/10):\n1. parse-001 (T5) - JSON parser from scratch, 27 parametrized tests vs stdlib json.loads\n2. memo-001 (T4) - Memoization with TTL/LRU. Key: use hash(key) not TypeError for dict usability.\n3. stream-001 (T5) - Lazy stream pipeline. Key: use built-in map()/filter() for chaining, not genexps.\n4. plug-001 (T5) - Plugin registry with DI + cycle detection. 9 tests.\n\nCRITICAL LEARNINGS THIS SESSION:\n- hash(key) is the correct way to test if something can be a dict key\n- Generator expressions create independent iterators - use map()/filter() for chaining\n- Nested try/except needs explicit variable assignment (exc = None pattern)\n- pytest-asyncio not needed; asyncio.get_event_loop().run_until_complete() works\n\nDB: 168 exercises, 331 attempts, avg 9.8",
+  "active_tasks": [
+    "R22 complete",
+    "R23 complete",
+    "R24 next"
+  ],
+  "decisions": [
+    "Use hash(key) to test dict key usability",
+    "Use built-in map()/filter() for lazy iterator chaining",
+    "Nested try/except needs explicit variable assignment"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R24 exercises. Consider: state machine, interpreter pattern, concurrent data structures, HTTP mock server.",
+  "timestamp": "2026-04-08T17:02:27Z",
+  "unix_time": 1775667747.7087638,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

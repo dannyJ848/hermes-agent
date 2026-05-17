@@ -1,0 +1,17 @@
+{
+  "label": "docker-restart-done-apr15",
+  "context": "All Z.AI freeze fixes complete. Docker restarted with 4GB memory cap (was 8GB). All 4 fixes applied:\n1. _build_keepalive_httpx_client() - SO_KEEPALIVE + 30s probes\n2. _force_close_tcp_sockets() - before all 5 error-path closes\n3. TCP keepidle reduced to 30s system-wide (persistent via launch daemon)\n4. Docker VM memory 8092→4096 MiB (applied after restart)\n\nUWorld pipeline complete: 1,822 cloze Anki cards. ~5,899 total study cards for Step 1 (~May 7).\nTraining gym: R167 skill_verifier.py in progress. Pre_llm_call hook, distill tips, restart gateway still needed.\nCortex daemon running. Two Hermes sessions active.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [
+    "~/hermes-agent/run_agent.py",
+    "/Library/LaunchDaemons/com.local.tcp-keepalive.plist",
+    "~/Library/Group Containers/group.com.docker/settings-store.json"
+  ],
+  "next_steps": "Danny shared an X/Twitter link from Clement Delangue (HuggingFace CEO) to check out. After that, continue with training gym or study prep.",
+  "timestamp": "2026-04-14T16:56:41Z",
+  "unix_time": 1776185801.5775712,
+  "task_id": "20260414_113106_74aada",
+  "source": "manual",
+  "version": 2
+}

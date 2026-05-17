@@ -1,0 +1,28 @@
+{
+  "label": "backup-system-complete-apr15",
+  "context": "Session started by restoring a checkpoint from a previous session that froze during cortex daemon diagnostic. The main work accomplished in this session:\n\n1. BACKUP SYSTEM BUILT AND LIVE:\n   - Script: ~/hermes-backup.sh (chmod +x)\n   - Runs: 3am daily via Hermes cron (job: hermes-daily-backup, id: 5d10a7a24b2a)\n   - Method: git commit (3 repos: hermes-agent, subconscious, .hermes) + tar.gz snapshot\n   - Includes: run_agent.py, config.yaml, .env, plugins/, ~/subconscious/, ~/.hermes/skills|memory|cron|knowledge/, TODAY'S sessions (files modified today only, ~56MB)\n   - Skips: old sessions, checkpoints, browser-profile, logs, venv, __pycache__\n   - Retention: 7 days at ~/.hermes-backups/\n   - Verified: 5 sec runtime, 96MB tar, 8516 files + 294 session files\n   - Rollback: git checkout HASH -- FILE for single files, tar xzf for full disaster recovery\n\n2. CORTEX DAEMON DIAGNOSTIC STATUS (partially complete from prior session):\n   - Fix 1 CONFIRMED: llm_judge.py has complete_flywheel_cycle() call (verified in code)\n   - Fix 2 CONFIRMED: 534 stuck llm_eval flywheel records cleaned\n   - Fix 3: cortex_quick_stats.py created\n   - Daemon restart attempted but multiple instances kept spawning — needs clean restart\n   - Still TODO: (a) clean daemon restart, (b) DB index health + vacuum, (c) redundancy/failure mode analysis, (d) final diagnostic report\n\n3. Key finding: the other CLI session was also working and edited something that broke the agent, requiring fix via OpenClaw. This motivated the backup system.",
+  "active_tasks": [
+    "Clean restart cortex daemon (single instance)",
+    "DB index health + dead tuples + vacuum status",
+    "Redundancy/failure mode analysis",
+    "Final diagnostic report + memory update"
+  ],
+  "decisions": [
+    "Daily backup at 3am via Hermes cron (not system crontab)",
+    "Include today's sessions in backup (not all 1.3GB)",
+    "Option 3: git + tar double protection",
+    "7-day retention window"
+  ],
+  "files_modified": [
+    "~/hermes-backup.sh",
+    "~/.hermes-backups/hermes_backup_20260414_131119.tar.gz",
+    "~/.hermes-backups/hermes_backup_20260414_131319.tar.gz",
+    "~/.hermes-backups/hermes_backup_20260414_131617.tar.gz"
+  ],
+  "next_steps": "Wait for Danny's direction — the other CLI session may be handling cortex daemon work. If Danny wants to continue the diagnostic here, start with a clean daemon restart using the Python script approach (/tmp/daemon_restart.py) to avoid the double-spawn issue with nohup.",
+  "timestamp": "2026-04-14T18:17:11Z",
+  "unix_time": 1776190631.2808058,
+  "task_id": "20260414_130307_36efe4",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,13 @@
+{
+  "label": "post-comprehensive-wiring-audit",
+  "context": "Full end-to-end verification of merged local knowledge core COMPLETE. All 4 tasks done (injection tightening, Hindsight local migration, verify).\n\nSYSTEM STATE:\n- Cerebrum (SQLite): 2,374 tips, avg conf 0.66\n- Hindsight (Local PG at localhost:8890): 9,945 nodes, 398K links, 3,790 docs\n- Recall test: 49 results in <10s (tool failure recovery query)\n- Plugin: ~2,648 lines, max 5 tips/call (conf>=0.7), 1 Hindsight KG fact/call\n- Gateway: RUNNING (5 procs)\n- Config: _HINDSIGHT_LOCAL, CACHE_TTL=120s, _MAX_INJECT=5\n- VPS (2.24.28.233) still running as backup but plugin uses LOCAL exclusively\n- All R153-R184 rounds wired and operational\n- 150+ subconscious modules\n- Local models: Phi-3(8081), Llama8B(8082), Nomic(8083), MiniMax M2.7(8084)\n- Bank: hermes-cerebrum on local Hindsight\n- Danny in fully autonomous mode — wants continuous training rounds\n\nFILES:\n- Plugin: ~/.hermes/plugins/distillation/__init__.py (2,648 lines)\n- Cerebrum: ~/.hermes/cerebrum_memory.db\n- Hindsight local PG: user=hindsight, db=hindsight, port 5432\n- Hindsight env: ~/.hindsight/profiles/hermes.env (Phi-3 at 8081)\n- Subconscious modules: ~/subconscious/ (150+ modules)\n- Key modules: decomposed_reward, fitness_registry, next_state_extractor, heuristic_reranker, turn_credit, trajectory_intel, curriculum_tracker, adaptive_compute, fademem_decay\n\nPENDING NEXT: R185+ autonomous training loop — research, extract, build, wire, test, restart. Consider building modules from R170-R184 paper insights (AutoTool graph, PASTE speculative executor, SkillX skill hierarchy, ToolTree MCTS planner, AIR safety lifecycle). Git commit all changes.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Continue autonomous training loop at R185. Research new papers/techniques, extract tips, build subconscious modules, wire into plugin, test, restart. Priority: build infrastructure modules from R170-R184 paper insights that haven't been coded yet.",
+  "timestamp": "2026-04-12T05:13:08Z",
+  "unix_time": 1775970788.4843578,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,26 @@
+{
+  "label": "qwen27b-benchmarks-complete-training-prep",
+  "context": "Qwen 27B Expert Logician benchmark evaluation COMPLETE. All major benchmarks finished:\n\n- MMLU: 86.57%\n- GSM8K: 66.19% (needs generation_config.json max_new_tokens patch)\n- HumanEval: 82.93% pass@1 (needs HF_ALLOW_CODE_EVAL=1)\n- ARC Challenge: 60.24%\n- WinoGrande: 77.19%\n- BBH: Skipped (intractable on GB10, 76s/it)\n\nModel path: /data/SpecForge/custom_dflash/checkpoints/final_model_merged\nEval results: /data/SpecForge/custom_dflash/evaluation_results/\n\nTRAINING PREP IN PROGRESS:\n- Datasets (337GB) currently transferring from MacBook to DGX via rsync\n- Transfer started: ~15% complete, ETA 3-4 hours\n- Transfer log: /tmp/dataset_push.log\n- Background process: proc_31fb84bca282\n\nTRAINING CONFIG READY:\n- Axolotl config: /data/SpecForge/custom_dflash/axolotl_config.yaml\n- LoRA r=256, alpha=512, target all linear modules\n- Base model: Qwen 27B checkpoint\n- Datasets: tier1-reasoning, tier2-reasoning, tier3-health\n- Output: /data/SpecForge/custom_dflash/adapters/qwen27b-tiered-r256\n- Training: 3 epochs, lr 2e-4, cosine schedule, 4096 seq len\n\nCONSOLIDATION SCRIPT:\n- /data/SpecForge/custom_dflash/consolidate_datasets.py\n- Converts raw datasets to axolotl input_output format\n\nNEXT STEPS WHEN TRANSFER COMPLETES:\n1. Run consolidate_datasets.py on DGX\n2. Start training: axolotl train axolotl_config.yaml\n3. Monitor with wandb or tensorboard\n\nMACBOOK DISK SPACE:\n- ~/datasets is 337GB\n- Should eventually move to external SSD (/Volumes/SSD8TB) to free space",
+  "active_tasks": [
+    "Dataset transfer from MacBook to DGX (~15% done)",
+    "Prepare consolidated datasets for axolotl",
+    "Start LoRA training r=256 on tiered datasets"
+  ],
+  "decisions": [
+    "Using LoRA r=256 (same as Franken V8) instead of r=64/128",
+    "Training on tier1-reasoning, tier2-reasoning, tier3-health (new data, not seen by model)",
+    "Using input_output format for axolotl (instruction/response pairs)",
+    "BBH skipped due to intractable runtime on GB10"
+  ],
+  "files_modified": [
+    "/data/SpecForge/custom_dflash/axolotl_config.yaml",
+    "/data/SpecForge/custom_dflash/consolidate_datasets.py",
+    "/data/SpecForge/custom_dflash/transfer_datasets.sh"
+  ],
+  "next_steps": "1. Wait for dataset transfer to complete (check /tmp/dataset_push.log)\n2. SSH to DGX and run: python3 /data/SpecForge/custom_dflash/consolidate_datasets.py\n3. Start training: cd /data/SpecForge/custom_dflash && axolotl train axolotl_config.yaml\n4. Monitor training progress",
+  "timestamp": "2026-05-13T05:43:51Z",
+  "unix_time": 1778651031.6817868,
+  "task_id": "20260511_000903_ddda73",
+  "source": "manual",
+  "version": 2
+}

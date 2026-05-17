@@ -1,0 +1,26 @@
+{
+  "label": "r141-clean-1000-tips-apr8",
+  "context": "R141. ACHIEVED: 1000 CLEAN tips at 0.848 avg confidence. \n\nJourney: R130~880 → R139 first 1000 (0.834) → R140 cleanup (941 at 0.846) → R141 clean 1000 (0.848). Quality cleanup was the highest-value action — removing noise tips raised quality more than adding new ones.\n\nSession stats:\n- 7 papers: TRACE, MatClaw, AgentGL, SkillX, Deep Researcher, COSMO-Agent, MemMachine, YC-Bench\n- 9 knowledge findings saved\n- 7-layer learning stack architecture synthesized (Persistence, Hierarchy, Reward, Retrieval, Memory, Training, Cost)\n- Pipeline: all 6 stages verified operational\n- 4 cross-domain transfers identified\n- Quality: 0.7 floor, 0.95 ceiling, bell curve peaking at 0.85-0.9\n\nKey findings:\n- MemMachine: ground-truth preservation, contextualized retrieval, 80% token savings\n- YC-Bench: scratchpad is strongest predictor of success, 47% failures from adversarial inputs\n- COSMO: small RL-tuned models beat GPT-4 at specific tasks\n- Quality cleanup > quantity growth (proven)\n\nSystem: gateway PID 28336, caffeinate PID 82351, disk 5%, DB 8.1MB vacuumed.\nDanny at daylong test. Quality-first. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R141 COMPLETE — clean 1000 tips at 0.848 avg confidence"
+  ],
+  "decisions": [
+    "Quality > quantity at ALL times",
+    "0.848 avg is the quality floor for new tips",
+    "Phase 2: depth over breadth — functional chains, adaptive retrieval, tip validation",
+    "Auto-generated 0.5 tips must be prevented at source (need CHECK constraint)",
+    "Clean 1000 at 0.848 > inflated 1000 at 0.834"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (clean 1000 tips, 0.848 avg, vacuumed)",
+    "~/.hermes/knowledge/cosmo-agent-tool-augmented-rl-apr2026.md",
+    "~/.hermes/knowledge/yc-bench-long-term-planning-apr2026.md",
+    "~/.hermes/knowledge/memmachine-ground-truth-memory-apr2026.md"
+  ],
+  "next_steps": "R142: Phase 2 — depth over breadth. Add functional chains for top 5 workflows. Implement adaptive retrieval beyond keyword matching.",
+  "timestamp": "2026-04-08T17:05:50Z",
+  "unix_time": 1775667950.563284,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

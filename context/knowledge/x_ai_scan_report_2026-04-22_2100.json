@@ -1,0 +1,157 @@
+{
+  "scan_date": "2026-04-22",
+  "total_tweets": 30,
+  "top_findings": [
+    {
+      "title": "Hermes Agent Native WeChat Support",
+      "source": "@NousResearch",
+      "priority": "HIGH",
+      "category": "hermes_integration",
+      "text": "\u7ed9\u4e2d\u56fd\u7528\u6237\u7684\u597d\u6d88\u606f\uff1aHermes Agent \u73b0\u5728\u539f\u751f\u652f\u6301\u4e2a\u4eba\u5fae\u4fe1\u4e86\n\n\u5fae\u4fe1\u626b\u7801\u5373\u53ef\u8fde\u63a5\uff0c\u79c1\u804a\u7fa4\u804a\u90fd\u652f\u6301\u3002\u56fe\u7247\u3001\u89c6\u9891\u3001\u6587\u4ef6\u3001\u8bed\u97f3\u6d88\u606f\u5168\u8986\u76d6\uff0c\u957f\u8f6e\u8be2\u76f4\u8fde\uff0c\u4e0d\u9700\u8981\u516c\u7f51 IP\u3002\n\n\u8fd0\u884c 'hermes update' \u5373\u53ef\u4f53\u9a8c\n\n\u6587\u6863\uff1ahttps://t.co/nonIEoaF79\n\n\u611f\u8c22 @Bravohenry_ \u7684\u8d21\u732e https://t.co/xFir5yAN6G",
+      "tweet_id": "2042821620281053641",
+      "engagement": {
+        "favs": 3369,
+        "rts": 573
+      }
+    },
+    {
+      "title": "Claude Code Multi-Agent Orchestration Open Sourced",
+      "source": "@ivanburazin",
+      "priority": "MEDIUM",
+      "category": "agent_framework",
+      "text": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open source model agnostic framework. \n\nHe studied the architecture, focused on the multi-agent orchestration layer (the coordinator that breaks goals into tasks, team https://t.co/nGAqQcZDW3",
+      "tweet_id": "2040112100597506107",
+      "engagement": {
+        "favs": 3441,
+        "rts": 545
+      }
+    },
+    {
+      "title": "Chinese Open Source Python AI Agent Framework",
+      "source": "@hasantoxr",
+      "priority": "MEDIUM",
+      "category": "agent_framework",
+      "text": "\ud83d\udea8 BREAKING: CHINA just released a Python framework for building AI agents. 100% OPEN SOURCE.\n\nIt has visual agent design, MCP tools, memory, RAG, and reasoning. All built in. All working together.\n\nIt's called AgentScope.\n\nYou describe your agent system. It builds the https://t.co/CCmL2uyUoy",
+      "tweet_id": "2036531659378663490",
+      "engagement": {
+        "favs": 2749,
+        "rts": 627
+      }
+    },
+    {
+      "title": "AG-UI Protocol for AI Agent-Frontend Communication",
+      "source": "@akshay_pachaar",
+      "priority": "MEDIUM",
+      "category": "protocol",
+      "text": "AI agents can finally talk to your frontend!\n\nThe AG-UI Protocol bridges the critical gap between AI agents and frontend apps, making human-agent collaboration seamless.\n\nMCP: Agents to tools\nA2A:  Agents to agents\nAG-UI: Agents to users\n\n100% open-source. https://t.co/OImTiNB0AM",
+      "tweet_id": "1963945302991450272",
+      "engagement": {
+        "favs": 1191,
+        "rts": 232
+      }
+    },
+    {
+      "title": "LocalCowork: Local AI Agent with 67 MCP Tools",
+      "source": "@liquidai",
+      "priority": "MEDIUM",
+      "category": "agent_framework",
+      "text": "&gt; 385ms average tool selection.\n&gt; 67 tools across 13 MCP servers.\n&gt; 14.5GB memory footprint.\n&gt; Zero network calls.\n\nLocalCowork is an AI agent that runs on a MacBook. Open source. \n\n\ud83e\uddf5 https://t.co/bnXupspSXc",
+      "tweet_id": "2029586519389086198",
+      "engagement": {
+        "favs": 1540,
+        "rts": 152
+      }
+    }
+  ],
+  "hermes_nous_count": 8,
+  "all_hermes_tweets": [
+    {
+      "text": "\u7ed9\u4e2d\u56fd\u7528\u6237\u7684\u597d\u6d88\u606f\uff1aHermes Agent \u73b0\u5728\u539f\u751f\u652f\u6301\u4e2a\u4eba\u5fae\u4fe1\u4e86\n\n\u5fae\u4fe1\u626b\u7801\u5373\u53ef\u8fde\u63a5\uff0c\u79c1\u804a\u7fa4\u804a\u90fd\u652f\u6301\u3002\u56fe\u7247\u3001\u89c6\u9891\u3001\u6587\u4ef6\u3001\u8bed\u97f3\u6d88\u606f\u5168\u8986\u76d6\uff0c\u957f\u8f6e\u8be2\u76f4\u8fde\uff0c\u4e0d\u9700\u8981\u516c\u7f51 IP\u3002\n\n\u8fd0\u884c 'hermes update' \u5373\u53ef\u4f53\u9a8c\n\n\u6587\u6863\uff1ahttps://t.co/nonIEoaF79\n\n\u611f\u8c22 @Bravohenry_ \u7684\u8d21\u732e https://t.co/xFir5yAN6G",
+      "handle": "@NousResearch",
+      "name": "Nous Research",
+      "tweet_id": "2042821620281053641",
+      "favs": 3369,
+      "rts": 573,
+      "query": "Nous Research OR Teknium OR Hermes agent min_faves:5",
+      "score": 5088,
+      "priority": "HIGH"
+    },
+    {
+      "text": "Hermes Agent \u52bf\u5934\u5f88\u731b\uff0c\u8fd9\u51e0\u5929\u63a8\u8350\u7684\u4eba\u5f88\u591a\uff0c\u53ef\u4ee5\u5173\u6ce8\u4e00\u4e0b\u3002\u6211\u81ea\u5df1\u5b89\u88c5\u8bd5\u7528\u4e86\u8fd8\u53ef\u4ee5\u3002\n\nHermes Agent \u662f\u7531 Nous Research \u5728\u4eca\u5e74 2 \u6708\u5e95\u5f00\u6e90\u7684 AI \u667a\u80fd\u4f53\u6846\u67b6\uff0c\u4e0a\u7ebf\u4e0d\u5230\u4e24\u4e2a\u6708\uff0cGitHub \u661f\u6807\u5df2\u7ecf\u63a5\u8fd1\u4e09\u4e07\u3002\u8fd9\u4e2a\u9879\u76ee\u88ab\u793e\u533a\u8ba4\u4e3a\u662f OpenClaw\uff08\u9f99\u867e\uff09\u4e0a\u7ebf\u4ee5\u6765\uff0c\u7b2c\u4e00\u4e2a\u771f\u6b63\u610f\u4e49\u4e0a\u7684\u7ade\u4e89\u5bf9\u624b\u3002",
+      "handle": "@dotey",
+      "name": "\u5b9d\u7389",
+      "tweet_id": "2041585514873037167",
+      "favs": 1834,
+      "rts": 391,
+      "query": "Nous Research OR Teknium OR Hermes agent min_faves:5",
+      "score": 3007,
+      "priority": "HIGH"
+    },
+    {
+      "text": "The Hermes Agent Creative Hackathon starts now\n\n16 Days, $25k in Prizes\n\nPresented by @Kimi_Moonshot &amp; @NousResearch \n\nFor the tinkerers pushing Hermes Agent into creative domains: video, image, audio, 3D, long-form writing, creative software, interactive media and more.\n\nShow us https://t.co/grqWJlXm3K",
+      "handle": "@NousResearch",
+      "name": "Nous Research",
+      "tweet_id": "2045225469088326039",
+      "favs": 1955,
+      "rts": 230,
+      "query": "Nous Research OR Teknium OR Hermes agent min_faves:5",
+      "score": 2645,
+      "priority": "HIGH"
+    },
+    {
+      "text": "Kimi K2.6 raises the bar for open-source models. \n\n\ud83e\udd99 available on Ollama's cloud! \n\nTry it with OpenClaw: \nollama launch openclaw --model kimi-k2.6:cloud\n\nTry it with Hermes Agent: \nollama launch hermes --model kimi-k2.6:cloud\n\nTry it with Claude Code: \nollama launch claude",
+      "handle": "@ollama",
+      "name": "ollama",
+      "tweet_id": "2046361868076487155",
+      "favs": 1920,
+      "rts": 175,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20",
+      "score": 2445,
+      "priority": "HIGH"
+    },
+    {
+      "text": "We just released Hermes Agent! In my humble opinion a very good blend between coding agents like Claude Code and generalist agents like Clawdbot.\n\nBeen working on this for the last month or so now - started as a way for us to have agentic primitives for datagen and RL and got",
+      "handle": "@Teknium",
+      "name": "Teknium \ud83e\udebd",
+      "tweet_id": "2026760653743206502",
+      "favs": 1304,
+      "rts": 90,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20",
+      "score": 1574,
+      "priority": "HIGH"
+    },
+    {
+      "text": "Access GPT Image 2.0 natively in Hermes Agent\n\nUpdate now to get access - just run `hermes update` and select your image generation tool model with `hermes tools`",
+      "handle": "@NousResearch",
+      "name": "Nous Research",
+      "tweet_id": "2046693872773062834",
+      "favs": 882,
+      "rts": 56,
+      "query": "Nous Research OR Teknium OR Hermes agent min_faves:5",
+      "score": 1050,
+      "priority": "HIGH"
+    },
+    {
+      "text": "Did you know you can get your claude through hermes without any fancy tricks?\n\nJust type /claude-code &lt;prompt&gt;\n\nIn a new session. Hermes Agent can pilot a claude code session for you like it\u2019s nothing. Give it a try\n\nIt also doesn\u2019t break all the self improvement loop and",
+      "handle": "@Teknium",
+      "name": "Teknium \ud83e\udebd",
+      "tweet_id": "2040603975343542503",
+      "favs": 844,
+      "rts": 55,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20",
+      "score": 1009,
+      "priority": "HIGH"
+    },
+    {
+      "text": "Kimi K2.6 is now available in Hermes Agent.\n\nSimply run `hermes update` and use `hermes model` to select a compatible provider hosting the model!",
+      "handle": "@NousResearch",
+      "name": "Nous Research",
+      "tweet_id": "2046300755683098910",
+      "favs": 865,
+      "rts": 39,
+      "query": "Nous Research OR Teknium OR Hermes agent min_faves:5",
+      "score": 982,
+      "priority": "HIGH"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "label": "priority-list-items-3-4-5",
+  "context": "Resuming the original 6-item priority list from Apr 14. Items 1-2 are DONE, items 3-5 were never completed due to session freezes. Now tackling:\n\n#3: Reflect and integrate UWorld project insights into training gym\n#4: Identify enhancements that would've helped during the UWorld project  \n#5: Get training gym running autonomously\n\nKey context:\n- UWorld project: 1,822 cloze Anki cards created from 186 quizzes, targeting 38 weak subtopics for USMLE Step 1 (~May 7)\n- UWorld API reverse-engineered: PascalCase, JWT auth (1hr expiry), correctAnswer is STRING not INT\n- Browser automation via Chrome CDP on Danny's Mac (port 9222) + Playwright\n- Major pain points: Z.AI socket freezes (CLOSE_WAIT deadlock), session context compaction losing work, Anki CSS specificity issues, UWorld API type mismatches\n- Training gym: cortex_daemon.py, llm_judge.py (3-provider ensemble), distillation pipeline, Elo evaluation\n- System state (Apr 15): 35,329 cortex nodes, 379,778 edges, 100% embeddings, 10/10 audit pass, daemon running\n\nFiles to reference:\n- ~/subconscious/cortex_daemon.py (training gym daemon)\n- ~/subconscious/llm_judge.py (3-judge ensemble)\n- ~/subconscious/trajectory_intel.py (trajectory analysis)\n- ~/subconscious/failure_exemplar_bank.py (failure patterns)\n- Skills: training-gym-continuous, agi-self-improvement-loop, uworld-api-extraction",
+  "active_tasks": [
+    "#3: UWorld project reflection → distill into training gym tips",
+    "#4: Identify concrete enhancements for future similar projects",
+    "#5: Verify training gym autonomous operation"
+  ],
+  "decisions": [
+    "Items 1-2 of original 6-item list are DONE",
+    "Tackling items 3-5 in order",
+    "Reflection should produce actionable tips, skills, and system improvements"
+  ],
+  "files_modified": [],
+  "next_steps": "Start with #3: Deep reflection on the UWorld project. Review what happened across sessions, extract successes/failures/patterns, and distill into training gym tips and skill improvements.",
+  "timestamp": "2026-04-14T20:03:39Z",
+  "unix_time": 1776197019.750012,
+  "task_id": "20260414_145941_c9011e",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r91-complete",
+  "context": "Training Gym R91 completed! ALL 4 PASS ON FIRST TRY!\n\nR91 RESULTS (all 10/10):\n1. binary-tree-level-order-001 (T7) - BFS with queue. Track level_size per iteration.\n2. word-break-dp-001 (T9) - dp[i] = True if any dp[j] and s[j:i] in set. O(n^2).\n3. partition-equal-subset-001 (T9) - If total%2!=0: False. Subset sum DP for target=total//2. Iterate backwards.\n4. binary-tree-max-path-sum-001 (T10) - DFS returns one-side gain. max_sum = max(node+left+right). Gain = max(0, child_gain).\n\nDB: 359 exercises, 603 attempts, avg 9.91, 95.7% perfect. 310 passed. Tier 9+ = 88, Tier 10 = 49.\n57+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R91 complete",
+    "R92 next"
+  ],
+  "decisions": [
+    "Max path sum: DFS returns max one-side gain (max(0, child_gain)). Update global max with node.val+left+right.",
+    "Word break: dp[i] = any(dp[j] and s[j:i] in set for j in range(i)). Use set for O(1) lookup.",
+    "Partition: subset sum. Iterate backwards to avoid using same element twice.",
+    "Level order: BFS. Track level size. Dequeue level_size nodes per iteration."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R92: Continue. Try: LRU Cache, Reverse Linked List, or Lowest Common Ancestor.",
+  "timestamp": "2026-04-08T22:07:05Z",
+  "unix_time": 1775686025.4035048,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

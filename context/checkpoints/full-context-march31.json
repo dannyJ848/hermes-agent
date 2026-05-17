@@ -1,0 +1,12 @@
+{
+  "label": "full-context-march31",
+  "context": "SESSION SUMMARY March 31, 2026:\n\n1. BROWSERBASE FIX (done, needs restart):\n   - Added `cloud_provider: browserbase` to ~/.hermes/config.yaml under browser: section\n   - Fixed 2 corrupted lines in ~/hermes-agent/tools/browser_providers/browserbase.py (os.env...EY\" -> os.environ.get(\"BROWSERBASE_API_KEY\"))\n   - ~/.hermes/.env has BROWSERBASE_API_KEY, BROWSERBASE_PROJECT_ID, BROWSERBASE_PROXIES=true\n   - Danny has Developer plan ($20/mo). Project ID: eda78810-ea93-43b2-ae25-f1e2096ca5c8\n   - RESTART INSTRUCTION: `pkill -9 -f hermes; sleep 2; cd ~/hermes-agent && source venv/bin/activate && hermes gateway`\n   - After restart, X login should work with residential proxies. Try logging into x.com with username e73_da\n\n2. RESEARCH COMPLETED (saved to knowledge base):\n   - MetaGPT: Watch-CauseBy implicit SOP, 3-axis message routing, ActionNode tree system, dual-mode roles. Knowledge file: metagpt-architecture.md\n   - AReaL: 8+ RL algorithms, async RL, tree training, version-aware training. Knowledge file: areal-rl-reasoning.md\n   - Agent landscape: mini-SWE-agent (100 lines beats complex), DeerFlow 2.0 (55k stars), Deep Agents (18k stars), MCP explosion. Knowledge file: agent-landscape-march-2026.md\n   - All findings in ~/.hermes/knowledge/\n\n3. X/TWITTER ACCESS RULES:\n   - READ-ONLY. Never post, like, retweet, reply, or interact.\n   - Username: e73_da\n   - Access blocked by bot detection without proxies (hence the Browserbase fix)\n\n4. PENDING: pydantic-ai deep-dive timed out twice. Retry next session.\n\n5. CRON: daily-intelligence-scan created, runs at 7am, scans GitHub trending + web + arxiv",
+  "active_tasks": [
+    "Restart gateway to activate Browserbase cloud provider (config.yaml + .env are set)",
+    "Retry pydantic-ai deep-dive (timed out twice)",
+    "Test X/Twitter login after restart with proxies",
+    "X is READ-ONLY - never post, like, or interact"
+  ],
+  "timestamp": "2026-04-01T01:41:25Z",
+  "task_id": "20260331_184629_03193c"
+}

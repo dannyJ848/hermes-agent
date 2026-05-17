@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r30-complete",
+  "context": "Training Gym R22-R30 completed. 36 exercises all 10/10.\n\nR30 RESULTS (all 10/10):\n1. priorityq-001 (T4) - Priority queue with decrease-key via lazy invalidation (mark old entries None, push new). 9 tests.\n2. template-001 (T4) - Template engine: {{var}}, {{#if}}, {{#else}}, {{#each}}, nested props, {{.}} for current item. 10 tests.\n3. rate-001 (T5) - Token bucket + sliding window rate limiters, thread-safe with Lock. 9 tests.\n4. eval-001 (T5) - Recursive-descent expression evaluator: Lexer→Parser with precedence levels, variables, function calls. 20 tests.\n\nKEY INSIGHTS:\n- Lazy invalidation for priority queue decrease-key: mark old entry None, push new\n- Template {{.}}: resolve(\".\") returns current context object in each loops\n- Expression evaluator: tokenize → parse with recursive descent, separate precedence levels\n\nDB: 196 exercises, 359 attempts, avg 9.9",
+  "active_tasks": [
+    "R22-R30 complete",
+    "R31 next"
+  ],
+  "decisions": [
+    "Lazy invalidation pattern for mutable priority queue entries",
+    "Template engine {{.}} resolves to current loop context",
+    "Recursive descent: lexer produces tokens, parser uses precedence climbing"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R31 exercises. Consider: bloom filter, consistent hashing, or pub/sub system.",
+  "timestamp": "2026-04-08T17:46:04Z",
+  "unix_time": 1775670364.476778,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

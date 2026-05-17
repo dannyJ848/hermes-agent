@@ -1,0 +1,13 @@
+{
+  "label": "heuristic-calibrated-75pct",
+  "context": "## Heuristic Judge Calibrated to 75% LLM Alignment\n\nStarted at 38%, now at 75%. Three changes made:\n1. Added IF-THEN structure bonus (0.3 for both IF+THEN, 0.15 for IF only)\n2. Added Elo signal (sigmoid 1.5 / (1 + exp(-(elo-1800)/200)))\n3. Tightened tie threshold from 0.1 → 0.05\n\nFiles modified:\n- ~/subconscious/cortex_flywheel.py (heuristic_judge function)\n- ~/subconscious/llm_judge.py (eval_history recording)\n- ~/.hermes/plugins/distillation/__init__.py (P2 domain, P1.5 exploration, injection caps)\n\nSample results (12 pairs, gemini-2.5-flash as LLM ground truth):\n- Agree: 9/12 (75%)\n- Disagree: 3/12 \n- Ties: 0/12\n\nArchitecture: heuristic = free workhorse (every 2h), LLM = weekly calibration ($0.25/mo)\nWeekly LLM cron already added to ~/.hermes/cron/jobs.json.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Run a 30-pair alignment test for more statistical confidence. Then check whether heuristic disagreements correlate with specific tip patterns (e.g., both IF-THEN canceling bonus). Consider adding embedding similarity as tiebreaker for disagreements.",
+  "timestamp": "2026-04-16T02:14:43Z",
+  "unix_time": 1776305683.542917,
+  "task_id": "20260415_205415_473e89",
+  "source": "manual",
+  "version": 2
+}

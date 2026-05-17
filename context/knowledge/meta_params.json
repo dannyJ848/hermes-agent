@@ -1,0 +1,37 @@
+{
+  "distillation": {
+    "tip_confidence_min": 0.8,
+    "tip_vote_threshold": 0,
+    "tip_frequency_min": 1,
+    "lesson_min_length": 20,
+    "lesson_max_age_days": 7,
+    "buffer_process_count": 20
+  },
+  "controller": {
+    "ground_truth_min_pct": 0.4,
+    "speculative_max_pct": 0.5,
+    "prediction_backlog_max": 50,
+    "trust_violation_max": 0,
+    "duplicate_max": 5
+  },
+  "brain": {
+    "cycle_interval_sec": 120,
+    "temporal_weight": 0.3,
+    "prefrontal_weight": 0.4,
+    "motor_weight": 0.3
+  },
+  "mastery": {
+    "learning_rate": 0.1,
+    "decay_rate": 0.01,
+    "confidence_threshold": 0.6,
+    "min_samples": 3
+  },
+  "context_injection": {
+    "max_tips": 5,
+    "max_lessons": 3,
+    "max_facts": 3,
+    "max_total_chars": 2000,
+    "semantic_tool_top_k": 3,
+    "semantic_tool_min_score": 0.4
+  }
+}

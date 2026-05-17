@@ -1,0 +1,11 @@
+{
+  "label": "zai-1210-fix-applied",
+  "context": "Fixed Z.AI HTTP 400 error (code 1210). Root cause: trailing comma in Cerebrum tool schema made description a Python tuple (JSON array) instead of string. Z.AI rejects array descriptions. Fix: changed trailing comma to \\n on line 67 of plugins/memory/cerebrum/provider.py. Verified all 103 tools pass against live API. Debug logging removed, run_agent.py restored from backup.",
+  "active_tasks": [
+    "Run 24h brain performance baseline",
+    "Verify plugin discovery after restart",
+    "Refine lesson injection in pre_llm_call"
+  ],
+  "timestamp": "2026-04-04T04:00:56Z",
+  "task_id": "20260403_134459_9fb996"
+}

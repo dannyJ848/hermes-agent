@@ -1,0 +1,27 @@
+{
+  "label": "multi-agent-training-gym-r33",
+  "context": "MULTI-AGENT PROFILES SET UP:\n  - Created 'training-gym' profile via `hermes profile create \"training-gym\" --clone`\n  - SOUL.md at ~/.hermes/profiles/training-gym/SOUL.md — specialized for autonomous training gym\n  - 14 meta skills copied to ~/.hermes/profiles/training-gym/skills/meta/\n  - 3 software-development skills copied\n  - Uses same glm-5.1 model, shares API keys, shares plugins/subconscious\n  - Running in tmux session 'training-gym' via `training-gym chat`\n  - Initial task: R33 META-LEARNING gap, researching arXiv papers\n  - Status file: /tmp/training-gym-status.md\n\nCURRENT STATE:\n  - R27-R32 complete (30 modules wired in plugin)\n  - Plugin: ~3,800 lines\n  - Cortex: ~4,150 tips, avg Elo 1089, max 2329\n  - GLM-5V gap analysis done: meta-learning is top priority gap\n  - Architecture diagram at ~/Desktop/cortex_architecture.html\n\nTMUX COMMANDS:\n  - Check: tmux capture-pane -t training-gym -p | tail -20\n  - Watch: tmux attach -t training-gym\n  - Status: tmux list-sessions\n  - Send task: tmux send-keys -t training-gym 'message' Enter\n\nIMPORTANT: Training gym agent is autonomous — do NOT interrupt it. Let it run.\nDanny's exam in ~2 days — all agents focused on training gym self-improvement.",
+  "active_tasks": [
+    "Training-gym agent running R33+ autonomously in tmux",
+    "Monitor training-gym progress via tmux capture-pane"
+  ],
+  "decisions": [
+    "Multi-agent profile setup: training-gym profile for autonomous R-rounds",
+    "Old soma-* profiles deleted, replaced with training-gym",
+    "All agents focused on training gym until Danny's exam"
+  ],
+  "files_modified": [
+    "~/.hermes/profiles/training-gym/SOUL.md",
+    "~/subconscious/memory_consolidator_r31.py",
+    "~/subconscious/agent_protocol_r32.py",
+    "~/.hermes/plugins/distillation/__init__.py",
+    "/tmp/training-gym-status.md",
+    "/tmp/training-gym-initial-task.md"
+  ],
+  "next_steps": "1. Monitor training-gym agent progress periodically\n2. If agent stalls, check tmux and respawn if needed\n3. After Danny's exam, may want to add more profiles (research, coding)",
+  "timestamp": "2026-04-15T02:28:50Z",
+  "unix_time": 1776220130.923328,
+  "task_id": "20260414_202742_dcd051",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,19 @@
+{
+  "label": "training-gym-r170-135-streak",
+  "context": "Training Gym R162-R170 all 10/10. 135-streak!\n\nDB: 525 exercises, 928 attempts, avg 9.94, 97.2% perfect. 476 passed. Tier 9+ = 190, Tier 10 = 90.\nSession covers R162-R170 (9 rounds × 4 problems = 36 problems solved).\n\nRecent solves include: coin change, LIS, islands, clone graph, longest consecutive, word search, \nproduct except self, rotate image, merge intervals, jump game II, trapping rain water, \nfirst missing positive, median two sorted, regex match, container water, substring concat,\nlongest palindrome, N-queens, sudoku solver, group anagrams, Kadane, 3Sum, longest valid parens,\nedit distance, daily temps, stock span, largest rect histogram, min stack, reverse linked list,\nLL cycle, merge sorted lists, add two numbers, tree traversals, validate BST, max path sum.\n\nTest approach: use test_r###.py files instead of one-liners (avoids quoting issues).",
+  "active_tasks": [
+    "R170 done, R171 next"
+  ],
+  "decisions": [
+    "Use test_r###.py files for all complex verify commands to avoid quoting issues"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R171: Try graph algorithms (Dijkstra, topological sort, union-find).",
+  "timestamp": "2026-04-09T01:16:35Z",
+  "unix_time": 1775697395.880351,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

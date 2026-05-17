@@ -1,0 +1,23 @@
+{
+  "label": "r200-milestone-audit",
+  "context": "R200 MILESTONE REACHED. Training gym audit results:\n\nTIPS: 1,599 active (conf>=0.3), avg confidence 0.74.\nTop types: heuristic (579, avg 0.88), optimization (511, avg 0.51), strategy (166, avg 0.82), REASONING (147, avg 0.86), recovery (62, avg 0.55), tool_usage (42, avg 0.86), meta (27, avg 0.88), memory (18, avg 0.86).\n\nPLUGIN: 2847 lines at ~/.hermes/plugins/distillation/__init__.py.\nSUBCONSCIOUS: 160 Python modules, 63 databases.\n\nWIRED MODULES (post_tool_call):\nR153 Nomic dedup, R154 Llama quality, R156 decomposed reward, R157 fitness evolution,\nR158 next-state signals, R159 ERL reranker, R160 turn credit, R161 trajectory intel,\nR163 curriculum tracker, R165 adaptive compute, R177 FadeMem decay,\nR186 PASTE executor, R187 ToolTree planner, R188 PE-EMP Borda, R189 I-MCTS introspective,\nR193a DGM version archive, R193b Speculative Actions, R194 Memory Consolidation,\nR195 AgentRR record/replay, R196 TT-SI uncertainty filter,\nR197 Trajectory Health Monitor, R198 Self-Debug Strategy Tracker,\nR199 Adaptive Evaluation Gate.\n\nRESEARCH ROUNDS COMPLETED: R153-R199 (47 rounds).\nPAPERS EXTRACTED: 50+ frontier papers on agent self-improvement.\nGateway running. All systems operational.",
+  "active_tasks": [
+    "R201: Continue autonomous training — next cycle of research + build + wire"
+  ],
+  "decisions": [
+    "Optimization tips have low avg confidence (0.51) — may need pruning or quality boost",
+    "Heuristic tips are highest quality (579 at 0.88) — core knowledge base",
+    "Adaptive eval auto-adjusts thresholds based on calibration data",
+    "Self-debug tracker only fires for code tools (patch, write_file, terminal)"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/adaptive_eval.py"
+  ],
+  "next_steps": "R201: Continue autonomous loop. Research more papers. Address low-confidence optimization tips (0.51 avg). Build more modules from frontier research. Consider: process reward scorer, exploration-first skill discovery, code self-modification tracker.",
+  "timestamp": "2026-04-12T07:28:11Z",
+  "unix_time": 1775978891.0427039,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,20 @@
+{
+  "label": "r110-complete-apr8",
+  "context": "R110 complete. 409 tips, avg conf 0.830. Added MT-GRPO tip (naive dense per-turn rewards DEGRADE performance by 14pp. Use Iterative Reward Calibration: empirical rollout analysis to align reward discriminativeness with advantage direction. GTPO hybrid advantage formulation. 4B model beats GPT-4.1). Domain: process-optimization. Round 110. ~04:52 AM. Danny sleeping. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R110 complete — 409 tips, 0.830 — ready for R111"
+  ],
+  "decisions": [
+    "Naive dense rewards are actively harmful for multi-turn agent training",
+    "Iterative Reward Calibration + GTPO hybrid advantage = proper reward alignment"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R111: Continue. Training gym healthy. Push forward.",
+  "timestamp": "2026-04-08T09:13:06Z",
+  "unix_time": 1775639586.587339,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

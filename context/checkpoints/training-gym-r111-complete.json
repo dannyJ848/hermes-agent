@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r111-complete",
+  "context": "Training Gym R111 completed! ALL 4 PASS ON FIRST TRY!\n\nR111 RESULTS (all 10/10):\n1. unique-paths-001 (T7) - 1D rolling DP. dp[j] += dp[j-1].\n2. unique-paths-obstacles-001 (T8) - Same but dp[j]=0 if obstacle. dp[0]=1 initially.\n3. min-path-sum-001 (T7) - dp[j] = grid[i][j] + min(dp[j], dp[j-1]).\n4. rotting-oranges-001 (T9) - Multi-source BFS. Queue all rotten. Count fresh. Track minutes.\n\nDB: 411 exercises, 683 attempts, avg 9.92, 96.2% perfect. 362 passed. Tier 9+ = 104, Tier 10 = 58.\n77+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R111 complete",
+    "R112 next"
+  ],
+  "decisions": [
+    "Unique paths: 1D rolling dp[j] += dp[j-1]. Init all 1.",
+    "Obstacles: same dp but dp[j]=0 when hit obstacle. dp[0]=1 check start.",
+    "Min path sum: dp[j] = grid[i][j] + min(dp[j], dp[j-1]). Inf init.",
+    "Rotting oranges: multi-source BFS. Queue all rotten at t=0. Count fresh remaining."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R112: Continue. Try: Walls and Gates BFS, Word Search, Number of Islands variant, or Pacific Atlantic.",
+  "timestamp": "2026-04-08T22:57:40Z",
+  "unix_time": 1775689060.892683,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

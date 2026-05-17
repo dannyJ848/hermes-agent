@@ -1,0 +1,19 @@
+{
+  "label": "twitter-vision-bridge-complete",
+  "context": "Twitter Vision Bridge fully operational. Two-layer architecture:\n1. ~/subconscious/twitter_bridge.py — GraphQL API fetches text, links, engagement from @tek_nium and @NousResearch. 38 tweets. Cookie auth working.\n2. ~/subconscious/twitter_vision_bridge.py — GLM-5V-turbo (glm-5v-turbo model on open.bigmodel.cn) analyzes tweet images. 7 images analyzed in test run.\n\nKEY DISCOVERY: GLM-5V-turbo is the ONLY working vision model. All other GLM vision models (glm-4v, glm-4v-flash, glm-4v-plus) return \"model not found\". Danny confirmed the Max plan got GLM-5V access.\n\nBrowserbase DOES NOT WORK for Twitter/X browsing — cloud browsers get \"account doesn't exist\" error even with valid cookies. API bridge is the only reliable method.\n\nCron job created: every 4h (e352e5a3c8b9).\n\nFiles:\n- ~/subconscious/twitter_bridge.py — API text bridge\n- ~/subconscious/twitter_vision_bridge.py — Combined API+vision bridge\n- ~/.hermes/twitter_bridge/vision_bridge_output.json — Latest output\n- ~/.hermes/twitter_bridge/seen_tweets.json — Dedup state (38 seen)\n- ~/.hermes/twitter_bridge/credentials.json — X cookies + config\n\nNOT YET DONE:\n- t.co link expansion to actual URLs\n- Rebuilding Hermes native browser tools for local vision\n- Local screen capture for Danny's projects",
+  "active_tasks": [],
+  "decisions": [
+    "Use API bridge as primary data source (Browserbase blocked by X)",
+    "GLM-5V-turbo for all vision analysis (only working model)",
+    "Cron every 4h for continuous monitoring"
+  ],
+  "files_modified": [
+    "~/subconscious/twitter_vision_bridge.py"
+  ],
+  "next_steps": "Continue with remaining items: t.co link expansion, local browser fix for Danny's projects, or return to training gym work",
+  "timestamp": "2026-04-13T01:59:34Z",
+  "unix_time": 1776045574.08087,
+  "task_id": "20260412_191932_edf6e1",
+  "source": "manual",
+  "version": 2
+}

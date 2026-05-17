@@ -1,0 +1,22 @@
+{
+  "label": "qwen27b-training-prep-may13",
+  "context": "Qwen 27B Expert Logician benchmark evaluation is COMPLETE. All major benchmarks finished successfully:\n\n- MMLU: 86.57%\n- GSM8K: 66.19% (required generation_config.json patch to max_new_tokens=512)\n- HumanEval: 82.93% pass@1 (required HF_ALLOW_CODE_EVAL=1)\n- ARC Challenge: 60.24%\n- WinoGrande: 77.19%\n- BBH: Skipped (intractable on GB10, 76s/it)\n\nTraining pipeline is PREPARED:\n- Axolotl config: /data/SpecForge/custom_dflash/axolotl_config.yaml\n- LoRA r=256, alpha=512, all target modules\n- Base model: /data/SpecForge/custom_dflash/checkpoints/final_model_merged\n- Output dir: /data/SpecForge/custom_dflash/adapters/qwen27b-tiered-r256\n- Consolidation script: /data/SpecForge/custom_dflash/consolidate_datasets.py\n\nDataset transfer is IN PROGRESS:\n- 337GB of tiered datasets (tier1-reasoning, tier2-reasoning, tier3-health)\n- Transferring from MacBook ~/datasets/ to DGX /data/SpecForge/custom_dflash/datasets/raw/\n- Background process: proc_4ae2632854f9 (rsync)\n- Log: /tmp/dataset_push.log on MacBook\n\nCritical memory notes:\n- DGX Spark GB10: generation_config.json MUST have max_new_tokens=512 for lm-eval-harness\n- SSH background: use terminal(background=true), NOT nohup/setsid/&\n- External SSD: exFAT, /Volumes/SSD8TB on Mac, /mnt/bigssd on DGX\n- MacBook disk: ~/datasets was 337GB, should stay on external SSD",
+  "active_tasks": [],
+  "decisions": [
+    "LoRA r=256 confirmed viable on GB10 (Franken V8 proved this)",
+    "BBH skipped - would take 5+ days at 76s/it",
+    "Dataset transfer from MacBook to DGX via rsync background process",
+    "Training config uses input_output format for instruction/response pairs"
+  ],
+  "files_modified": [
+    "/data/SpecForge/custom_dflash/axolotl_config.yaml",
+    "/data/SpecForge/custom_dflash/consolidate_datasets.py",
+    "/data/SpecForge/custom_dflash/transfer_datasets.sh"
+  ],
+  "next_steps": "1. Check dataset transfer completion: process(action='poll', session_id='proc_4ae2632854f9')\n2. Once transfer done, run consolidation on DGX: ssh djg6228@10.0.0.171 'cd /data/SpecForge/custom_dflash && python3 consolidate_datasets.py'\n3. Start training: ssh djg6228@10.0.0.171 'cd /data/SpecForge/custom_dflash && axolotl train axolotl_config.yaml'\n4. Monitor training progress\n5. Run BBH benchmark later if needed (currently skipped due to time)",
+  "timestamp": "2026-05-13T06:03:57Z",
+  "unix_time": 1778652237.601044,
+  "task_id": "20260511_000903_ddda73",
+  "source": "manual",
+  "version": 2
+}

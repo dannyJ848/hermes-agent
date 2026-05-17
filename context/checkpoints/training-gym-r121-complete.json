@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r121-complete",
+  "context": "Training Gym R121 completed! ALL 4 PASS ON FIRST TRY! 2 T10 + 1 T9 + 1 T8!\n\nR121 RESULTS (all 10/10):\n1. burst-balloons-001 (T10) - Interval DP. Add sentinel 1s. dp[left][right] = max over last burst k.\n2. palindrome-partitioning-001 (T8) - Backtracking. Check prefix palindrome. Recurse on suffix.\n3. evaluate-division-001 (T9) - Weighted graph. BFS with product accumulation.\n4. word-squares-001 (T10) - Backtracking with prefix map. Build prefix from step-th column chars.\n\nDB: 434 exercises, 723 attempts, avg 9.93, 96.4% perfect. 386 passed. Tier 9+ = 117, Tier 10 = 60.\n87+ consecutive rounds all 10/10. MILESTONE: 60 T10 exercises passed!",
+  "active_tasks": [
+    "R121 complete",
+    "R122 next"
+  ],
+  "decisions": [
+    "Burst balloons: pad with [1]. dp[left][right] iterates k as LAST burst. Coins = nums[left]*nums[k]*nums[right].",
+    "Palindrome partition: check prefix==prefix[::-1]. If yes, recurse on remainder.",
+    "Evaluate division: build weighted bidirectional graph. BFS accumulates product of edge weights.",
+    "Word squares: prefix_map[step-th column prefix] prunes candidates. square[i][step] builds prefix."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R122: Continue. Try: Reconstruct Itinerary, Count of Smaller Numbers After Self, or Remove Invalid Parentheses.",
+  "timestamp": "2026-04-08T23:22:39Z",
+  "unix_time": 1775690559.393975,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

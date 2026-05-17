@@ -1,0 +1,20 @@
+{
+  "label": "r17-training-gym-complete",
+  "context": "R17 COMPLETE. Built skill_gap_detector.py (task-tool mismatch tracking). Detects when same tool fails 3+ times for same task area → suggests skill creation. Wired as R183 in both post_tool_call and pre_llm_call. 2 tips.\n\n18-MODULE STACK (16 wired + 2 stored):\n  WIRED: R168-R183. Plugin: 3,533 lines. 114 tips. Compressions: 1 of 4 (hard limit).",
+  "active_tasks": [
+    "R18+: Continue until 4th compression"
+  ],
+  "decisions": [
+    "Skill gaps detected at 3+ failures per task area per tool"
+  ],
+  "files_modified": [
+    "~/subconscious/skill_gap_detector.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "R18: Continue until 4th compression.",
+  "timestamp": "2026-04-14T21:50:16Z",
+  "unix_time": 1776203416.58284,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

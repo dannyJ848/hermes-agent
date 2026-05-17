@@ -1,0 +1,20 @@
+{
+  "label": "r93-complete-apr8",
+  "context": "R93 complete. 332 tips, avg conf 0.825. Added LLM Agent Evaluation Survey tip (two-dimensional evaluation: WHAT (behavior/capabilities/reliability/safety) + HOW (interaction/datasets/metrics/tooling). Include enterprise concerns: RBAC, compliance, long-horizon. Single-metric evaluation misses real-world failures). New domain: evaluation-design. Round 93. ~03:58 AM. Danny sleeping. Loop continues. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R93 complete — 332 tips, 0.825 — ready for R94"
+  ],
+  "decisions": [
+    "Agent evaluation must be two-dimensional (what + how), not single-metric",
+    "Enterprise concerns (RBAC, compliance, long-horizon) are critical for deployment evaluation"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R94: Continue. Push into context window management or attention mechanisms.",
+  "timestamp": "2026-04-08T08:42:09Z",
+  "unix_time": 1775637729.1619682,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

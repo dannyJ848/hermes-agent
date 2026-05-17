@@ -1,0 +1,9 @@
+{
+  "label": "v2-test-post-cache",
+  "context": "test after pycache clear",
+  "active_tasks": [
+    "test"
+  ],
+  "timestamp": "2026-04-06T07:11:36Z",
+  "task_id": "20260405_193236_c8c810"
+}

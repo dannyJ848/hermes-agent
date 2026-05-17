@@ -1,0 +1,12 @@
+{
+  "label": "post-reasoning-traces-integration",
+  "context": "Integrated Lambda/NousResearch Hermes Reasoning Traces (Kimi K2.5, 7.6K examples). Two new behaviors added: VERIFY-AFTER-WRITE and CONCISE REASONING. Skill created. Local dataset at /tmp/hermes_traces.parquet. ZAnatomyLoader updated with real GLB asset paths (LAYER_ASSETS replaces LAYER_GLB_FILES), loadLayer now loads multiple GLBs per layer in parallel. Need TS verification on that file. Next priorities: (1) TS verify ZAnatomyLoader, (2) wire ZAnatomyLoader into a React component, (3) close open loops from checkpoint.",
+  "active_tasks": [
+    "TS-verify ZAnatomyLoader after LAYER_ASSETS refactor",
+    "Create AnatomyViewer React component using ZAnatomyLoader",
+    "Study reasoning traces for error-recovery patterns",
+    "Dojo cron output analysis"
+  ],
+  "timestamp": "2026-04-02T22:07:49Z",
+  "task_id": "20260402_152751_4b5e7b"
+}

@@ -1,0 +1,13 @@
+{
+  "label": "eyes-build-starting",
+  "context": "Starting build of unified perception pipeline (codename: EYES). Goal: see any file format - video, PDF, audio, documents, 3D models, presentations, spreadsheets, games. Architecture: DETECTOR \u2192 CONVERTER \u2192 NAVIGATOR \u2192 VISION AI. Build directory: ~/hermes-agent/plugins/evey-eyes/",
+  "active_tasks": [
+    "Phase 1: Core SEE pipeline + detector + image/SVG/PDF",
+    "Phase 2: Video frame extraction + scene analysis",
+    "Phase 3: Audio spectrograms + document rendering (DOCX/PPTX)",
+    "Phase 4: 3D model viewing + browser fluid navigation",
+    "Phase 5: Unified see tool integrated into Hermes"
+  ],
+  "timestamp": "2026-04-04T06:24:51Z",
+  "task_id": "20260403_232453_811e81"
+}

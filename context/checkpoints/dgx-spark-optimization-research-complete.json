@@ -1,0 +1,13 @@
+{
+  "label": "dgx-spark-optimization-research-complete",
+  "context": "Completed comprehensive research on DGX Spark Qwen3.6-35B-A3B BF16 optimization. Scanned NVIDIA Developer Forums (7 threads), Reddit r/LocalLLaMA, GitHub repos, NVIDIA blog, Qwen docs, TurboQuant paper. Key finding: stock vLLM image has CMake bug that omits SM121 kernels, causing 3.65x performance penalty (13 vs 49 tok/s). Full optimization stack documented in 7 layers: SM121 kernels (3.65x), MTP-3 (+25-40%), FP8 KV+prefix caching (+5-10%), DFlash/LSTM (long ctx), FlashInfer (+5-10%), HF Kernels Hub (1.7-2.5x MoE), GPU clock (+15%). NVFP4 CONFIRMED BROKEN on SM121. TurboQuant expands capacity not speed. Community-verified benchmarks: single Spark FP8 ~52-54 tok/s, BF16 ~40-49 tok/s with MTP-3, dual Spark FP8 ~77.7 tok/s. Updated skill to v2.0. Saved comprehensive knowledge file.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Danny's Spark arrives next week. When it does: (1) run SM121 kernel build or pull community image, (2) launch Qwen3.6 with optimized BF16 config, (3) benchmark and verify, (4) wire Hermes config.yaml to Spark, (5) kill Z.AI plan.",
+  "timestamp": "2026-04-17T17:49:07Z",
+  "unix_time": 1776448147.396799,
+  "task_id": "20260417_124034_a25fb2",
+  "source": "manual",
+  "version": 2
+}

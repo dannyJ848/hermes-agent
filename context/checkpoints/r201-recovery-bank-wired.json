@@ -1,0 +1,22 @@
+{
+  "label": "r201-recovery-bank-wired",
+  "context": "Training gym R201 complete. Researched PALADIN (2509.25238) and MAS-FIRE (2602.19843). Distilled 10 tips. Built recovery_bank.py — 8 seeded failure→recovery cases indexed by error taxonomy, retrieves closest match on tool failure. Wired into plugin post_tool_call (error detection triggers recovery lookup).\n\nPlugin: 2862 lines. Tips: 1643 active (conf>=0.3). 160+ modules. Gateway running.\nNew DB: recovery_bank.db with 8 default recovery cases.\nAll R153-R201 modules operational.",
+  "active_tasks": [
+    "R202: Continue autonomous training — more research + build + wire"
+  ],
+  "decisions": [
+    "Recovery bank only triggers on detected errors (error/Error/failed/timeout in result)",
+    "8 default cases seeded: timeout, syntax, api_error, db_lock, import, permission, not_found, json_parse",
+    "Case-based recovery generalizes to novel failures via taxonomy matching"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/recovery_bank.py"
+  ],
+  "next_steps": "R202: Continue autonomous loop. Research more papers. Consider: process reward scorer per step, exploration-first skill discovery module, context window management with revisitable memory.",
+  "timestamp": "2026-04-12T07:39:36Z",
+  "unix_time": 1775979576.85616,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

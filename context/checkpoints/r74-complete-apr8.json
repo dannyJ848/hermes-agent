@@ -1,0 +1,21 @@
+{
+  "label": "r74-complete-apr8",
+  "context": "R74 complete. 215 tips, avg conf 0.812. Added AgentProcessBench tip (ternary step labeling, tool failures are irreversible, process signals complement outcome signals). Other agent contributing heavily (~15 tips since last check). Round 74. ~03:05 AM. Danny sleeping. Loop continues.",
+  "active_tasks": [
+    "R74 complete — ready for R75"
+  ],
+  "decisions": [
+    "Tool-use failures are irreversible — unlike math, backtracking doesn't fix them",
+    "Ternary labeling (correct/neutral/erroneous) captures exploration that binary misses",
+    "Weaker models inflate correctness via early termination — need adjusted metrics"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R75: Continue. Try agent benchmarking, evaluation metrics, or scoring.",
+  "timestamp": "2026-04-08T08:05:29Z",
+  "unix_time": 1775635529.305959,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

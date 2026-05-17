@@ -1,0 +1,22 @@
+{
+  "label": "apr20-kimi-k26-wired",
+  "context": "Wired Kimi K2.6 as MAIN model provider (replacing GLM-5.1). Config changes: model.base_url=https://api.kimi.com/coding/v1, model.default=kimi-for-coding, model.provider=kimi-coding. KIMI_API_KEY added to .env. Also added kimi-coding as custom provider in providers section and as fallback_model. Kimi coding API requires User-Agent: claude-code/1.0 header (rejects without it). Model ID is just \"kimi-for-coding\" (not k2p5 or K2.6-code-preview). API endpoint: https://api.kimi.com/coding/v1 (OpenAI-compatible). Raw curl and LiteLLM both work. Delegation layer had 400 errors but main agent loop may handle it differently via built-in kimi-coding provider. GLM-5.1 credentials still in config for fallback. About to restart gateway to test.",
+  "active_tasks": [
+    "Kimi K2.6 wired as main model — restarting gateway to test"
+  ],
+  "decisions": [
+    "Kimi K2.6 wired as main model (replacing GLM-5.1)",
+    "GLM-5.1 available as fallback via providers section",
+    "Tirith disabled, Hermes Relay installed, xurl updated"
+  ],
+  "files_modified": [
+    "~/.hermes/config.yaml",
+    "~/.hermes/.env"
+  ],
+  "next_steps": "Restart gateway to activate Kimi K2.6. If main loop fails with same 400 error, debug Hermes agent loop vs kimi-coding provider. GLM-5.1 creds still in providers section for manual fallback.",
+  "timestamp": "2026-04-20T16:46:03Z",
+  "unix_time": 1776703563.689224,
+  "task_id": "20260419_160251_5f2584",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,19 @@
+{
+  "label": "r221-eval-episodic-complete",
+  "context": "R220-R221 complete. Standardized AI Evaluation + Bandit RAG + Conformal Social Choice + Episodic Memory position paper. All tip-only rounds (20 tips). Total tips: 2807.\n\nPlugin: 3012 lines. Tips: 2807 active. Gateway running.\n\nKEY INSIGHTS: (1) Pass@k reliability > single-shot evaluation. (2) Bandit query decomposition: explore early, exploit late. (3) Consensus stopping has wrong-consensus convergence risk. (4) Episodic memory needs 5 properties: single-shot, temporal, autobiographic, voluntary retrieval, consolidation. (5) Three-layer memory architecture validated by episodic memory paper.",
+  "active_tasks": [
+    "R222: Continue autonomous training"
+  ],
+  "decisions": [
+    "R220-R221 are tip-only rounds — no new modules",
+    "Evaluation contamination is a key risk for training gym — keep eval separate from training",
+    "Episodic memory paper validates existing three-layer architecture"
+  ],
+  "files_modified": [],
+  "next_steps": "R222: Continue autonomous loop. Approaching 2,850 tips.",
+  "timestamp": "2026-04-12T11:05:59Z",
+  "unix_time": 1775991959.832962,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

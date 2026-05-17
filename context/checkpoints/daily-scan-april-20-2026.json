@@ -1,0 +1,21 @@
+{
+  "label": "daily-scan-april-20-2026",
+  "context": "Ran daily intelligence scan for April 20, 2026. Scanned GitHub trending repos, web research on agent frameworks, and arxiv papers on LLM reasoning/planning.\n\nKey findings:\n1. FLARE paper (arXiv:2601.22311) — proves ReAct is a greedy policy, proposes MCTS lookahead with receding-horizon. LLaMA-8B+FLARE beats GPT-4o. Highly relevant for Hermes delegation.\n2. Pre-Act paper (arXiv:2505.09970) — multi-step planning with iterative refinement. 70% improvement over ReAct. Validates plan-then-refine approach.\n3. Franklin repo — autonomous agent with USDC wallet, learned Smart Router with Elo scoring for model selection. MCP auto-discovery pattern.\n4. StateWalker — FSM-based agent framework as alternative to ReAct loops.\n5. Agent framework landscape: All 3 major providers now have agent SDKs.\n\nTelegram delivery failed (no bot token). Finding saved to knowledge base at daily-scan-2026-04-20.",
+  "active_tasks": [
+    "daily-scan-2026-04-20: COMPLETED",
+    "FLARE integration analysis: pending (flagged for next session)",
+    "Pre-Act plan-refinement pattern: pending (flagged for Hermes improvement)"
+  ],
+  "decisions": [
+    "Flagged FLARE receding-horizon planning for potential Hermes integration",
+    "Flagged Pre-Act iterative plan refinement for autonomous_plan improvement",
+    "Franklin's Elo-based Smart Router is a pattern worth studying for delegation quality scoring"
+  ],
+  "files_modified": [],
+  "next_steps": "Consider implementing FLARE-style receding-horizon planning in Hermes delegation routing. Study Franklin's Elo-based model router for improving delegation model selection. Review if Pre-Act's plan-refinement loop can enhance autonomous_plan.",
+  "timestamp": "2026-04-20T12:07:15Z",
+  "unix_time": 1776686835.350476,
+  "task_id": "463b15f6-8bee-4deb-90b8-77dc782f32d3",
+  "source": "manual",
+  "version": 2
+}

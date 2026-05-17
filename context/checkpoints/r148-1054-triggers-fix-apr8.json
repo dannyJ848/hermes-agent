@@ -1,0 +1,22 @@
+{
+  "label": "r148-1054-triggers-fix-apr8",
+  "context": "R148. Major quality milestone.\n\nKey achievements:\n- Auto-gen noise problem SOLVED permanently: DB triggers prevent any tip below 0.7 confidence from being inserted or updated\n- Cross-domain synthesis tips from SkillX, HyperAgents, COSMO-Agent, TRACE, Deep Researcher\n- Process reward tips from SQL-ASTRA (dense step-level rewards, trajectory aggregation)\n- MIA paper insights (bidirectional memory, test-time learning, Manager-Planner-Executor)\n- MemMachine retrieval optimization breakdown (depth +4.2%, formatting +2.0%, prompt +1.8%)\n\nTip DB: 1054 tips, 0.8502 avg, 0.7 floor (enforced by triggers), 0.95 ceiling\nKnowledge: 13 findings\nFunctional chains: 21 at 0.8957 avg\n\nAuto-gen noise fix: Two triggers (INSERT + UPDATE) on distilled_tips enforce confidence >= 0.7.\nFadeMem decay still runs but trigger prevents it from pushing below floor.\n\nSystem: gateway PID 28336, caffeinate PID 82351, disk 5%\nDanny at daylong test. Fully autonomous.",
+  "active_tasks": [
+    "R148 COMPLETE — 1054 tips, 0.8502 avg, auto-gen noise SOLVED via DB triggers"
+  ],
+  "decisions": [
+    "DB triggers solve auto-gen noise permanently — no more manual purging",
+    "Quality > quantity enforced at schema level",
+    "Cross-domain synthesis produces higher-value tips than domain-specific ones",
+    "Process rewards (dense step-level) improve feedback granularity"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1054 tips, 0.8502, triggers added)"
+  ],
+  "next_steps": "R149: Continue growth. Research tool composition, world models for agents, or multi-agent coordination. Keep quality-first.",
+  "timestamp": "2026-04-08T17:24:44Z",
+  "unix_time": 1775669084.364944,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

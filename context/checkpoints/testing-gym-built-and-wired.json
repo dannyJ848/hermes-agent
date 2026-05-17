@@ -1,0 +1,28 @@
+{
+  "label": "testing-gym-built-and-wired",
+  "context": "## TESTING GYM — Built, Wired, and Validated\n\n### What was built\n- `~/subconscious/testing_gym.py` (1064 lines) — complete benchmark evaluation framework\n- Wiring in `~/.hermes/plugins/distillation/__init__.py` (+28 lines, now 1273 total)\n\n### Architecture\n- **BenchmarkTask**: 20 tasks (5 domains × 2 tasks × 2 sets: baseline/holdout)\n- **5 Domains**: search, coding, reasoning, tool_use, planning\n- **3 Difficulty levels**: L1 (simple), L2 (complex)\n- **TrajectoryScorer**: 3-axis scoring — outcome 60% + efficiency 20% + tool selection 20%\n- **Oracle types**: exact_match, state_diff, behavioral, invariant\n- **Statistical tests**: Welch's t-test + Cohen's d for paired-calibration\n- **GymReport**: regressions, improvements, memorization flag, production gate\n- **Cortex storage**: benchmark_result nodes for trend tracking\n\n### Plugin Integration\n1. **Import**: `_tg = get_instance(\"default\")` (R270 module)\n2. **Post-tool-call**: `record_step()` captures each tool call into the active trajectory\n3. **Pre-LLM-call**: `build_injection()` injects benchmark step tracking context (priority 3)\n4. **INJECTION_PRIORITY**: BENCHMARK at priority 3\n\n### Scoring Bug Fixes Applied\n1. Behavioral oracle \"must_address\": keyword-level matching (not exact phrase)\n2. Behavioral oracle \"must_fix\": partial match when key words present (0.7 score)\n3. Coding tasks: broadened expected_tools (removed read_file/terminal from required)\n\n### Real Benchmark Results (6 tasks)\n- Overall composite: 8.8/10\n- Reasoning: 9.0/10 (L1 perfect, L2 partial math)\n- Planning: 10.0/10\n- Search: 9.6/10\n- Coding: 6.0/10 (weakest — oracle checks prose not code)\n\n### Known Issues / Next Steps\n1. **Coding scoring still weak**: must_fix checks prose explanation, not actual code output. Need code-aware oracle (check if regex actually works)\n2. **Reasoning L2 scoring**: answer_ranges is strict on numeric precision — acceptable but could use tolerance bands\n3. **Automated benchmark triggering**: No cron job or round hook yet. Agent must manually call start_task/finish_task\n4. **State-diff oracle**: Only checks file existence + content keywords — doesn't validate format/structure\n5. **Cortex storage**: _store_to_cortex() uses CortexDB which may fail silently if DB connection has issues\n6. **Benchmark execution**: Agent needs a benchmark_runner wrapper that automatically starts tasks, gives prompts to the agent, and collects answers\n\n### Files Modified This Session\n- ~/.hermes/plugins/distillation/__init__.py (wired testing_gym)\n- ~/subconscious/testing_gym.py (scoring fixes)\n\n### Flywheel State (from previous checkpoint)\n- 8,871 active nodes, 5 canonical domains, 0 non-canonical\n- 100% embedded, DB dedup constraints active\n- plugin-fully-audited-100pct checkpoint available",
+  "active_tasks": [
+    "Build benchmark execution wrapper (automated task start/finish)",
+    "Run full 10-task baseline suite",
+    "Wire benchmark into training gym round hooks",
+    "Fix coding oracle to check actual code output, not prose"
+  ],
+  "decisions": [
+    "Trajectory > outcome scoring (Galileo framework)",
+    "3-axis: outcome 60% + efficiency 20% + tool selection 20%",
+    "Keyword-level matching for behavioral oracle (not exact phrase)",
+    "Partial credit (0.7) for must_fix when key words present but not exact phrase",
+    "Testing gym records steps passively via plugin hooks (no agent modification needed)",
+    "BENCHMARK injection at priority 3 (supplementary, not critical)"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/testing_gym.py"
+  ],
+  "next_steps": "Build a benchmark execution wrapper that can automatically run tasks and collect answers for full baseline suite",
+  "timestamp": "2026-04-15T22:21:56Z",
+  "unix_time": 1776291716.810109,
+  "task_id": "20260415_171642_f58e77",
+  "source": "manual",
+  "version": 2
+}

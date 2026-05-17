@@ -1,0 +1,27 @@
+{
+  "label": "training-gym-r5-complete",
+  "context": "Restored from injection-cleanup-apr7-v2 checkpoint. Completed Rounds 4 and 5 of Training Gym. Round 4 (Tier 6): 8/8 exercises, 100%. Round 5 (Tier 7): 8/8 exercises, 100%. Grand total: 48 exercises, 475/480 (99.0%), 46/48 perfect. 16 techniques mastered. 24 tips distilled into cerebrum. Key discoveries: (1) Hermes has 39 plugins, not 4-5 as predicted. (2) cerebrum_memory.db largest table is perspective_diversity (8701 rows). (3) Meta-reasoning compounds errors with depth. (4) Minimal reproduction from debugging transfers to research as 'minimal unknown' technique. Danny's directive: NEVER STOP training — keep creating rounds with increasingly advanced techniques.",
+  "active_tasks": [
+    "Round 5 training exercises: COMPLETE (8/8, 100%)",
+    "Round 6 exercises: CREATE NEXT",
+    "Distillation tips: 24 inserted across R4+R5",
+    "Wiki expansion: continuous",
+    "AGI self-improvement loop: continuous"
+  ],
+  "decisions": [
+    "R5 exercises designed from frontier research: PRM, MCTS, adversarial self-play, curiosity-driven, world model, compression, chain-of-meta, HyperAgent",
+    "8 tips per round distilled into cerebrum distilled_tips table",
+    "Training gym at ~/subconscious/training_gym.py + training_gym.db"
+  ],
+  "files_modified": [
+    "/tmp/gym-url-checker.py",
+    "/tmp/gym-email-validator.py",
+    "/tmp/gym-flask-app/app.py"
+  ],
+  "next_steps": "Research Round 6 techniques (even more advanced — look at: self-evolving reward functions, emergent tool creation, multi-agent debate, constitutional AI self-correction, latent space exploration). Create exercises. Execute. Never stop.",
+  "timestamp": "2026-04-07T23:22:44Z",
+  "unix_time": 1775604164.450899,
+  "task_id": "20260407_171527_b7e3d6",
+  "source": "manual",
+  "version": 2
+}

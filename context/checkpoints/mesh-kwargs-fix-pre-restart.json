@@ -1,0 +1,20 @@
+{
+  "label": "mesh-kwargs-fix-pre-restart",
+  "context": "Fixed mesh gateway kwargs bug — added 'user_task' to _GATEWAY_KWARGS set in ~/.hermes/plugins/evey-mesh/__init__.py line 127. Patch is on disk but needs gateway restart to take effect. Also updated memory entry with complete list of known gateway kwargs.",
+  "active_tasks": [
+    "Fix mesh_status kwargs bug - DONE (on disk, needs restart)",
+    "Restart gateway to apply fix - NEXT"
+  ],
+  "decisions": [
+    "Added user_task to _GATEWAY_KWARGS exclusion set"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/evey-mesh/__init__.py"
+  ],
+  "next_steps": "Restart gateway to load the patched mesh plugin. Verify mesh_status works without kwargs error after restart.",
+  "timestamp": "2026-04-06T21:30:48Z",
+  "unix_time": 1775511048.106602,
+  "task_id": "20260406_162750_c08e9c",
+  "source": "manual",
+  "version": 2
+}

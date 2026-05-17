@@ -1,0 +1,29 @@
+{
+  "label": "uworld-pipeline-complete-formatted",
+  "context": "UWorld Pipeline FULLY COMPLETE. 1,822 cloze Anki cards created in deck \"UWorld Weak Subtopics\" from 186 UWorld quizzes, filtered to Danny's 5 weak body systems (Neuro, Cardio, Pulmonary, Heme/Immuno, Endo, Psych/Behavioral).\n\nFORMATTING DONE:\n- All 1,822 cards reformatted: question+choices+cloze answer in Text field, explanation moved to Back Extra (only shows after flip)\n- Cloze model CSS updated to match AnKing styling: gray bg (#D1CFCE), blue cloze, navy explanation, Arial font\n- Mobile font set to 15px via `.mobile .card { font-size: 15px }` (desktop 28px) — Danny approved this size\n- Desktop stays at 28px\n- Template updated to show `<hr id=\"answer\">` divider + `{{Back Extra}}` on back\n\nKEY TECHNICAL DETAILS:\n- UWorld API POST body: {\"TestRecordId\": \"STRING\", \"QbankId\": 1, \"QuestionIndexes\": [int...]} (PascalCase, string TestRecordId)\n- Type bug: correctAnswer is STRING, choiceNumber is INT — must int(correct_num)\n- JWT expires ~1hr, must refresh between Phase 1 (scan) and Phase 2 (card creation)\n- AnkiConnect batch addNotes returns error array when batch has duplicates — must retry each note INDIVIDUALLY to rescue new cards\n- CSS specificity: `.mobile .card` needed to beat `.card` for font-size on mobile\n- answerChoiceList[].choice contains full answer text for text-based questions, only letters for image-based questions\n\nFILES:\n- ~/Desktop/uworld_phase1_broad.py — Phase 1 broad system scan (1,803 matches)\n- ~/Desktop/uworld_phase2_broad_v2.py — Phase 2 card creation with individual retry fix\n- ~/Desktop/uworld_reformat2.py — Moved explanation to Back Extra for all 1,822 cards\n- ~/Desktop/uworld_data/phase1_broad_matches.json — 1,803 matched questions by test\n- ~/Desktop/uworld_data/test_record_ids.json — 186 test record IDs\n\nCOMBINED STUDY MATERIALS:\n- 1,822 UWorld cloze cards (weak systems)\n- 4,077 AnKing NBME-targeted cards (Phase 1)\n- Total: ~5,899 targeted cards for Step 1 (~May 7)\n\nCHROME CDP still running on port 9222 for UWorld auth. AnkiConnect on localhost:8765.",
+  "active_tasks": [
+    "UWorld pipeline COMPLETE",
+    "Card formatting COMPLETE",
+    "CSS mobile font 15px APPROVED"
+  ],
+  "decisions": [
+    "Broad system-level filter over narrow topic+system filter (1,803 vs 396)",
+    "Explanation goes in Back Extra field (only shows after flip)",
+    "Mobile font 15px, desktop 28px",
+    "AnKing-style CSS (gray bg, blue cloze, navy extra)"
+  ],
+  "files_modified": [
+    "~/Desktop/uworld_phase1_broad.py",
+    "~/Desktop/uworld_phase2_broad_v2.py",
+    "~/Desktop/uworld_reformat2.py",
+    "~/Desktop/uworld_data/phase1_broad_matches.json",
+    "~/Desktop/uworld_verification.py",
+    "~/Desktop/uworld_dedup_check.py"
+  ],
+  "next_steps": "After restart, run: hermes --resume uworld-pipeline-complete-formatted",
+  "timestamp": "2026-04-14T15:38:47Z",
+  "unix_time": 1776181127.340203,
+  "task_id": "20260413_215447_795a06",
+  "source": "manual",
+  "version": 2
+}

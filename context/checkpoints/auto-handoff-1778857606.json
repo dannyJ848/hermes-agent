@@ -1,0 +1,14 @@
+{
+  "label": "auto-handoff-1778857606",
+  "timestamp": 1778857606.406046,
+  "context": {
+    "timestamp": 1778857606.405803,
+    "session_id": "20260514_214938_9ecf63",
+    "compression_count": 9,
+    "message_count": 175,
+    "model": "kimi-for-coding",
+    "system_prompt_preview": "You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and in",
+    "todo_snapshot": "[Your active task list was preserved across context compression]\n- [>] 2. Identify additional vLLM optimizations with no quality loss (in_progress)\n- [ ] 3. Implement and test optimizations (pending)\n- [ ] 4. Verify output quality vs BF16 baseline (pending)\n- [ ] 5. Document final optimized config (pending)"
+  },
+  "session_id": "20260514_214938_9ecf63"
+}

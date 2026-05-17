@@ -1,0 +1,13 @@
+{
+  "label": "apparatus-fully-wired-e2e",
+  "context": "FULL RECONSTRUCTION + ALL 5 FIXES + E2E VERIFIED + 100% AUDIT\n\nPlugin: ~/.hermes/plugins/distillation/__init__.py\n- 6861 lines (rebuilt from scratch after corruption)\n- 230 R-modules with build_injection loaded\n- All modules needing session_id now properly instantiated with session_id=\"default\"\n- _check_duplicate return type fixed (returns Optional[str], not tuple)\n- P3 experience query fixed (dedup line removed, length>50 filter for action_hash entries)\n\nE2E VERIFICATION RESULTS (12 checks):\n1. Plugin load: 0.2s — PASS\n2. 5 hooks registered — PASS\n3. Injection avg 1085 chars / 9 lines — PASS (was 0 in original due to dead injection)\n4. P1 hybrid_search — WIRED\n5. P2 self-improvement — WIRED\n6. P3 episodic memory + experience — WIRED\n7. 9/9 fixes verified\n8. 230 R-modules loaded\n9. post_tool_call success + error paths — PASS\n10. pre_tool_call — PASS\n11. post_api_request + 429 tracking — PASS\n12. Cortex DB connected, hybrid_search returning real tips — PASS\n\nCORTEX STATE: 358 active tips, 13 domains, 54 accessed, 90 domains, 0 uppercase\nAUDIT: 23/23 (100%)\nPostgres trigger: domain_normalize (auto-lowercase on insert/update)\n\nREMAINING NIGGLES:\n- Daemon creates duplicate tips between cycles — MD5 dedup scripts catch these but it's ongoing\n- Some R-module build_injection() calls return None (no current data to inject) — that's normal\n- Circuit breaker is managed by CircuitBreakerManager (not per-tool ToolCircuitBreaker) — correct design\n- P3 experience query uses length>50 as proxy to skip action_hash entries (could be more precise)\n- The original had ~5900 lines with ~56 modules; rebuild has 6861 lines with 237 modules (more comprehensive but some may not produce useful injections)",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "(1) Run the db_audit.py as a cron to catch daemon-created duplicates, (2) Build testing_gym.py, (3) Update CORTEX_FLYWHEEL_BLUEPRINT.md with new line counts and fix details",
+  "timestamp": "2026-04-15T20:58:40Z",
+  "unix_time": 1776286720.727705,
+  "task_id": "20260415_154031_df4821",
+  "source": "manual",
+  "version": 2
+}

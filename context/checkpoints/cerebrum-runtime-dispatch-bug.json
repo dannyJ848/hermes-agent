@@ -1,0 +1,10 @@
+{
+  "label": "cerebrum-runtime-dispatch-bug",
+  "context": "Cerebrum memory provider plugin works perfectly in all isolated tests (load, init, tool call). The plugin code at plugins/memory/cerebrum/ is correct, config is set to memory.provider: cerebrum, and `hermes memory status` shows it active. HOWEVER, at runtime in the live Hermes CLI agent, calling `cerebrum` tool returns \"Unknown tool: cerebrum\" because the tool falls through to registry.dispatch() instead of going through _memory_manager.handle_tool_call(). This means self._memory_manager is likely None at dispatch time in _invoke_tool(), even though it was alive during tool schema injection (we see the cerebrum schema in the system prompt). Root cause unknown - may be a Python GC issue, an exception during initialize_all() that's silently caught, or a threading/state issue. FIX NEEDED: Add debug logging to run_agent.py lines 1063-1090 to capture the actual exception, OR patch the _invoke_tool method to have a fallback path. This is a 3-session recurring issue.",
+  "active_tasks": [
+    "Debug cerebrum runtime dispatch failure",
+    "Add instrumentation to run_agent.py memory provider init"
+  ],
+  "timestamp": "2026-04-03T05:29:01Z",
+  "task_id": "20260403_001703_a36811"
+}

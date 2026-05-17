@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r122-complete",
+  "context": "Training Gym R122 completed! ALL 4 PASS ON FIRST TRY! 3 T10 + 1 T9!\n\nR122 RESULTS (all 10/10):\n1. reconstruct-itinerary-001 (T9) - Hierholzer's Euler path. Sort adj. DFS post-order. Reverse.\n2. count-of-smaller-numbers-after-self-001 (T10) - Sorted list + bisect_left. Process reversed.\n3. remove-invalid-parentheses-001 (T10) - BFS level by level. First valid level = answer.\n4. maximal-rectangle-001 (T10) - Heights per row + largest-rectangle-histogram monotonic stack.\n\nDB: 438 exercises, 727 attempts, avg 9.93, 96.4% perfect. 390 passed. Tier 9+ = 121, Tier 10 = 63.\n88+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R122 complete",
+    "R123 next"
+  ],
+  "decisions": [
+    "Euler path: sort adj. DFS post-order append. Reverse at end.",
+    "Count smaller: process reversed. bisect_left on sorted list gives count of smaller.",
+    "Remove invalid parens: BFS. Remove one paren at each level. Check validity. Stop at first valid level.",
+    "Maximal rectangle: heights array per row. Monotonic stack histogram for each row."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R123: Continue. Try: Longest Consecutive Sequence, Basic Calculator, or Swim in Rising Water.",
+  "timestamp": "2026-04-08T23:24:40Z",
+  "unix_time": 1775690680.794709,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,27 @@
+{
+  "label": "training-gym-r132-complete",
+  "context": "Training Gym R131-R132 completed! All 10/10 first try!\n\nR131: skyline(T10), russian_doll(T10), coin_change(T8), robber2(T8)\nR132: clone_graph(T8), btps(T9), word_search2(T10), course3(T9)\n\nDB: 454 exercises, 767 attempts, avg 9.93, 96.6% perfect. 406 passed. Tier 9+ = 134, Tier 10 = 66.\n98+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R132 complete",
+    "R133 next"
+  ],
+  "decisions": [
+    "Skyline: line sweep with max-heap. Track active heights. Events: (l,-h,r) and (r,0,0).",
+    "Russian Doll: sort (w asc, h desc) + LIS on heights via bisect.",
+    "Coin change: unbounded DP. dp[i] = min(dp[i-coin]+1).",
+    "House Robber II: two cases - rob[0..n-2] vs rob[1..n-1].",
+    "Clone graph: DFS with old->new node map.",
+    "Max path sum: DFS returning gain. Track global max at split point.",
+    "Word Search II: Trie + DFS backtracking. Mark visited with '#'.",
+    "Course Schedule III: sort by deadline. Greedy + max-heap for longest duration."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R133: Continue. Try: LRUCache, MaxStack, or expression evaluation.",
+  "timestamp": "2026-04-08T23:47:34Z",
+  "unix_time": 1775692054.685194,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

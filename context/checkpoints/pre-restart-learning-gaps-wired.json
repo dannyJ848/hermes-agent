@@ -1,0 +1,11 @@
+{
+  "label": "pre-restart-learning-gaps-wired",
+  "context": "All 4 learning gaps wired shut. Changes need gateway restart to take effect.\n\nWIRED:\n1. Positive lesson extraction: _extract_positive_lesson() added, fires on every success\n2. Mastery engine tables: learning_bootstrap.py creates 8 tables on session start\n3. Cross-session lesson injection: on_session_start calls learning_bootstrap.py, stores lessons in _report_cache\n4. Speed trends: _extract_speed_lesson() analyzes last 10 speeds for optimization insights\n\nFILES CHANGED:\n- ~/.hermes/plugins/evey-tool-intelligence/__init__.py (4 patches)\n- ~/subconscious/learning_bootstrap.py (new file)\n- ~/subconscious/parallel_brain.py (3 patches removing speculative fact storage)\n- Synced to soma-coder, soma-researcher, soma-tester\n\nPENDING AFTER RESTART:\n- AGI 100-cycle audit\n- 1000-cycle roadmap\n- Cron updates for autonomous execution",
+  "active_tasks": [
+    "AGI AUDIT: 100-cycle comprehensive self-audit",
+    "AGI PLAN: Build 1000-cycle upgrade roadmap",
+    "AGI EXECUTE: Update crons + skills for autonomous 1000-cycle run"
+  ],
+  "timestamp": "2026-04-05T03:24:12Z",
+  "task_id": "20260404_215806_7e676d"
+}

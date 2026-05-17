@@ -1,0 +1,9 @@
+{
+  "label": "3d-vision-midpoint-25-50",
+  "context": "3D Vision Exploration Audit \u2014 25/50 cycles complete (MIDPOINT).\n\nCOMPLETED MODULES:\n1. volume_3d.py (21KB) \u2014 DICOM/volume reconstruction, marching cubes, MPR, MIP, oblique slicing, ray-casting\n2. depth_estimation.py (20KB) \u2014 5 depth methods + point cloud generation from depth\n3. cross_section.py (17KB) \u2014 Planar/multi/oblique/curved slicing, thickness measurement\n4. multi_view.py (18KB) \u2014 Feature detection, matching, triangulation, SfM pipeline\n5. pointcloud.py (21KB) \u2014 Load/save PLY, analysis, normals, distances, segmentation, downsampling\n\nREMAINING (25 cycles):\n- 26-30: Surface Reconstruction (marching cubes, Poisson approximation, contour-based)\n- 31-35: Volumetric Measurement (organ sizing, tumor volumes, distance maps)\n- 36-40: Normal Map + Pseudo-3D (depth from shading, normal visualization)\n- 41-45: Semantic 3D Understanding (anatomical labeling on meshes)\n- 46-50: 3D Memory Architecture (spatial memories, organ positioning)\n\nAll scripts at: ~/.hermes/plugins/evey-eyes/scripts/\nAll use numpy, scipy, trimesh, skimage \u2014 confirmed installed in Hermes venv.",
+  "active_tasks": [
+    "3D Vision Exploration Audit \u2014 cycles 26-50 remaining"
+  ],
+  "timestamp": "2026-04-04T17:13:22Z",
+  "task_id": "20260403_232453_811e81"
+}

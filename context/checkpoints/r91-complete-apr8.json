@@ -1,0 +1,20 @@
+{
+  "label": "r91-complete-apr8",
+  "context": "R91 complete. 323 tips, avg conf 0.824. Added prompt injection defense tip (lightweight inference-time filters fail on reasoning-heavy prompts. Defense-in-depth required: input sanitization + output monitoring + behavioral anomaly detection. No single-layer filtering). New domain: agent-safety. Round 91. ~03:52 AM. Danny sleeping. Loop continues. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R91 complete — 323 tips, 0.824 — ready for R92"
+  ],
+  "decisions": [
+    "Inference-time filters are necessary but insufficient — reasoning-heavy prompts consistently bypass them",
+    "Defense-in-depth is the standard: input + output + behavioral anomaly layers"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R92: Continue. Push into agent collaboration or communication protocols.",
+  "timestamp": "2026-04-08T08:38:47Z",
+  "unix_time": 1775637527.47522,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

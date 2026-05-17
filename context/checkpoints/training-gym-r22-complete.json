@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r22-complete",
+  "context": "Training Gym R22 completed. 4/4 exercises pass with real pytest verification.\n\nR22 RESULTS (all 10/10):\n1. graph-001 (T5) - Directed graph: topo sort, cycle detection, BFS path, Dijkstra shortest path. 13 tests.\n2. typ-001 (T5) - Type-safe EventEmitter with generics, subscribe/once/error isolation. 9 tests.\n3. err-001 (T4) - Error chain tracer with circular ref protection. Fixed variable scoping in nested try/except. 8 tests.\n4. async-001 (T4) - AsyncTaskRunner with cancellation, timeout gather, exception isolation. 7 tests.\n\nKEY LEARNING: Nested try/except in Python 3.8 has variable scope issues - use `exc = None` pattern then `except ... as caught: exc = caught` instead of reusing `e` variable across nested levels.\n\nDB: 164 exercises, 327 attempts, avg 9.8\n\nTIPS ADDED:\n- Nested try/except: use explicit variable assignment to avoid scope issues\n- Async testing: asyncio.get_event_loop().run_until_complete() works without pytest-asyncio\n- Error chains: protect against circular __cause__ references with id() set tracking",
+  "active_tasks": [
+    "R22 complete",
+    "R23 next"
+  ],
+  "decisions": [
+    "Nested try/except needs explicit variable assignment",
+    "Async testing works with run_until_complete without pytest-asyncio",
+    "Circular __cause__ protection needed for error chain tracers"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R23 exercises. Consider: parser combinators, observer pattern, memoization decorator, streaming data pipeline.",
+  "timestamp": "2026-04-08T16:53:09Z",
+  "unix_time": 1775667189.848866,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

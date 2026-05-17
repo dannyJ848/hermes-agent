@@ -1,0 +1,24 @@
+{
+  "label": "testing-gym-research-done",
+  "context": "TESTING GYM — Research complete, build phase next.\n\nRESEARCH SYNTHESIS complete. All sources analyzed:\n1. AgentBench (ICLR'24) — 8 environments, OS/DB/KG/Web/Shopping/CardGame/Puzzle/Household\n2. GAIA (Meta/HuggingFace) — 466 questions, 3 difficulty levels (L1:<5 steps, L2:5-10 steps, L3:10+ steps), factual scoring, human 92% vs AI 15-74%\n3. Galileo Framework — trajectory > outcome, 3-tier rubrics (7 primary dims → 25 sub-dims → 130 rubric items), 0.80 Spearman target, Cronbach's alpha reliability\n4. Self-eval methodology — paired-calibration with holdout ladders (L0-L3), Welch's t-test, Cohen's d, task contamination guard\n5. Domain rubrics — 5 domains (search, coding, reasoning, tool-use, planning) with concrete tasks and failure modes\n\nKEY DESIGN PRINCIPLES:\n- TRAJECTORY > OUTCOME: measure HOW agent works (tool precision/recall, step efficiency), not just if it succeeded\n- 3 DIFFICULTY LEVELS: L1 (<5 steps), L2 (5-10 steps), L3 (10+ steps, long-term planning)\n- PAIRED-CALIBRATION: 3+ baseline runs frozen, then 3+ post runs with module active, statistical comparison\n- ORACLE TYPES: exact match, state diff, behavioral assertions, invariant checks\n- SCORING: 60% outcome + 20% efficiency + 20% tool selection = composite 0-10\n- REGRESSION GUARD: improvement on hard tasks must NOT regress easy tasks\n- CROSS-ENTROPY BAND: H_post > 0.3 * H_baseline (detect memorization vs learning)\n- PRODUCTION GATES: dev 70%, staging 85%, production 95%\n\nPLANNED ARCHITECTURE:\ntesting_gym.py (~600-800 lines)\n├── BenchmarkTask (dataclass): id, domain, difficulty, prompt, oracle_type, oracle_spec, expected_tools, max_steps\n├── TaskRegistry: 20 tasks total (2 per domain × 5 domains × 2 sets: baseline + holdout)\n│   Domains: search, coding, reasoning, tool_use, planning\n├── BenchmarkRunner: run_baseline(), run_post(), compare() with Welch's t-test\n├── TrajectoryScorer: outcome_score(0-10), efficiency_score(0-10), tool_score(0-10), composite(0-10)\n├── GymReport: per-task, per-domain, overall, regression detection, significance\n└── Cortex integration: store results as benchmark_result nodes for trend tracking\n\nDOMAIN-SPECIFIC TASKS (from research):\nSEARCH: needle-in-haystack fact extraction, conflicting info synthesis\nCODING: subtle bug debugging, dependency resolution CLI tool\nREASONING: constrained scheduling puzzle, scenario analysis with math\nTOOL USE: end-to-end workflow chaining, error recovery from API failures\nPLANNING: vague goal decomposition, prerequisite tree with dependencies\n\nSTATE:\n- 30 modules wired in plugin (R168-R181, R182-R189, R25-R26, R27-R32)\n- Plugin: ~3,800 lines\n- Cortex: ~4,150 tips\n- NO testing_gym.py exists yet — needs to be built from scratch\n- Danny's exam: ~2 days away",
+  "active_tasks": [
+    "Build testing_gym.py with full benchmark suite (~600-800 lines)",
+    "Wire testing gym into distillation plugin (pre/post round hooks)",
+    "Run baseline benchmarks to get starting scores",
+    "Continue training gym R33+ with benchmark validation"
+  ],
+  "decisions": [
+    "Trajectory > outcome scoring (Galileo framework)",
+    "3 difficulty levels per GAIA methodology",
+    "5 domains × 2 tasks × 2 sets = 20 benchmark tasks",
+    "Paired-calibration with Welch's t-test for significance",
+    "Cortex-backed results for trend tracking"
+  ],
+  "files_modified": [],
+  "next_steps": "1. Write ~/subconscious/testing_gym.py with BenchmarkTask, TaskRegistry, BenchmarkRunner, TrajectoryScorer, GymReport\n2. Define all 20 benchmark tasks with concrete prompts and oracle specs\n3. Wire into distillation plugin as pre/post round hooks\n4. Run first baseline to get starting scores",
+  "timestamp": "2026-04-15T04:38:04Z",
+  "unix_time": 1776227884.275585,
+  "task_id": "20260414_231635_bbb0ac",
+  "source": "manual",
+  "version": 2
+}

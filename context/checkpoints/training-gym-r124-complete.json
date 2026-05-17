@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r124-complete",
+  "context": "Training Gym R124 completed! ALL 4 PASS ON FIRST TRY! 1 T10 + 2 T9 + 1 T8!\n\nR124 RESULTS (all 10/10):\n1. candy-001 (T8) - Two passes. Left-to-right then right-to-left. Take max.\n2. text-justification-001 (T9) - Greedy pack. Distribute extra spaces left-biased. Last line left-justified.\n3. expression-add-operators-001 (T10) - Backtracking with prev operand for multiplication.\n4. dungeon-game-001 (T9) - Reverse DP. dp[i][j] = max(1, min(down,right) - cell).\n\nDB: 445 exercises, 735 attempts, avg 9.93, 96.5% perfect. 397 passed. Tier 9+ = 126, Tier 10 = 64.\n90+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R124 complete",
+    "R125 next"
+  ],
+  "decisions": [
+    "Candy: two passes. Left pass: if rating[i] > rating[i-1], candy[i] = candy[i-1]+1. Right pass: symmetric.",
+    "Text justify: greedy pack words. Distribute extra spaces left-biased. Last line left-justified.",
+    "Expression add ops: backtrack with value and prev. For *, undo prev and add prev*curr.",
+    "Dungeon game: reverse DP from princess. dp[i][j] = max(1, min(right,down) - dungeon[i][j])."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R125: Continue. Try: IPO, Split Array Largest Sum, or Find Median from Data Stream.",
+  "timestamp": "2026-04-08T23:29:00Z",
+  "unix_time": 1775690940.245072,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

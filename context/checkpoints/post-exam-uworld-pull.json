@@ -1,0 +1,24 @@
+{
+  "label": "post-exam-uworld-pull",
+  "context": "## Session: UWorld Exhibit Cleanup + Hardware Research\n\n### RESOLVED:\n- 30 wrong uw_exhibit_* images deleted from Anki media (exhibit href ≠ media file ID confirmed)\n- 1 card fixed: note 1776178154478 (L47016.jpg → uw_L47016.jpg local)\n- 49 cards with exhibit `<a href>` links left as-is (2.7% of deck, negligible)\n- CSS: Cloze desktop front=16px, back=1.0rem, mobile=15px/1.0rem\n- AnkiConnect port conflict killed (stale http.server 8765)\n\n### TOMORROW'S PLAN (after Danny's exam, 4 score reports):\n1. Danny provides 4 NBME/UWSA score reports\n2. Analyze top 5 weakest subtopics from score breakdown\n3. Scan UWorld for NEW questions in those subtopics via Chrome CDP (free)\n4. Filter out existing cards by checking `uworld::q{ID}` tags\n5. Create only NEW cards, add to \"UWorld Weak Subtopics\" deck\n6. Download inline `<img>` images via CDP, store locally as uw_* files\n7. Skip exhibit `<a href>` links (2.7%, not worth the hassle)\n8. Budget: $23 credits left — CDP+Anki operations are free\n\n### HARDWARE RESEARCH (for local inference):\n- Qwen3.6-35B-A3B: 35B total/3B active MoE, 256K native context, SWE-bench 73.4, AIME26 92.7\n- GGUF sizes: Q4_K_XL=22.4GB, Q5_K_XL=26.6GB, BF16=69.4GB\n- DGX Spark ($3,999): 128GB unified, GB10 Blackwell, runs full BF16 with 58GB headroom\n- Mac mini M4 Pro 48GB (~$1,100 refurb): runs Q4_K_XL with 25GB free\n- M2 Air 24GB: can't run Q4_K_XL (only 1.5GB free, would swap)\n- DGX Spark is the ideal Hermes inference server\n\n### KEY FILES:\n- Phase 1 scan: ~/Desktop/uworld_phase1_broad.py\n- Phase 2 card creation: ~/Desktop/uworld_phase2_broad_v2.py\n- UWorld API skill: ~/.hermes/skills/devops/uworld-api-extraction/SKILL.md\n\n### UWorld API REMINDERS:\n- CORS: ALL calls through Chrome CDP Runtime.evaluate fetch()\n- JWT expires ~1hr, refresh via location.reload()\n- getTestByQuestionIndexes: PascalCase, STRING TestRecordId, correctAnswer is STRING\n- Chrome CDP on port 9222, user-data-dir=/tmp/chrome-uworld\n- websocket-client installed in hermes venv\n- Tag format: uworld::q{questionId}\n- Exhibit href ID ≠ media file ID (CONFIRMED, saved to memory)",
+  "active_tasks": [
+    "Wait for Danny's 4 score reports after exam",
+    "Pull new UWorld questions for weakest subtopics",
+    "Create new Anki cards with local images"
+  ],
+  "decisions": [
+    "Exhibit images: leave 49 exhibit-link cards as-is (2.7% negligible)",
+    "Tomorrow: add new cards only, don't re-pull existing 1800+",
+    "Hardware: DGX Spark $3999 is the ideal local inference server for Qwen3.6-35B-A3B at BF16"
+  ],
+  "files_modified": [
+    "~/Library/Application Support/Anki2/User 1/collection.media (30 uw_exhibit_* deleted, 1 uw_L47016.jpg added)",
+    "Anki note 1776178154478 (fixed inline img)"
+  ],
+  "next_steps": "When Danny provides 4 score reports: (1) parse for weakest subtopics, (2) run Phase 1 CDP scan filtering existing qIDs, (3) run Phase 2 to create new cards with local images, (4) add to \"UWorld Weak Subtopics\" deck",
+  "timestamp": "2026-04-16T16:52:45Z",
+  "unix_time": 1776358365.36375,
+  "task_id": "20260415_205415_473e89",
+  "source": "manual",
+  "version": 2
+}

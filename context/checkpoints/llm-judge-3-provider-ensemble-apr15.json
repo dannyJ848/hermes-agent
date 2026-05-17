@@ -1,0 +1,29 @@
+{
+  "label": "llm-judge-3-provider-ensemble-apr15",
+  "context": "LLM Judge ensemble fully rebuilt from 5 models (3 dead free-tier) to 3 reliable paid models from 3 different providers.\n\nCHANGES MADE:\n1. Removed Hermes 3 405B (0% availability), Nemotron 120B (11%), Gemma 4 31B (22%) — all permanently rate-limited on OpenRouter free tier\n2. Added openai/gpt-4.1-mini ($0.40/$1.60 per 1M tokens) — tested at 2.3s latency, clean JSON output\n3. Kept MiniMax M2.7 (direct API, primary) and google/gemini-2.5-flash ($0.30/$2.50)\n4. Updated JUDGE_MODELS and FAST_MODELS in ~/subconscious/llm_judge.py\n5. Updated docstring header with accurate model list and cost\n6. Cleaned up stale memory entries about old 5-model ensemble\n\nCOST ANALYSIS:\n- Full audit (1,319 tips × 3 matches × 2 calls): ~$9 total across all 3 judges\n- $10 OpenRouter credit covers one complete initial audit pass\n- After initial pass, incremental maintenance is pennies/day as new tips trickle in\n\nTESTING RESULTS (all 3 confirmed working):\n- MiniMax M2.7: 5.4s, 100% reliable, direct API\n- Gemini 2.5 Flash: ~3s, 100% reliable, via OpenRouter\n- GPT-4.1-mini: 2.3s, confidence 0.8, clean JSON, via OpenRouter\n\nrun_full_audit_sweep() already created and wired into daemon as Phase 1.5 (every 5th cycle, 30 tips × 3 matches).\nDaemon restarted with new config as PID 40536.",
+  "active_tasks": [
+    "fix1-shim-where: Fix shim WHERE/SELECT bugs (pending)",
+    "fix2-vacuum: VACUUM cortex_nodes + cortex_edges (pending)",
+    "fix3-stale-conns: Clean stale idle-aborted DB connections (pending)",
+    "fix4-sql-injection: Fix f-string SQL injection in shim (pending)",
+    "fix5-permissions: Tighten shim file permissions 644→600 (pending)",
+    "fix6-log-locks: Enable log_lock_waits in Postgres config (pending)",
+    "fix7-elo-extend: Extend Elo evaluation beyond tips (pending)",
+    "fix8-embeddings: Generate embeddings for uncovered nodes (pending)",
+    "audit-gauntlet: Run full audit gauntlet (10+ audits) on fixed system (pending)"
+  ],
+  "decisions": [
+    "3 judges from 3 providers (MiniMax/Google/OpenAI) beats 5 models where 3 never respond",
+    "Paid models with $10 credit > free models with rate limits for judge reliability",
+    "GPT-4.1-mini chosen over alternatives (deepseek-v3.2, claude-haiku, gemini-pro) for best cost/reasoning ratio"
+  ],
+  "files_modified": [
+    "~/subconscious/llm_judge.py"
+  ],
+  "next_steps": "Daemon is running with the new 3-judge ensemble. Next steps: (1) Monitor first full audit cycle completion, (2) Return to shim/audit fix gauntlet (fix1-fix8 + audit-gauntlet in todo list), or (3) Return to UWorld project per user preference.",
+  "timestamp": "2026-04-14T19:57:02Z",
+  "unix_time": 1776196622.289359,
+  "task_id": "20260414_134505_6cd910",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,21 @@
+{
+  "label": "r13-training-gym-complete",
+  "context": "R13 COMPLETE. Built confidence_estimator.py (Confidence-First Paradigm, arXiv 2603.05881). Domain familiarity lookup + uncertainty signal detection. Two-tier warnings: LOW→verify, VERY LOW→delegate. Wired as R179 in pre_llm_call. 3 tips distilled.\n\n14-MODULE STACK (12 wired + 2 stored):\n  WIRED: R168-R179 (self_critic, reasoning_discover, task_frontier, uncertainty_reward, tool_adaptor, meta_reasoner, reflection_synth, curriculum, tool_router, heuristic_matcher, recovery_selector, confidence_estimator)\n  STORED: context_governor\n  Plugin: 3,472 lines. 97 total tips. Compressions: 1 of 16. ~140K tokens used.",
+  "active_tasks": [
+    "R14: Continue training gym"
+  ],
+  "decisions": [
+    "Confidence injection only at <50% — above that is waste",
+    "Two-tier: LOW(30-50%)→verify, VERY_LOW(<30%)→delegate"
+  ],
+  "files_modified": [
+    "~/subconscious/confidence_estimator.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "R14: Continue. Near compression #2.",
+  "timestamp": "2026-04-14T21:26:55Z",
+  "unix_time": 1776202015.586658,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

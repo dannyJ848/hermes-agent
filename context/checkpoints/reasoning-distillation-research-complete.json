@@ -1,0 +1,13 @@
+{
+  "label": "reasoning-distillation-research-complete",
+  "context": "Researched reasoning distillation for Qwen3.6-35B on DGX Spark. KEY FINDING: structure of long CoT matters MORE than content correctness (Li et al 2025). Corrupting step content drops accuracy 3-4%, but corrupting structure drops 12-14%. This means: (1) don't need perfect teacher traces, (2) structural patterns of reflection/backtracking/self-verification are what transfer, (3) just 17K examples via LoRA produced 15.2% avg accuracy improvement (Bespoke-Stratos matched o1-preview).\n\nDATASETS RANKED:\n1. OpenThoughts2-1M (1M examples, 8.3GB, best coverage)\n2. OpenR1-Math-220k (220K, math-focused, DeepSeek-R1 traces)  \n3. Bespoke-Stratos-17k (17K, proven LoRA baseline, $800 to generate)\n4. NuminaMath-CoT (73K, competition math with step-by-step)\n5. CodeContests (13K, code reasoning with explanations)\n6. MedQA-CoT (~12.8K + custom generation from GLM-5.1)\n\nLORA CONFIG FOR REASONING (different from behavioral):\n- Rank 64-128 (NOT 16 — reasoning needs higher rank)\n- Alpha 128-256\n- LR 1e-4 to 3e-4 (higher than behavioral)\n- Sequence length 8192 (reasoning traces are long)\n- Targets: q/k/v/o/gate/up/down_proj (more modules than behavioral)\n\nDATA MIX: Math 30-35%, Code 15-20%, STEM 15-20%, Medical 10-15%, Qwen-native 10-15%, Self-generated 5-10%\n\nPHASES:\n1. Bespoke-Stratos-17k baseline (1 week, +10-15%)\n2. OpenR1-Math + NuminaMath + GLM-5.1 medical traces (2-3 weeks, +15-25%)\n3. OpenThoughts2-1M (month 2)\n4. Ongoing domain specialization + self-play loop\n\nKnowledge saved: reasoning-distillation-for-qwen3-spark.md",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "When Spark arrives: (1) deploy inference, (2) download OpenR1-Math-220k and Bespoke-Stratos-17k, (3) run reasoning LoRA Phase 1 with rank=64",
+  "timestamp": "2026-04-17T18:41:02Z",
+  "unix_time": 1776451262.628733,
+  "task_id": "20260417_124034_a25fb2",
+  "source": "manual",
+  "version": 2
+}

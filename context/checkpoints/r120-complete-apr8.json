@@ -1,0 +1,20 @@
+{
+  "label": "r120-complete-apr8",
+  "context": "R120 complete. 480 tips, avg conf 0.829. Added 6 tips: Agent-O1 reasoning model pattern (high-level goals > step-by-step for reasoning models), Multi-Agent Debate (2-3 rounds, genuine diversity needed), Context Engineering (compress, summarize, cap, evict — treat context as managed resource), Agent-as-Judge (different prompt from worker + structured rubric), Prompt Injection Defense (multi-layer defense-in-depth), Trace2Skill Transfer (explicit pattern identification + tool abstraction for cross-domain transfer). Round 120. ~05:52 AM. Danny sleeping. Cron a81e43404f79 safety net. 20 tips to 500.",
+  "active_tasks": [
+    "R120 complete — 480 tips, 0.829 — ready for R121, push to 500"
+  ],
+  "decisions": [
+    "Context engineering > prompt engineering for agents",
+    "Reasoning models need different prompting than standard LLMs"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (6 new tips)"
+  ],
+  "next_steps": "R121: Push to 500 tips milestone.",
+  "timestamp": "2026-04-08T09:34:19Z",
+  "unix_time": 1775640859.1016378,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}
