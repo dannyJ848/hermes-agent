@@ -1,0 +1,161 @@
+# MASTER.md — Hermes Agent Master Documentation
+
+**System**: Hermes Agent v0.13.0 (config v23)
+**Last Updated**: 2026-05-17
+**Host**: MacBook (local) + DGX Spark (remote)
+
+---
+
+## Quick Reference
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| Primary Model | ✅ | kimi-for-coding (kimi-coding provider) |
+| Fallback Model | ✅ | kimi-for-coding (kimi-coding provider) |
+| Memory Provider | ✅ | yantrikdb (active, ~33K memories) |
+| Context Engine | ✅ | lcm |
+| Skills | ✅ | 399 enabled (78 builtin, 321 local) |
+| Plugins | ✅ | 41 enabled, 4 disabled |
+| Toolsets | ✅ | All enabled |
+| Cron Gateway | ✅ | 43 jobs, active |
+| MCP | ✅ | BioMCP server |
+| Git Repo | ⚠️ | 2 uncommitted changes |
+
+---
+
+## Architecture
+
+### Local (MacBook)
+- **Hermes Agent**: `/Users/dannygomez/hermes-agent/`
+- **Virtual Env**: Python 3.11.14
+- **Config**: `~/.hermes/config.yaml`
+- **Memory**: `~/.hermes/yantrikdb_copy.db` (~33K records)
+- **Skills**: `~/.hermes/skills/` (321 local)
+- **Plugins**: `~/.hermes/plugins/` (yantrikdb, paperclip-adapter, etc.)
+
+### Remote (DGX Spark)
+- **Host**: spark-85e8.local (user: djg6228)
+- **vLLM**: Qwen3.6-27B-Uncensored @ /data/models/Qwen3.6-27B-Uncensored
+- **Specs**: BF16 @ port 8000, FP8 @ port 8001
+- **Features**: Dynamic LoRA, DFlash speculative decoding
+- **Tool Calling**: Broken (XML vs JSON mismatch) — use text-based wrapper
+- **Speed**: ~6.2 tok/s (speculative), ~12 tok/s (without)
+
+---
+
+## Configuration
+
+### API Providers
+```yaml
+kimi-coding: https://api.kimi.com/coding  (primary)
+deepseek:    https://api.deepseek.com/v1
+spark-fp8:   http://10.0.0.171:8001/v1
+spark-bf16:  http://10.0.0.171:8000/v1
+local:       http://localhost:11434/v1    (ollama)
+featherless: https://api.featherless.ai/v1
+jina-reader: https://r.jina.ai
+```
+
+### Key Settings
+- `model.default`: kimi-for-coding
+- `memory.provider`: yantrikdb
+- `context.engine`: lcm
+- `delegation.model`: deepseek-v4-pro
+- `fallback_model.model`: kimi-for-coding
+- `agent.max_turns`: 90
+- `terminal.timeout`: 180
+- `checkpoints.enabled`: true
+
+### Disabled Features
+- evey-eyes, evey-moltbook, evey-mqtt, evey-wallet (plugins)
+- OpenRouter (not configured)
+- MiniMax (invalid key)
+- Browser-CDP, Discord, HomeAssistant, ImageGen, Spotify (missing deps/tokens)
+
+---
+
+## Profiles
+
+| Profile | Model | Purpose |
+|---------|-------|---------|
+| spark-quality | qwen3.6-27b-uncensored | Quality inference on DGX |
+| spark-speed | qwen3.6-27b-uncensored | Speed inference on DGX |
+| training-gym | glm-5.1 | Training and evaluation |
+
+---
+
+## Critical Files
+
+### Must Not Modify Without Permission
+- `~/.hermes/config.yaml` — especially model names in 3 locations
+- `~/.hermes/.env` — API keys
+- `~/.hermes/auth.json` — auth state
+
+### Context Files (Auto-loaded)
+- `~/.hermes/SOUL.md` — persona & learned behaviors
+- `~/.hermes/MEMORY.md` — long-term memory
+- `~/.hermes/USER.md` — user profile (365 chars)
+- `~/.hermes/AGENTS.md` — workspace conventions
+
+### Persistence Layers
+- Git repo: `/Users/dannygomez/hermes-agent/` (hermes-agent source)
+- Memory DB: `~/.hermes/yantrikdb_copy.db`
+- State DB: `~/.hermes/state.db`
+- Session logs: `~/.hermes/sessions/`
+- Skills: `~/.hermes/skills/` + builtin
+- Checkpoints: `~/.hermes/workspace/checkpoints/`
+
+---
+
+## 5-Repo Integration
+
+| Repo | Location | Status |
+|------|----------|--------|
+| hermeshub | `~/.hermes/plugins/hermeshub/` | ✅ 22 skills |
+| superpowers | `~/.hermes/plugins/superpowers/` | ✅ 14 skills |
+| obsidian-skills | `~/.hermes/plugins/obsidian-skills/` | ✅ 5 skills |
+| paperclip-adapter | `~/.hermes/plugins/paperclip-adapter/` | ✅ enabled |
+| yantrikdb | `~/.hermes/plugins/yantrikdb/` | ✅ enabled, rebuilt for py3.11 |
+
+---
+
+## Known Issues & Workarounds
+
+1. **YantrikDB Python version mismatch**: Rebuild with `maturin build --release --interpreter <python>`
+2. **Gateway module shadowing**: Pre-import `gateway` via `importlib.util`
+3. **DGX Qwen XML tool output**: Use text-based wrapper, not vLLM parser
+4. **Cron stale jobs**: Gateway restart fixes (done May 17)
+5. **Orphan aliases**: Remove from `~/.local/bin/` (done May 17)
+
+---
+
+## Operations
+
+### Daily Checks
+- `hermes doctor` — system health
+- `hermes memory status` — memory provider
+- `hermes cron list` — cron jobs
+
+### Maintenance
+- Memory consolidation: automatic via evey-memory-consolidate
+- Curator: auto-archive after 90 days
+- Checkpoints: auto-prune orphans, 7-day retention
+
+### Emergency Recovery
+1. Check model names in config.yaml (3 locations)
+2. Verify `~/.hermes/.env` has API keys
+3. Check git status for uncommitted changes
+4. Run `hermes doctor --fix`
+5. Rebuild YantrikDB if needed: `cd ~/.hermes/plugins/yantrikdb && maturin develop --release`
+
+---
+
+## User Constraints
+- **NO systemd daemons** — screen/tmux only
+- **NO autonomous agents without explicit permission**
+- **NO touching DGX vLLM** — managed separately
+- **NO modifying kimi config** — caused recovery incident May 16
+
+---
+
+*This document is the single source of truth for Hermes Agent state. Update it whenever configuration changes.*
