@@ -16,6 +16,22 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent.resolve()
 
+# === PATCH: ensure gateway package is imported before hermes_cli.gateway shadows it ===
+import importlib.util
+_gateway_pkg_dir = PROJECT_ROOT / "gateway"
+if _gateway_pkg_dir.is_dir() and "gateway" not in sys.modules:
+    _gateway_init = _gateway_pkg_dir / "__init__.py"
+    if _gateway_init.exists():
+        _gateway_spec = importlib.util.spec_from_file_location(
+            "gateway",
+            str(_gateway_init),
+            submodule_search_locations=[str(_gateway_pkg_dir)]
+        )
+        _gateway_mod = importlib.util.module_from_spec(_gateway_spec)
+        sys.modules["gateway"] = _gateway_mod
+        _gateway_spec.loader.exec_module(_gateway_mod)
+# ================================================================================
+
 from gateway.status import terminate_pid
 from gateway.restart import (
     DEFAULT_GATEWAY_RESTART_DRAIN_TIMEOUT,
