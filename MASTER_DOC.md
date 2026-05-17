@@ -1,14 +1,16 @@
 # Hermes Agent — Master Documentation
 
-## Status: FULLY OPERATIONAL (July 2026)
+## Status: FULLY OPERATIONAL (May 17 2026)
 
 All cognitive systems, tools, plugins, and configurations are verified, wired, and functional within the Hermes source tree.
 
-### Current Active Project: Qwen 27B Benchmark Evaluation
-- **Status**: In Progress — MMLU complete, GSM8K running
-- **Checkpoint**: `qwen27b-benchmarks-in-progress-may10`
-- **Resume**: `hermes --resume qwen27b-benchmarks-in-progress-may10`
-- **DGX Process**: PID 3233497 (background SSH, survives disconnects)
+### Current Active Project: Persistence Layer Update + System Hardening
+- **Status**: COMPLETE — All layers updated, YantrikDB rebuilt for Python 3.11
+- **Last Commit**: `375dcf681` — YantrikDB memory provider + gateway module shadowing fix
+- **Memory**: yantrikdb provider active (~33K memories)
+- **Skills**: 399 enabled (78 builtin, 321 local)
+- **Plugins**: 41 enabled, 4 disabled
+- **Cron**: 43 jobs active, gateway working
 
 ---
 
@@ -120,19 +122,25 @@ Rules:
 
 ~/.hermes/
   config.yaml               # Config including x_cookies
-  plugins/                  # 41 plugins
+  plugins/                  # 45 plugins (41 enabled)
     cognitive-systems/        # v2.0.0
     distillation/
+    yantrikdb/                # v0.2.4 — rebuilt for Python 3.11
+    paperclip-adapter/        # v0.3.0
     ...
-  skills/                   # 289 skills
+  skills/                   # 399 skills (78 builtin, 321 local)
     software-development/
     research/
     meta/
     ...
   knowledge/                # 1158 knowledge files
   *.db                      # 105 databases
-  cron/                     # Scheduled jobs
+  cron/                     # 43 scheduled jobs
   workspace/checkpoints/      # Session checkpoints
+  MEMORY.md                 # Long-term memory (updated May 17 2026)
+  SOUL.md                   # Persona & learned behaviors (updated May 17 2026)
+  USER.md                   # User profile (updated May 17 2026)
+  MASTER.md                 # Master reference (created May 17 2026)
 ```
 
 ---
