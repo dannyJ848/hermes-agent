@@ -1,9 +1,8 @@
 model:
-  base_url: http://10.0.0.171:8000/v1
-  default: merged-lora
-  provider: spark-bf16
-  api_key: not-needed
-  dtype: bfloat16
+  base_url: https://api.kimi.com/coding
+  default: kimi-for-coding
+  provider: kimi-coding
+  api_key_env: KIMI_API_KEY
 providers:
   local:
     api: http://localhost:11434/v1
@@ -43,16 +42,6 @@ providers:
         context_length: 262144
         supports_tools: true
         supports_thinking: true
-  spark-fp8:
-    api: http://10.0.0.171:8001/v1
-    api_key: not-needed
-    name: spark-fp8
-    models:
-      qwen3.6-fp8:
-        context_length: 262144
-        supports_tools: true
-        supports_reasoning: true
-        supports_vision: true
   spark-bf16:
     api: http://10.0.0.171:8000/v1
     api_key: not-needed
@@ -133,8 +122,8 @@ agent:
     uwu: hewwo! i'm your fwiendwy assistant uwu~ i wiww twy my best to hewp you! *nuzzles
       your code* OwO what's this? wet me take a wook! i pwomise to be vewy hewpful
       >w<
-  reasoning_effort: medium
-  verbose: false
+  reasoning_effort: high
+  verbose: true
 terminal:
   backend: local
   modal_mode: auto
@@ -407,7 +396,7 @@ delegation:
   inherit_mcp_toolsets: true
   max_iterations: 50
   child_timeout_seconds: 600
-  reasoning_effort: medium
+  reasoning_effort: high
   max_concurrent_children: 3
   max_spawn_depth: 1
   orchestrator_enabled: true
