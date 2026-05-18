@@ -288,9 +288,10 @@ class CheckpointManager:
         Keep at most this many checkpoints per directory.
     """
 
-    def __init__(self, enabled: bool = False, max_snapshots: int = 50):
+    def __init__(self, enabled: bool = False, max_snapshots: int = 50, max_total_size_mb: int = 500):
         self.enabled = enabled
         self.max_snapshots = max_snapshots
+        self.max_total_size_mb = max_total_size_mb
         self._checkpointed_dirs: Set[str] = set()
         self._git_available: Optional[bool] = None  # lazy probe
 
