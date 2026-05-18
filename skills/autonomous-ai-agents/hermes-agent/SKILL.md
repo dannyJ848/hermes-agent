@@ -555,13 +555,36 @@ terminal(command="tmux capture-pane -t backend -p | tail -30", timeout=5)
 terminal(command="tmux send-keys -t frontend 'Here is the API schema from the backend agent: ...' Enter", timeout=5)
 ```
 
-### Session Resume
+### Session Resume & Checkpoints
 
-```
+**Resume commands (CLI):**
+```bash
 # Resume most recent session
+hermes --continue
+hermes -c
+
+# Resume specific session by ID
+hermes --resume SESSION_ID
+hermes -r SESSION_ID
+
+# Resume by session name/title
+hermes --continue "my-session-name"
+```
+
+**In-session checkpoint commands:**
+```
+/rollback [N]        Restore filesystem checkpoint (if --checkpoints enabled)
+/background <prompt>  Run prompt in background
+/queue <prompt>      Queue for next turn
+/resume [name]       Resume a named session (in-gateway)
+```
+
+**Resume via tmux (for long-running background sessions):**
+```
+# Resume most recent in tmux
 terminal(command="tmux new-session -d -s resumed 'hermes --continue'", timeout=10)
 
-# Resume specific session
+# Resume specific session in tmux
 terminal(command="tmux new-session -d -s resumed 'hermes --resume 20260225_143052_a1b2c3'", timeout=10)
 ```
 
@@ -603,6 +626,36 @@ terminal(command="tmux new-session -d -s resumed 'hermes --resume 20260225_14305
 1. `hermes skills list` — verify installed
 2. `hermes skills config` — check platform enablement
 3. Load explicitly: `/skill name` or `hermes -s name`
+
+### Session Checkpoint / Resume Issues
+
+**`CheckpointManager.__init__() got an unexpected keyword argument 'max_total_size_mb'` or `'max_file_size_mb'`**
+- **Cause:** `tools/checkpoint_manager.py` `__init__` missing parameters that callers pass. The `config.yaml` has `checkpoints.max_total_size_mb` and `checkpoints.max_file_size_mb`, and `cli.py` passes both to `CheckpointManager()`, but the definition only had `enabled` and `max_snapshots`.
+- **Fix:** Add BOTH parameters to `CheckpointManager.__init__` in `tools/checkpoint_manager.py`:
+  ```python
+  def __init__(self, enabled: bool = False, max_snapshots: int = 50, max_total_size_mb: int = 500, max_file_size_mb: int = 10):
+      self.enabled = enabled
+      self.max_snapshots = max_snapshots
+      self.max_total_size_mb = max_total_size_mb
+      self.max_file_size_mb = max_file_size_mb
+  ```
+- **Verify:** `grep -n "def __init__" tools/checkpoint_manager.py` should show 5 parameters including both `max_total_size_mb` and `max_file_size_mb`.
+- **Pattern:** When config adds new checkpoint settings, always check if `CheckpointManager.__init__` needs matching parameters. The config and the class must stay in sync.
+
+**`AttributeError: 'HermesCLI' object has no attribute '_vprint'` or `'log_prefix'`**
+- **Cause:** Self-manager handoff code was inserted into `HermesCLI.__init__` calling `self._vprint()` and `self.log_prefix` before those attributes/methods were defined. Common when adding features to `__init__` without checking dependency order.
+- **Fix:** Add `self.log_prefix = "[hermes] "` early in `__init__` (before any code that uses it), and add `def _vprint(self, message, *, force=False)` as a method right after `__init__` ends.
+- **Pattern:** When adding code to `__init__` that references `self.X`, always verify `self.X` is defined earlier in `__init__` or is a method defined before the call site.
+
+**Resume not working / session not found**
+- Check available sessions: `hermes sessions list`
+- Verify session ID: `hermes sessions browse` (interactive picker)
+- Sessions are stored in `~/.hermes/sessions/` as JSONL files
+
+**Checkpoints not created**
+- Enable checkpoints: `hermes config set checkpoints.enabled true`
+- Set max snapshots: `hermes config set checkpoints.max_snapshots 50`
+- Requires `--checkpoints` flag or config enabled; takes effect on next session (`/reset` or new `hermes` invocation)
 
 ### Gateway issues
 Check logs first:
@@ -658,6 +711,8 @@ For occasional contributors and PR authors. Full developer docs: https://hermes-
 ### Monolithic Cognitive Integration
 
 For details on the inline cognitive systems integration (replacing plugin hook indirection with direct function calls), see `references/monolithic-integration-v4.md`.
+
+For the CheckpointManager `max_total_size_mb` parameter fix (2026-05-18), see `references/checkpoint-manager-fix-2026-05-18.md`.
 
 ### Project Layout
 

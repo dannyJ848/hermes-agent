@@ -136,9 +136,39 @@ If training the local model:
 
 No cloud API teacher needed. GRPO is self-play — model generates, execution verifies, policy updates. Training data on disk = $0/round.
 
+## BF16-Only Constraint for Trained Models
+
+When the user explicitly says "BF16 native only" or "remove all quant":
+
+- **NEVER add FP8/quantized providers** to config — remove them if they exist
+- **NEVER suggest `--quantization fp8`** or `--kv-cache-dtype fp8` for inference
+- **Always use `--dtype bfloat16`** for vLLM serve
+- **Context length tradeoff**: At BF16, 32K context uses ~59GB GPU memory (27x concurrency). 64K uses ~75GB (14x concurrency). 262K uses ~96GB (4x concurrency). For agent workloads, 32K-64K is the practical range.
+- **Remove from config:** Any `spark-fp8`, `qwen3.6-fp8`, or quantized model entries
+- **Keep in config:** Only BF16 providers with `dtype: bfloat16` explicitly noted
+
+Example config enforcement:
+```yaml
+providers:
+  spark-bf16:
+    api: http://10.0.0.171:8000/v1
+    api_key: not-needed
+    models:
+      merged-lora:
+        context_length: 32768
+        supports_tools: true
+        supports_reasoning: true
+```
+
+No FP8 provider. No quantized alternatives. BF16 only.
+
 ## Pitfalls
 
 1. **Profile configs have SPARK_IP_PLACEHOLDER** — must be patched with real IP before use. The wiring script handles this.
+
+2. **Self-manager handoff code may reference missing attributes** — If you see `AttributeError: 'HermesCLI' object has no attribute '_vprint'` or `log_prefix` during startup, the self-manager auto-resume code in `cli.py` references attributes/methods that don't exist yet in `__init__`. Fix: add the missing attribute/method right after `self.verbose` assignment (or wherever it first needs to be available). Example fixes:
+   - `_vprint`: add as method after `__init__` — `def _vprint(self, message, *, force=False): if force or self.verbose: print(message)`
+   - `log_prefix`: add as attribute — `self.log_prefix = "[hermes] "` right after `self.verbose`
 
 2. **Plugins are SHARED, not per-profile** — all profiles use `~/.hermes/plugins/`. Plugin changes affect all profiles.
 
@@ -171,6 +201,23 @@ No cloud API teacher needed. GRPO is self-play — model generates, execution ve
 16. **NEVER disable Hermes safety guardrails for local inference** — When wiring local vLLM, do NOT disable `tirith_enabled`, `warnings_enabled`, or `hard_stop_enabled` in Hermes config. The user explicitly corrected this: "keep all those safety parameters as they were they stop you from wasting tokens." Safety guardrails prevent token-wasting loops. Always keep original settings: `tirith_enabled: true`, `warnings_enabled: true`, `warn_after: {exact_failure: 2, same_tool_failure: 3, idempotent_no_progress: 2}`, `hard_stop_after: {exact_failure: 5, same_tool_failure: 8, idempotent_no_progress: 5}`. If you already disabled them, restore immediately.
 
 16. **Serve base model + LoRA adapter, NOT merged weights** — Qwen3.5 merged models trigger `Qwen3_5Config` (vision-language) which vLLM cannot load. Serve base model with `--enable-lora --lora-modules name=/path/to/adapter` instead.
+
+17. **Qwen Uncensored models output XML tool calls, vLLM expects JSON** — Qwen2.5/3.6 Uncensored variants (especially D-Flash tuned) output tool calls in XML format (`<tool_call><function=name>...</function></tool_call>`) but vLLM's default tool parsers expect JSON. This causes silent tool-calling failures where Hermes sends tools but the model returns XML that vLLM cannot parse. **Fixes:**
+    - Use `--tool-call-parser qwen3_xml` if your vLLM build supports it (rare)
+    - Use text-based tool execution: disable `tool_choice: auto`, parse tools from text output
+    - Use a JSON-format model instead (standard Qwen-Instruct, not Uncensored)
+    - See `references/qwen-xml-tool-calling-incompatibility.md` for full workaround recipes
+
+## References
+
+- `references/qwen-xml-tool-calling-incompatibility.md` — XML vs JSON tool calling problem and workarounds
+- `references/dgx-qwen27b-lora-config-example.md` — Complete working config for DGX Qwen 27B + LoRA setup
+
+17. **Qwen Uncensored models output XML tool calls, vLLM expects JSON** — Qwen2.5/3.6 Uncensored variants (especially D-Flash tuned) output tool calls in XML format (`<tool_call><function=name>...</function></tool_call>`) but vLLM's default tool parsers expect JSON. This causes silent tool-calling failures where Hermes sends tools but the model returns XML that vLLM cannot parse. **Fixes:**
+    - Use `--tool-call-parser qwen3_xml` if your vLLM build supports it (rare)
+    - Use text-based tool execution: disable `tool_choice: auto`, parse tools from text output
+    - Use a JSON-format model instead (standard Qwen-Instruct, not Uncensored)
+    - See `references/qwen-xml-tool-calling-incompatibility.md` for full workaround recipes
 
 ## Verification Patterns (No SSH Required)
 

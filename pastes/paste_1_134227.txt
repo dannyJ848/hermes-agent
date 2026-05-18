@@ -1,0 +1,53 @@
+─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    All persistence layers updated and committed. Here's the summary:
+    
+    
+    
+    Persistence Layers Updated — Commit c5bc7f54d
+    
+    MEMORY.md (19,685 bytes)
+    - DGX Qwen Integration section added (model, IP, LoRA path, launch command)
+    - API Providers updated: removed spark-fp8, kept spark-bf16 only
+    - Profiles updated: dgx-qwen-lora as primary, deprecated old spark profiles
+    - 10 new learned behaviors from today's fixes (HermesCLI, CheckpointManager, BF16, profiles, Qwen XML/JSON, DGX verification, session handoff, cache clearing)
+    - Session History summary of all May 18 work
+    
+    SOUL.md (7,576 bytes)
+    - 8 new learned behaviors added:
+      - HermesCLI _vprint/log_prefix fix pattern
+      - CheckpointManager parameter fix pattern
+      - BF16-only enforcement (remove FP8 providers)
+      - Profile creation for local models
+      - Qwen XML vs JSON tool calling fix
+      - DGX HTTP verification instead of SSH
+      - Session compression handoff protocol
+      - Python cache clearing after code changes
+    
+    MASTER.md (5,928 bytes)
+    - Git commit updated to bf53b5b9b
+    - DGX Integration status line added
+    - Profiles table: dgx-qwen-lora as primary, old profiles marked deprecated
+    - API Providers: removed spark-fp8, added BF16 native note
+    - DGX Qwen Integration section with endpoint, LoRA module, context, tool calling status
+    - Remote DGX section updated with LoRA details, removed FP8 references
+    
+    
+    
+    Context Handoff for New CLI
+    
+    Paste this into new session:
+    
+    
+    Continuing DGX Qwen 27B Uncensored D-Flash Final + LoRA integration.
+    
+    State: Config complete on MacBook, needs vLLM verification on DGX.
+    DGX: 10.0.0.171 (djg6228/6228)
+    Launch: dgx-qwen-lora chat
+    Profile: ~/.hermes/profiles/dgx-qwen-lora/config.yaml
+    Provider: spark-bf16 (port 8000, BF16 native)
+    
+    Next: Verify vLLM running on DGX, test tool calling, fix XML/JSON mismatch if needed.
+    
+    
+    All layers committed and pushed to origin/main.
+╰──────────────────────────────────────────────────────────────────────────────╯

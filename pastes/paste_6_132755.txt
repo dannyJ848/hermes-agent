@@ -1,0 +1,9 @@
+● dannygomez@MacBook-Air-9 ~ % hermes 
+[learning-brain] Learning loop wired: pre_tool_call, post_tool_call, 
+on_session_start, on_session_end
+... (+13 more lines)
+AttributeError: 'HermesCLI' object has no attribute 'log_prefix'
+dannygomez@MacBook-Air-9 ~ % 
+Initializing agent...
+Failed to initialize agent: CheckpointManager.__init__() got an unexpected 
+keyword argument 'max_file_size_mb'

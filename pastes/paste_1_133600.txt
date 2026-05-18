@@ -1,0 +1,69 @@
+╭─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    Got it — you need the context handoff for a new CLI session to continue from where we are. Here's the compressed state to paste into the new session:
+    
+    
+    
+    CONTEXT HANDOFF — Hermes DGX Integration
+    
+    What we're doing:
+    Integrating Qwen 27B Uncensored D-Flash Final + LoRA adapter on DGX into Hermes CLI on MacBook. BF16 native only (no quantization — model was trained in BF16).
+    
+    DGX Details (from previous sessions):
+    - IP: 10.0.0.171
+    - User: djg6228 / Pass: 6228
+    - vLLM BF16: Port 8000 (base model + LoRA)
+    - Model path: /data/models/Qwen3.6-27B-Uncensored
+    - LoRA path: /data/checkpoints/final_model
+    - LoRA name: merged-lora
+    
+    Hermes Config Status:
+    Main config (~/.hermes/config.yaml):
+    - spark-bf16 provider → http://10.0.0.171:8000/v1
+    - merged-lora model registered (context_length: 32768, supports_tools: true)
+    - qwen3.6-27b-uncensored base model fallback
+    - Removed: spark-fp8 provider (port 8001, FP8 quantized) — deleted
+    
+    Profile (dgx-qwen-lora):
+    - Created with --clone from default
+    - Config points to spark-bf16 provider
+    - Uses merged-lora model
+    - dtype: bfloat16 enforced
+    
+    Recent Fixes Applied:
+    1. CheckpointManager.init() missing max_total_size_mb — FIXED (added parameter)
+    2. CheckpointManager.init() missing max_file_size_mb — FIXED (added parameter)
+    3. HermesCLI._vprint method missing — FIXED (added method)
+    4. HermesCLI.log_prefix attribute missing — FIXED (added attribute)
+    5. Python cache cleared (pycache and .pyc files)
+    
+    Git Status:
+    - MacBook: main branch, commits pushed to origin/main
+    - DGX: 6+ commits behind MacBook (needs git pull)
+    - Latest commit: bf53b5b9b (CheckpointManager max_file_size_mb fix)
+    
+    Known Issues:
+    - Tool calling on vLLM: Qwen 27B Uncensored outputs XML tool calls but vLLM expects JSON. Need to verify --tool-call-parser qwen3_xml or use text-based wrapper.
+    - Context compression: Session hit compression threshold (12+ compactions) — reason for new CLI.
+    
+    Next Steps:
+    1. Verify hermes launches without errors on MacBook
+    2. Test dgx-qwen-lora chat connects to DGX
+    3. Verify tool calling works (may need vLLM flag adjustment)
+    4. Sync DGX with git pull if needed
+    
+    Launch Commands:
+    bash
+    Test basic hermes
+    hermes
+    
+    Launch with DGX model
+    dgx-qwen-lora chat
+    
+    Or direct
+    hermes chat --provider spark-bf16 --model merged-lora
+    
+    
+    
+    
+    Paste this into the new CLI session and say "continue from here" or "launch DGX model".
+╰──────────────────────────────────────────────────────────────────────────────
