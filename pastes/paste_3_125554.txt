@@ -1,0 +1,17 @@
+dannygomez@MacBook-Air-9 ~ % hermes
+[learning-brain] Learning loop wired: pre_tool_call, post_tool_call, on_session_start, on_session_end
+[learning-brain] LLM Judge ready: deepseek-v4-pro @ https://api.deepseek.com
+[learning-brain] Autobrowse R191 wired: tracer, analyzer, synthesizer, graduator (trigger every 20 calls)
+Traceback (most recent call last):
+  File "/Users/dannygomez/.local/bin/hermes", line 11, in <module>
+    sys.exit(main())
+  File "/Users/dannygomez/.hermes/hermes_cli/main.py", line 10467, in main
+    cmd_chat(args)
+  File "/Users/dannygomez/.hermes/hermes_cli/main.py", line 1337, in cmd_chat
+    cli_main(**kwargs)
+  File "/Users/dannygomez/.hermes/cli.py", line 12451, in main
+    cli = HermesCLI(
+  File "/Users/dannygomez/.hermes/cli.py", line 2402, in __init__
+    self._vprint(f"{self.log_prefix}🔄 Auto-resuming from handoff: {resume}", force=True)
+AttributeError: 'HermesCLI' object has no attribute '_vprint'
+dannygomez@MacBook-Air-9 ~ %       

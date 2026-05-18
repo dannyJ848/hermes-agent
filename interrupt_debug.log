@@ -1,0 +1,6 @@
+12:55:55 ENTER: queued interrupt msg='wait: \n[Pasted text #3: 17 lines → /Users/dannygomez/.hermes', agent_running=True
+12:55:55 interrupt fired: msg='wait: \n[Pasted text #3: 17 lines → /Users/dannygomez/.hermes', children=0, parent._interrupt=True
+12:56:03 ENTER: queued interrupt msg='wait', agent_running=True
+12:56:11 interrupt fired: msg='wait', children=0, parent._interrupt=True
+12:56:29 interrupt fired: msg='another issue: \n[Pasted text #4: 17 lines → /Users/dannygome', children=0, parent._interrupt=True
+12:56:29 ENTER: queued interrupt msg='another issue: \n[Pasted text #4: 17 lines → /Users/dannygome', agent_running=True
