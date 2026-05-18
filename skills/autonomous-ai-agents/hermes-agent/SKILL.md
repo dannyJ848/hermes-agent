@@ -712,7 +712,9 @@ For occasional contributors and PR authors. Full developer docs: https://hermes-
 
 For details on the inline cognitive systems integration (replacing plugin hook indirection with direct function calls), see `references/monolithic-integration-v4.md`.
 
-For the CheckpointManager `max_total_size_mb` parameter fix (2026-05-18), see `references/checkpoint-manager-fix-2026-05-18.md`.
+For the CheckpointManager parameter fixes (2026-05-18), see `references/checkpoint-manager-fix-2026-05-18.md`.
+
+For the HermesCLI `_vprint` and `log_prefix` startup fixes (2026-05-18), see `references/hermescli-startup-attributes-fix.md`.
 
 ### Project Layout
 
