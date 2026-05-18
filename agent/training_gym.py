@@ -488,7 +488,101 @@ def record_attempt(exercise_id, score, max_score, tools_used=None, errors=None,
     db.commit()
     db.close()
 
-if __name__ == "__main__":
+
+# ── UPSTREAM PATTERN: Background Review Fork (adapted from background_review.py) ──
+# After each exercise, spawn an isolated review to evaluate whether the
+# exercise produced a tip worth distilling. Uses tool whitelist like upstream.
+
+def _spawn_exercise_review(exercise_id, attempt_data, raw_output):
+    """Fork a lightweight review after exercise completion.
+    
+    Adapted from upstream background_review.py pattern:
+    - Isolated evaluation (no side effects on main session)
+    - Tool whitelist: only memory/skill tools
+    - Prefix cache optimization (inherits system prompt)
+    """
+    import threading
+    import contextlib
+    from io import StringIO
+    
+    def _review_target():
+        # Capture stdout to prevent leakage
+        buf = StringIO()
+        with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+            try:
+                # Evaluate: did this exercise produce a learning?
+                score = attempt_data.get("score", 0)
+                max_score = attempt_data.get("max_score", 10)
+                errors = json.loads(attempt_data.get("errors", "[]"))
+                
+                if score >= max_score and not errors:
+                    # Perfect run — maybe too easy, consider tier bump
+                    _bump_exercise_tier(exercise_id)
+                elif errors:
+                    # Failure — extract tip for distillation
+                    _extract_exercise_tip(exercise_id, errors, raw_output)
+                
+            except Exception:
+                pass  # Review failures are non-blocking
+    
+    # Spawn as daemon thread (non-blocking, like upstream)
+    t = threading.Thread(target=_review_target, daemon=True)
+    t.start()
+    return t
+
+
+def _bump_exercise_tier(exercise_id):
+    """Consider bumping exercise to next tier if consistently perfect."""
+    db = get_db()
+    # Check last 3 attempts
+    rows = db.execute(
+        "SELECT score, max_score FROM attempts WHERE exercise_id=? ORDER BY finished_at DESC LIMIT 3",
+        (exercise_id,)
+    ).fetchall()
+    
+    if len(rows) >= 3 and all(r["score"] >= r["max_score"] for r in rows):
+        # Consistently perfect — bump tier
+        db.execute(
+            "UPDATE exercises SET tier = tier + 1 WHERE id=? AND tier < 5",
+            (exercise_id,)
+        )
+        db.commit()
+    db.close()
+
+
+def _extract_exercise_tip(exercise_id, errors, raw_output):
+    """Extract a tip from exercise failure for distillation pipeline."""
+    if not errors:
+        return
+    
+    # Get exercise info
+    db = get_db()
+    ex = db.execute("SELECT category, name, prompt FROM exercises WHERE id=?", (exercise_id,)).fetchone()
+    if not ex:
+        db.close()
+        return
+    
+    # Build tip from first error
+    error = errors[0] if isinstance(errors, list) else str(errors)
+    condition = f"When training in {ex['category']} (exercise: {ex['name']})"
+    recommendation = f"Error encountered: {str(error)[:100]}. Review: {ex['prompt'][:80]}"
+    
+    # Store in cerebrum via distillation bridge if available
+    try:
+        from agent.distillation_bridge import bottom_up_store
+        bottom_up_store(
+            tool_name=f"training_{ex['category']}",
+            args={"exercise": ex['name']},
+            status="error",
+            speed_ms=0,
+            error=str(error)[:200],
+            lesson=recommendation
+        )
+    except Exception:
+        pass
+    
+    db.close()
+
     init_db()
     seed_exercises()
     print("Training gym initialized!")

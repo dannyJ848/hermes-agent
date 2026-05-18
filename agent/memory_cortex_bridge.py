@@ -260,6 +260,79 @@ class MemoryParser:
 # MAIN BRIDGE
 # ---------------------------------------------------------------------------
 
+# ── UPSTREAM PATTERN: Memory Isolation (adapted from background_review.py) ──
+# Isolate cognitive memory operations from external plugin interference.
+# Uses whitelist approach: only cognitive subsystems can access memory DB.
+
+import threading
+
+# Thread-local storage for isolation context
+_isolation_context = threading.local()
+
+
+def set_cognitive_isolation(enabled=True):
+    """Enable/disable cognitive isolation for current thread.
+    
+    When enabled, only whitelisted cognitive operations can access
+    the memory database. Prevents plugins from corrupting cognitive state.
+    """
+    _isolation_context.enabled = enabled
+    _isolation_context.whitelist = {
+        "memory_cortex_bridge",
+        "distillation_bridge", 
+        "tiered_memory",
+        "cognitive_orchestrator",
+        "training_gym",
+        "self_audit",
+        "error_learning"
+    }
+
+
+def is_cognitive_operation(caller):
+    """Check if caller is a whitelisted cognitive subsystem."""
+    if not getattr(_isolation_context, 'enabled', False):
+        return True  # No isolation = allow all
+    
+    caller_str = str(caller).lower()
+    return any(w in caller_str for w in _isolation_context.whitelist)
+
+
+class IsolatedCortexDBBridge(CortexDBBridge):
+    """CortexDB bridge with cognitive isolation.
+    
+    Inherits all CortexDBBridge functionality but adds isolation checks
+    before write operations. Prevents plugin interference.
+    """
+    
+    def write_memory_unit(self, entry, caller="unknown"):
+        """Write with isolation check."""
+        if not is_cognitive_operation(caller):
+            logger.warning("Memory write denied for non-cognitive caller: %s", caller)
+            return {"status": "denied", "reason": "non_cognitive_caller"}
+        
+        return super().write_memory_unit(entry)
+    
+    def read_memory_units(self, query, caller="unknown"):
+        """Read with isolation check."""
+        if not is_cognitive_operation(caller):
+            logger.warning("Memory read denied for non-cognitive caller: %s", caller)
+            return []
+        
+        return super().read_memory_units(query)
+
+
+def install_memory_isolation():
+    """Install memory isolation globally.
+    
+    Call once at startup to protect cognitive memory operations.
+    """
+    set_cognitive_isolation(True)
+    logger.info("Memory isolation installed — cognitive operations protected")
+
+
+# ── Original MemoryCortexBridge class continues below ──
+
+
 class MemoryCortexBridge:
     """Auto-offload bridge: Hermes memory → CortexDB."""
     

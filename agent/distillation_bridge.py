@@ -890,6 +890,103 @@ def get_stats():
         return 0
 
 
+# ── UPSTREAM PATTERN: Trajectory Format Export (adapted from agent_runtime_helpers.py) ──
+# Export successful tool sequences as standardized training trajectories.
+# Format matches upstream convert_to_trajectory_format for compatibility.
+
+def export_trajectory(session_messages, user_query, completed=True):
+    """Export session as trajectory for training replay.
+    
+    Adapted from upstream agent_runtime_helpers.py:
+    - Standardized format for training data
+    - Strips think blocks, keeps tool calls + results
+    - Stores in training_gym for replay
+    """
+    import re
+    trajectory = []
+    
+    # System message with tool definitions (simplified)
+    trajectory.append({
+        "from": "system",
+        "value": "You are a function calling AI. Use available tools to assist."
+    })
+    
+    # User query
+    trajectory.append({
+        "from": "human", 
+        "value": user_query
+    })
+    
+    # Process messages — extract tool calls and results
+    for msg in session_messages:
+        if msg.get("role") == "assistant":
+            # Strip think blocks (upstream pattern)
+            content = msg.get("content", "")
+            if content:
+                # Remove <thinking>...</thinking> blocks
+                content = re.sub(r'<thinking>.*?</thinking>', '', content, flags=re.DOTALL)
+                content = content.strip()
+            
+            entry = {"from": "gpt", "value": content}
+            
+            # Add tool calls if present
+            if msg.get("tool_calls"):
+                tool_calls = []
+                for tc in msg["tool_calls"]:
+                    tool_calls.append({
+                        "name": tc.get("function", {}).get("name", ""),
+                        "arguments": tc.get("function", {}).get("arguments", "")
+                    })
+                entry["tool_calls"] = tool_calls
+            
+            trajectory.append(entry)
+        
+        elif msg.get("role") == "tool":
+            # Tool result
+            trajectory.append({
+                "from": "tool",
+                "name": msg.get("name", ""),
+                "value": str(msg.get("content", ""))[:500]  # Truncate long outputs
+            })
+    
+    # Store in training gym buffer
+    try:
+        traj_path = Path.home() / ".hermes" / "training_trajectories.jsonl"
+        with open(traj_path, "a") as f:
+            f.write(json.dumps({
+                "query": user_query,
+                "completed": completed,
+                "trajectory": trajectory,
+                "timestamp": time.time()
+            }) + "\n")
+    except Exception:
+        pass
+    
+    return trajectory
+
+
+def get_recent_trajectories(hours=24, limit=50):
+    """Get recent trajectories for training replay."""
+    traj_path = Path.home() / ".hermes" / "training_trajectories.jsonl"
+    if not traj_path.exists():
+        return []
+    
+    cutoff = time.time() - (hours * 3600)
+    trajectories = []
+    
+    try:
+        with open(traj_path) as f:
+            for line in f:
+                entry = json.loads(line)
+                if entry.get("timestamp", 0) > cutoff:
+                    trajectories.append(entry)
+    except Exception:
+        pass
+    
+    # Return most recent, limited
+    return sorted(trajectories, key=lambda x: x.get("timestamp", 0), reverse=True)[:limit]
+
+
 if __name__ == "__main__":
     print("=== Distillation Bridge v3 — Test ===\n")
     

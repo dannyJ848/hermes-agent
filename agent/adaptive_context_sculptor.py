@@ -107,6 +107,106 @@ class TaskProfile:
             }
 
 
+# ── UPSTREAM PATTERN: Feasibility Probes (adapted from conversation_compression.py) ──
+# Before attempting compression, check if the auxiliary model can handle it.
+# Warns when context window is too small; auto-lowers threshold when needed.
+
+def check_compression_feasibility(agent):
+    """Check if compression model can handle the task.
+    
+    Adapted from upstream check_compression_model_feasibility:
+    - Probes auxiliary model context window
+    - Compares against compression threshold
+    - Auto-adjusts threshold if model is too small
+    """
+    if not getattr(agent, 'compression_enabled', False):
+        return {"feasible": False, "reason": "compression_disabled"}
+    
+    try:
+        # Get main model context length
+        main_context = getattr(agent, 'context_length', 128000)
+        
+        # Get compression threshold (typically 80% of context)
+        threshold = getattr(agent, 'compression_threshold', 0.8)
+        needed = int(main_context * threshold)
+        
+        # Check if we have an auxiliary model configured
+        aux_context = getattr(agent, 'aux_context_length', None)
+        
+        if aux_context is None:
+            # Try to detect from config
+            try:
+                from agent.auxiliary_client import get_text_auxiliary_client
+                client, aux_model = get_text_auxiliary_client("compression")
+                if client and aux_model:
+                    # Estimate context length from model name
+                    if '4k' in aux_model.lower():
+                        aux_context = 4096
+                    elif '8k' in aux_model.lower():
+                        aux_context = 8192
+                    elif '16k' in aux_model.lower():
+                        aux_context = 16384
+                    elif '32k' in aux_model.lower():
+                        aux_context = 32768
+                    elif '128k' in aux_model.lower() or '200k' in aux_model.lower():
+                        aux_context = 128000
+                    else:
+                        aux_context = 8192  # Default conservative
+            except Exception:
+                aux_context = 4096  # Conservative fallback
+        
+        if aux_context < needed:
+            # Auto-lower threshold to fit
+            new_threshold = (aux_context * 0.9) / main_context
+            agent.compression_threshold = new_threshold
+            return {
+                "feasible": True,
+                "warning": f"Aux model context ({aux_context}) < threshold ({needed}). Auto-lowered threshold to {new_threshold:.2%}",
+                "aux_context": aux_context,
+                "needed": needed,
+                "adjusted_threshold": new_threshold
+            }
+        
+        return {
+            "feasible": True,
+            "aux_context": aux_context,
+            "needed": needed,
+            "threshold": threshold
+        }
+        
+    except Exception as e:
+        return {"feasible": False, "reason": f"probe_error: {e}"}
+
+
+def probe_before_compress(messages, agent):
+    """Run feasibility probe before attempting compression."""
+    feasibility = check_compression_feasibility(agent)
+    
+    if not feasibility.get("feasible"):
+        logger.warning("Compression not feasible: %s", feasibility.get("reason"))
+        return {"should_compress": False, "reason": feasibility.get("reason")}
+    
+    # Check message size
+    total_chars = sum(len(str(m.get("content", ""))) for m in messages)
+    threshold_chars = getattr(agent, 'compression_threshold', 0.8) * getattr(agent, 'context_length', 128000)
+    
+    if total_chars < threshold_chars:
+        return {"should_compress": False, "reason": "under_threshold", "total_chars": total_chars}
+    
+    if feasibility.get("warning"):
+        logger.info(feasibility["warning"])
+    
+    return {
+        "should_compress": True,
+        "total_chars": total_chars,
+        "threshold_chars": threshold_chars,
+        "aux_context": feasibility.get("aux_context")
+    }
+
+
+# ── Original AdaptiveContextSculptor class continues below ──
+
+
 class AdaptiveContextSculptor:
     """
     Analyzes conversation state and sculpts optimal context allocation.

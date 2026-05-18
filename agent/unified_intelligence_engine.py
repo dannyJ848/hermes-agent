@@ -25,6 +25,61 @@ class CrossSystemInsight:
     recommendation: str
 
 
+# ── UPSTREAM PATTERN: Iteration Budget Tracking (adapted from iteration_budget.py) ──
+# Thread-safe budget tracking for cognitive subsystem operations.
+# Prevents runaway subsystems from consuming all iterations.
+
+import threading
+
+
+class CognitiveIterationBudget:
+    """Thread-safe iteration counter per cognitive subsystem.
+    
+    Adapted from upstream IterationBudget:
+    - Each subsystem gets its own budget cap
+    - Parent (orchestrator) has total budget
+    - execute_code iterations are refunded (don't eat budget)
+    """
+    
+    def __init__(self, max_total=100):
+        self.max_total = max_total
+        self._used = 0
+        self._lock = threading.Lock()
+        self._subsystem_usage = {}  # Track per-subsystem
+    
+    def consume(self, subsystem_name="general"):
+        """Try to consume one iteration. Returns True if allowed."""
+        with self._lock:
+            if self._used >= self.max_total:
+                return False
+            self._used += 1
+            self._subsystem_usage[subsystem_name] = self._subsystem_usage.get(subsystem_name, 0) + 1
+            return True
+    
+    def refund(self, subsystem_name="general"):
+        """Give back one iteration (e.g. for execute_code turns)."""
+        with self._lock:
+            if self._used > 0:
+                self._used -= 1
+                if subsystem_name in self._subsystem_usage:
+                    self._subsystem_usage[subsystem_name] -= 1
+    
+    @property
+    def used(self):
+        with self._lock:
+            return self._used
+    
+    @property
+    def remaining(self):
+        with self._lock:
+            return max(0, self.max_total - self._used)
+    
+    def get_subsystem_report(self):
+        """Get per-subsystem usage breakdown."""
+        with self._lock:
+            return dict(self._subsystem_usage)
+
+
 class UnifiedIntelligenceEngine:
     """Cross-system query engine for the cognitive apparatus."""
 
@@ -36,6 +91,37 @@ class UnifiedIntelligenceEngine:
             'errors': Path.home() / ".hermes" / "error_patterns.db",
         }
         self._connections = {}
+        # Initialize iteration budget tracking (upstream pattern)
+        self._budget = CognitiveIterationBudget(max_total=100)
+        self._budget_enabled = True
+
+    def track_subsystem_call(self, subsystem_name, action_type):
+        """Track a subsystem call against the iteration budget."""
+        if not getattr(self, '_budget_enabled', False):
+            return {"allowed": True, "budget_remaining": -1}
+        
+        allowed = self._budget.consume(subsystem_name)
+        if not allowed:
+            logger.warning("Budget exhausted for %s — skipping %s", subsystem_name, action_type)
+        
+        return {
+            "allowed": allowed,
+            "budget_remaining": self._budget.remaining,
+            "subsystem_usage": self._budget.get_subsystem_report()
+        }
+
+    def get_budget_report(self):
+        """Get full budget status report."""
+        if not getattr(self, '_budget_enabled', False):
+            return {"error": "Budget tracking not initialized"}
+        
+        return {
+            "total_budget": self._budget.max_total,
+            "used": self._budget.used,
+            "remaining": self._budget.remaining,
+            "per_subsystem": self._budget.get_subsystem_report(),
+            "exhausted": self._budget.remaining <= 0
+        }
 
     def _get_db(self, name: str) -> Optional[sqlite3.Connection]:
         if name not in self._connections:
