@@ -39,15 +39,108 @@ Last updated: 2026-05-18
 - When updating persistence layers, verify each layer independently: git status, memory files, skills, SOUL.md, MASTER.md, and all context files. Don't assume one success means all succeeded.
 - When recovering from a cerebrum schema disaster, use SQLite `.recover` to extract data from corrupt backups, then rebuild the table with the correct schema and re-import.
 - When capturing Hermes working state for deployment, always include: config.yaml, .env, auth.json, and the exact git commit of hermes-agent source.
+- When the YantrikDB ingest queue fills during bulk memory migration, use `record_batch()` with chunk sizes of 50-100 and call `think()` every 5 chunks to flush the queue. Single-record insertion with retry backoff is too slow for 1000+ items.
+- When smoke-testing integrated repos (hermeshub, superpowers, obsidian-skills, paperclip-adapter, yantrikdb), verify skills load via `skill_view()`, plugins compile (`npm run typecheck`), and core APIs work (`record()`/`recall()`/`close()`).
+- When deploying Qwen models on vLLM for tool calling, verify the model's tool format matches the parser. Qwen3.6-27B-Uncensored outputs XML (`<tool_call><function=name>`) but vLLM Hermes parser expects JSON. Use text-based tool execution wrapper or switch to Qwen-Instruct variant with native function calling support.
+- When user requests persistent autonomous agents, always use screen/tmux sessions rather than systemd daemons. Explicitly confirm no daemon dependency.
+- When YantrikDB Rust extension fails to load, check Python version mismatch. The .so is compiled for a specific Python version — rebuild with `maturin build --release --interpreter <python>` for the target Python version.
+- When updating persistence layers, verify each layer independently: git status, memory files, skills, SOUL.md, MASTER.md, and all context files. Don't assume one success means all succeeded.
+- When preparing for a new CLI deployment, update all persistence layers: MEMORY.md with current state, SOUL.md with learned behaviors, MASTER.md with system status, commit all changes, and verify git push succeeds before declaring ready.
+- When integrating upstream patterns into existing cognitive subsystems, always adapt (don't replace). Insert new functions alongside existing code, use daemon threads for background work, and wrap all new code in try/except. Verify with import smoke tests before committing.
+- When HermesCLI.__init__ calls self._vprint before _vprint is defined, add _vprint method right after __init__ ends. When log_prefix is referenced before assignment, add it right after self.verbose.
+- When CheckpointManager gets unexpected keyword arguments (max_total_size_mb, max_file_size_mb), add them to __init__ with sensible defaults.
+- When config has spark-fp8 but model must be BF16 native only, remove the FP8 provider entirely.
+- When creating Hermes profiles for local models, use `hermes profile create <name> --clone` then edit profile config to point to local provider.
+- When vLLM tool calling breaks with Qwen models, the issue is XML vs JSON format mismatch. Qwen outputs `<tool_call><function=name>` but vLLM expects JSON. Fix: use `--tool-call-parser qwen3_xml` or text-based wrapper.
+- When DGX is behind NAT/firewall, use HTTP verification instead of SSH: `curl http://DGX_IP:8000/v1/models`.
+- When session compression threshold is hit (12+ compactions), start new CLI session with context handoff.
+- When fixing multiple CLI startup errors, clear Python cache after code changes: `find ~/.hermes -name "__pycache__" -type d -exec rm -rf {} +`.
 
 ## Active Projects
 - The Lens (propaganda demystification engine) — built, tested end-to-end
 - Qwen 27B training (on DGX, managed separately)
 - AGI self-improvement loop (continuous)
 - 5-repo integration: hermeshub, superpowers, obsidian-skills, paperclip-adapter, yantrikdb — all operational May 17 2026
+- **DGX Hermes Integration** (NEW — May 18 2026): Integrating Qwen 27B Uncensored D-Flash Final + LoRA into Hermes CLI
 
 ## Hermes Configuration (May 18 2026)
 - **Version**: v0.13.0 (config v23)
+- **Python**: 3.10.0 (default `python3` points to 3.10)
+- **Skills**: 399 enabled (78 builtin, 321 local), 0 disabled
+- **Plugins**: 45 total, 41 enabled, 4 disabled (evey-eyes, evey-moltbook, evey-mqtt, evey-wallet)
+- **Toolsets**: All enabled (previously 6 disabled now enabled: video, moa, rl, homeassistant, spotify, yuanbao)
+- **Memory provider**: yantrikdb (active and working)
+- **Context engine**: lcm
+- **Model**: kimi-for-coding via kimi-coding provider
+- **Fallback model**: kimi-for-coding via kimi-coding provider
+- **Delegation model**: deepseek-v4-pro via deepseek provider
+- **Profiles**: 4 active
+  - spark-quality: qwen3.6-27b-uncensored (DEPRECATED — use dgx-qwen-lora)
+  - spark-speed: qwen3.6-27b-uncensored (DEPRECATED — use dgx-qwen-lora)
+  - training-gym: glm-5.1
+  - **dgx-qwen-lora**: merged-lora on spark-bf16 (NEW — BF16 native)
+- **Cron**: 43 jobs scheduled, gateway active and working
+- **YantrikDB**: ~33K memories, cerebrum_tips namespace fully migrated
+- **MCP**: BioMCP server active (biomcp)
+- **Cognitive Systems**: Monolithic integration complete (May 18)
+  - All 7 systems inline: iteration_engine, cortex_flywheel, agent_scorecard, red_team_hippocampus, tool_misuse_prevention, memory_cortex_bridge, hermes_enhancement_suite
+  - Score: 100/100 (wiring, load, hygiene, runtime, documentation, config)
+
+## API Providers Configured
+- kimi-coding (primary): https://api.kimi.com/coding
+- deepseek: https://api.deepseek.com/v1
+- spark-bf16: http://10.0.0.171:8000/v1 (BF16 native, no quantization)
+- local (ollama): http://localhost:11434/v1
+- featherless: https://api.featherless.ai/v1
+- jina-reader: https://r.jina.ai
+- **REMOVED**: spark-fp8 (port 8001, FP8 quantized) — deleted for BF16-only policy
+
+## DGX Qwen Integration State (May 18 2026)
+- **Model**: Qwen3.6-27B-Uncensored D-Flash Final + LoRA adapter
+- **DGX IP**: 10.0.0.171 (user: djg6228, pass: 6228)
+- **vLLM BF16**: Port 8000 — base model + LoRA (merged-lora)
+- **LoRA path**: /data/checkpoints/final_model
+- **Context length**: 32768 (sweet spot for agent workloads)
+- **Tool calling**: Broken (XML vs JSON mismatch) — needs vLLM parser fix
+- **Profile**: dgx-qwen-lora configured and ready
+- **Launch command**: `dgx-qwen-lora chat`
+- **Status**: Config complete, CLI fixes applied, needs vLLM verification on DGX
+
+## Disabled/Optional Features
+- OpenRouter (not configured)
+- MiniMax (invalid API key)
+- Tinker Atropos (not installed)
+- Browser-CDP (system dependency not met)
+- Discord (missing token)
+- HomeAssistant (system dependency not met)
+- Image generation (system dependency not met)
+- Google Meet (system dependency not met)
+- Spotify (system dependency not met)
+- Web search tools (missing EXA, PARALLEL, TAVILY, FIRECRAWL keys)
+
+## Preferences
+- Thoroughness over speed
+- Wants daily autonomous cognitive apparatus optimization
+- Expects persistence layers updated without being asked
+- Screen/tmux only for persistent processes — no systemd daemons
+- BF16 native only for trained models — no quantization
+
+## DGX Deployment State (May 16-18 2026)
+- vLLM serves Qwen3.6-27B-Uncensored + dynamic LoRA + DFlash speculative decoding
+- Tool calling broken: Qwen outputs XML format but vLLM Hermes parser expects JSON
+- **Fix needed**: --tool-call-parser qwen3_xml or text-based wrapper
+- BF16 native enforced (no FP8/quantization)
+
+## Session History (May 18 2026)
+- Monolithic cognitive integration v4 deployed to DGX
+- Git main at 0924ed231, restored to bf0c4337f (preserved 21-subsystem apparatus)
+- Cherry-picked 6 upstream files for surgical integration
+- 5 upstream patterns integrated into existing subsystems (additive, no replacements)
+- CheckpointManager parameter fixes (max_total_size_mb, max_file_size_mb)
+- HermesCLI startup fixes (_vprint, log_prefix)
+- DGX Qwen integration config complete
+- Python cache cleared after fixes
+- All changes committed and pushed to origin/main
 - **Python**: 3.10.0 (default `python3` points to 3.10)
 - **Skills**: 399 enabled (78 builtin, 321 local), 0 disabled
 - **Plugins**: 45 total, 41 enabled, 4 disabled (evey-eyes, evey-moltbook, evey-mqtt, evey-wallet)

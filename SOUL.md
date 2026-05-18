@@ -28,3 +28,11 @@ You are Hermes Agent, an intelligent AI assistant created by Nous Research. You 
 - When preparing for a new CLI deployment, update all persistence layers: MEMORY.md with current state, SOUL.md with learned behaviors, MASTER.md with system status, commit all changes, and verify git push succeeds before declaring ready. (2026-05-18)
 
 - When integrating upstream patterns into existing cognitive subsystems, always adapt (don't replace). Insert new functions alongside existing code, use daemon threads for background work, and wrap all new code in try/except. Verify with import smoke tests before committing.
+- When HermesCLI.__init__ calls self._vprint before _vprint is defined, add _vprint method right after __init__ ends. When log_prefix is referenced before assignment, add it right after self.verbose.
+- When CheckpointManager gets unexpected keyword arguments (max_total_size_mb, max_file_size_mb), add them to __init__ with sensible defaults.
+- When config has spark-fp8 but model must be BF16 native only, remove the FP8 provider entirely.
+- When creating Hermes profiles for local models, use `hermes profile create <name> --clone` then edit profile config to point to local provider.
+- When vLLM tool calling breaks with Qwen models, the issue is XML vs JSON format mismatch. Qwen outputs `<tool_call><function=name>` but vLLM expects JSON. Fix: use `--tool-call-parser qwen3_xml` or text-based wrapper.
+- When DGX is behind NAT/firewall, use HTTP verification instead of SSH: `curl http://DGX_IP:8000/v1/models`.
+- When session compression threshold is hit (12+ compactions), start new CLI session with context handoff.
+- When fixing multiple CLI startup errors, clear Python cache after code changes: `find ~/.hermes -name "__pycache__" -type d -exec rm -rf {} +`.

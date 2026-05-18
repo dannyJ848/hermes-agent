@@ -21,7 +21,8 @@
 | Cron Gateway | ✅ | 43 jobs, active |
 | MCP | ✅ | BioMCP server |
 | **Cognitive Systems** | ✅ | Monolithic inline (May 18), 7/7 active, Score 100/100 |
-| **Git Repo** | ✅ | Clean (commit c2cccabf1) |
+| **Git Repo** | ✅ | Clean (commit bf53b5b9b) |
+| **DGX Integration** | 🔄 | Config complete, needs vLLM verification |
 
 ---
 
@@ -37,11 +38,15 @@
 
 ### Remote (DGX Spark)
 - **Host**: spark-85e8.local (user: djg6228)
-- **vLLM**: Qwen3.6-27B-Uncensored @ /data/models/Qwen3.6-27B-Uncensored
-- **Specs**: BF16 @ port 8000, FP8 @ port 8001
-- **Features**: Dynamic LoRA, DFlash speculative decoding
-- **Tool Calling**: Broken (XML vs JSON mismatch) — use text-based wrapper
+- **IP**: 10.0.0.171
+- **vLLM BF16**: Qwen3.6-27B-Uncensored + LoRA @ port 8000
+  - Base model: /data/models/Qwen3.6-27B-Uncensored
+  - LoRA adapter: /data/checkpoints/final_model (merged-lora)
+  - DType: bfloat16 (native, no quantization)
+  - Context: 32768 tokens
+  - Tool calling: XML vs JSON mismatch — needs --tool-call-parser qwen3_xml
 - **Speed**: ~6.2 tok/s (speculative), ~12 tok/s (without)
+- **Status**: Configured in Hermes, needs vLLM verification
 
 ---
 
@@ -51,12 +56,19 @@
 ```yaml
 kimi-coding: https://api.kimi.com/coding  (primary)
 deepseek:    https://api.deepseek.com/v1
-spark-fp8:   http://10.0.0.171:8001/v1
-spark-bf16:  http://10.0.0.171:8000/v1
+spark-bf16:  http://10.0.0.171:8000/v1    (BF16 native — Qwen 27B + LoRA)
 local:       http://localhost:11434/v1    (ollama)
 featherless: https://api.featherless.ai/v1
 jina-reader: https://r.jina.ai
 ```
+
+### DGX Qwen Integration
+- **Model**: Qwen3.6-27B-Uncensored D-Flash Final + LoRA
+- **Endpoint**: http://10.0.0.171:8000/v1
+- **LoRA module**: merged-lora
+- **Context**: 32768 tokens
+- **Tool calling**: XML vs JSON mismatch — needs vLLM parser fix
+- **Launch**: `dgx-qwen-lora chat`
 
 ### Key Settings
 - `model.default`: kimi-for-coding
@@ -80,8 +92,9 @@ jina-reader: https://r.jina.ai
 
 | Profile | Model | Purpose |
 |---------|-------|---------|
-| spark-quality | qwen3.6-27b-uncensored | Quality inference on DGX |
-| spark-speed | qwen3.6-27b-uncensored | Speed inference on DGX |
+| dgx-qwen-lora | merged-lora | **NEW** — Qwen 27B + LoRA BF16 on DGX |
+| spark-quality | qwen3.6-27b-uncensored | DEPRECATED — use dgx-qwen-lora |
+| spark-speed | qwen3.6-27b-uncensored | DEPRECATED — use dgx-qwen-lora |
 | training-gym | glm-5.1 | Training and evaluation |
 
 ---
