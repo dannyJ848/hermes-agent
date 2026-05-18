@@ -48,11 +48,11 @@ providers:
     name: spark-bf16
     models:
       merged-lora:
-        context_length: 32768
+        context_length: 262144
         supports_tools: true
         supports_reasoning: true
       qwen3.6-27b-uncensored:
-        context_length: 32768
+        context_length: 262144
         supports_tools: true
         supports_reasoning: true
 fallback_providers: []
