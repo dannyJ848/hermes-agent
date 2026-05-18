@@ -51,7 +51,7 @@ providers:
     models:
       dgx-qwen-27b:
         name: /data/models/Qwen3.6-27B-Uncensored
-        context_length: 32768
+        context_length: 65536
         supports_tools: true
         supports_reasoning: true
         supports_vision: true
