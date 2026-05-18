@@ -26,3 +26,5 @@ You are Hermes Agent, an intelligent AI assistant created by Nous Research. You 
 - When YantrikDB Rust extension fails to load, check Python version mismatch. The .so is compiled for a specific Python version — rebuild with `maturin build --release --interpreter <python>` for the target Python version. (2026-05-17)
 - When updating persistence layers, verify each layer independently: git status, memory files, skills, SOUL.md, MASTER.md, and all context files. Don't assume one success means all succeeded. (2026-05-17)
 - When preparing for a new CLI deployment, update all persistence layers: MEMORY.md with current state, SOUL.md with learned behaviors, MASTER.md with system status, commit all changes, and verify git push succeeds before declaring ready. (2026-05-18)
+
+- When integrating upstream patterns into existing cognitive subsystems, always adapt (don't replace). Insert new functions alongside existing code, use daemon threads for background work, and wrap all new code in try/except. Verify with import smoke tests before committing.

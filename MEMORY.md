@@ -223,3 +223,34 @@ Configure API keys in ~/.hermes/.env:
 - hermes_cli/main.py does NOT need cognitive imports — it's just a wrapper
 - Tool count: 31 implemented, 76 aliases, 60 unimplemented
 - Both MacBook and DGX have identical monolithic cognitive architecture
+
+## 2026-05-18: Surgical Upstream Integration (Commit e2e2c5825)
+
+Cherry-picked 6 upstream files from NousResearch/hermes-agent (8,722 commits ahead).
+Surgically integrated 5 patterns into existing cognitive subsystems — no replacements:
+
+1. **training_gym.py** ← `background_review.py` (TIER S)
+   - `_spawn_exercise_review()`: daemon-thread post-exercise evaluation
+   - `_bump_exercise_tier()`: auto-promote after 3 perfect runs
+   - `_extract_exercise_tip()`: feed failures to distillation pipeline
+
+2. **distillation_bridge.py** ← `agent_runtime_helpers.py` (TIER S)
+   - `export_trajectory()`: standardized training format with think-block stripping
+   - `get_recent_trajectories()`: replay buffer for training gym
+
+3. **unified_intelligence_engine.py** ← `iteration_budget.py` (TIER A)
+   - `CognitiveIterationBudget`: thread-safe per-subsystem counter
+   - `track_subsystem_call()`: budget-gate expensive ops
+   - `get_budget_report()`: per-subsystem usage breakdown
+
+4. **adaptive_context_sculptor.py** ← `conversation_compression.py` (TIER A)
+   - `check_compression_feasibility()`: probe aux model context before compression
+   - `probe_before_compress()`: auto-lower threshold if model too small
+
+5. **memory_cortex_bridge.py** ← `background_review.py` (TIER A)
+   - `set_cognitive_isolation()`: whitelist-based access control
+   - `IsolatedCortexDBBridge`: deny non-cognitive callers
+   - `install_memory_isolation()`: global protection at startup
+
+Smoke test results: ALL PASS (20 subsystems: 19 active, 1 skipped, 0 failed).
+Orchestrator before_action/after_action/session_end hooks all functional.
