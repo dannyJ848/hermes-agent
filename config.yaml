@@ -57,11 +57,14 @@ providers:
     api_key: not-needed
     name: spark-bf16
     models:
-      qwen3.6-27b-uncensored:
-        context_length: 262144
+      merged-lora:
+        context_length: 32768
         supports_tools: true
         supports_reasoning: true
-        supports_vision: true
+      qwen3.6-27b-uncensored:
+        context_length: 32768
+        supports_tools: true
+        supports_reasoning: true
 fallback_providers: []
 credential_pool_strategies:
   zai: round_robin
