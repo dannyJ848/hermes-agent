@@ -2185,7 +2185,8 @@ class HermesCLI:
             self.busy_input_mode = "interrupt"
 
         self.verbose = verbose if verbose is not None else (self.tool_progress_mode == "verbose")
-        
+        self.log_prefix = "[hermes] "
+
         # streaming: stream tokens to the terminal as they arrive (display.streaming in config.yaml)
         self.streaming_enabled = CLI_CONFIG["display"].get("streaming", False)
         self.final_response_markdown = str(
