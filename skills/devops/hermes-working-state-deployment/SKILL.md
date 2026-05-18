@@ -61,6 +61,22 @@ Capture and restore complete Hermes Agent working state including configuration,
 
 ## Deployment Steps
 
+### 0. Pre-Deployment Persistence Layer Update (CRITICAL)
+
+When user says "get ready for a new CLI" or similar, do this FIRST before any deployment:
+
+1. **Update MEMORY.md** — add current state entry with date, what was done, final scores
+2. **Update SOUL.md** — add any new learned behaviors from this session
+3. **Update MASTER.md** — refresh system status table, last updated date, component statuses
+4. **Verify cognitive systems** — run integration test, all 7 must pass
+5. **Verify skills load** — `hermes skills list` should show expected count (91 builtin + local)
+6. **Verify tools** — `hermes doctor` tool availability section
+7. **Git commit all changes** — MEMORY.md, SOUL.md, MASTER.md, any fixed agent/ files
+8. **Git push to origin/main** — verify push succeeds
+9. **Only then** proceed to deployment steps below
+
+**Pitfall**: Skipping step 0 and going straight to deployment. The new CLI will load stale context files and appear broken even if the source code is correct.
+
 ### 1. Capture Current Working State
 
 ```bash
