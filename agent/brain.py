@@ -677,7 +677,17 @@ JSON: {{"insights": [{{"concept": "key idea", "explanation": "why it matters", "
             iter_stats = self.iterator.get_learning_stats()
             
             # Reasoning quality stats
-            reasoning_score = self.reasoning.get_reasoning_score()
+            try:
+                reasoning_summary = self.reasoning.get_session_summary()
+                reasoning_score = {
+                    "score": int(reasoning_summary.get("quality", "excellent") == "excellent") * 10,
+                    "grade": reasoning_summary.get("quality", "N/A").upper(),
+                    "total_traces": reasoning_summary.get("total_flaws", 0),
+                    "success_rate": 1.0 - min(reasoning_summary.get("total_flaws", 0) / 10.0, 1.0),
+                    "avg_calibration_error": 0.0,
+                }
+            except Exception:
+                reasoning_score = {"score": 0, "grade": "N/A", "total_traces": 0, "success_rate": 0, "avg_calibration_error": 0}
             
             self.log("CYCLE", f"Complete in {elapsed:.1f}s — Level {maslow}/5")
             self.log("EPISTEMIC", f"Quality: {grounded_pct}% grounded, "

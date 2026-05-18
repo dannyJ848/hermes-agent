@@ -84,90 +84,125 @@ class SelfImprovementDaemon:
         """Generate improvement tasks based on recent activity."""
         tasks = []
         
-        # Task 1: Review recent errors
-        with _cortex_cursor() as cur:
-            cur.execute("""
-                SELECT error_type, COUNT(*) as count, MAX(last_occurred) as last
-                FROM error_patterns
-                WHERE last_occurred > NOW() - INTERVAL '24 hours'
-                GROUP BY error_type
-                ORDER BY count DESC
-            """)
-            
-            for row in cur.fetchall():
-                if row['count'] >= 2:
+        # Task 1: Review recent errors (from my_error_patterns table)
+        try:
+            with _cortex_cursor() as cur:
+                cur.execute("""
+                    SELECT error_type, COUNT(*) as count, MAX(last_occurred) as last
+                    FROM my_error_patterns
+                    WHERE last_occurred > NOW() - INTERVAL '24 hours'
+                    GROUP BY error_type
+                    ORDER BY count DESC
+                """)
+                
+                for row in cur.fetchall():
+                    if row['count'] >= 2:
+                        tasks.append(ImprovementTask(
+                            task_type='review',
+                            priority=min(0.9, row['count'] / 10),
+                            description=f"Review {row['count']} recent {row['error_type']} errors",
+                            context=f"error_type:{row['error_type']}",
+                            estimated_duration_minutes=3,
+                            created_at=time.time(),
+                        ))
+        except Exception:
+            pass  # Table may not exist
+        
+        # Task 2: Research frequently asked topics (skip if memory_usage_log doesn't exist)
+        try:
+            with _cortex_cursor() as cur:
+                cur.execute("""
+                    SELECT query_context, COUNT(*) as count
+                    FROM memory_usage_log
+                    WHERE timestamp > NOW() - INTERVAL '7 days'
+                      AND query_context != ''
+                    GROUP BY query_context
+                    HAVING COUNT(*) >= 3
+                    ORDER BY count DESC
+                    LIMIT 5
+                """)
+                
+                for row in cur.fetchall():
                     tasks.append(ImprovementTask(
-                        task_type='review',
-                        priority=min(0.9, row['count'] / 10),
-                        description=f"Review {row['count']} recent {row['error_type']} errors",
-                        context=f"error_type:{row['error_type']}",
-                        estimated_duration_minutes=3,
+                        task_type='research',
+                        priority=0.6,
+                        description=f"Research: {row['query_context'][:80]}",
+                        context=row['query_context'],
+                        estimated_duration_minutes=10,
                         created_at=time.time(),
                     ))
+        except Exception:
+            pass  # Table may not exist
         
-        # Task 2: Research frequently asked topics
-        with _cortex_cursor() as cur:
-            cur.execute("""
-                SELECT query_context, COUNT(*) as count
-                FROM memory_usage_log
-                WHERE timestamp > NOW() - INTERVAL '7 days'
-                  AND query_context != ''
-                GROUP BY query_context
-                HAVING COUNT(*) >= 3
-                ORDER BY count DESC
-                LIMIT 5
-            """)
-            
-            for row in cur.fetchall():
-                tasks.append(ImprovementTask(
-                    task_type='research',
-                    priority=0.6,
-                    description=f"Research: {row['query_context'][:80]}",
-                    context=row['query_context'],
-                    estimated_duration_minutes=10,
-                    created_at=time.time(),
-                ))
+        # Task 3: Practice weak tools (skip if tool_usage_patterns doesn't exist)
+        try:
+            with _cortex_cursor() as cur:
+                cur.execute("""
+                    SELECT tool_name, success_rate, usage_count
+                    FROM tool_usage_patterns
+                    WHERE success_rate < 0.7
+                      AND usage_count > 2
+                    ORDER BY success_rate ASC
+                    LIMIT 5
+                """)
+                
+                for row in cur.fetchall():
+                    tasks.append(ImprovementTask(
+                        task_type='practice',
+                        priority=0.5 + (0.7 - (row['success_rate'] or 0)),
+                        description=f"Practice {row['tool_name']} (success rate: {row['success_rate']:.1%})",
+                        context=f"tool:{row['tool_name']}",
+                        estimated_duration_minutes=5,
+                        created_at=time.time(),
+                    ))
+        except Exception:
+            pass  # Table may not exist
         
-        # Task 3: Practice weak tools
-        with _cortex_cursor() as cur:
-            cur.execute("""
-                SELECT tool_name, success_rate, usage_count
-                FROM tool_usage_patterns
-                WHERE success_rate < 0.7
-                  AND usage_count > 2
-                ORDER BY success_rate ASC
-                LIMIT 5
-            """)
-            
-            for row in cur.fetchall():
-                tasks.append(ImprovementTask(
-                    task_type='practice',
-                    priority=0.5 + (0.7 - (row['success_rate'] or 0)),
-                    description=f"Practice {row['tool_name']} (success rate: {row['success_rate']:.1%})",
-                    context=f"tool:{row['tool_name']}",
-                    estimated_duration_minutes=5,
-                    created_at=time.time(),
-                ))
+        # Task 4: Consolidate memories (skip if memory_units doesn't exist)
+        try:
+            with _cortex_cursor() as cur:
+                cur.execute("""
+                    SELECT COUNT(*) as count
+                    FROM memory_units
+                    WHERE created_at > NOW() - INTERVAL '7 days'
+                      AND access_count = 0
+                """)
+                
+                row = cur.fetchone()
+                if row and row['count'] > 10:
+                    tasks.append(ImprovementTask(
+                        task_type='consolidate',
+                        priority=0.4,
+                        description=f"Consolidate {row['count']} unused memories",
+                        context="memory_cleanup",
+                        estimated_duration_minutes=5,
+                        created_at=time.time(),
+                    ))
+        except Exception:
+            pass  # Table may not exist
         
-        # Task 4: Consolidate memories
-        with _cortex_cursor() as cur:
-            cur.execute("""
-                SELECT COUNT(*) as count
-                FROM memory_units
-                WHERE created_at > NOW() - INTERVAL '7 days'
-                  AND access_count = 0
-            """)
-            
-            row = cur.fetchone()
-            if row and row['count'] > 10:
-                tasks.append(ImprovementTask(
-                    task_type='consolidate',
-                    priority=0.4,
-                    description=f"Consolidate {row['count']} unused memories",
-                    context="memory_cleanup",
-                    estimated_duration_minutes=5,
-                    created_at=time.time(),
-                ))
+        # Task 5: Check for stale skills that need updating
+        try:
+            with _cortex_cursor() as cur:
+                cur.execute("""
+                    SELECT skill_name, last_updated
+                    FROM my_skills
+                    WHERE last_updated < NOW() - INTERVAL '30 days'
+                    ORDER BY last_updated ASC
+                    LIMIT 3
+                """)
+                
+                for row in cur.fetchall():
+                    tasks.append(ImprovementTask(
+                        task_type='skill_update',
+                        priority=0.35,
+                        description=f"Review stale skill: {row['skill_name']}",
+                        context=f"skill:{row['skill_name']}",
+                        estimated_duration_minutes=5,
+                        created_at=time.time(),
+                    ))
+        except Exception:
+            pass
         
         # Sort by priority
         tasks.sort(key=lambda t: -t.priority)

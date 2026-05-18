@@ -413,13 +413,13 @@ class CortexDB:
         with cortex_cursor(dsn=self.dsn) as cur:
             if self._has_pg:
                 cur.execute("""
-                    INSERT INTO cortex_flywheel (cycle_id, cycle_type, status, started_at)
-                    VALUES (%s, %s, 'running', NOW())
+                    INSERT INTO cortex_flywheel (id, cycle_type, status, started_at, metrics)
+                    VALUES (%s, %s, 'running', NOW(), '{}')
                 """, (cycle_id, cycle_type))
             else:
                 cur.execute("""
-                    INSERT INTO cortex_flywheel (cycle_id, cycle_type, status, started_at)
-                    VALUES (?, ?, 'running', ?)
+                    INSERT INTO cortex_flywheel (id, cycle_type, status, started_at, metrics)
+                    VALUES (?, ?, 'running', ?, '{}')
                 """, (cycle_id, cycle_type, time.time()))
         
         return cycle_id
@@ -433,24 +433,24 @@ class CortexDB:
                 cur.execute("""
                     UPDATE cortex_flywheel 
                     SET status = %s, 
-                        pairs_evaluated = %s,
-                        tips_repaired = %s,
-                        tips_consolidated = %s,
-                        duration_ms = %s,
+                        items_processed = %s,
+                        items_produced = %s,
+                        metrics = jsonb_build_object('tips_repaired', %s, 'tips_consolidated', %s, 'duration_ms', %s),
                         completed_at = NOW()
-                    WHERE cycle_id = %s
-                """, (status, pairs_evaluated, tips_repaired, tips_consolidated, duration_ms, cycle_id))
+                    WHERE id = %s
+                """, (status, pairs_evaluated, tips_repaired, tips_repaired, tips_consolidated, duration_ms, cycle_id))
             else:
+                import json
+                metrics = json.dumps({'tips_repaired': tips_repaired, 'tips_consolidated': tips_consolidated, 'duration_ms': duration_ms})
                 cur.execute("""
                     UPDATE cortex_flywheel 
                     SET status = ?, 
-                        pairs_evaluated = ?,
-                        tips_repaired = ?,
-                        tips_consolidated = ?,
-                        duration_ms = ?,
+                        items_processed = ?,
+                        items_produced = ?,
+                        metrics = ?,
                         completed_at = ?
-                    WHERE cycle_id = ?
-                """, (status, pairs_evaluated, tips_repaired, tips_consolidated, duration_ms, time.time(), cycle_id))
+                    WHERE id = ?
+                """, (status, pairs_evaluated, tips_repaired, metrics, time.time(), cycle_id))
             return cur.rowcount > 0
     
     # ========================================================================

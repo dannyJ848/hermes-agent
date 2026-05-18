@@ -9862,6 +9862,30 @@ class AIAgent:
                 old_title = self._session_db.get_session_title(self.session_id)
                 # Trigger memory extraction on the old session before it rotates.
                 self.commit_memory_session(messages)
+
+                # --- SESSION STATE PUBLISH ---
+                # Auto-commit and push session-critical files to the remote repo
+                # before context is compressed and potentially lost.
+                try:
+                    from agent.session_publisher import SessionPublisher
+                    publisher = SessionPublisher(self.session_id, self.model)
+                    pub_result = publisher.publish_session_checkpoint(messages, focus_topic)
+                    if pub_result.get("committed"):
+                        _pub_hash = pub_result.get("commit_hash", "?")[:8]
+                        _pub_files = len(pub_result.get("files_staged", []))
+                        logger.info(
+                            "Session state published: %s (%d files, %dms)",
+                            _pub_hash, _pub_files, pub_result.get("elapsed_ms", 0)
+                        )
+                        # Surface a brief note to the user if push succeeded
+                        if pub_result.get("pushed"):
+                            self._emit_warning(
+                                f"📤 Session checkpoint pushed: {_pub_hash} ({_pub_files} files)"
+                            )
+                except Exception as _pub_err:
+                    logger.debug("SessionPublisher failed (non-blocking): %s", _pub_err)
+                # --- END SESSION STATE PUBLISH ---
+
                 self._session_db.end_session(self.session_id, "compression")
                 old_session_id = self.session_id
                 self.session_id = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
