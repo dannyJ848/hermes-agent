@@ -42,16 +42,6 @@ providers:
         context_length: 262144
         supports_tools: true
         supports_thinking: true
-  spark-fp8:
-    api: http://10.0.0.171:8001/v1
-    api_key: not-needed
-    name: spark-fp8
-    models:
-      qwen3.6-fp8:
-        context_length: 262144
-        supports_tools: true
-        supports_reasoning: true
-        supports_vision: true
   spark-bf16:
     api: http://10.0.0.171:8000/v1
     api_key: not-needed

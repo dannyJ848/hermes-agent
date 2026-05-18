@@ -3,6 +3,7 @@ model:
   default: merged-lora
   provider: spark-bf16
   api_key: not-needed
+  dtype: bfloat16
 providers:
   local:
     api: http://localhost:11434/v1
