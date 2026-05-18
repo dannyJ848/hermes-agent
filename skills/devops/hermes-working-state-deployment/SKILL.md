@@ -271,12 +271,14 @@ assert len(status["subsystems"]) == 20, f"Only {len(status['subsystems'])} subsy
 | Date | Location | Commit | Notes |
 |------|----------|--------|-------|
 | 2026-05-16 | `~/.hermes/snapshots/working-20260516-144642/` | b6fa8f918 | Module shadowing fix + cognitive orchestrator + 20/20 subsystems |
-| 2026-05-18 | `~/.hermes/` (current) | c2cccabf1 | Monolithic cognitive integration v4, 384 skills, 27 tools (45 with API keys) |
+| 2026-05-18 | `~/.hermes/` (current) | 7f6281ca9 | Monolithic cognitive integration v4, 384 skills, 27 tools (45 with API keys) |
+| 2026-05-18 | DGX `/data/SpecForge/hermes-agent` | 7f6281ca9 | Full port complete: venv, config, .env, 385 skills, ~50 tools, 21 cognitive subsystems |
 
 ## Reference Files
 
 | File | Description |
 |------|-------------|
+| `references/dgx-full-port-procedure-may18-2026.md` | Complete DGX port: venv, config, .env, skills, cognitive verification |
 | `references/kimi-auth-debugging-pattern-may16-2026.md` | Kimi auth 401/404 debugging — model name drift, base URL /v1 suffix, credential pool preference |
 | `references/module-shadowing-fix-may16-2026.md` | Python module shadowing between hermes_cli/gateway.py and gateway/ package |
 | `references/dgx-hermes-service-setup-may16-2026.md` | DGX systemd service + vLLM + tool calling setup |

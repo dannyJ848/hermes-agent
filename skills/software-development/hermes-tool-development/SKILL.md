@@ -135,8 +135,28 @@ if _cc >= 5:
 | **Module import failing silently** | Top-level `import heavy_lib` | `def handler(): import heavy_lib` |
 | **Standalone script trap** | Building `~/subconscious/my_thing.py` that never gets called | Put it in `tools/`, `cli.py`, or `run_agent.py` where Hermes actually executes |
 | **Schema mismatch in existing code** | Inserting `(tool_name, success, elapsed_ms)` when table has `(tool_name, status, speed_ms)` | Check actual table schema with `.schema table_name` before writing INSERTs |
+| **Alias vs implementation gap** | Assuming 76 aliases = 76 working tools | Verify with `grep 'def .*task_id' tools/` — only 31 actually implemented. See `references/tool-alias-vs-implementation-audit-may18-2026.md` |
 
 The **list membership gotcha** is especially common when parsing multi-line text blocks. `"x" in some_list` checks if `"x"` is an *element*, not if any element *contains* `"x"`. Always use `any()` for substring checks across lists.
+
+### Tool Alias vs Implementation Audit
+
+When a user reports a tool count discrepancy (e.g., "I expected 92 tools but see 27"), run this audit:
+
+```python
+# Count aliases in toolsets.py
+aliases = !grep 'ToolAlias' toolsets.py | wc -l
+
+# Count actual implementations
+functions = !grep -r 'def .*task_id' tools/ | wc -l
+
+# Count registered tools
+registered = !python3 -c "from tools.registry import registry; print(len(registry._tools))"
+
+print(f"Aliases: {aliases}, Functions: {functions}, Registered: {registered}")
+```
+
+**Key insight:** Aliases in `toolsets.py` are a configuration wishlist. Actual tool functions in `tools/*.py` are the reality. The gap (60 unimplemented aliases in this case) is not a bug — it's undeveloped features. Document the actual count clearly.
 
 ## Testing Without Restarting Hermes
 
