@@ -1,0 +1,31 @@
+commit 973f27e95631aaecbda5e32e3fa9e5d7f6a2e1d3
+Author: Teknium <127238744+teknium1@users.noreply.github.com>
+Date:   Sat May 16 20:33:38 2026 -0700
+
+    fix(run_agent): isolate background review fork from external memory plugins (#27190)
+    
+    Pass skip_memory=True to the AIAgent constructor used by
+    _spawn_background_review() so the review fork's __init__ no longer
+    rebuilds a _memory_manager wired to honcho / mem0 / supermemory /
+    etc. under the parent's session_id.
+    
+    Before this change, the review fork ingested its harness prompt
+    (the 'Review the conversation above and update the skill library...'
+    text) into the user's real memory namespace via three sites in
+    run_conversation():
+      - on_turn_start(turn_count, prompt)      cadence + turn-message
+      - prefetch_all(prompt)                   recall query
+      - sync_all(prompt, review_output, ...)   harness + review output
+                                               recorded as a
+                                               (user, assistant) pair
+    
+    Built-in MEMORY.md / USER.md state is still rebound from the parent
+    right after construction, so memory(action='add') writes from the
+    review continue to land on disk; only the external-plugin side
+    effects are removed.
+    
+    Reported by @Utku.
+
+ run_agent.py                              | 16 +++++++++++
+ tests/run_agent/test_background_review.py | 48 +++++++++++++++++++++++++++++++
+ 2 files changed, 64 insertions(+)

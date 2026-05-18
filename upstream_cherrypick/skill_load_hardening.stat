@@ -1,0 +1,17 @@
+commit 4b17c2411ab2518fabe9d87872a03a47d3b8cfcc
+Author: 0xchainer <109617724+0xchainer@users.noreply.github.com>
+Date:   Sun May 17 01:08:53 2026 +0300
+
+    fix(skills): return None instead of truthy stub when skill load fails
+    
+    build_skill_invocation_message() returns a non-empty placeholder string
+    ('[Failed to load skill: ...]') when the skill exists in the command cache
+    but loading the actual SKILL.md payload fails. CLI/gateway callers treat
+    any truthy return value as success, so the failure is silently routed into
+    the model as if it were a valid skill prompt.
+    
+    Return None instead, matching the existing behavior for unknown commands,
+    so callers using 'if msg:' can properly detect the failure.
+
+ agent/skill_commands.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
