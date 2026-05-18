@@ -1,0 +1,1 @@
+User prefers concise terminal output. When user says 'loop?' it means 'stop repeating commands and change strategy'. User values clean git history and proper .gitignore setup. DGX clone target: /data/SpecForge/hermes-agent. Monolithic integration commit: cf881f1d6 (v4).
