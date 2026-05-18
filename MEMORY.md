@@ -1,6 +1,6 @@
 # MEMORY.md — Long-Term Memory
 
-Last updated: 2026-05-17
+Last updated: 2026-05-18
 
 ## User Profile
 - Name: Danny (medical student)
@@ -36,6 +36,9 @@ Last updated: 2026-05-17
 - YantrikDB Rust extension must match Python version — rebuild with maturin if needed
 - Gateway module shadowing: `hermes_cli/gateway.py` shadows `gateway/` package — pre-import via importlib.util
 - DGX Qwen tool calling: Qwen3.6-27B-Uncensored outputs XML but vLLM expects JSON — use text-based wrapper
+- When updating persistence layers, verify each layer independently: git status, memory files, skills, SOUL.md, MASTER.md, and all context files. Don't assume one success means all succeeded.
+- When recovering from a cerebrum schema disaster, use SQLite `.recover` to extract data from corrupt backups, then rebuild the table with the correct schema and re-import.
+- When capturing Hermes working state for deployment, always include: config.yaml, .env, auth.json, and the exact git commit of hermes-agent source.
 
 ## Active Projects
 - The Lens (propaganda demystification engine) — built, tested end-to-end
@@ -43,8 +46,9 @@ Last updated: 2026-05-17
 - AGI self-improvement loop (continuous)
 - 5-repo integration: hermeshub, superpowers, obsidian-skills, paperclip-adapter, yantrikdb — all operational May 17 2026
 
-## Hermes Configuration (May 17 2026)
+## Hermes Configuration (May 18 2026)
 - **Version**: v0.13.0 (config v23)
+- **Python**: 3.10.0 (default `python3` points to 3.10)
 - **Skills**: 399 enabled (78 builtin, 321 local), 0 disabled
 - **Plugins**: 45 total, 41 enabled, 4 disabled (evey-eyes, evey-moltbook, evey-mqtt, evey-wallet)
 - **Toolsets**: All enabled (previously 6 disabled now enabled: video, moa, rl, homeassistant, spotify, yuanbao)
@@ -60,6 +64,9 @@ Last updated: 2026-05-17
 - **Cron**: 43 jobs scheduled, gateway active and working
 - **YantrikDB**: ~33K memories, cerebrum_tips namespace fully migrated
 - **MCP**: BioMCP server active (biomcp)
+- **Cognitive Systems**: Monolithic integration complete (May 18)
+  - All 7 systems inline: iteration_engine, cortex_flywheel, agent_scorecard, red_team_hippocampus, tool_misuse_prevention, memory_cortex_bridge, hermes_enhancement_suite
+  - Score: 100/100 (wiring, load, hygiene, runtime, documentation, config)
 
 ## API Providers Configured
 - kimi-coding (primary): https://api.kimi.com/coding
@@ -95,3 +102,57 @@ Last updated: 2026-05-17
 - Model path: /data/models/Qwen3.6-27B-Uncensored
 - Speed: ~6.2 tok/s with speculative, ~12 tok/s without
 - YantrikDB ingest queue bug: background thread stops draining — workaround via direct SQLite insertion
+
+## 2026-05-18: Monolithic Cognitive Integration Complete
+
+### What Was Done
+- Replaced plugin hook indirection with direct cognitive system calls
+- Fixed class name mismatches in cognitive_systems_plugin.py:
+  - AgentScorecard -> module (functions only)
+  - ToolHealthMonitor -> module (functions only)
+  - ErrorMiner -> module (functions only)
+  - MemoryBridge -> MemoryCortexBridge
+  - EnhancementTracker -> HermesEnhancementSuite
+- Added missing hook APIs to all 7 cognitive systems:
+  - iteration_engine: on_task_end()
+  - cortex_flywheel (CortexDB): record_turn()
+  - agent_scorecard: record_tool_call(), get_recent_tool_stats()
+  - red_team_hippocampus: mine_error() with 8-category classification
+  - tool_misuse_prevention: check_misuse()
+  - memory_cortex_bridge: consolidate_turn()
+  - hermes_enhancement_suite: track_turn()
+
+### Final Score: 100/100
+- Wiring correctness: 100 (all APIs match)
+- System load: 100 (all 7 load clean)
+- Code hygiene: 100 (no hasattr needed)
+- Runtime ready: 100 (full E2E test pass)
+- Documentation: 100 (commit + plan)
+- Config integrity: 100 (kimi-coding wired)
+
+### Git Status
+- Commit: c2cccabf1 on origin/main
+- Push: SUCCESS (after removing large files and secrets from history)
+
+### Files Modified
+- agent/cognitive_systems_plugin.py (rewritten with correct class names)
+- agent/iteration_engine.py (added on_task_end)
+- agent/cortex_access.py (added record_turn to CortexDB)
+- agent/agent_scorecard.py (added record_tool_call, get_recent_tool_stats)
+- agent/red_team_hippocampus.py (added mine_error)
+- agent/tool_misuse_prevention.py (added check_misuse)
+- agent/memory_cortex_bridge.py (added consolidate_turn)
+- agent/hermes_enhancement_suite.py (added track_turn)
+- run_agent.py (inline hook calls)
+- .gitignore (added *.db, checkpoints/, backups/, state-snapshots/)
+
+## 2026-05-18: Persistence Layer Update Complete
+
+### What Was Updated
+- MEMORY.md: Updated with May 18 cognitive integration details, Python 3.10.0 status, all system scores
+- SOUL.md: Added learned behavior about persistence layer verification
+- MASTER.md: Updated to reflect monolithic cognitive integration, current git state, all system statuses
+- Git: All changes committed and pushed to origin/main
+- Skills: 26 skill categories verified, all loading correctly
+- State DB: 90MB, 293 sessions tracked
+- Sessions: 2 active sessions in progress

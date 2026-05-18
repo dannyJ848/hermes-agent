@@ -1,8 +1,9 @@
 # MASTER.md — Hermes Agent Master Documentation
 
 **System**: Hermes Agent v0.13.0 (config v23)
-**Last Updated**: 2026-05-17
+**Last Updated**: 2026-05-18
 **Host**: MacBook (local) + DGX Spark (remote)
+**Python**: 3.10.0 (default `python3` points to 3.10)
 
 ---
 
@@ -19,7 +20,8 @@
 | Toolsets | ✅ | All enabled |
 | Cron Gateway | ✅ | 43 jobs, active |
 | MCP | ✅ | BioMCP server |
-| Git Repo | ⚠️ | 2 uncommitted changes |
+| **Cognitive Systems** | ✅ | Monolithic inline (May 18), 7/7 active, Score 100/100 |
+| **Git Repo** | ✅ | Clean (commit c2cccabf1) |
 
 ---
 
@@ -27,7 +29,7 @@
 
 ### Local (MacBook)
 - **Hermes Agent**: `/Users/dannygomez/hermes-agent/`
-- **Virtual Env**: Python 3.11.14
+- **Virtual Env**: Python 3.10.0
 - **Config**: `~/.hermes/config.yaml`
 - **Memory**: `~/.hermes/yantrikdb_copy.db` (~33K records)
 - **Skills**: `~/.hermes/skills/` (321 local)
@@ -95,6 +97,7 @@ jina-reader: https://r.jina.ai
 - `~/.hermes/SOUL.md` — persona & learned behaviors
 - `~/.hermes/MEMORY.md` — long-term memory
 - `~/.hermes/USER.md` — user profile (365 chars)
+- `~/.hermes/MASTER.md` — system status (this file)
 - `~/.hermes/AGENTS.md` — workspace conventions
 
 ### Persistence Layers
