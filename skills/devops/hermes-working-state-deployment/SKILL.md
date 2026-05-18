@@ -18,6 +18,7 @@ Capture and restore complete Hermes Agent working state including configuration,
 - After fixing auth issues to preserve working state
 - When migrating to a new machine or environment
 - When one CLI works and another doesn't
+- **When user says "get ready for a new CLI" — this means update all persistence layers, commit, push, verify cognitive systems green**
 
 ## What Gets Captured
 
@@ -28,6 +29,17 @@ Capture and restore complete Hermes Agent working state including configuration,
 | Auth Cache | `~/.hermes/auth.json` | Credential pool with working state |
 | Shell Env | `~/.zshrc` | PATH, env vars |
 | Source Code | `~/hermes-agent/` | Git commit with cognitive orchestrator |
+
+## What Gets Verified During Deployment
+
+| Check | Why It Matters |
+|-------|--------------|
+| Git status clean | Uncommitted changes can cause drift between sessions |
+| All persistence layers updated | MEMORY.md, SOUL.md, MASTER.md must reflect current state |
+| Skills count matches | 93 builtin + local vs 384 after source install — know which you have |
+| Tool count matches | 27 core vs 90+ with API keys — verify .env has expected keys |
+| Cognitive systems load | All 7 inline systems must pass integration test |
+| Git push succeeds | Local-only commits are invisible to other CLI instances |
 
 ## Critical Config Rules
 
