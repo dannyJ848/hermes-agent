@@ -1,10 +1,10 @@
 {
-  "timestamp": 1779130190.898655,
+  "timestamp": 1779130230.598953,
   "reason": "compression_threshold",
-  "checkpoint_label": "auto-handoff-1779130190",
-  "session_id": "20260518_134950_c7e46a",
+  "checkpoint_label": "auto-handoff-1779130230",
+  "session_id": "20260518_135030_9dbbac",
   "compression_count": 12,
   "active_tasks": [],
-  "next_steps": "Resume from checkpoint auto-handoff-1779130190",
+  "next_steps": "Resume from checkpoint auto-handoff-1779130230",
   "notes": "Auto-handoff after 12 compressions. Start new CLI and resume."
 }
