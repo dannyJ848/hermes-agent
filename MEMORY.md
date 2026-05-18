@@ -156,3 +156,24 @@ Last updated: 2026-05-18
 - Skills: 26 skill categories verified, all loading correctly
 - State DB: 90MB, 293 sessions tracked
 - Sessions: 2 active sessions in progress
+
+## 2026-05-18: Tool Count Clarification
+
+### What Was Discovered
+- Old context claimed "92 tools, 412 skills" - this was from a BROKEN backup
+- Current CLI correctly shows: 27 tools (15 enabled + 12 disabled), 384 skills
+- Toolsets.py defines 76 unique tools across all toolsets
+- hermes-cli toolset defines 45 tools
+- Only 15 are enabled without API keys (core tools)
+- 12 are disabled (need API keys or system dependencies)
+- 18 are gated by check_fn (kanban, ha_*, messaging, etc.)
+
+### To Enable More Tools
+Configure API keys in ~/.hermes/.env:
+- OPENROUTER_API_KEY → moa toolset
+- EXA_API_KEY, PARALLEL_API_KEY, TAVILY_API_KEY, FIRECRAWL_API_KEY → web toolset
+- DISCORD_BOT_TOKEN → discord toolset
+- TINKER_API_KEY, WANDB_API_KEY → rl toolset
+- HASS_TOKEN → homeassistant toolset
+- Gateway running → messaging toolset
+
