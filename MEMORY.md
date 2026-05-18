@@ -189,3 +189,37 @@ Configure API keys in ~/.hermes/.env:
 - Video provider → video_analyze (+1)
 - TTS provider → text_to_speech (+1)
 
+
+## 2026-05-18: Full Apparatus Port to DGX
+
+### What Was Done
+- DGX clone at /data/SpecForge/hermes-agent synced with MacBook at commit 7f6281ca9
+- Created Python 3.12.3 venv on DGX (externally managed system Python)
+- Installed hermes v0.13.0 in venv
+- Copied MacBook config.yaml + .env to DGX ~/.hermes/
+- Synced 385 skills to DGX ~/.hermes/skills/
+- Verified all 21 cognitive subsystems present and wired
+
+### DGX State
+- Commit: 7f6281ca9 (identical to MacBook)
+- Skills: 385 (1 more than MacBook's 384 — likely temp file)
+- Tools: ~50 enabled (full evey plugin suite active)
+- Cognitive: 21 subsystems active (20 in orchestrator + iteration_engine)
+- Entry point: /data/SpecForge/hermes-agent/venv/bin/hermes
+- PATH: export PATH=/data/SpecForge/hermes-agent/venv/bin:$PATH
+
+### DGX Port Procedure
+1. git pull origin main on DGX
+2. python3 -m venv venv
+3. venv/bin/pip install -e .
+4. Copy config.yaml + .env from MacBook
+5. Sync skills/ directory
+6. Symlink venv/bin/hermes to ~/.local/bin/hermes
+7. Verify with hermes doctor
+
+### Key Findings from Audit
+- 20 subsystems in cognitive_orchestrator.py + iteration_engine.py = 21 total
+- run_agent.py (lines 2125-2145) initializes all cognitive systems
+- hermes_cli/main.py does NOT need cognitive imports — it's just a wrapper
+- Tool count: 31 implemented, 76 aliases, 60 unimplemented
+- Both MacBook and DGX have identical monolithic cognitive architecture
