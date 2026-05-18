@@ -151,6 +151,7 @@ When user says:
 - "I spent hours getting this back" → Working state loss is traumatic, prevent recurrence
 - "get ready for a new CLI" → This is a PRE-DEPLOYMENT signal, not just preservation. Update all persistence layers (MEMORY.md, SOUL.md, MASTER.md), verify cognitive systems, commit, push, THEN capture state. See `hermes-working-state-deployment` skill Step 0.
 - "be careful with breaking anything, I care about the model" → User values working cognitive systems over upstream features. Abort risky updates rather than break the cognitive apparatus. See `references/may18-2026-v14-abort-recovery.md` for the May 2026 abort where v0.14 update was abandoned to preserve 21 cognitive subsystems.
+- "sorry sorry sorry sorry" / "just fix it" / "stop talking" → User wants minimal-response debugging mode. Report the fix, confirm it works, move on. No verbose explanations. See `references/minimal-response-debugging-mode.md`.
 
 ## Restore Scenarios
 

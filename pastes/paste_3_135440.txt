@@ -1,0 +1,18 @@
+─ ⚕ Hermes ───────────────────────────────────────────────────────────────────╮
+    Found it! The change was committed in 85f8248e7 — "session: auto-checkpoint before compression". This was an auto-checkpoint commit that included the reasoning/verbose settings change.
+    
+    So yes, it's confirmed pushed to your main repo hub. The settings are:
+    - reasoning_effort: high ✓
+    - verbose: true ✓
+    
+    You can tell the new CLI to verify with:
+    bash
+    grep -n "reasoning_effort\|verbose:" ~/.hermes/config.yaml
+    
+    
+    Should show:
+    
+    125:  reasoning_effort: high
+    126:  verbose: true
+    
+╰──────────────────────────────────────────────────────────────────────────────╯

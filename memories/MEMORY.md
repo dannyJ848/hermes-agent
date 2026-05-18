@@ -4,3 +4,5 @@ Surgical integration workflow established: when upstream is incompatible (no hoo
 2026-05-18: Hermes CLI startup debugging session. Multiple issues with self-manager handoff code in HermesCLI.__init__ and CheckpointManager parameters. Key fixes: (1) _vprint method missing — added after __init__, (2) log_prefix attribute missing — added after self.verbose, (3) CheckpointManager missing max_total_size_mb and max_file_size_mb parameters — both added. Pattern: when config adds new settings, always check if the consuming class __init__ needs matching parameters. When adding code to __init__ that references self.X, verify X is defined earlier.
 §
 User explicitly enforces BF16 native only for trained models — no FP8, no quantization. When user says "remove all quant" or "BF16 native", immediately remove FP8 providers from config and ensure vLLM uses --dtype bfloat16.
+§
+Session compression threshold hit (12+ compactions). When this happens, start new CLI session with context handoff. Context handoff format: concise summary of goal, current state, next steps, key config values, and any blockers. User expects this proactively without being asked.

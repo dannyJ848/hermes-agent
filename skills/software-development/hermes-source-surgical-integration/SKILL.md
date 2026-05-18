@@ -813,6 +813,54 @@ These directories are **intentional** Hermes extension points and should NOT be 
 - Scripts in `/tmp/` that persist across sessions
 - Any code that creates/modifies files outside `~/hermes-agent/` and `~/.hermes/`
 
+## Upstream Surgical Integration (When Upstream Has No Hook Infrastructure)
+
+When upstream (e.g., NousResearch/hermes-agent) is 8,000+ commits ahead but has no hook infrastructure compatible with your cognitive systems, **do NOT attempt a full merge**. Instead:
+
+### The Cherry-Pick → Adapt → Insert Pattern
+
+1. **Identify specific files** in upstream that contain patterns you want
+   - Use `git log --oneline --all | head -50` to find relevant commits
+   - Use `git show <commit>` to inspect changes
+   - Cherry-pick individual files: `git checkout upstream/main -- path/to/file.py`
+
+2. **Study the pattern** in isolation
+   - Read the cherry-picked file completely
+   - Identify the core technique (not the surrounding infrastructure)
+   - Extract the minimal pattern that delivers value
+
+3. **Adapt the pattern** to your existing subsystems
+   - Rename functions to match your naming conventions
+   - Replace upstream-specific imports with your module paths
+   - Strip out upstream hook infrastructure (you have your own)
+
+4. **Insert alongside existing code** (never replace)
+   - Add new methods to existing classes
+   - Add new functions to existing modules
+   - Use daemon threads for background work
+   - Wrap all new code in try/except
+
+5. **Verify with import smoke tests**
+   - `python -c "from agent.module import new_function"`
+   - Run the module's existing tests
+   - Check no existing functionality broke
+
+### Example: May 2026 Upstream Integration
+
+Cherry-picked 6 upstream files, surgically integrated 5 patterns:
+
+| Upstream File | Pattern | Destination | Integration Type |
+|---------------|---------|-------------|------------------|
+| `background_review.py` | Post-exercise evaluation daemon | `agent/training_gym.py` | New method `_spawn_exercise_review()` |
+| `agent_runtime_helpers.py` | Trajectory export for training | `agent/distillation_bridge.py` | New function `export_trajectory()` |
+| `iteration_budget.py` | Per-subsystem iteration budget | `agent/unified_intelligence_engine.py` | New class `CognitiveIterationBudget` |
+| `conversation_compression.py` | Compression feasibility probe | `agent/adaptive_context_sculptor.py` | New function `check_compression_feasibility()` |
+| `background_review.py` | Memory isolation whitelist | `agent/memory_cortex_bridge.py` | New methods `set_cognitive_isolation()` |
+
+**All additive. No existing code touched. No merge conflicts.**
+
+### Key Principle
+
 ## Support Files
 
 - `references/integration-95-modules.md` — full 95-file mapping from May 2026
@@ -833,5 +881,6 @@ These directories are **intentional** Hermes extension points and should NOT be 
 - `references/live-plugin-verification-2026-07.md` — live PluginManager verification: discover_and_load(), check _plugins and _hooks, test module loading from the actual plugin path (not agent/cognitive_systems_plugin.py), verify DB health and experience counts
 - `references/tool-registry-inspection.md` — Python-level tool registry inspection: Python version traps, import paths, empty registry pitfalls, and the correct verification script
 - `references/cognitive-orchestrator-module-sync.md` — cross-system module sync pattern for cognitive orchestrator subsystems (MacBook → DGX, etc.)
+- `references/upstream-surgical-integration-pattern.md` — cherry-pick → adapt → insert pattern for integrating upstream patterns when upstream has incompatible hook infrastructure (May 2026)
 - `scripts/bulk-config-cleanup.py` — run this after integration to fix all config references
 - `scripts/verify-cognitive-plugin-compatibility.py` — run after any agent/ module change to catch class/method drift before silent hook failures
