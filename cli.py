@@ -2467,6 +2467,11 @@ class HermesCLI:
         self._background_tasks: Dict[str, threading.Thread] = {}
         self._background_task_counter = 0
 
+    def _vprint(self, message: str, *, force: bool = False) -> None:
+        """Verbose print -- only shows if verbose mode is on or force=True."""
+        if force or getattr(self, 'verbose', False):
+            print(message)
+
     def _invalidate(self, min_interval: float = 0.25) -> None:
         """Throttled UI repaint — prevents terminal blinking on slow/SSH connections."""
         if getattr(self, "_resize_recovery_pending", False):
