@@ -162,18 +162,30 @@ Last updated: 2026-05-18
 ### What Was Discovered
 - Old context claimed "92 tools, 412 skills" - this was from a BROKEN backup
 - Current CLI correctly shows: 27 tools (15 enabled + 12 disabled), 384 skills
-- Toolsets.py defines 76 unique tools across all toolsets
-- hermes-cli toolset defines 45 tools
-- Only 15 are enabled without API keys (core tools)
-- 12 are disabled (need API keys or system dependencies)
-- 18 are gated by check_fn (kanban, ha_*, messaging, etc.)
+- Deep analysis reveals:
+  - 28 tool modules discovered in tools/
+  - 31 actual tool functions with task_id parameter
+  - 76 tool aliases defined in toolsets.py
+  - 60 aliases in toolsets.py have NO corresponding tool function (planned/unimplemented)
+  - 15 tool functions exist but are NOT in toolsets.py (internal helpers)
+  - hermes-cli toolset: 45 aliases, but only ~15 are implemented and enabled
+
+### Tool Count Breakdown
+- Implemented and enabled: 15 (browser, clarify, code_execution, cronjob, terminal, etc.)
+- Implemented but disabled (need API keys): 12 (web, moa, rl, discord, etc.)
+- Implemented but gated: 18 (kanban, ha_*, messaging, etc.)
+- Aliases without implementation: 60 (defined in toolsets.py but no tool function exists)
+- Internal helpers not exposed: 15 (cleanup, notify, reset, etc.)
 
 ### To Enable More Tools
 Configure API keys in ~/.hermes/.env:
-- OPENROUTER_API_KEY → moa toolset
-- EXA_API_KEY, PARALLEL_API_KEY, TAVILY_API_KEY, FIRECRAWL_API_KEY → web toolset
-- DISCORD_BOT_TOKEN → discord toolset
-- TINKER_API_KEY, WANDB_API_KEY → rl toolset
-- HASS_TOKEN → homeassistant toolset
-- Gateway running → messaging toolset
+- OPENROUTER_API_KEY → moa toolset (+1)
+- EXA_API_KEY, PARALLEL_API_KEY, TAVILY_API_KEY, FIRECRAWL_API_KEY → web toolset (+2)
+- DISCORD_BOT_TOKEN → discord toolset (+2)
+- TINKER_API_KEY, WANDB_API_KEY → rl toolset (+10)
+- HASS_TOKEN → homeassistant toolset (+4)
+- Gateway running → messaging toolset (+1)
+- Image gen provider → image_generate (+1)
+- Video provider → video_analyze (+1)
+- TTS provider → text_to_speech (+1)
 
