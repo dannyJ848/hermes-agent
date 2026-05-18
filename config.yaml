@@ -49,6 +49,12 @@ providers:
     api_key: not-needed
     name: spark-bf16
     models:
+      /data/models/Qwen3.6-27B-Uncensored:
+        context_length: 65536
+        supports_tools: true
+        supports_reasoning: true
+        supports_vision: true
+        tool_call_parser: qwen3_xml
       dgx-qwen-27b:
         name: /data/models/Qwen3.6-27B-Uncensored
         context_length: 65536
