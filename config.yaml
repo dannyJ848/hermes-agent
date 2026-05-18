@@ -1,8 +1,10 @@
 model:
   base_url: https://api.kimi.com/coding
-  default: kimi-for-coding
-  provider: kimi-coding
+  default: dgx-qwen-27b
+  provider: spark-bf16
   api_key_env: KIMI_API_KEY
+  reasoning_effort: high
+  thinking: true
 providers:
   local:
     api: http://localhost:11434/v1
@@ -47,6 +49,13 @@ providers:
     api_key: not-needed
     name: spark-bf16
     models:
+      dgx-qwen-27b:
+        name: /data/models/Qwen3.6-27B-Uncensored
+        context_length: 32768
+        supports_tools: true
+        supports_reasoning: true
+        supports_vision: true
+        tool_call_parser: qwen3_xml
       merged-lora:
         context_length: 32768
         supports_tools: true
