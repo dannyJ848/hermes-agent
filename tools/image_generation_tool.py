@@ -879,21 +879,6 @@ IMAGE_GENERATE_SCHEMA = {
 }
 
 
-def _read_configured_image_model():
-    """Return the value of ``image_gen.model`` from config.yaml, or None."""
-    try:
-        from hermes_cli.config import load_config
-        cfg = load_config()
-        section = cfg.get("image_gen") if isinstance(cfg, dict) else None
-        if isinstance(section, dict):
-            value = section.get("model")
-            if isinstance(value, str) and value.strip():
-                return value.strip()
-    except Exception as exc:
-        logger.debug("Could not read image_gen.model: %s", exc)
-    return None
-
-
 def _read_configured_image_provider():
     """Return the value of ``image_gen.provider`` from config.yaml, or None.
 
@@ -930,9 +915,6 @@ def _dispatch_to_plugin_provider(prompt: str, aspect_ratio: str):
     if not configured or configured == "fal":
         return None
 
-    # Also read configured model so we can pass it to the plugin
-    configured_model = _read_configured_image_model()
-
     try:
         # Import locally so plugin discovery isn't triggered just by
         # importing this module (tests rely on that).
@@ -968,10 +950,7 @@ def _dispatch_to_plugin_provider(prompt: str, aspect_ratio: str):
         })
 
     try:
-        kwargs = {"prompt": prompt, "aspect_ratio": aspect_ratio}
-        if configured_model:
-            kwargs["model"] = configured_model
-        result = provider.generate(**kwargs)
+        result = provider.generate(prompt=prompt, aspect_ratio=aspect_ratio)
     except Exception as exc:
         logger.warning(
             "Image gen provider '%s' raised: %s",

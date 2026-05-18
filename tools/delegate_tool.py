@@ -462,37 +462,6 @@ def _is_mcp_toolset_name(name: str) -> bool:
     return bool(target and str(target).startswith("mcp-"))
 
 
-def _expand_parent_toolsets(parent_toolsets: set) -> set:
-    """Expand composite toolsets so individual toolset names are recognized.
-
-    When a parent uses a composite toolset like ``hermes-cli`` (which bundles
-    all core tools), the child may request individual toolsets such as ``web``
-    or ``terminal``.  A simple name-based intersection would reject them
-    because ``"web" != "hermes-cli"``.
-
-    This helper collects the tool names from each parent toolset, then adds
-    the names of any individual toolsets whose tools are a *subset* of the
-    parent's available tools.  The original parent toolset names are preserved.
-    """
-    parent_tool_names: set = set()
-    for ts_name in parent_toolsets:
-        ts_def = TOOLSETS.get(ts_name)
-        if ts_def:
-            parent_tool_names.update(ts_def.get("tools", []))
-
-    if not parent_tool_names:
-        return set(parent_toolsets)
-
-    expanded = set(parent_toolsets)
-    for ts_name, ts_def in TOOLSETS.items():
-        if ts_name in expanded:
-            continue
-        ts_tools = ts_def.get("tools", [])
-        if ts_tools and set(ts_tools).issubset(parent_tool_names):
-            expanded.add(ts_name)
-    return expanded
-
-
 def _preserve_parent_mcp_toolsets(
     child_toolsets: List[str], parent_toolsets: set[str]
 ) -> List[str]:
@@ -514,8 +483,8 @@ _HEARTBEAT_INTERVAL = 30  # seconds between parent activity heartbeats during de
 # The idle ceiling stays tight so genuinely stuck children don't mask the gateway
 # timeout. The in-tool ceiling is much higher so legit long-running tools get
 # time to finish; child_timeout_seconds (default 600s) is still the hard cap.
-_HEARTBEAT_STALE_CYCLES_IDLE = 15  # 15 * 30s = 450s idle between turns → stale
-_HEARTBEAT_STALE_CYCLES_IN_TOOL = 40  # 40 * 30s = 1200s stuck on same tool → stale
+_HEARTBEAT_STALE_CYCLES_IDLE = 5  # 5 * 30s = 150s idle between turns → stale
+_HEARTBEAT_STALE_CYCLES_IN_TOOL = 20  # 20 * 30s = 600s stuck on same tool → stale
 DEFAULT_TOOLSETS = ["terminal", "file", "web"]
 
 
@@ -592,16 +561,6 @@ def _build_child_system_prompt(
             "Use this exact path for local repository/workdir operations unless the task explicitly says otherwise."
         )
     parts.append(
-        "\n## Execution Discipline (CLAUDE.md Rules)\n"
-        "Follow these rules on every tool call and edit:\n"
-        "1. Think Before Acting — State assumptions explicitly. Surface tradeoffs. Ask before guessing.\n"
-        "2. Simplicity First — Minimize code that solves the problem. No speculative features.\n"
-        "3. Surgical Changes — Touch ONLY what you must. Don't restructure, refactor, or rename unless required.\n"
-        "4. Goal-Oriented Execution — Every edit must have a clear, stated goal. Follow what success looks like.\n"
-        "5. Code Decides Deterministic Things — Use status codes, file existence, and other objective signals. Don't ask the model to 'decide if we should retry' when data answers it.\n"
-        "6. Read Before You Write — Understand adjacent code before modifying it. Avoid conflicts 30 lines away.\n"
-        "7. Fail Visibly, Not Silently — If something fails, report it clearly. A function that 'works' but returns wrong data is worse than a crash.\n"
-        "8. Convention Beats Novelty — Follow existing patterns in the codebase. Don't invent a third pattern.\n"
         "\nComplete this task using the tools available to you. "
         "When finished, provide a clear, concise summary of:\n"
         "- What you did\n"
@@ -948,11 +907,8 @@ def _build_child_agent(
         parent_toolsets = set(DEFAULT_TOOLSETS)
 
     if toolsets:
-        # Intersect with parent — subagent must not gain tools the parent lacks.
-        # Expand composite toolsets (e.g. hermes-cli) so that individual
-        # toolset names (e.g. web, terminal) are recognised during intersection.
-        expanded_parent = _expand_parent_toolsets(parent_toolsets)
-        child_toolsets = [t for t in toolsets if t in expanded_parent]
+        # Intersect with parent — subagent must not gain tools the parent lacks
+        child_toolsets = [t for t in toolsets if t in parent_toolsets]
         if _get_inherit_mcp_toolsets():
             child_toolsets = _preserve_parent_mcp_toolsets(
                 child_toolsets, parent_toolsets
@@ -1070,29 +1026,6 @@ def _build_child_agent(
     except Exception as exc:
         logger.debug("Could not load delegation reasoning_effort: %s", exc)
 
-    # Inherit the parent's fallback provider chain so subagents can recover
-    # from rate-limits and credential exhaustion exactly like the top-level
-    # agent does.  _fallback_chain is a list accepted by AIAgent's
-    # fallback_model parameter (which handles both list and dict forms).
-    parent_fallback = getattr(parent_agent, "_fallback_chain", None) or None
-
-    # Inherit the parent's OpenRouter provider-preference filters by default
-    # (so subagents routed to the same provider honour the same routing
-    # constraints).  BUT: when `delegation.provider` is set the user is
-    # explicitly asking the child to run on a different provider, and
-    # parent-level OpenRouter filters (e.g. `only=["Anthropic"]`) would
-    # silently force the child back onto the parent's provider. Clear the
-    # filters in that case so the delegated provider is honoured.
-    child_providers_allowed = getattr(parent_agent, "providers_allowed", None)
-    child_providers_ignored = getattr(parent_agent, "providers_ignored", None)
-    child_providers_order = getattr(parent_agent, "providers_order", None)
-    child_provider_sort = getattr(parent_agent, "provider_sort", None)
-    if override_provider:
-        child_providers_allowed = None
-        child_providers_ignored = None
-        child_providers_order = None
-        child_provider_sort = None
-
     child = AIAgent(
         base_url=effective_base_url,
         api_key=effective_api_key,
@@ -1105,7 +1038,6 @@ def _build_child_agent(
         max_tokens=getattr(parent_agent, "max_tokens", None),
         reasoning_config=child_reasoning,
         prefill_messages=getattr(parent_agent, "prefill_messages", None),
-        fallback_model=parent_fallback,
         enabled_toolsets=child_toolsets,
         quiet_mode=True,
         ephemeral_system_prompt=child_prompt,
@@ -1117,10 +1049,10 @@ def _build_child_agent(
         thinking_callback=child_thinking_cb,
         session_db=getattr(parent_agent, "_session_db", None),
         parent_session_id=getattr(parent_agent, "session_id", None),
-        providers_allowed=child_providers_allowed,
-        providers_ignored=child_providers_ignored,
-        providers_order=child_providers_order,
-        provider_sort=child_provider_sort,
+        providers_allowed=parent_agent.providers_allowed,
+        providers_ignored=parent_agent.providers_ignored,
+        providers_order=parent_agent.providers_order,
+        provider_sort=parent_agent.provider_sort,
         tool_progress_callback=child_progress_cb,
         iteration_budget=None,  # fresh budget per subagent
     )
@@ -2298,17 +2230,11 @@ def _resolve_delegation_credentials(cfg: dict, parent_agent) -> dict:
     """Resolve credentials for subagent delegation.
 
     If ``delegation.base_url`` is configured, subagents use that direct
-    OpenAI-compatible endpoint. ``delegation.api_key`` overrides the key; when
-    omitted, ``api_key`` is returned as ``None`` so ``_build_child_agent``
-    inherits the parent agent's key (``effective_api_key = override_api_key or
-    parent_api_key``). This lets providers that store their key outside
-    ``OPENAI_API_KEY`` (e.g. ``MINIMAX_API_KEY``, ``DASHSCOPE_API_KEY``) work
-    without a duplicate config entry.
-
-    Otherwise, if ``delegation.provider`` is configured, the full credential
-    bundle (base_url, api_key, api_mode, provider) is resolved via the runtime
-    provider system — the same path used by CLI/gateway startup. This lets
-    subagents run on a completely different provider:model pair.
+    OpenAI-compatible endpoint. Otherwise, if ``delegation.provider`` is
+    configured, the full credential bundle (base_url, api_key, api_mode,
+    provider) is resolved via the runtime provider system — the same path used
+    by CLI/gateway startup. This lets subagents run on a completely different
+    provider:model pair.
 
     If neither base_url nor provider is configured, returns None values so the
     child inherits everything from the parent agent.
@@ -2321,13 +2247,12 @@ def _resolve_delegation_credentials(cfg: dict, parent_agent) -> dict:
     configured_api_key = str(cfg.get("api_key") or "").strip() or None
 
     if configured_base_url:
-        # When delegation.api_key is not set, return None so _build_child_agent
-        # falls back to the parent agent's API key via the credential inheritance
-        # path (effective_api_key = override_api_key or parent_api_key). This
-        # lets providers that store their key in a non-OPENAI_API_KEY env var
-        # (e.g. MINIMAX_API_KEY, DASHSCOPE_API_KEY) work without requiring
-        # callers to duplicate the key under delegation.api_key.
-        api_key = configured_api_key  # None → inherited from parent in _build_child_agent
+        api_key = configured_api_key or os.getenv("OPENAI_API_KEY", "").strip()
+        if not api_key:
+            raise ValueError(
+                "Delegation base_url is configured but no API key was found. "
+                "Set delegation.api_key or OPENAI_API_KEY."
+            )
 
         base_lower = configured_base_url.lower()
         provider = "custom"
@@ -2367,7 +2292,7 @@ def _resolve_delegation_credentials(cfg: dict, parent_agent) -> dict:
     try:
         from hermes_cli.runtime_provider import resolve_runtime_provider
 
-        runtime = resolve_runtime_provider(requested=configured_provider, target_model=configured_model)
+        runtime = resolve_runtime_provider(requested=configured_provider)
     except Exception as exc:
         raise ValueError(
             f"Cannot resolve delegation provider '{configured_provider}': {exc}. "
@@ -2405,7 +2330,7 @@ def _load_config() -> dict:
     try:
         from cli import CLI_CONFIG
 
-        cfg = CLI_CONFIG.get("delegation") or {}
+        cfg = CLI_CONFIG.get("delegation", {})
         if cfg:
             return cfg
     except Exception:
@@ -2414,7 +2339,7 @@ def _load_config() -> dict:
         from hermes_cli.config import load_config
 
         full = load_config()
-        return full.get("delegation") or {}
+        return full.get("delegation", {})
     except Exception:
         return {}
 
@@ -2523,7 +2448,7 @@ DELEGATE_TASK_SCHEMA = {
                         },
                         "acp_command": {
                             "type": "string",
-                            "description": "Per-task ACP command override (e.g. 'copilot'). Overrides the top-level acp_command for this task only.",
+                            "description": "Per-task ACP command override (e.g. 'claude'). Overrides the top-level acp_command for this task only.",
                         },
                         "acp_args": {
                             "type": "array",
@@ -2563,11 +2488,10 @@ DELEGATE_TASK_SCHEMA = {
             "acp_command": {
                 "type": "string",
                 "description": (
-                    "Override ACP command for child agents (e.g. 'copilot'). "
+                    "Override ACP command for child agents (e.g. 'claude', 'copilot'). "
                     "When set, children use ACP subprocess transport instead of inheriting "
-                    "the parent's transport. Requires an ACP-compatible CLI "
-                    "(currently GitHub Copilot CLI via 'copilot --acp --stdio'). "
-                    "See agent/copilot_acp_client.py for the implementation."
+                    "the parent's transport. Enables spawning Claude Code (claude --acp --stdio) "
+                    "or other ACP-capable agents from any parent, including Discord/Telegram/CLI."
                 ),
             },
             "acp_args": {
@@ -2575,7 +2499,7 @@ DELEGATE_TASK_SCHEMA = {
                 "items": {"type": "string"},
                 "description": (
                     "Arguments for the ACP command (default: ['--acp', '--stdio']). "
-                    "Only used when acp_command is set."
+                    "Only used when acp_command is set. Example: ['--acp', '--stdio', '--model', 'claude-opus-4-6']"
                 ),
             },
         },

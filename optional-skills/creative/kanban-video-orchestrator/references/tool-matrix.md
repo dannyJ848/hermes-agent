@@ -81,20 +81,7 @@ them directly.
 | Remotion CLI (`npx remotion render`) | React-based motion graphics | renderer-motion-graphics |
 | Manim CE (`manim`) | Math animation render (driven by `manim-video` skill's recipes) | renderer-manim |
 | Blender (`blender -b`) | 3D rendering (alternative to `blender-mcp`) | renderer-3d |
-<<<<<<< HEAD
 | Gemini multimodal / Claude vision | AI review of clips | reviewer, cinematographer, editor |
-=======
-
-## Built-in Hermes tools for media review
-
-These are native Hermes tools — not invoked via terminal but through their own
-toolsets. Enable them per-profile by adding the toolset to the profile config.
-
-| Tool | Toolset | What it does | Profile that uses it |
-|------|---------|--------------|----------------------|
-| `video_analyze` | `video` (opt-in — `hermes tools enable video`) | Native video understanding — sends full clip to a multimodal LLM (Gemini via OpenRouter) for review without frame extraction. Supports mp4, webm, mov, avi, mkv. 50 MB cap. Model: `AUXILIARY_VIDEO_MODEL` env → `AUXILIARY_VISION_MODEL` fallback. | reviewer, cinematographer, editor |
-| `vision_analyze` | `vision` (core — enabled by default) | Image/frame analysis — review stills, thumbnails, exported frames. Already available to all profiles without opt-in. | reviewer, cinematographer, concept-artist |
->>>>>>> v0.13-integration
 
 ## Standard toolset configurations per role
 
@@ -169,11 +156,6 @@ toolsets:
   - kanban
   - terminal
   - file
-<<<<<<< HEAD
-=======
-  - video               # video_analyze — review full clips natively
-  - vision              # vision_analyze — review stills / exported frames
->>>>>>> v0.13-integration
 skills:
   always_load:
     - kanban-worker
@@ -264,11 +246,6 @@ toolsets:
   - kanban
   - terminal
   - file
-<<<<<<< HEAD
-=======
-  - video              # video_analyze — editor reviews assembled cuts natively
-  - vision             # vision_analyze — spot-check frames
->>>>>>> v0.13-integration
 skills:
   always_load:
     - kanban-worker
@@ -282,7 +259,6 @@ For captioner add Whisper invocation patterns to the SOUL.md.
 ```yaml
 toolsets:
   - kanban
-<<<<<<< HEAD
   - terminal           # for media inspection
   - file
 skills:
@@ -291,15 +267,6 @@ skills:
 env_required:
   - OPENROUTER_API_KEY    # if using Gemini multimodal review
   # or ANTHROPIC_API_KEY if using Claude vision (already required globally)
-=======
-  - terminal           # for media inspection (ffprobe, etc.)
-  - file
-  - video              # video_analyze — review full clips natively
-  - vision             # vision_analyze — review stills / exported frames
-skills:
-  always_load:
-    - kanban-worker
->>>>>>> v0.13-integration
 ```
 
 ## API key requirements
@@ -311,11 +278,7 @@ key is present in `~/.hermes/.env` (or macOS Keychain) before firing the kanban.
 |---------|---------|---------|
 | ElevenLabs | `ELEVENLABS_API_KEY` | voice-talent |
 | OpenAI | `OPENAI_API_KEY` | image-generator (DALL-E), voice-talent (TTS) |
-<<<<<<< HEAD
 | OpenRouter | `OPENROUTER_API_KEY` | reviewer, cinematographer, editor (Gemini multimodal review) |
-=======
-| OpenRouter | `OPENROUTER_API_KEY` | reviewer, cinematographer, editor (`video_analyze` routes through `AUXILIARY_VIDEO_MODEL` → OpenRouter) |
->>>>>>> v0.13-integration
 | FAL | `FAL_KEY` | image-generator (FAL flux models) |
 | Replicate | `REPLICATE_API_TOKEN` | image-generator (alternate provider) |
 | Runway | `RUNWAY_API_KEY` | image-to-video-generator |

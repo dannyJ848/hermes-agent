@@ -37,9 +37,7 @@ import json
 import logging
 import os
 import re
-import secrets
 import socket
-import stat
 import sys
 import threading
 import time
@@ -55,24 +53,19 @@ logger = logging.getLogger(__name__)
 # Lazy imports -- MCP SDK with OAuth support is optional
 # ---------------------------------------------------------------------------
 
-_OAUTH_AVAILABLE=False
+_OAUTH_AVAILABLE = False
 try:
     from mcp.client.auth import OAuthClientProvider
     from mcp.shared.auth import (
         OAuthClientInformationFull,
         OAuthClientMetadata,
-        OAuthMetadata,
         OAuthToken,
     )
+    from pydantic import AnyUrl
 
-    _OAUTH_AVAILABLE=True
+    _OAUTH_AVAILABLE = True
 except ImportError:
     logger.debug("MCP OAuth types not available -- OAuth MCP auth disabled")
-
-try:
-    from pydantic import AnyUrl
-except ImportError:
-    AnyUrl = None  # type: ignore[assignment, misc]
 
 
 # ---------------------------------------------------------------------------
@@ -163,41 +156,15 @@ def _read_json(path: Path) -> dict | None:
 
 
 def _write_json(path: Path, data: dict) -> None:
-    """Write a dict as JSON with restricted permissions (0o600).
-
-    Uses ``os.open`` with ``O_EXCL`` and an explicit mode so the file is
-    created atomically at 0o600. The previous ``write_text`` + post-write
-    ``chmod`` opened a TOCTOU window where the temp file briefly inherited
-    the process umask (commonly 0o644 = world-readable), exposing OAuth
-    tokens to other local users between create and chmod. Mirrors the fix
-    in ``agent/google_oauth.py`` (#19673).
-    """
+    """Write a dict as JSON with restricted permissions (0o600)."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    # Tighten parent dir to 0o700 so siblings can't traverse to the creds.
-    # No-op on Windows (POSIX mode bits aren't enforced); ignore failures.
+    tmp = path.with_suffix(".tmp")
     try:
-        os.chmod(path.parent, 0o700)
+        tmp.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
+        os.chmod(tmp, 0o600)
+        tmp.rename(path)
     except OSError:
-        pass
-    # Per-process random suffix avoids collisions between concurrent
-    # writers and stale leftovers from a prior crashed write.
-    tmp = path.with_suffix(f".tmp.{os.getpid()}.{secrets.token_hex(4)}")
-    try:
-        fd = os.open(
-            str(tmp),
-            os.O_WRONLY | os.O_CREAT | os.O_EXCL,
-            stat.S_IRUSR | stat.S_IWUSR,
-        )
-        with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            json.dump(data, fh, indent=2, default=str)
-            fh.flush()
-            os.fsync(fh.fileno())
-        os.replace(tmp, path)
-    except OSError:
-        try:
-            tmp.unlink(missing_ok=True)
-        except OSError:
-            pass
+        tmp.unlink(missing_ok=True)
         raise
 
 
@@ -213,7 +180,6 @@ class HermesTokenStorage:
 
         HERMES_HOME/mcp-tokens/<server_name>.json         -- tokens
         HERMES_HOME/mcp-tokens/<server_name>.client.json   -- client info
-        HERMES_HOME/mcp-tokens/<server_name>.meta.json     -- oauth server metadata
     """
 
     def __init__(self, server_name: str):
@@ -224,9 +190,6 @@ class HermesTokenStorage:
 
     def _client_info_path(self) -> Path:
         return _get_token_dir() / f"{self._server_name}.client.json"
-
-    def _meta_path(self) -> Path:
-        return _get_token_dir() / f"{self._server_name}.meta.json"
 
     # -- tokens ------------------------------------------------------------
 
@@ -305,33 +268,11 @@ class HermesTokenStorage:
         _write_json(self._client_info_path(), client_info.model_dump(mode="json", exclude_none=True))
         logger.debug("OAuth client info saved for %s", self._server_name)
 
-    # -- oauth server metadata --------------------------------------------
-    # The MCP SDK keeps discovered ``OAuthMetadata`` (token endpoint URL,
-    # etc.) in memory only. Persisting it here lets a restarted process
-    # refresh tokens without re-running metadata discovery. Without this,
-    # cold-start refresh requests fall back to the SDK's guessed
-    # ``{server_url}/token`` which returns 404 on most real providers and
-    # forces a full browser re-authorization.
-
-    def save_oauth_metadata(self, metadata: "OAuthMetadata") -> None:
-        _write_json(self._meta_path(), metadata.model_dump(exclude_none=True, mode="json"))
-        logger.debug("OAuth metadata saved for %s", self._server_name)
-
-    def load_oauth_metadata(self) -> "OAuthMetadata | None":
-        data = _read_json(self._meta_path())
-        if data is None:
-            return None
-        try:
-            return OAuthMetadata.model_validate(data)
-        except (ValueError, TypeError, KeyError) as exc:
-            logger.warning("Corrupt OAuth metadata at %s -- ignoring: %s", self._meta_path(), exc)
-            return None
-
     # -- cleanup -----------------------------------------------------------
 
     def remove(self) -> None:
         """Delete all stored OAuth state for this server."""
-        for p in (self._tokens_path(), self._client_info_path(), self._meta_path()):
+        for p in (self._tokens_path(), self._client_info_path()):
             p.unlink(missing_ok=True)
 
     def has_cached_tokens(self) -> bool:
