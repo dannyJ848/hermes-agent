@@ -655,6 +655,10 @@ hermes config set auxiliary.vision.model <model_name>
 
 For occasional contributors and PR authors. Full developer docs: https://hermes-agent.nousresearch.com/docs/developer-guide/
 
+### Monolithic Cognitive Integration
+
+For details on the inline cognitive systems integration (replacing plugin hook indirection with direct function calls), see `references/monolithic-integration-v4.md`.
+
 ### Project Layout
 
 ```
@@ -758,3 +762,58 @@ Types: `fix:`, `feat:`, `refactor:`, `docs:`, `chore:`
 - Use `get_hermes_home()` from `hermes_constants` for all paths (profile-safe)
 - Config values go in `config.yaml`, secrets go in `.env`
 - New tools need a `check_fn` so they only appear when requirements are met
+
+### Python Version Compatibility
+
+Hermes requires **Python 3.10+** for full functionality. The codebase uses `tuple[...]` and `list[...]` type hint syntax (PEP 585) which fails on Python 3.8/3.9 with:
+
+```
+TypeError: 'type' object is not subscriptable
+```
+
+**Symptom:** Tool discovery fails, `hermes skills list` shows fewer skills/tools than expected, or the CLI crashes at startup with type-related errors.
+
+**Fix:** Ensure the `hermes` wrapper uses Python 3.10+:
+```bash
+# Check wrapper
+head -1 $(which hermes)
+# Should show: #!/usr/bin/env python3.10 or similar
+
+# If using pyenv or multiple Python versions:
+pyenv global 3.10.0
+# Or explicitly: python3.10 -m hermes_cli.main
+```
+
+**If stuck on Python 3.8/3.9:** Replace `tuple[...]` with `Tuple[...]` (import from `typing`) and `list[...]` with `List[...]`. Common files needing this: `tools/registry.py`, `tools/web_tools.py`, `tools/tts_tool.py`.
+
+### Persistence Layer Update Before Deployment
+
+Before any CLI deployment or major system change, update all persistence layers to prevent working state loss:
+
+1. **MEMORY.md** — Update with current state, recent fixes, system scores, and any new learned behaviors
+2. **SOUL.md** — Add new learned behaviors as bullet points with dates
+3. **MASTER.md** — Update system status table, last updated date, and any changed configurations
+4. **Git commit** — Stage all modified files, commit with descriptive message
+5. **Git push** — Verify push succeeds to origin/main
+6. **Verification** — Run `hermes doctor` and cognitive system load test to confirm everything works
+
+**Common pitfall**: `config.yaml` may be 0 bytes if never configured — run `hermes setup` to generate it before deployment. Check with `ls -la ~/.hermes/config.yaml`.
+
+**User expectation**: The user treats working state loss as traumatic. Always capture state before fixing anything. When user says "get ready for new CLI" or similar, they expect all of the above steps done proactively without being asked to confirm each one.
+
+### Optional Skills Not Loading
+
+If `hermes skills list` shows only builtin skills (e.g., 78) but `optional-skills/` directory contains additional skills (e.g., 71 more):
+
+**Cause:** `skills.external_dirs` in `config.yaml` is empty by default.
+
+**Fix:** Add `optional-skills` to external_dirs:
+```bash
+hermes config set skills.external_dirs '["~/.hermes/optional-skills"]'
+# Or edit config.yaml directly:
+skills:
+  external_dirs:
+    - ~/.hermes/optional-skills
+```
+
+Restart Hermes (`/reset` in chat or exit and relaunch) for skills to load.
