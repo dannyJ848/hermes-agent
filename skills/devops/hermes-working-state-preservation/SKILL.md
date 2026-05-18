@@ -116,6 +116,10 @@ Create `HERMES_WORKING_STATE.md` with:
 | Shell Env | `~/.zshrc`, `~/.zshenv` | Env vars for new terminal windows |
 | Source Code | `~/hermes-agent/` | Cognitive orchestrator, custom modules |
 | Git State | Commit hash | Exact source code version |
+| Persistence Docs | `MEMORY.md`, `SOUL.md`, `MASTER.md` | Context files loaded by every new session |
+| Skills | `~/.hermes/skills/` | Local skills (not auto-installed from source) |
+
+**Critical**: When restoring working state, verify ALL layers independently. Don't assume one success means all succeeded. A common failure mode: config.yaml restores correctly but skills are missing because `~/.hermes/skills/` was not captured, or `.env` has keys but `auth.json` cache is stale.
 
 ## Provider-Specific State (Kimi Example)
 
@@ -145,6 +149,7 @@ When user says:
 - "this is wrong" → Don't continue down rabbit hole, capture and pivot
 - "don't lose this" → Highest priority preservation
 - "I spent hours getting this back" → Working state loss is traumatic, prevent recurrence
+- "get ready for a new CLI" → This is a PRE-DEPLOYMENT signal, not just preservation. Update all persistence layers (MEMORY.md, SOUL.md, MASTER.md), verify cognitive systems, commit, push, THEN capture state. See `hermes-working-state-deployment` skill Step 0.
 
 ## Restore Scenarios
 

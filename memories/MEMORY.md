@@ -1,1 +1,5 @@
 User prefers concise terminal output. When user says 'loop?' it means 'stop repeating commands and change strategy'. User values clean git history and proper .gitignore setup. DGX clone target: /data/SpecForge/hermes-agent. Monolithic integration commit: cf881f1d6 (v4).
+§
+When user says "get ready for a new CLI" or similar, this means: (1) update all persistence layers (MEMORY.md, SOUL.md, MASTER.md), (2) verify cognitive systems green, (3) verify skills/tools count matches expectations, (4) commit and push all changes, (5) only THEN proceed with deployment. This is a PRE-DEPLOYMENT protocol, not just preservation. (2026-05-18)
+§
+May 18 2026 session: Monolithic cognitive integration v4 deployed to DGX. Git main at 0924ed231. Key fixes: Python 3.8 tuple[] → Tuple[] in tools/registry.py, restored 71 optional skills from pre-filter branch, added skills.external_dirs to config.yaml. DGX clone at /data/SpecForge/hermes-agent with backup at .backup.20260518_004102. 161 skills, 72 tools, 7 cognitive systems inline.

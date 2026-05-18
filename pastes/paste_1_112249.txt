@@ -1,0 +1,25 @@
+ ─  ⚕ Hermes  ───────────────────────────────────────────────────────────────── 
+                                                                                
+     Yes — DGX details are in the summary file at                               
+     ~/.hermes/memory/2026-05-18-session-summary.md. Here's what's              
+     captured:                                                                  
+                                                                                
+     DGX Clone (lines 55-60, 91-97):                                            
+     - Location: /data/SpecForge/hermes-agent                                   
+     - Commit: 0924ed231 (detached HEAD)                                        
+     - Skills: 161                                                              
+     - All 7 cognitive systems verified present                                 
+     - Backup: /data/SpecForge/hermes-agent.backup.20260518_004102              
+                                                                                
+     Also in the "For New CLI" section (line 111):                              
+     > "Clone github.com/dannyJ848/hermes-agent, checkout 0924ed231..."         
+                                                                                
+     And in the compacted context summary (line 32):                            
+     > "CLONE to DGX — spark-85e8.local:/data/SpecForge/hermes-agent at         
+     commit 0924ed231; backup created at .backup.20260518_004102; all 7         
+     cognitive systems verified"                                                
+                                                                                
+     The summary also notes DGX is at detached HEAD — you may want to           
+     create a branch there next session.                                        
+                                                                                
+ ────────────────────────────────────────────────────────────────────────────── 
