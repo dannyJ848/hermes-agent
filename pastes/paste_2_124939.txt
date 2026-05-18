@@ -1,0 +1,10 @@
+────────────────────────────────────────
+● ─ ⚕ Hermes 
+───────────────────────────────────────────────────────────────────╮
+    We're ready. Here's the final state:
+... (+15 more lines)
+    Ready for new CLI deployment.
+╰──────────────────────────────────────────────────────────────────────────────╯
+Initializing agent...
+Failed to initialize agent: CheckpointManager.__init__() got an unexpected 
+keyword argument 'max_total_size_mb'
