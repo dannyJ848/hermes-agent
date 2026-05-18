@@ -237,12 +237,33 @@ When 50+ commits behind and local changes are small (a few files), the cleanest 
 is hard reset to upstream, then re-apply local patches on top. Stash/rebase causes cascading
 conflicts across dozens of upstream commits — not worth it for 2-3 patched files.
 
+**CRITICAL: Check upstream hook compatibility BEFORE resetting.** If your local patches depend on
+`invoke_hook`, `before_action`/`after_action`, or other hook infrastructure in `run_agent.py`,
+verify upstream still has these hooks. Upstream may have removed or replaced the hook system
+entirely (observed May 2026: upstream 8,722 commits ahead had zero hook infrastructure).
+
 ```bash
 cd ~/hermes-agent
 git fetch origin
 git log --oneline HEAD..origin/main | wc -l    # count incoming commits
 
+# === PRE-FLIGHT: Check hook compatibility ===
+grep -c 'invoke_hook\|before_action\|after_action' run_agent.py  # baseline
+git show origin/main:run_agent.py > /tmp/upstream_run_agent.py
+grep -c 'invoke_hook\|before_action\|after_action' /tmp/upstream_run_agent.py  # upstream
+# If upstream count is 0 and local count is >0: ABORT hard reset. Hooks are gone.
+
 # === Step 1: BACKUP ALL PATCHED FILES BEFORE TOUCHING ANYTHING ===
+# BACKUP ENTIRE COMMITTED FILES, not just git diff — diff misses committed cognitive files
+mkdir -p /tmp/hermes-backup-$(date +%Y%m%d_%H%M%S)/critical
+git show HEAD:run_agent.py > /tmp/hermes-backup/run_agent.py
+git show HEAD:agent/cognitive_orchestrator.py > /tmp/hermes-backup/cognitive_orchestrator.py 2>/dev/null || true
+# Backup ALL agent/ cognitive files (they may be committed but unmodified)
+for f in agent/cognitive_orchestrator.py agent/iteration_engine.py agent/cortex_flywheel.py \
+         agent/agent_scorecard.py agent/red_team_hippocampus.py agent/tool_misuse_prevention.py \
+         agent/memory_cortex_bridge.py agent/hermes_enhancement_suite.py; do
+    git show HEAD:$f > /tmp/hermes-backup/$(basename $f) 2>/dev/null || true
+done
 cp agent/prompt_builder.py /tmp/pb_backup.py
 cp run_agent.py /tmp/run_agent_backup.py
 cp -r plugins/context_engine/hindsight /tmp/hindsight_backup/
@@ -295,6 +316,14 @@ git commit -m 'feat: local patches re-applied on upstream'
 ```
 
 KEY GOTCHAS:
+- **Hook infrastructure may be removed upstream**: Always verify `invoke_hook`, `before_action`,
+  `after_action` exist in upstream run_agent.py BEFORE hard resetting. If hooks are gone, your
+  cognitive orchestrator cannot function without major re-engineering. Abort and stay on current
+  version, or redesign cognitive as a plugin using upstream's current plugin API.
+- **Backup committed cognitive files**: `git diff` only captures modified files. Committed files
+  like `agent/cognitive_orchestrator.py` that weren't modified in the working tree will NOT appear
+  in `git diff` and will be lost on hard reset. Use `git show HEAD:$file` to backup ALL critical
+  committed files before resetting.
 - **Shell quoting**: NEVER try to do Python string replacement via terminal() inline commands.
   The triple-quoted strings, backslashes, and quotes create bash syntax errors. Write a Python
   script to /tmp/ and run `python3 /tmp/apply_patches.py` instead.
@@ -491,5 +520,13 @@ This avoids the stash/pop dance entirely. Only use the full stash procedure abov
 - **Centralized Logging**: `hermes logs` CLI command, structured logs to `~/.hermes/logs/`.
 - **MCP OAuth 2.1 PKCE**: Full OAuth for MCP server authentication.
 - **Reasoning Effort Config-Only**: `HERMES_REASONING_EFFORT` env var removed — use `config.yaml` only.
+
+### May 2026: v0.14 Does Not Exist
+- **PyPI**: Latest is 0.9.0
+- **GitHub releases**: Latest is v2026.5.16
+- **Upstream main**: 8,722 commits ahead of v0.13-era forks
+- **Hook infrastructure removed**: Upstream run_agent.py no longer has `invoke_hook`, `before_action`, `after_action` — cognitive orchestrators depending on these hooks cannot function without major re-engineering
+- **Recommendation**: Stay on v0.13 with working cognitive apparatus rather than break everything for upstream features
+- **Reference**: `references/may18-2026-v14-abort-transcript.md` — full abort transcript and recovery steps
 
 **IMPORTANT**: Upstream v0.8 does NOT have `post_tool_call` — only `pre_api_request`, `post_api_request`, `post_llm_call`, `on_session_end`, `on_session_finalize`, `on_session_reset`. Our `post_tool_call` is entirely custom.

@@ -1,190 +1,90 @@
-# Full Apparatus Wiring & Performance Audit — 2026-05-18
+# Full Apparatus Wiring and Performance Audit — May 18, 2026
 
-**Trigger:** User asked "run a full line by line wiring and performance audit of your entire integrated hermes apparatus. aka the entire source code."
+## Scope
+Line-by-line verification of the entire integrated Hermes cognitive apparatus across MacBook and DGX.
 
-**Key discovery:** Cognitive orchestrator exists (972 lines) but is **completely unwired** — zero calls to `initialize_cognitive_systems()` or `get_orchestrator()` anywhere in the codebase. This is a "dead code" failure mode distinct from partial hook wiring.
+## MacBook State
+- **Commit**: 7f6281ca9 → bf0c4337f (after persistence update)
+- **Skills**: 384 SKILL.md (91 builtin + 293 local)
+- **Tools**: 27 shown by CLI (15 enabled + 12 disabled)
+  - Actual: 31 implemented tool functions
+  - Aliases: 76 in toolsets.py
+  - Unimplemented: 60 aliases without backing functions
+- **Agent modules**: 200 Python files
+- **Tool modules**: 111 Python files
+- **Cognitive systems**: 21 total
+  - 20 subsystems in cognitive_orchestrator.py
+  - Plus iteration_engine.py wired separately in run_agent.py
 
----
+## DGX State
+- **Location**: /data/SpecForge/hermes-agent
+- **Commit**: 7f6281ca9 (synced with MacBook before persistence update)
+- **Python**: 3.12.3 with venv
+- **Hermes**: v0.13.0
+- **Skills**: 385 (1 more than MacBook — likely temp file)
+- **Tools**: ~50 enabled (full evey plugin suite)
+- **Cognitive**: All 21 subsystems present and wired
 
-## Audit Methodology
+## Cognitive Subsystem Verification
 
-### 1. Repository Scale Metrics
-```python
-import subprocess, os
-os.chdir('~/.hermes')
+### Files Present
+| File | Lines | Bytes | Status |
+|------|-------|-------|--------|
+| agent/cognitive_orchestrator.py | ~1,000 | 41,829 | ✅ Imports 20 subsystems |
+| agent/iteration_engine.py | 671 | 28,961 | ✅ Wired in run_agent.py |
+| agent/cortex_flywheel.py | 428 | 16,501 | ✅ In orchestrator |
+| agent/agent_scorecard.py | 317 | 9,761 | ✅ In orchestrator |
+| agent/red_team_hippocampus.py | 757 | 29,503 | ✅ In orchestrator |
+| agent/tool_misuse_prevention.py | 156 | 5,592 | ✅ In orchestrator |
+| agent/memory_cortex_bridge.py | 465 | 17,076 | ✅ In orchestrator |
+| agent/hermes_enhancement_suite.py | 370 | 14,054 | ✅ In orchestrator |
 
-# Count files by extension
-r = subprocess.run(['find', '.', '-type', 'f',
-    '(', '-name', '*.py', '-o', '-name', '*.js', '-o', '-name', '*.ts',
-    '-o', '-name', '*.yaml', '-o', '-name', '*.yml', '-o', '-name', '*.json',
-    '-o', '-name', '*.md', '-o', '-name', '*.sh', ')',
-    '-not', '-path', './venv/*', '-not', '-path', './node_modules/*',
-    '-not', '-path', './.git/*', '-not', '-path', './sessions/*'],
-    capture_output=True, text=True)
-files = [f for f in r.stdout.strip().split('\n') if f.strip()]
+### Wiring in run_agent.py
+- Line 2130: `from agent.cognitive_orchestrator import initialize_cognitive_systems`
+- Line 2131: `self.cognitive_orchestrator = initialize_cognitive_systems(self)`
+- Lines 10091-10211: `before_action` and `after_action` hooks in tool execution loop
+- Lines 10757, 11009: iteration_engine before/after action hooks
+- Lines 11531-12170: `invoke_hook` calls for pre_llm_call, post_tool_call
 
-# Count Python files
-r = subprocess.run(['find', '.', '-name', '*.py', '-not', '-path', './venv/*'],
-    capture_output=True, text=True)
-py_files = [f for f in r.stdout.strip().split('\n') if f.strip()]
+### 20 Orchestrator Subsystems
+1. tiered_memory — 3-tier memory with overflow
+2. error_learning — Error pattern extraction
+3. skill_tracker — Skill quality tracking
+4. brain — ParallelBrain 6-phase cycle
+5. cortex_flywheel — Continuous learning flywheel
+6. distillation_bridge — Research-to-distillation pipeline
+7. self_audit — Post-session quality scoring
+8. training_gym — Continuous self-improvement loop
+9. memory_bridge — Memory-cortex bidirectional sync
+10. subconscious — Hook registration system
+11. autobrowse_tracer — Execution tracing
+12. context_sculptor — Adaptive context shaping
+13. tool_oracle — Predictive tool routing
+14. trust_scorer — Epistemic trust scoring
+15. unified_intelligence — Cross-system analytics
+16. failure_prevention — Before-action risk scoring
+17. experimentation — Self-directed learning loop
+18. domain_transfer — Pattern generalization across domains
+19. attention_prioritizer — Relevance-based memory injection
+20. evaluation_gate — Self-evaluation quality gate
 
-# Count lines in first 100 Python files
-total_lines = 0
-for f in py_files[:100]:
-    with open(f, 'r', encoding='utf-8', errors='ignore') as fh:
-        total_lines += len(fh.readlines())
+Plus iteration_engine (wired separately in run_agent.py) = 21 total
 
-# Extrapolate: total_lines * (len(py_files)/100)
-estimated_total = total_lines * (len(py_files) / 100)
-```
+## False Alarm Clarification
+Earlier audit reported cognitive systems "unwired" because `hermes_cli/main.py` doesn't import them. This is expected — `hermes_cli/main.py` is just the CLI wrapper. The actual agent runtime in `run_agent.py` correctly initializes all 21 subsystems. Both MacBook and DGX have identical, functioning wiring.
 
-### 2. Tool Implementation vs Alias Audit
-```python
-# Check toolsets.py for aliases vs actual implementations
-r = subprocess.run(['grep', '-n', '^def ', 'tools/registry.py'],
-    capture_output=True, text=True)
-implemented = [l for l in r.stdout.strip().split('\n') if l.strip()]
-
-# Check toolsets.py for aliases
-r = subprocess.run(['grep', '-n', 'ToolAlias', 'toolsets.py'],
-    capture_output=True, text=True)
-aliases = [l for l in r.stdout.strip().split('\n') if l.strip()]
-
-# Check discover_builtin_tools()
-r = subprocess.run(['grep', '-n', 'discover_builtin_tools', 'tools/registry.py'],
-    capture_output=True, text=True)
-```
-
-**Finding:** 76 aliases defined, only 31 actual tool functions implemented, 60 aliases without implementation. The CLI shows 27 tools (15 enabled + 12 disabled) because it only registers implemented functions.
-
-### 3. Cognitive System File Presence vs Wiring
-```python
-# Check files exist
-cognitive_files = [
-    'agent/iteration_engine.py',
-    'agent/cortex_flywheel.py',
-    'agent/agent_scorecard.py',
-    'agent/red_team_hippocampus.py',
-    'agent/tool_misuse_prevention.py',
-    'agent/memory_cortex_bridge.py',
-    'agent/hermes_enhancement_suite.py',
-    'agent/cognitive_orchestrator.py'
-]
-
-for f in cognitive_files:
-    if os.path.exists(f):
-        size = os.path.getsize(f)
-        with open(f) as fh:
-            lines = len(fh.readlines())
-        print(f"✓ {f}: {lines} lines, {size} bytes")
-    else:
-        print(f"✗ {f}: MISSING")
-
-# Check for ANY imports of these systems
-r = subprocess.run(['grep', '-rn',
-    'from agent.iteration_engine|from agent.cortex_flywheel|from agent.agent_scorecard',
-    '.', '--include', '*.py', '-not', '-path', './venv/*'],
-    capture_output=True, text=True)
-imports = [l for l in r.stdout.strip().split('\n') if l.strip()]
-print(f"\nDirect imports found: {len(imports)}")
-
-# Check for orchestrator usage
-r = subprocess.run(['grep', '-rn', 'get_orchestrator|initialize_cognitive_systems',
-    '.', '--include', '*.py', '-not', '-path', './venv/*'],
-    capture_output=True, text=True)
-usage = [l for l in r.stdout.strip().split('\n') if l.strip()]
-print(f"Orchestrator usage: {len(usage)}")
-```
-
-**Finding:** 7/7 cognitive system files present (3,164 lines total). Orchestrator present (972 lines). **Zero imports. Zero usage. Zero initialization calls.**
-
-### 4. Cross-Machine Sync Verification
-```bash
-# MacBook status
-hermes skills list | wc -l
-hermes doctor
-
-# DGX status (via SSH)
-ssh user@dgx 'cd /data/SpecForge/hermes-agent && git log --oneline -3'
-ssh user@dgx 'find skills/ -name "SKILL.md" -maxdepth 3 | wc -l'
-
-# Sync if needed
-git push origin main
-ssh user@dgx 'cd /data/SpecForge/hermes-agent && git pull origin main'
-```
-
-**Finding:** DGX at detached HEAD commit 0924ed231, 18 commits behind origin/main. After sync: both at 4e856e29a, 384 skills.
-
----
-
-## Results Summary
-
-| Layer | Metric | Value | Status |
-|-------|--------|-------|--------|
-| **Repository** | Total files | 8,033 | — |
-| | Python files | 1,857 | — |
-| | Est. total lines | ~200,000+ | — |
-| | Agent modules | 172 | — |
-| | Tool modules | 111 | — |
-| **Skills** | Total SKILL.md | 384 | ✓ |
-| | Builtin | 91 | ✓ |
-| | Local | 293 | ✓ |
-| **Tools** | Registered | 27 (15+12) | ⚠ |
-| | Aliases | 76 | — |
-| | Implemented | 31 | — |
-| | Unimplemented | 60 | ✗ |
-| **Plugins** | Directories | 46 | — |
-| | Evey plugins | 29 | — |
-| **Cognitive** | System files | 7/7 | ✓ |
-| | Total lines | 3,164 | — |
-| | Orchestrator | 972 lines | ✓ |
-| | **Wired to CLI** | **0 references** | **✗ DEAD CODE** |
-| **Sync** | MacBook commit | 4e856e29a | ✓ |
-| | DGX commit | 4e856e29a | ✓ |
-| | Skills match | 384 vs 384 | ✓ |
-
----
-
-## Failure Mode Classification
-
-| Failure Mode | Previous Audit (May 16) | This Audit (May 18) |
-|--------------|------------------------|---------------------|
-| Cognitive files | Present | Present |
-| Hook wiring | Partial (post_tool_call missing) | **None — zero imports** |
-| Orchestrator | Wired in run_agent.py | **Unreferenced — dead code** |
-| Root cause | Asymmetric hook pairs | **No integration points** |
-| Fix complexity | Add hook invocation | **Add 4 integration points to run_agent.py** |
-
----
-
-## Fix Required
-
-To activate the cognitive systems, add these 4 integration points to `hermes_cli/main.py` or `run_agent.py`:
-
-```python
-# 1. In __init__ (~line 2127):
-from agent.cognitive_orchestrator import get_orchestrator
-self.cognitive_orchestrator = get_orchestrator()
-self.cognitive_orchestrator.initialize(self)
-
-# 2. Before each tool call:
-self.cognitive_orchestrator.before_action(action_type, detail)
-
-# 3. After each tool call:
-self.cognitive_orchestrator.after_action(action_type, detail, result, duration_ms)
-
-# 4. At session end:
-self.cognitive_orchestrator.session_end(telemetry)
-```
-
-Until these 4 lines are added, all 3,164 lines of cognitive system code are **completely inactive**.
-
----
+## Tool Count Clarification
+- `discover_builtin_tools()` loads 28 modules
+- 31 actual tool functions with `task_id` parameter
+- 76 aliases in toolsets.py
+- 60 aliases without implementation
+- 15 internal helpers not exposed
+- Old "92 tools" was from fully-configured setup with all API keys
 
 ## Performance Notes
+- run_agent.py: 784,787 bytes (old v0.13 architecture with hooks)
+- Upstream run_agent.py: 178,046 bytes (new architecture without hooks)
+- The size difference reflects the hook infrastructure and cognitive integration
 
-- 1,857 Python files may slow import time
-- 384 skills load at startup (latency concern)
-- 172 agent/ modules = significant memory footprint
-- 3,164 lines of unused cognitive code = wasted memory
-- 60 unimplemented tool aliases = user confusion potential
+## Key Finding
+The cognitive orchestrator requires `invoke_hook`, `before_action`, `after_action` infrastructure in run_agent.py. Upstream (8,722 commits ahead) removed this infrastructure. Updating to upstream would break all 21 cognitive subsystems.
