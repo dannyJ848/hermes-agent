@@ -425,6 +425,14 @@ def wire_all(agent_class=None):
     except Exception as e:
         logger.warning("[MEGA] Run conversation patch failed: %s", e)
 
+    # Wire smart iteration pipeline
+    try:
+        from agent.smart_iteration_pipeline import enhance_iteration_budget
+        from run_agent import IterationBudget
+        enhance_iteration_budget(IterationBudget)
+    except Exception as e:
+        logger.warning("[MEGA] Smart iteration pipeline failed: %s", e)
+
     logger.info("[MEGA] All enhancements wired into AIAgent")
 
 
