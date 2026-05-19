@@ -604,6 +604,39 @@ automatically scope to the active profile.
    This is intentional — it lets `hermes -p coder profile list` see all profiles regardless
    of which one is active.
 
+## Cognitive Architecture (Mega Enhancement Layer)
+
+As of May 18 2026, the agent includes a monkey-patched enhancement layer (no direct `run_agent.py` edits) that adds:
+
+### Memory Systems
+- **Cerebrum** (`agent/cerebrum.py`) — 4-tier biologically-inspired memory: episodic (raw events), semantic (facts), procedural (workflows), distilled tips (context injections). Auto-consolidation pipeline.
+- **Cortex** (`agent/cortex_flywheel.py`) — Experience capture, reflection cycles, pattern detection, skill candidate generation.
+- **Knowledge Graph** (`agent/knowledge_graph.py`) — Structured nodes (concept, tool, error, solution) with relationship edges (causes, solved_by, related_to).
+- **Vector Memory** (`agent/vector_memory.py`) — Sentence-transformer embeddings + SQLite.
+- **Semantic Cache** (`agent/semantic_cache.py`) — Exact + fuzzy query caching.
+
+### Intelligence & Routing
+- **Model Router** (`agent/model_router.py`) — Routes tasks by complexity (code/debug → powerful model, simple/status → fast model).
+- **Smart Iteration Pipeline** (`agent/smart_iteration_pipeline.py`) — Budget pressure detection, model switching at 60% consumed, efficiency scoring.
+- **Code Intelligence Bridge** (`agent/code_intelligence_bridge.py`) — Queries code_intelligence.db for relevant snippets.
+- **Cognitive Orchestrator** (`agent/cognitive_orchestrator.py`) — Session lifecycle hooks.
+
+### Resilience
+- **@resilient_call** decorator + CircuitBreaker — 3 retries, exponential backoff, opens after 5 failures/60s.
+- **Metrics Collector** (`agent/metrics.py`) — Thread-safe counters/histograms.
+- **MCP Client** (`agent/mcp_client.py`) — stdio JSON-RPC tool discovery.
+
+### Wiring
+All modules are lazy-initialized via `agent/mega_wiring.py` which monkey-patches `AIAgent._interruptible_api_call`, `_invoke_tool`, and `run_conversation`. ZERO-FAILURE guarantee: every subsystem has try/except, missing modules are silently skipped, safe defaults used. See commit `c0574e7ae`.
+
+### Learning Lifecycle (Automatic)
+- **Session start**: Cerebrum captures initialization episode; Cortex logs session begin.
+- **Tool execution**: Success/error captured with emotional valence and importance scoring.
+- **Session end**: Reflection cycle runs (pattern detection → tip generation); distillation pipeline processes last 24h; old episodic memories (7+ days) cleaned.
+- **Nightly cron**: Consolidation episodic→semantic→procedural; skill candidate promotion.
+
+Config sections: `cerebrum`, `cortex`, `distillation`, `knowledge_graph` in `~/.hermes/config.yaml`.
+
 ## Known Pitfalls
 
 ### DO NOT hardcode `~/.hermes` paths
