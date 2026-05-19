@@ -523,6 +523,24 @@ def run_conversation(
     except Exception as exc:
         logger.warning("pre_llm_call hook failed: %s", exc)
 
+    # ── COGNITIVE: Pre-turn evaluation gate ──
+    _evaluation_gate_passed = True
+    _evaluation_gate_msg = ""
+    try:
+        from agent.cognitive_orchestrator import get_orchestrator
+        _orch = get_orchestrator()
+        if _orch and hasattr(_orch, '_subsystems'):
+            _eg = _orch._subsystems.get("evaluation_gate")
+            if _eg and hasattr(_eg, 'should_proceed'):
+                _complexity = "high" if len(str(original_user_message)) > 200 else "medium"
+                _evaluation_gate_passed = _eg.should_proceed(_complexity, api_call_count)
+                if not _evaluation_gate_passed:
+                    _evaluation_gate_msg = "🔍 Evaluation gate: forcing review before proceeding with complex task"
+                    if not agent.quiet_mode:
+                        agent._safe_print(_evaluation_gate_msg)
+    except Exception:
+        pass
+
     # Main conversation loop
     api_call_count = 0
     final_response = None
@@ -594,6 +612,29 @@ def run_conversation(
             effective_task_id=effective_task_id,
             should_review_memory=_should_review_memory,
         )
+
+    # ── COGNITIVE: Turn-by-turn learning feedback ──
+    # Record the turn start time for duration tracking
+    _turn_start = time.time()
+    
+    # Record in iteration engine BEFORE the loop
+    try:
+        if hasattr(agent, 'iteration_engine') and agent.iteration_engine and hasattr(agent.iteration_engine, 'before_action'):
+            agent.iteration_engine.before_action(
+                action_type="conversation_turn",
+                detail=original_user_message[:200] if isinstance(original_user_message, str) else "",
+            )
+    except Exception:
+        pass
+    
+    # Notify cognitive orchestrator of turn start
+    try:
+        from agent.cognitive_orchestrator import get_orchestrator
+        _orch = get_orchestrator()
+        if _orch and hasattr(_orch, 'session_start'):
+            _orch.session_start(agent.session_id)
+    except Exception:
+        pass
 
     while (api_call_count < agent.max_iterations and agent.iteration_budget.remaining > 0) or agent._budget_grace_call:
         # Reset per-turn checkpoint dedup so each iteration can take one snapshot
@@ -802,6 +843,28 @@ def run_conversation(
         effective_system = active_system_prompt or ""
         if agent.ephemeral_system_prompt:
             effective_system = (effective_system + "\n\n" + agent.ephemeral_system_prompt).strip()
+        
+        # ── COGNITIVE: Adaptive context injection ──
+        # Inject learned lessons and relevant memories into system prompt
+        # WITHOUT breaking prompt cache — we append to ephemeral only
+        _cognitive_context = ""
+        try:
+            from agent.cognitive_orchestrator import get_orchestrator
+            _orch = get_orchestrator()
+            if _orch and hasattr(_orch, 'get_enhanced_context'):
+                _ctx_items = _orch.get_enhanced_context(
+                    query=original_user_message if isinstance(original_user_message, str) else "",
+                    limit=5
+                )
+                if _ctx_items:
+                    _cognitive_context = "\n\n".join(str(item) for item in _ctx_items[:3])
+        except Exception:
+            pass
+        
+        if _cognitive_context:
+            # Append to ephemeral so it doesn't break the prefix cache
+            effective_system = (effective_system + "\n\n[Adaptive Context]\n" + _cognitive_context).strip()
+        
         if effective_system:
             api_messages = [{"role": "system", "content": effective_system}] + api_messages
 
@@ -3938,6 +4001,77 @@ def run_conversation(
         except Exception as _ver_err:
             logger.debug("file-mutation verifier footer failed: %s", _ver_err)
 
+    # ── COGNITIVE: Post-turn evaluation and adaptive injection ──
+    _quality_score = None
+    _evaluation_feedback = ""
+    try:
+        from agent.cognitive_orchestrator import get_orchestrator
+        _orch = get_orchestrator()
+        if _orch and hasattr(_orch, '_subsystems') and final_response and not interrupted:
+            # 1. Evaluate response quality
+            _eg = _orch._subsystems.get("evaluation_gate")
+            if _eg and hasattr(_eg, 'evaluate'):
+                _task_type = "coding" if any(t in str(original_user_message).lower() for t in ["code", "debug", "fix", "script", "function"]) else "general"
+                _complexity = "high" if len(str(original_user_message)) > 200 else "medium"
+                _eval_result = _eg.evaluate(
+                    response=final_response,
+                    task_type=_task_type,
+                    complexity=_complexity,
+                    session_id=agent.session_id or "",
+                    tool_calls_used=api_call_count,
+                    iteration_count=api_call_count,
+                )
+                _quality_score = _eval_result.score.overall if hasattr(_eval_result, 'score') else 0
+                
+                # Gate check
+                if hasattr(_eg, 'gate_check'):
+                    _passed, _msg = _eg.gate_check(_eval_result)
+                    _evaluation_feedback = _msg
+                    if not agent.quiet_mode and _msg:
+                        agent._safe_print(f"📊 {_msg}")
+                
+                # If quality is low, append improvement suggestions
+                if hasattr(_eval_result, 'improvements') and _eval_result.improvements and _eval_result.should_redo:
+                    _improvements = "\n".join(f"  • {imp}" for imp in _eval_result.improvements[:3])
+                    final_response += f"\n\n💡 Quality improvement suggestions:\n{_improvements}"
+            
+            # 2. Run self-audit
+            _sa = _orch._subsystems.get("self_audit")
+            if _sa and hasattr(_sa, 'audit_session'):
+                try:
+                    _audit = _sa.audit_session({"session_id": agent.session_id, "response": final_response[:500]})
+                    if not agent.quiet_mode and _audit.get("score", 1.0) < 0.6:
+                        agent._safe_print(f"🔍 Self-audit score: {_audit.get('score', 0):.0%}")
+                except Exception:
+                    pass
+            
+            # 3. Record in iteration engine
+            if hasattr(agent, 'iteration_engine') and agent.iteration_engine and hasattr(agent.iteration_engine, 'after_action'):
+                try:
+                    agent.iteration_engine.after_action(
+                        action_type="conversation_turn",
+                        detail=original_user_message[:200],
+                        result=final_response[:500],
+                        speed_ms=int((time.time() - _turn_start) * 1000) if '_turn_start' in dir() else 0,
+                    )
+                except Exception:
+                    pass
+            
+            # 4. Update cortex flywheel
+            _cf = _orch._subsystems.get("cortex_flywheel")
+            if _cf and hasattr(_cf, 'record_event'):
+                try:
+                    _cf.record_event("turn_complete", {
+                        "session_id": agent.session_id,
+                        "api_calls": api_call_count,
+                        "quality_score": _quality_score or 0,
+                        "task_type": _task_type if '_task_type' in dir() else "general",
+                    })
+                except Exception:
+                    pass
+    except Exception as _cog_err:
+        logger.debug("Cognitive post-turn evaluation failed: %s", _cog_err)
+
     # Plugin hook: transform_llm_output
     # Fired once per turn after the tool-calling loop completes.
     # Plugins can transform the LLM's output text before it's returned.
@@ -4017,10 +4151,12 @@ def run_conversation(
         "prompt_tokens": agent.session_prompt_tokens,
         "completion_tokens": agent.session_completion_tokens,
         "total_tokens": agent.session_total_tokens,
-        "last_prompt_tokens": getattr(agent.context_compressor, "last_prompt_tokens", 0) or 0,
         "estimated_cost_usd": agent.session_estimated_cost_usd,
         "cost_status": agent.session_cost_status,
         "cost_source": agent.session_cost_source,
+        # ── COGNITIVE: quality metrics ──
+        "quality_score": _quality_score if '_quality_score' in dir() else None,
+        "evaluation_feedback": _evaluation_feedback if '_evaluation_feedback' in dir() else "",
     }
     if agent._tool_guardrail_halt_decision is not None:
         result["guardrail"] = agent._tool_guardrail_halt_decision.to_metadata()
@@ -4032,6 +4168,44 @@ def run_conversation(
         result["pending_steer"] = _leftover_steer
     agent._response_was_previewed = False
     
+    # ── COGNITIVE: Session end hooks ──
+    try:
+        from agent.cognitive_orchestrator import get_orchestrator
+        _orch = get_orchestrator()
+        if _orch and hasattr(_orch, 'session_end'):
+            _orch.session_end(agent.session_id)
+        
+        # Update cortex flywheel with session summary
+        if _orch and hasattr(_orch, '_subsystems'):
+            _cf = _orch._subsystems.get("cortex_flywheel")
+            if _cf and hasattr(_cf, 'record_health'):
+                _cf.record_health({
+                    "session_id": agent.session_id,
+                    "api_calls": api_call_count,
+                    "completed": completed,
+                    "interrupted": interrupted,
+                })
+            
+            # Run self-audit if available
+            _sa = _orch._subsystems.get("self_audit")
+            if _sa and hasattr(_sa, 'run_audit'):
+                try:
+                    _audit = _sa.run_audit("session")
+                    if not agent.quiet_mode and _audit.get('grade'):
+                        agent._safe_print(f"📋 Session audit: {_audit.get('grade', 'N/A')}")
+                except Exception:
+                    pass
+            
+            # Run training gym exercise
+            _tg = _orch._subsystems.get("training_gym")
+            if _tg and hasattr(_tg, 'run_exercise'):
+                try:
+                    _tg.run_exercise("reflection", {"session_id": agent.session_id})
+                except Exception:
+                    pass
+    except Exception as _cog_err:
+        logger.debug("Cognitive session end hooks failed: %s", _cog_err)
+
     # Include interrupt message if one triggered the interrupt
     if interrupted and agent._interrupt_message:
         result["interrupt_message"] = agent._interrupt_message
