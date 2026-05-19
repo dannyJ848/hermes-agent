@@ -136,6 +136,11 @@ def _get_cognitive_orch():
             return None
         from agent.cognitive_orchestrator import CognitiveOrchestrator
         _cognitive_orch = CognitiveOrchestrator()
+        # Initialize with a lightweight agent proxy so subsystems register
+        try:
+            _cognitive_orch.initialize(_AgentProxy())
+        except Exception:
+            pass
         logger.info("[MEGA] Cognitive orchestrator initialized")
     except Exception as e:
         logger.warning("[MEGA] Cognitive orchestrator failed to load: %s", e)
@@ -398,6 +403,14 @@ def _patch_run_conversation(agent_class):
 
 
 # ── Helpers ──
+
+class _AgentProxy:
+    """Lightweight proxy for initializing cognitive orchestrator without full agent."""
+    def __init__(self):
+        self.session_id = "bootstrap"
+        self.tools = {}
+        self.memory = {}
+
 
 def _cache_key_from_messages(messages: List[Dict]) -> str:
     """Build a cache key from the last user message + recent context."""
