@@ -844,6 +844,16 @@ def init_agent(
         if missing_reqs:
             print(f"⚠️  Some tools may not work due to missing requirements: {missing_reqs}")
     
+    # ── Iteration Engine: experiential learning loop ──────────────────
+    try:
+        from agent.iteration_engine import get_engine as _get_iteration_engine
+        agent.iteration_engine = _get_iteration_engine()
+        if not agent.quiet_mode:
+            print("🔄 Iteration engine ready: experiential learning loop active")
+    except Exception as _ie_err:
+        logger.warning("Iteration engine init failed: %s", _ie_err)
+        agent.iteration_engine = None
+
     # Show trajectory saving status
     if agent.save_trajectories and not agent.quiet_mode:
         print("📝 Trajectory saving enabled")
