@@ -24,6 +24,10 @@ _code_intel = None
 _vector_memory = None
 _metrics = None
 _cognitive_orch = None
+_cerebrum = None
+_cortex = None
+_distillation = None
+_knowledge_graph = None
 
 _config_cache = {}
 
@@ -137,6 +141,70 @@ def _get_cognitive_orch():
         logger.warning("[MEGA] Cognitive orchestrator failed to load: %s", e)
         _cognitive_orch = False
     return _cognitive_orch if _cognitive_orch is not False else None
+
+def _get_cerebrum():
+    global _cerebrum
+    if _cerebrum is not None:
+        return _cerebrum
+    try:
+        cfg = _load_config().get("cerebrum", {})
+        if not cfg.get("enabled", True):
+            return None
+        from agent.cerebrum import get_cerebrum
+        _cerebrum = get_cerebrum()
+        logger.info("[MEGA] Cerebrum memory initialized")
+    except Exception as e:
+        logger.warning("[MEGA] Cerebrum failed to load: %s", e)
+        _cerebrum = False
+    return _cerebrum if _cerebrum is not False else None
+
+def _get_cortex():
+    global _cortex
+    if _cortex is not None:
+        return _cortex
+    try:
+        cfg = _load_config().get("cortex", {})
+        if not cfg.get("enabled", True):
+            return None
+        from agent.cortex_flywheel import get_cortex
+        _cortex = get_cortex()
+        logger.info("[MEGA] Cortex flywheel initialized")
+    except Exception as e:
+        logger.warning("[MEGA] Cortex failed to load: %s", e)
+        _cortex = False
+    return _cortex if _cortex is not False else None
+
+def _get_distillation():
+    global _distillation
+    if _distillation is not None:
+        return _distillation
+    try:
+        cfg = _load_config().get("distillation", {})
+        if not cfg.get("enabled", True):
+            return None
+        from agent.distillation import get_pipeline
+        _distillation = get_pipeline()
+        logger.info("[MEGA] Distillation pipeline initialized")
+    except Exception as e:
+        logger.warning("[MEGA] Distillation failed to load: %s", e)
+        _distillation = False
+    return _distillation if _distillation is not False else None
+
+def _get_knowledge_graph():
+    global _knowledge_graph
+    if _knowledge_graph is not None:
+        return _knowledge_graph
+    try:
+        cfg = _load_config().get("knowledge_graph", {})
+        if not cfg.get("enabled", True):
+            return None
+        from agent.knowledge_graph import get_knowledge_graph as get_kg
+        _knowledge_graph = get_kg()
+        logger.info("[MEGA] Knowledge graph initialized")
+    except Exception as e:
+        logger.warning("[MEGA] Knowledge graph failed to load: %s", e)
+        _knowledge_graph = False
+    return _knowledge_graph if _knowledge_graph is not False else None
 
 
 # ── Patch decorators ──
@@ -433,7 +501,120 @@ def wire_all(agent_class=None):
     except Exception as e:
         logger.warning("[MEGA] Smart iteration pipeline failed: %s", e)
 
+    # Wire learning apparatus (cerebrum + cortex + distillation)
+    try:
+        _wire_learning_system(agent_class)
+    except Exception as e:
+        logger.warning("[MEGA] Learning system wiring failed: %s", e)
+
     logger.info("[MEGA] All enhancements wired into AIAgent")
+
+
+def _wire_learning_system(agent_class):
+    """Wire cerebrum, cortex, and distillation into the agent lifecycle.
+    
+    Hooks:
+    - session_start: initialize learning context
+    - tool_success/error: capture experiences
+    - session_end: run reflection + distillation
+    """
+    original_init = agent_class.__init__
+    
+    @wraps(original_init)
+    def wrapped_init(self, *args, **kwargs):
+        result = original_init(self, *args, **kwargs)
+        try:
+            cerebrum = _get_cerebrum()
+            cortex = _get_cortex()
+            if cerebrum and hasattr(self, 'session_id'):
+                cerebrum.capture_episode(
+                    self.session_id, "session_start", "Agent initialized",
+                    importance=0.3
+                )
+            if cortex and hasattr(self, 'session_id'):
+                cortex.capture_experience(
+                    self.session_id, "session", "Session started",
+                    tags=["lifecycle"]
+                )
+        except Exception as e:
+            logger.debug("[MEGA] Learning init hook failed: %s", e)
+        return result
+    agent_class.__init__ = wrapped_init
+    
+    # Hook tool execution for experience capture
+    original_invoke = agent_class._invoke_tool
+    
+    @wraps(original_invoke)
+    def wrapped_invoke(self, tool_name, tool_input):
+        result = original_invoke(self, tool_name, tool_input)
+        try:
+            cerebrum = _get_cerebrum()
+            cortex = _get_cortex()
+            session_id = getattr(self, 'session_id', 'unknown')
+            if isinstance(result, dict) and result.get('error'):
+                # Error experience
+                if cerebrum:
+                    cerebrum.capture_episode(
+                        session_id, "tool_error",
+                        f"Tool {tool_name} failed: {result.get('error')}",
+                        context={"tool": tool_name, "input": tool_input},
+                        importance=0.8, emotional_valence=-0.5
+                    )
+                if cortex:
+                    cortex.capture_experience(
+                        session_id, "error",
+                        f"Tool {tool_name} failed: {result.get('error')}",
+                        outcome="failed",
+                        lessons=f"Check {tool_name} inputs and prerequisites",
+                        tags=["tool", tool_name, "error"]
+                    )
+            else:
+                # Success experience
+                if cerebrum:
+                    cerebrum.capture_episode(
+                        session_id, "tool_success",
+                        f"Tool {tool_name} succeeded",
+                        context={"tool": tool_name},
+                        importance=0.4
+                    )
+        except Exception as e:
+            logger.debug("[MEGA] Learning tool hook failed: %s", e)
+        return result
+    agent_class._invoke_tool = wrapped_invoke
+    
+    # Hook session end for reflection
+    if hasattr(agent_class, 'session_end') or hasattr(agent_class, 'cleanup'):
+        end_method = getattr(agent_class, 'session_end', None) or getattr(agent_class, 'cleanup', None)
+        if end_method:
+            original_end = end_method
+            @wraps(original_end)
+            def wrapped_end(self, *args, **kwargs):
+                try:
+                    session_id = getattr(self, 'session_id', 'unknown')
+                    # Run reflection
+                    cortex = _get_cortex()
+                    if cortex:
+                        reflection = cortex.run_reflection_cycle()
+                        logger.info("[MEGA] Reflection cycle: %s", reflection)
+                    # Run distillation
+                    distillation = _get_distillation()
+                    if distillation:
+                        tips = distillation.distill_last_24h()
+                        logger.info("[MEGA] Distilled %d tips", len(tips))
+                    # Cleanup old episodes
+                    cerebrum = _get_cerebrum()
+                    if cerebrum:
+                        deleted = cerebrum.cleanup_old_episodes(days=7)
+                        logger.info("[MEGA] Cleaned up %d old episodes", deleted)
+                except Exception as e:
+                    logger.debug("[MEGA] Learning end hook failed: %s", e)
+                return original_end(self, *args, **kwargs)
+            if hasattr(agent_class, 'session_end'):
+                agent_class.session_end = wrapped_end
+            else:
+                agent_class.cleanup = wrapped_end
+    
+    logger.info("[MEGA] Learning system wired into AIAgent lifecycle")
 
 
 # Auto-wire on import if AIAgent is already loaded
