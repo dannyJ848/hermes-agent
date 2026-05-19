@@ -295,9 +295,21 @@ def _patch_tool_execution(agent_class):
 
     @wraps(original)
     def wrapped(self, function_name: str, function_args: dict, effective_task_id: str, **kwargs):
+        # ── Cognitive Orchestrator: BEFORE action ──
+        try:
+            orch = _get_cognitive_orch()
+            if orch:
+                try:
+                    orch.before_action(function_name, str(function_args)[:500])
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
         metrics = _get_metrics()
         start = time.time()
         success = True
+        result = None
         try:
             result = original(self, function_name, function_args, effective_task_id, **kwargs)
             return result
@@ -305,8 +317,8 @@ def _patch_tool_execution(agent_class):
             success = False
             raise
         finally:
+            duration = (time.time() - start) * 1000
             try:
-                duration = (time.time() - start) * 1000
                 if metrics:
                     metrics.record_tool_call(function_name, success, duration)
             except Exception:
@@ -324,12 +336,13 @@ def _patch_tool_execution(agent_class):
             except Exception:
                 pass
 
-            # ── Cognitive Orchestrator ──
+            # ── Cognitive Orchestrator: AFTER action ──
             try:
                 orch = _get_cognitive_orch()
                 if orch:
                     try:
-                        orch.before_action(function_name, function_args)
+                        result_str = str(result)[:500] if result else ""
+                        orch.after_action(function_name, str(function_args)[:500], result_str, int(duration))
                     except Exception:
                         pass
             except Exception:

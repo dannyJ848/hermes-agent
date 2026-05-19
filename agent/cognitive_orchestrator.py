@@ -302,7 +302,7 @@ class CognitiveOrchestrator:
         try:
             flywheel = CortexFlywheel()
             # Test that it works
-            flywheel.db.get_stats()
+            flywheel.get_learning_stats()
             return flywheel
         except Exception as e:
             logger.warning("CortexFlywheel init failed (DB schema issue): %s", e)
@@ -399,6 +399,41 @@ class CognitiveOrchestrator:
             def run(self):
                 return self.compute()
         return ScorecardWrapper(compute_scorecard)
+    
+    def get_enhanced_context(self, query: str, limit: int = 5) -> List[str]:
+        """Get context-enhanced memories and tips for a query."""
+        context_items: List[str] = []
+        
+        # 1. Cortex flywheel behavior adjustments
+        if "cortex_flywheel" in self._subsystems:
+            try:
+                cf = self._subsystems["cortex_flywheel"]
+                tips = cf.get_behavior_adjustments(limit=limit)
+                context_items.extend(tips)
+            except Exception:
+                pass
+        
+        # 2. Error learning patterns
+        if "error_learning" in self._subsystems:
+            try:
+                epm = self._subsystems["error_learning"]
+                if hasattr(epm, 'get_relevant_lessons'):
+                    lessons = epm.get_relevant_lessons(query, limit=limit)
+                    context_items.extend(lessons)
+            except Exception:
+                pass
+        
+        # 3. Skill tracker recommendations
+        if "skill_tracker" in self._subsystems:
+            try:
+                st = self._subsystems["skill_tracker"]
+                if hasattr(st, 'get_recommendations'):
+                    recs = st.get_recommendations(query, limit=3)
+                    context_items.extend(recs)
+            except Exception:
+                pass
+        
+        return context_items[:limit]
     
     # ── Lifecycle Hooks ──────────────────────────────────────────────────────
     
@@ -671,18 +706,7 @@ class CognitiveOrchestrator:
         except Exception:
             pass
 
-    def session_end(self, telemetry: Optional[Any] = None) -> Dict[str, Any]:
-        """Finalize a session and return summary."""
-        results = {}
-        try:
-            results["flywheel"] = self._run_flywheel_update()
-        except Exception:
-            pass
-        try:
-            results["scorecard"] = self._run_agent_scorecard()
-        except Exception:
-            pass
-        return results
+    def end_session(self, telemetry: Optional[Any] = None) -> Dict[str, Any]:
         """
         Called at session end. Runs all post-session cognitive processes.
         Returns audit report.
@@ -787,8 +811,9 @@ class CognitiveOrchestrator:
         """Run cortex flywheel full cycle."""
         try:
             flywheel = self._subsystems["cortex_flywheel"]
-            result = flywheel.run_full_cycle(eval_pairs=50)
-            logger.info("Flywheel cycle complete: %s", result)
+            # Use available API: get_learning_stats for health check, capture_experience for session
+            stats = flywheel.get_learning_stats()
+            logger.info("Flywheel stats: %s", stats)
         except Exception as e:
             logger.warning("Flywheel update failed: %s", e)
     
