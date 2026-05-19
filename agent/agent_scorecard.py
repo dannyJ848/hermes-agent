@@ -4,6 +4,12 @@ import time
 from typing import Dict, Any, Optional
 
 
+class AgentScorecard:
+    """Stub class for cognitive orchestrator compatibility."""
+    def __init__(self):
+        pass
+
+
 def compute_scorecard(
     session_count: Optional[int] = None,
     error_rate: Optional[float] = None,
