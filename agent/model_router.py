@@ -1,169 +1,86 @@
-"""Model router -- heuristic task-to-model selection.
+"""Model router with task complexity scoring.
 
-Reads model lists from ``~/.hermes/config.yaml`` under the ``router_models``
-key and falls back to the default model when no match is found.
-
-Example config snippet::
-
-    router_models:
-      powerful: "anthropic/claude-opus-4.6"
-      fast: "openai/gpt-4.1-mini"
-      default: "anthropic/claude-sonnet-4"
-
-If ``router_models`` is absent, the router falls back to the top-level
-``model.default`` value.
+ZERO-FAILURE GUARANTEE:
+- Every method catches ALL exceptions and returns safe defaults
+- Missing config → returns default model
+- Invalid task description → returns default model
+- Config read errors → returns default model
 """
 
-from __future__ import annotations
-
 import logging
-import re
-from typing import Dict, Any
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-# Keywords that signal a task needs a powerful (slow/expensive) model.
-_POWERFUL_KEYWORDS = frozenset(
-    {"code", "debug", "complex", "refactor", "architecture", "design", "algorithm"}
-)
-
-# Keywords that signal a task can use a fast/cheap model.
-_FAST_KEYWORDS = frozenset(
-    {"simple", "quick", "status", "summary", "list", "check", "ping", "hello"}
-)
-
-# Regexes compiled from the keyword sets for whole-word matching.
-_POWERFUL_RE = re.compile(
-    r"\b(" + "|".join(map(re.escape, _POWERFUL_KEYWORDS)) + r")\b", re.IGNORECASE
-)
-_FAST_RE = re.compile(
-    r"\b(" + "|".join(map(re.escape, _FAST_KEYWORDS)) + r")\b", re.IGNORECASE
-)
-
-
-def _load_router_config() -> Dict[str, Any]:
-    """Load the ``router_models`` section from user config.
-
-    Returns an empty dict when the config file is missing or the key
-    is absent so that callers can apply their own fallback logic.
-    """
-    try:
-        from hermes_cli.config import load_config
-    except Exception as exc:  # pragma: no cover
-        logger.debug("Unable to import hermes_cli.config: %s", exc)
-        return {}
-
-    try:
-        cfg = load_config()
-    except Exception as exc:  # pragma: no cover
-        logger.debug("Config load failed: %s", exc)
-        return {}
-
-    return cfg.get("router_models") or {}
-
-
-def _get_default_model() -> str:
-    """Return the user's default model from config, or a hard-coded fallback."""
-    try:
-        from hermes_cli.config import load_config
-        cfg = load_config()
-        default = cfg.get("model", {}).get("default") or cfg.get("model", {}).get("model")
-        if default:
-            return str(default)
-    except Exception as exc:  # pragma: no cover
-        logger.debug("Could not resolve default model from config: %s", exc)
-    return "anthropic/claude-sonnet-4"
-
 
 class ModelRouter:
-    """Heuristic router that maps a task description to a model name.
-
-    The router scans the *task_description* for keywords and selects:
-
-    * **powerful** model – when keywords like ``code``, ``debug``,
-      ``complex`` are detected.
-    * **fast** model – when keywords like ``simple``, ``quick``,
-      ``status`` are detected.
-    * **default** model – when no strong signal is present or when the
-      configured model name is missing.
-
-    Model names are read from the ``router_models`` config block;
-    missing entries fall back to the user's default model.
+    """Routes tasks to appropriate models based on complexity heuristics.
+    
+    ZERO-FAILURE: Always returns a valid model string.
     """
 
-    def __init__(self, models: Dict[str, str] | None = None) -> None:
-        """Initialise the router.
+    POWERFUL_KEYWORDS = {"code", "debug", "complex", "refactor", "architecture", "design", "implement", "build", "deep", "hard", "difficult", "sophisticated"}
+    FAST_KEYWORDS = {"simple", "quick", "status", "check", "list", "show", "get", "tell", "what", "who", "when", "where", "yes", "no"}
 
-        Args:
-            models: Optional mapping of ``{"powerful": ..., "fast": ...,
-            "default": ...}``.  When *None* the mapping is loaded from
-            ``~/.hermes/config.yaml``.
-        """
-        if models is not None:
-            self._models = dict(models)
-        else:
-            self._models = _load_router_config()
+    def __init__(self):
+        self._models = {}
+        self._default = None
+        self._load_config()
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
-
-    def route_task(self, task_description: str) -> str:
-        """Return the model name best suited for *task_description*.
-
-        Args:
-            task_description: Free-form text describing the task.
-
-        Returns:
-            A model identifier string (e.g. ``"anthropic/claude-opus-4.6"``).
-        """
-        if not isinstance(task_description, str):
-            task_description = str(task_description)
-
-        powerful_hits = len(_POWERFUL_RE.findall(task_description))
-        fast_hits = len(_FAST_RE.findall(task_description))
-
-        if powerful_hits > fast_hits:
-            chosen = self._models.get("powerful")
-            logger.debug(
-                "Router chose powerful model (%d > %d hits): %s",
-                powerful_hits,
-                fast_hits,
-                chosen,
-            )
-        elif fast_hits > powerful_hits:
-            chosen = self._models.get("fast")
-            logger.debug(
-                "Router chose fast model (%d > %d hits): %s",
-                fast_hits,
-                powerful_hits,
-                chosen,
-            )
-        else:
-            # No strong signal or tied scores → default.
-            chosen = self._models.get("default")
-            logger.debug(
-                "Router chose default model (powerful=%d, fast=%d): %s",
-                powerful_hits,
-                fast_hits,
-                chosen,
-            )
-
-        if not chosen:
-            chosen = _get_default_model()
-            logger.debug("Router falling back to default model: %s", chosen)
-
-        return chosen
-
-    # ------------------------------------------------------------------
-    # Helpers for testing / introspection
-    # ------------------------------------------------------------------
-
-    @property
-    def models(self) -> Dict[str, str]:
-        """Current model mapping (read-only copy)."""
-        return dict(self._models)
+    def _load_config(self) -> None:
+        """Load model routing config from ~/.hermes/config.yaml."""
+        try:
+            import yaml
+            from pathlib import Path
+            config_path = Path.home() / ".hermes" / "config.yaml"
+            if config_path.exists():
+                with open(config_path) as f:
+                    config = yaml.safe_load(f) or {}
+                routing = config.get("model_routing", {})
+                self._models = {
+                    "powerful": routing.get("powerful", "kimi-for-coding"),
+                    "fast": routing.get("fast", "deepseek-v4-pro"),
+                    "default": routing.get("default", "kimi-for-coding"),
+                }
+                self._default = self._models["default"]
+            else:
+                self._models = {"powerful": "kimi-for-coding", "fast": "deepseek-v4-pro", "default": "kimi-for-coding"}
+                self._default = "kimi-for-coding"
+        except Exception as e:
+            logger.debug("[ModelRouter] Config load failed: %s", e)
+            self._models = {"powerful": "kimi-for-coding", "fast": "deepseek-v4-pro", "default": "kimi-for-coding"}
+            self._default = "kimi-for-coding"
 
     def reload(self) -> None:
-        """Reload model mapping from disk config."""
-        self._models = _load_router_config()
+        """Reload config from disk."""
+        self._load_config()
+
+    @property
+    def models(self) -> dict:
+        """Return current routing config."""
+        return dict(self._models)
+
+    def route_task(self, task_description: str) -> str:
+        """Route a task to the most appropriate model.
+        
+        NEVER FAILS: Always returns a valid model string.
+        """
+        if not task_description or not isinstance(task_description, str):
+            return self._default or "kimi-for-coding"
+        
+        try:
+            task_lower = task_description.lower()
+            words = set(task_lower.split())
+            
+            powerful_score = len(words & self.POWERFUL_KEYWORDS)
+            fast_score = len(words & self.FAST_KEYWORDS)
+            
+            if powerful_score > fast_score:
+                return self._models.get("powerful", self._default)
+            elif fast_score > powerful_score:
+                return self._models.get("fast", self._default)
+            else:
+                return self._default or "kimi-for-coding"
+        except Exception as e:
+            logger.debug("[ModelRouter] Routing failed: %s", e)
+            return self._default or "kimi-for-coding"

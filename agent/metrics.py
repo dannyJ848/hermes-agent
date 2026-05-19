@@ -1,101 +1,84 @@
-"""In-memory metrics collection for agent operations.
+"""Metrics collector with in-memory counters and histograms.
 
-Provides thread-safe counters and histograms for tracking API latency,
-tool call success rates, and overall error rates.
+ZERO-FAILURE GUARANTEE:
+- Every method catches ALL exceptions
+- Thread-safe with locks
+- Invalid data types → silently ignored
+- get_summary() always returns a valid dict
 """
 
 import threading
-from collections import defaultdict
+import logging
 from typing import Dict, Any
+
+logger = logging.getLogger(__name__)
 
 
 class MetricsCollector:
     """Thread-safe in-memory metrics collector.
-
-    Tracks:
-        - total_api_calls: number of API latency recordings
-        - avg_latency: mean API latency in milliseconds
-        - tool_success_rate: percentage of successful tool calls
-        - error_rate: percentage of failed tool calls
+    
+    ZERO-FAILURE: All operations are safe. get_summary() always returns a dict.
     """
 
-    def __init__(self) -> None:
+    def __init__(self):
         self._lock = threading.Lock()
-
-        # API latency tracking
-        self._api_call_count = 0
-        self._api_latency_total_ms = 0.0
-
-        # Tool call tracking
-        self._tool_calls_total = 0
-        self._tool_calls_successful = 0
-        self._tool_calls_failed = 0
-
-        # Per-tool histograms: tool_name -> list of durations
-        self._tool_latencies: Dict[str, list] = defaultdict(list)
+        self._total_api_calls = 0
+        self._total_api_latency_ms = 0.0
+        self._total_tool_calls = 0
+        self._total_tool_successes = 0
+        self._total_tool_failures = 0
+        self._tool_latencies: Dict[str, list[float]] = {}
 
     def record_api_latency(self, duration_ms: float) -> None:
-        """Record an API call latency observation.
+        """Record an API call latency."""
+        try:
+            duration = float(duration_ms)
+            if duration < 0:
+                return
+            with self._lock:
+                self._total_api_calls += 1
+                self._total_api_latency_ms += duration
+        except Exception as e:
+            logger.debug("[Metrics] record_api_latency failed: %s", e)
 
-        Args:
-            duration_ms: Latency of the API call in milliseconds.
-        """
-        with self._lock:
-            self._api_call_count += 1
-            self._api_latency_total_ms += duration_ms
-
-    def record_tool_call(
-        self, tool_name: str, success: bool, duration_ms: float
-    ) -> None:
-        """Record a tool call observation.
-
-        Args:
-            tool_name: Name of the tool that was invoked.
-            success: True if the tool call succeeded, False otherwise.
-            duration_ms: Duration of the tool call in milliseconds.
-        """
-        with self._lock:
-            self._tool_calls_total += 1
-            if success:
-                self._tool_calls_successful += 1
-            else:
-                self._tool_calls_failed += 1
-            self._tool_latencies[tool_name].append(duration_ms)
+    def record_tool_call(self, tool_name: str, success: bool, duration_ms: float) -> None:
+        """Record a tool call result."""
+        try:
+            name = str(tool_name) if tool_name else "unknown"
+            duration = float(duration_ms) if duration_ms is not None else 0.0
+            with self._lock:
+                self._total_tool_calls += 1
+                if success:
+                    self._total_tool_successes += 1
+                else:
+                    self._total_tool_failures += 1
+                self._tool_latencies.setdefault(name, []).append(duration)
+        except Exception as e:
+            logger.debug("[Metrics] record_tool_call failed: %s", e)
 
     def get_summary(self) -> Dict[str, Any]:
-        """Return a snapshot of current metrics.
-
-        Returns:
-            Dictionary containing:
-                - total_api_calls (int)
-                - avg_latency (float | None)
-                - tool_success_rate (float | None)
-                - error_rate (float | None)
-                - total_tool_calls (int)
-                - per_tool_latencies (Dict[str, list])
-        """
-        with self._lock:
-            avg_latency = (
-                self._api_latency_total_ms / self._api_call_count
-                if self._api_call_count > 0
-                else None
-            )
-            tool_success_rate = (
-                self._tool_calls_successful / self._tool_calls_total
-                if self._tool_calls_total > 0
-                else None
-            )
-            error_rate = (
-                self._tool_calls_failed / self._tool_calls_total
-                if self._tool_calls_total > 0
-                else None
-            )
-
+        """Return metrics summary. NEVER FAILS."""
+        try:
+            with self._lock:
+                total_tools = self._total_tool_successes + self._total_tool_failures
+                return {
+                    "total_api_calls": self._total_api_calls,
+                    "avg_latency": round(self._total_api_latency_ms / max(self._total_api_calls, 1), 2),
+                    "tool_success_rate": round(self._total_tool_successes / max(total_tools, 1), 2),
+                    "error_rate": round(self._total_tool_failures / max(total_tools, 1), 2),
+                    "total_tool_calls": self._total_tool_calls,
+                    "per_tool_latencies": {
+                        name: round(sum(latencies) / max(len(latencies), 1), 2)
+                        for name, latencies in self._tool_latencies.items()
+                    },
+                }
+        except Exception as e:
+            logger.debug("[Metrics] get_summary failed: %s", e)
             return {
-                "total_api_calls": self._api_call_count,
-                "avg_latency": avg_latency,
-                "tool_success_rate": tool_success_rate,
-                "error_rate": error_rate,
-                "total_tool_calls": self._tool_calls_total,
-                "per_tool_latencies": dict(self._tool_latencies),
+                "total_api_calls": 0,
+                "avg_latency": 0.0,
+                "tool_success_rate": 0.0,
+                "error_rate": 0.0,
+                "total_tool_calls": 0,
+                "per_tool_latencies": {},
             }
