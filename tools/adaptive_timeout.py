@@ -5,6 +5,16 @@
 import sqlite3
 import json
 
+class AdaptiveTimeout:
+    """Adaptive timeout calculator for tool execution."""
+    
+    def __init__(self, default_timeout=30.0):
+        self.default_timeout = default_timeout
+    
+    def get_timeout(self, tool_name):
+        """Get adaptive timeout for a tool."""
+        return get_adaptive_timeout(tool_name, self.default_timeout)
+
 def get_adaptive_timeout(tool_name, default_timeout=30.0):
     """Calculate adaptive timeout for a tool."""
     conn = sqlite3.connect('/Users/dannygomez/.hermes/cerebrum_memory.db')

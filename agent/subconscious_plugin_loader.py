@@ -26,5 +26,6 @@ def init_subconscious_plugins() -> None:
 # Keep old aliases for compatibility
 get_subconscious_plugin = lambda name: None
 list_subconscious_plugins = lambda: []
+load_plugins = init_subconscious_plugins  # alias for mega_wiring compatibility
 
-__all__ = ["init_subconscious_plugins", "get_subconscious_plugin", "list_subconscious_plugins"]
+__all__ = ["init_subconscious_plugins", "get_subconscious_plugin", "list_subconscious_plugins", "load_plugins"]
