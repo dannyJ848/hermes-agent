@@ -299,7 +299,7 @@ def _patch_tool_execution(agent_class):
     original = agent_class._invoke_tool
 
     @wraps(original)
-    def wrapped(self, function_name: str, function_args: dict, effective_task_id: str, **kwargs):
+    def wrapped(self, function_name: str, function_args: dict, effective_task_id: str, *args, **kwargs):
         # ── Cognitive Orchestrator: BEFORE action ──
         try:
             orch = _get_cognitive_orch()
@@ -316,7 +316,7 @@ def _patch_tool_execution(agent_class):
         success = True
         result = None
         try:
-            result = original(self, function_name, function_args, effective_task_id, **kwargs)
+            result = original(self, function_name, function_args, effective_task_id, *args, **kwargs)
             return result
         except Exception:
             success = False
