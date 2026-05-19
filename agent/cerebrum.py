@@ -224,8 +224,8 @@ class CerebrumMemory:
         conn = sqlite3.connect(str(self.db_path))
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO procedural_memory (pattern_name, trigger_conditions, action_sequence, origin_session)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO procedural_memory (pattern_name, trigger_conditions, action_sequence, origin_session, usage_count)
+            VALUES (?, ?, ?, ?, 1)
             ON CONFLICT(pattern_name) DO UPDATE SET
                 action_sequence = excluded.action_sequence,
                 usage_count = procedural_memory.usage_count + 1,

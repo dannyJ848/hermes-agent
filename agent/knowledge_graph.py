@@ -206,7 +206,12 @@ class KnowledgeGraph:
         for node in nodes:
             neighbors = self.query_neighbors(node["id"], relation_type="solved_by", direction="out")
             for n in neighbors:
-                solutions.append(n.get("target_label", "unknown"))
+                # Get target node label
+                target_id = n.get("target_id")
+                if target_id:
+                    target = self.get_node(target_id)
+                    if target:
+                        solutions.append(target.get("label", "unknown"))
         return solutions
 
     @_safe
