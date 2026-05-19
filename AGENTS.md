@@ -973,7 +973,29 @@ All modules are lazy-initialized via `agent/mega_wiring.py` which monkey-patches
 - **Session end**: Reflection cycle runs (pattern detection → tip generation); distillation pipeline processes last 24h; old episodic memories (7+ days) cleaned.
 - **Nightly cron**: Consolidation episodic→semantic→procedural; skill candidate promotion.
 
-Config sections: `cerebrum`, `cortex`, `distillation`, `knowledge_graph` in `~/.hermes/config.yaml`.
+Config sections: `cerebrum`, `cortex`, `distillation`, `knowledge_graph`, `cognitive_orchestrator`, `metrics`, `vector_memory`, `code_intelligence`, `cache` in `~/.hermes/config.yaml`.
+
+### Cognitive Pipeline — Full Implementation (May 2026)
+
+The cognitive enhancement layer evolved from stubs to a fully operational closed-loop pipeline:
+
+1. **SelfEvaluationGate** (`agent/self_evaluation_gate.py`) — 5-dimension quality scoring (accuracy, completeness, clarity, safety, reasoning) with SQLite persistence. Thresholds: ≥70% complex tasks, ≥50% simple. Blocks sub-threshold responses.
+
+2. **IterationEngine** (`agent/iteration_engine.py`) — Turn-by-turn experiential learning. `before_action()`/`after_action()` wired into `conversation_loop.py` at every turn. Records tool outcomes, speed, errors, lessons to SQLite.
+
+3. **CognitiveOrchestrator** (`agent/cognitive_orchestrator.py`) — 21/21 subsystems active. All modules have real methods: brain, self_audit, training_gym, tiered_memory, memory_cortex_bridge, distillation_bridge, error_learning, skill_effectiveness_tracker, autobrowse_tracer, tool_oracle, unified_intelligence_engine, predictive_failure_prevention, autonomous_experimentation, cross_domain_transfer, attention_context_prioritizer.
+
+4. **Conversation Loop Hooks** (`agent/conversation_loop.py`) — 4 injection points:
+   - Pre-turn evaluation gate check
+   - Turn-by-turn learning feedback (iteration engine before/after)
+   - Adaptive context injection (appends to ephemeral system prompt, preserves `_cached_system_prompt` invariant)
+   - Post-turn quality evaluation + self-audit + training gym + session end
+
+5. **MegaWiring** (`agent/mega_wiring.py`) — Patches `AIAgent.__init__` to forward to `agent_init.py::init_agent()`. All cognitive init lives in `agent_init.py`, not the forwarder.
+
+**Verification**: `python3 -c "from agent.cognitive_orchestrator import get_orchestrator; o=get_orchestrator(); print(sum(1 for v in o.initialize(type('A',(),{'session_id':'x','model':'x','provider':'x','quiet_mode':True})()).values() if v=='active'))"` → `21`
+
+**Key invariant**: Adaptive context is appended to the ephemeral system prompt, NOT the cached `_cached_system_prompt`. This preserves upstream prompt cache stability.
 
 ## Known Pitfalls
 

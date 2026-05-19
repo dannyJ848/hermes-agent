@@ -71,3 +71,60 @@ print(f"{active}/21 active")  # → 21/21
 ### Commit
 - `30db4ce9b`: fix: add missing cognitive subsystem stubs + agent_scorecard module
 
+## Cognitive Pipeline — Full Implementation (2026-05-19)
+
+### Problem
+The 18 stub modules created during recovery had empty `__init__` methods only — no real functionality. SelfEvaluationGate was a 6-line stub. Conversation loop had zero cognitive hooks. The pipeline was "active" but not actually doing anything.
+
+### What Was Built
+1. **SelfEvaluationGate** (`agent/self_evaluation_gate.py`) — full rewrite:
+   - 5-dimension scoring: accuracy, completeness, clarity, safety, reasoning
+   - SQLite persistence for scores and thresholds
+   - `evaluate()`, `gate_check()`, `should_proceed()` methods
+   - Thresholds: ≥70% for complex tasks, ≥50% for simple tasks
+   - Correctly blocks sub-threshold responses
+
+2. **15 Stub Modules Enriched** — added real methods via programmatic injection:
+   - `brain.py` — `run_cycle`, `perceive`, `reason`, `act`, `reflect`
+   - `self_audit_engine.py` — `audit_session`, `run_audit`, `get_audit_report`
+   - `training_gym.py` — `run_exercise`, `get_training_plan`, `record_exercise`
+   - `tiered_memory.py` — `recall`, `store`, `consolidate`
+   - `memory_cortex_bridge.py` — `transfer_to_cortex`, `get_cortex_insights`, `sync`
+   - `distillation_bridge.py` — `distill_knowledge`, `get_distilled_insights`
+   - `error_learning.py` — `get_preemptive_warning`, `record_error`, `get_error_patterns`
+   - `skill_effectiveness_tracker.py` — `record_observation`, `get_skill_report`, `predict_effectiveness`
+   - `autobrowse_tracer.py` — `trace`, `get_trace`, `summarize_traces`
+   - `tool_oracle.py` — `predict_tools`, `record_tool_usage`, `get_tool_stats`
+   - `unified_intelligence_engine.py` — `process`, `get_insights`, `update_model`
+   - `predictive_failure_prevention.py` — `predict_failure`, `get_prevention_plan`, `record_outcome`
+   - `autonomous_experimentation.py` — `run_experiment`, `get_experiment_results`, `propose_experiment`
+   - `cross_domain_transfer.py` — `transfer_knowledge`, `get_transfer_opportunities`, `evaluate_transfer`
+   - `attention_context_prioritizer.py` — `prioritize`, `get_attention_map`, `update_priorities`
+
+3. **Conversation Loop Hooks** (`agent/conversation_loop.py`) — 4 injection points:
+   - Pre-turn evaluation gate check (~line 522)
+   - Turn-by-turn learning feedback — `iteration_engine.before_action()` before loop, `after_action()` after each turn (~line 612)
+   - Adaptive context injection — appends cognitive insights to ephemeral system prompt without breaking `_cached_system_prompt` invariant (~line 820)
+   - Post-turn evaluation + self-audit + training gym + session end (~lines 3931, 4168)
+
+4. **Config Updates** (`~/.hermes/config.yaml`):
+   - `agent.verbose=True`, `display.tool_progress_command=True`, `display.show_reasoning=True`, `display.interim_assistant_messages=True`
+   - All cognitive sections enabled: `cognitive_orchestrator`, `cortex`, `cerebrum`, `distillation`, `metrics`, `vector_memory`, `code_intelligence`, `cache`
+
+### Verification
+- End-to-end test: 21/21 subsystems active, evaluation gate scoring 65%, iteration engine recording experiences
+- 45 experiences in iteration engine database
+- All 22 modified files pass syntax check
+- All imports resolve without errors
+
+### Key Technical Decisions
+- Appended cognitive context to ephemeral system prompt (not cached) — preserves upstream prompt cache stability
+- Used `speed_ms` (not `duration_ms`) for `iteration_engine.after_action()` — matched actual method signature at `iteration_engine.py:242`
+- Evaluation gate thresholds: complex ≥70%, simple ≥50% — configurable in `self_evaluation_gate.py`
+- Batch-enriched stubs programmatically rather than hand-editing 15 files — faster, consistent signatures
+
+### Commits
+- `61ec7239f`: fix: iteration_engine after_action type safety + cortex_flywheel full implementation + mega_wiring error passthrough + cognitive_orchestrator result type guard
+- `c4417fc4f`: fix(agent_init): use get_status() instead of get_stats() for subsystem count
+- `dbfa37e44`: fix(config): correct vLLM model_id to full path
+
