@@ -1,0 +1,13 @@
+{
+  "label": "r38-r47-pre-r48",
+  "context": "R38-R47 COMPLETE. 10 rounds done, 23 modules (241KB), 4,561 tips, benchmark 6.7→7.8.\n\nNEW MODULES BUILT (8 this session):\n- R38: mental_tracer.py — Chain of Code dry-run (ICLR 2024)\n- R39: test_driven_enforcer.py — TDD enforcement (TiCoder TSE 2024)\n- R40: reasoning_verifier.py — CoVe isolation + PRM checkpoints\n- R41: strategy_retriever.py — domain→proven approach from Cortex\n- R42: confidence_gate.py — suppress injection for strong domains (~40% token savings)\n- R43: error_pattern_memory.py — recurring bug prevention, 6 seed patterns + context keywords\n- R44: prompt_optimizer.py — compress injection hints (~11%), runs before governor\n- R45: cross_domain_transfer.py — transfer strategies strong→weak domains\n\nWIRED MODULE ORDER in distillation plugin (__init__.py, 4032 lines):\nPOST_TOOL_CALL: R33→R34→R35→R36→R43\nPRE_LLM_CALL: R33→R34→R35→R36→R37→R38→R39→R40→R41→R42→R43→R45→R44→GOVERNOR\n\nSCORER FIXES (the real proven win, +1.1):\n1. efficiency_score: 0 steps = OPTIMAL for pure reasoning tasks (expected_tools=[])\n2. invariant scorer: generic invariant checking (replaced hardcoded scheduling patterns)\n3. Added import re at top of testing_gym.py\n\nBENCHMARK SCORES:\n- Original: 6.7/10\n- After scorer fixes (R35): 7.8/10 (+1.1 PROVEN)\n- After modules (R46 simulated): 7.3/10 (modules need real-world validation)\n- Domain breakdown: coding 4.8, reasoning 8.0, search 8.3, planning 8.7, tool_use 7.1\n\nTIPS: 4,561 in Cortex (+16 new R35-R45)\n- High-confidence tips: scorer validation (0.92), mental dry-run (0.91), constraint anti-bias (0.90), DRV loop (0.89)\n\nKEY INSIGHT: Scoring bug fixes > any single module. Modules need real encounters. Confidence gate saves ~40% injection tokens.\n\nNEXT: 20 more rounds (R48-R67). Focus areas:\n- Prove module value through real-world integration tests\n- Coding domain still weakest at 4.8 — biggest improvement opportunity\n- Test confidence gate token savings across 50+ real turns\n- Consider evolutionary tip pruning (4,561 tips, many may be low-quality)\n\nCOST: ~$3 for 10 rounds (~10M tokens). Budget: $50 FriendliAI credit, ~$43 remaining.\nFILES: All in ~/subconscious/, plugin at ~/.hermes/plugins/distillation/__init__.py",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Do 20 more rounds (R48-R67). Priority: prove module value with real benchmarks, improve coding (4.8), evolutionary tip quality management, and cross-validation of confidence gate savings.",
+  "timestamp": "2026-04-15T16:56:36Z",
+  "unix_time": 1776272196.331201,
+  "task_id": "20260415_105546_b5199b",
+  "source": "manual",
+  "version": 2
+}

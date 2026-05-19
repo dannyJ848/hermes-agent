@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r27-complete",
+  "context": "Training Gym R22-R27 completed. 24/24 exercises pass with real pytest verification.\n\nR27 RESULTS (all 10/10):\n1. trie-001 (T5) - Trie with autocomplete, frequency ranking, delete. 11 tests.\n2. lru-001 (T5) - LRU cache with TTL, stats, thread-safe OrderedDict. 12 tests.\n3. heap-001 (T5) - Min/max heap with heapify, sort, update, custom comparator. 14 tests. Fixed: test assumed heap index mapping after heapify.\n4. graph-002 (T5) - Weighted graph + Dijkstra with shortest_path reconstruction. 11 tests.\n\nKEY BUG FIXES:\n- heap-001: Test used wrong index after heapify - heapify reorders elements so indices don't match original positions. Fixed by using push() for predictable structure.\n- command-001 (R26): AddTextCommand computed position at init time - fixed to compute at execute time.\n\nDB: 184 exercises, 347 attempts, avg 9.8",
+  "active_tasks": [
+    "R22-R27 complete",
+    "R28 next"
+  ],
+  "decisions": [
+    "LRU cache: OrderedDict.move_to_end() is the canonical Python pattern",
+    "Trie autocomplete: sort by (-frequency, word) for deterministic ranking",
+    "Dijkstra: use prev dict for path reconstruction, not just distances"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R28 exercises. Consider: functional programming (curry, compose, memoize), or concurrency patterns (actor, CSP).",
+  "timestamp": "2026-04-08T17:25:01Z",
+  "unix_time": 1775669101.9133198,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

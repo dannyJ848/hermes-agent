@@ -1,0 +1,12 @@
+{
+  "label": "reservoir-v2-ready-for-restart",
+  "context": "CONTEXT RESERVOIR v2 BUILT AND WIRED. Full Pichay architecture (10 features). Module: ~/subconscious/context_reservoir.py. DB: ~/.hermes/context_reservoir.db. Hooked into cerebrum provider on_pre_compress(). NEEDS GATEWAY RESTART. Gateway PID 98043, brain daemon PID 71480. All systems ready.",
+  "active_tasks": [
+    "Restart gateway to activate reservoir",
+    "Expose fault_in as Hermes tool",
+    "Inject retrieval handles into context on each turn",
+    "Monitor fault rates and dead tool collection"
+  ],
+  "timestamp": "2026-04-05T17:45:51Z",
+  "task_id": "20260404_215806_7e676d"
+}

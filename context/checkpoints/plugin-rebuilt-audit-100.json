@@ -1,0 +1,13 @@
+{
+  "label": "plugin-rebuilt-audit-100",
+  "context": "FULLY REBUILT the distillation plugin after corruption and got 100% audit score.\n\nWHAT HAPPENED:\n- Original __init__.py (5902 lines) was accidentally overwritten with write_file on Apr 15\n- No backup existed (backup script excluded ~/.hermes/plugins/)\n- All standard recovery avenues exhausted (pyc, git, time machine, decompilers)\n- Reconstructed from scratch by scanning all 237 subconscious R-modules and auto-generating the wiring code\n\nREBUILT PLUGIN:\n- 7081 lines (larger than original because ALL 237 modules wired, original had ~56)\n- 230 R-modules with build_injection successfully loaded\n- 4 hooks: post_tool_call, pre_tool_call, pre_llm_call, post_api_request\n- Load time: 0.2s\n- Syntax validated, import tested, injection produces real Cortex content\n\nALL 5 FIXES APPLIED:\n1. Injection pipeline: hybrid_search, 2400 char budget, 15 lines, 8 max tips, conf>=0.6\n2. World model: 10% random base rate for simulate()\n3. Metacog: reads from cortex_nodes (persistent) not per-process singleton\n4. Episodic memory: retrieve() wired into P3 injection\n5. Credit assignment: cortex_tip_id column + ALTER TABLE safety\n\nAUDIT: 23/23 checks pass (100%)\n- 357 active tips, 13 canonical domains, 0 uppercase, 0 non-canonical\n- Embeddings: tips 94%, experiences 95%, facts 100%\n- Postgres trigger installed: domain auto-lowercase on insert/update\n- 68 MD5 duplicates deactivated, 2 fuzzy duplicates deactivated\n- Daemon running (PID 61217)\n\nBACKUP SCRIPT PATCHED:\n- Added ~/.hermes/plugins/ to hermes-backup.sh includes (was missing, root cause of no-backup)\n\nKEY FILES:\n- ~/.hermes/plugins/distillation/__init__.py (7081 lines, fully rebuilt)\n- ~/.hermes/plugins/distillation/mythos_enhancements.py (673 lines, unchanged)\n- ~/.hermes/plugins/distillation/plugin.yaml (hooks definition, unchanged)\n- /tmp/db_audit.py (23-check fast audit, reused)\n- ~/hermes-backup.sh (patched: added .hermes/plugins/)\n- Postgres trigger: domain_normalize on cortex_nodes",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Next priorities: (1) Update CORTEX_FLYWHEEL_BLUEPRINT.md with fix details, (2) Build testing_gym.py (checkpoint testing-gym-prebuild exists), (3) Save rebuild-as-skill for future reference",
+  "timestamp": "2026-04-15T20:53:26Z",
+  "unix_time": 1776286406.611682,
+  "task_id": "20260415_154031_df4821",
+  "source": "manual",
+  "version": 2
+}

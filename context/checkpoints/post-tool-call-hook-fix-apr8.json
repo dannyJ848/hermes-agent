@@ -1,0 +1,23 @@
+{
+  "label": "post-tool-call-hook-fix-apr8",
+  "context": "CRITICAL BUG FOUND AND FIXED:\n\nThe distillation plugin's post_tool_call hook was registered but NEVER called from the agent runtime. Both concurrent and sequential tool execution paths in run_agent.py had tool_complete_callback but no invoke_hook(\"post_tool_call\", ...).\n\nThis means the entire feedback loop was broken:\n- Tips injected (pre_llm_call) ✓\n- API usage tracked (post_api_request) ✓  \n- Tip outcome feedback (post_tool_call) ✗ — NEVER FIRED\n\nSAGE reward, condition-aware voting, mythos cycle detection, behavior calibration, trajectory metrics — ALL were running on simulated data only, never real tool outcomes.\n\nFIX: Added invoke_hook(\"post_tool_call\", ...) to both:\n1. _execute_tool_calls_concurrent (L6245, after tool_complete_callback)\n2. _execute_tool_calls_sequential (L6559, after tool_complete_callback)\n\nBoth patches pass lint. Gateway restart needed to activate.\n\nTip DB: 1154 tips, 0.8528 avg\nGateway PID: 11926 (needs restart)\nDanny at test.",
+  "active_tasks": [
+    "FIXED: post_tool_call hook was NEVER invoked from run_agent.py",
+    "Added to both concurrent (L6245) and sequential (L6559) paths",
+    "Restarting gateway to activate"
+  ],
+  "decisions": [
+    "Danny's Build-Activate-Test cycle caught this — the MOST important bug fix of the session",
+    "post_tool_call was never wired = entire distillation feedback loop was blind",
+    "All previous 'live' data in mythos/SAGE DBs was from simulation, not real tool calls"
+  ],
+  "files_modified": [
+    "~/hermes-agent/run_agent.py (added post_tool_call hook in 2 locations)"
+  ],
+  "next_steps": "1. Restart gateway to activate post_tool_call fix\n2. Make 3-5 tool calls and verify mythos/SAGE DBs get REAL entries\n3. Only THEN continue training gym growth",
+  "timestamp": "2026-04-08T18:01:24Z",
+  "unix_time": 1775671284.560483,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

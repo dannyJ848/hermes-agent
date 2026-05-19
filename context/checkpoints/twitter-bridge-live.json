@@ -1,0 +1,28 @@
+{
+  "label": "twitter-bridge-live",
+  "context": "Twitter Feed Bridge BUILT AND OPERATIONAL at ~/subconscious/twitter_bridge.py.\n\nCREDENTIALS:\n- X cookies (ct0 + auth_token) saved in ~/.hermes/twitter_bridge/credentials.json - expire Mar 2027\n- Browserbase API key updated in ~/.hermes/.env (bb_live_WIEIGAAWgx4OpJmxHbEKPMIMTks)\n- Browserbase project ID: eda78810-ea93-43b2-ae25-f1e2096ca5c8\n\nTRACKED ACCOUNTS:\n- @Teknium (ID: 1365020011123773442) - 20 tweets fetched\n- @NousResearch (ID: 1318419526132862976) - 18 tweets fetched\n\nKEY FINDINGS FROM BRIDGE RUN:\n1. Teknium posted \"A new era for opensource!\" with media - HOT\n2. GitHub link found: nesquena/hermes-webUI (sleek UI refresh)\n3. Hermes WebUI getting community contributions\n4. Free Mimo on Nous Portal (~1.5 weeks left)\n5. Community building: music (Ghost In The Wire), pixel art, multi-chat Telegram mini app\n6. Chinese market growing (WeChat integration, Chinese tutorials)\n\nBRIDGE FEATURES:\n- Fetches UserTweets via GraphQL API with cookie auth\n- Resolves screen names to user IDs via UserByScreenName\n- Extracts links, GitHub repos, media from tweets\n- Fetches replies for hot tweets (>100 likes or has links) to find repo links in comments\n- Deduplicates with seen_tweets.json\n- Saves to latest_tweets.json\n\nNEXT STEPS:\n- Wire bridge into cron (every 2h or 4h)\n- Add more tracked accounts\n- Add link expansion (t.co → actual URLs)\n- Build Telegram digest delivery\n- Use Browserbase for vision-based tweet screenshot analysis",
+  "active_tasks": [
+    "Twitter bridge built and tested",
+    "Need cron wiring",
+    "Need link expansion",
+    "Need Telegram digest"
+  ],
+  "decisions": [
+    "X cookie auth (GraphQL API) as primary method over Browserbase vision - faster, more reliable",
+    "Track both @Teknium and @NousResearch",
+    "Fetch replies for hot tweets to find community repo links"
+  ],
+  "files_modified": [
+    "~/subconscious/twitter_bridge.py",
+    "~/.hermes/.env",
+    "~/.hermes/twitter_bridge/credentials.json",
+    "~/.hermes/twitter_bridge/seen_tweets.json",
+    "~/.hermes/twitter_bridge/latest_tweets.json"
+  ],
+  "next_steps": "Wire the Twitter bridge into a cron job for periodic monitoring. Expand t.co links to actual URLs. Add Telegram digest delivery for new tweets with GitHub links.",
+  "timestamp": "2026-04-13T01:22:55Z",
+  "unix_time": 1776043375.1719859,
+  "task_id": "20260412_191932_edf6e1",
+  "source": "manual",
+  "version": 2
+}

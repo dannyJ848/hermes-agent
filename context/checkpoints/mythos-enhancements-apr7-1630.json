@@ -1,0 +1,25 @@
+{
+  "label": "mythos-enhancements-apr7-1630",
+  "context": "MYTHOS-TIER ENHANCEMENTS BUILT + WIRED (Apr 7, 16:30):\n\n5 new modules in ~/.hermes/plugins/distillation/mythos_enhancements.py:\n(1) META-COGNITIVE CYCLE DETECTION (Minitap +9 pts) — detects loops (same tool/args/error 3x in 120s), auto-triggers strategy change + suggests alternative tool\n(2) BEHAVIOR CALIBRATION (ET-Agent) — tracks redundant/insufficient/productive calls per session\n(3) TRAJECTORY EFFICIENCY METRICS (TES/TASR) — productive/total ratio + time-adjusted success\n(4) VGCO TIP REVISION — flags injected tips that still fail, candidates for auto-revision\n(5) ADAPTIVE INJECTION GATING — event-driven, only injects relevant sections per turn\n\nWIRED INTO: ~/.hermes/plugins/distillation/__init__.py\n- post_tool_call: added mythos on_post_tool_call_enhanced() call after _sync_tool_capability (line ~443)\n- pre_llm_call: added mythos on_pre_llm_call_enhanced() call before final return (line ~766)\n\nDB: ~/subconscious/mythos_enhancements.db (5 tables: call_history, behavior_calibration, trajectory_metrics, tip_verification, cycle_interventions)\n\nALL TESTS PASSED. __pycache__ cleared.\n\nRESEARCH SAVED: ~/.hermes/knowledge/frontier-agent-self-improvement-apr2026.md\n- 12 frontier techniques from Mythos, Minitap, ET-Agent, VGCO, HyperAgents\n- Priority implementation order documented\n\nCURRENT STATE:\n- Distillation plugin v2.2 with 7 AGI enhancements (SWIRL, AUQ, Polaris, ERL, AutoAgent + 5 Mythos)\n- 249 distilled tips (237 high-conf)\n- Wiki: 135 pages, 267KB (saturated)\n- Greeting echo triple fix deployed\n- Context injection trimmed 60%\n\nPRIORITY ORDER (per Danny):\n1. Deep research → novel findings → distillation enhancements (ACTIVE - just completed a round)\n2. Black hat extraction — SHELVED\n3. AGI cron cycles — autonomous\n\nNEEDS: Gateway restart to activate the mythos enhancements.",
+  "active_tasks": [
+    "Deep research for distillation enhancements (COMPLETED this round)",
+    "Mythos-tier enhancements built + wired (COMPLETED, needs gateway restart)"
+  ],
+  "decisions": [
+    "Mythos enhancements wired into existing plugin, not separate plugin",
+    "Adaptive injection gating replaces static always-on injection",
+    "Cycle detection threshold: 3 identical calls in 120s window",
+    "Black hat extraction SHELVED per Danny"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/mythos_enhancements.py (NEW - 27KB)",
+    "~/.hermes/plugins/distillation/__init__.py (patched post_tool_call + pre_llm_call)",
+    "~/.hermes/knowledge/frontier-agent-self-improvement-apr2026.md (NEW - 7.8KB)"
+  ],
+  "next_steps": "Restart gateway to activate mythos enhancements. Then continue deep research for next round of distillation improvements.",
+  "timestamp": "2026-04-07T21:28:57Z",
+  "unix_time": 1775597337.410578,
+  "task_id": "20260407_160244_287312",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r39-complete",
+  "context": "Training Gym R39 completed. All 4 exercises 10/10.\n\nR39 RESULTS (all 10/10):\n1. interval-tree-001 (T8) - Interval Tree with point query and range query, max_end pruning. 6 tests. Clean.\n2. btree-001 (T8) - B-Tree order=3 with insert/split, delete with merge/borrow. 6 tests. Clean.\n3. uf-path-splitting-001 (T6) - Union-Find with path splitting (grandparent), compared to path compression. 5 tests. Bug: path splitting only halves chain, not logarithmic.\n4. cuckoo-filter-001 (T8) - Cuckoo Filter with fingerprint, XOR alt-index, eviction. 5 tests. Clean.\n\nKEY PATTERNS:\n- Interval tree: BST by start, max_end field for pruning queries\n- B-Tree delete: predecessor from left subtree or successor from right, merge when both below min\n- Path splitting: parent[x] = parent[parent[x]] — iterative, halves path each find\n- Cuckoo: fp=sha256(item)[0], h1=sha256(item), h2=h1 XOR sha256(fp), eviction loop\n\nDB: 230 exercises, 395 attempts, avg 9.87",
+  "active_tasks": [
+    "R39 complete",
+    "R40 next"
+  ],
+  "decisions": [
+    "Path splitting is O(log n) amortized but single pass on chain only halves — not as good as recursive path compression for single calls",
+    "B-Tree delete: always ensure child has >= t keys before descending, merge/borrow as needed",
+    "Cuckoo filter: ensure fingerprint is non-zero (OR with 1) so XOR alt-index actually changes the bucket"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R40 exercises. Continue with: Fenwick Tree (BIT), Skip List, Consistent Hashing, or HyperLogLog.",
+  "timestamp": "2026-04-08T18:47:28Z",
+  "unix_time": 1775674048.0850618,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r40-complete",
+  "context": "Training Gym R40 completed. ALL 4 exercises 10/10 first pass — 2nd clean round in a row!\n\nR40 RESULTS (all 10/10, zero bug fixes):\n1. fenwick-bit-001 (T6) - Fenwick Tree with O(n) build. 5 tests. Clean.\n2. skip-list-001 (T7) - Skip List with randomized levels, sorted iteration. 5 tests. Clean.\n3. consistent-hash-001 (T7) - Consistent Hash with virtual nodes, bisect ring. 5 tests. Clean.\n4. hyperloglog-001 (T8) - HyperLogLog with alpha bias correction, merge. 5 tests. Clean.\n\nKEY PATTERNS:\n- Fenwick: 1-indexed internal, i & -i gives lowest set bit, update climbs, query descends\n- Skip List: level = random with p=0.5, update[] array for predecessors, O(log n) expected\n- Consistent hash: sorted ring + bisect for O(log n) lookup, virtual nodes for even distribution\n- HyperLogLog: precision bits for register, rho for leftmost 1-bit, harmonic mean + bias correction\n\nDB: 234 exercises, 399 attempts, avg 9.87\nTWO CLEAN ROUNDS IN A ROW (R38, R39, R40). Coding accuracy improving.",
+  "active_tasks": [
+    "R40 complete",
+    "R41 next"
+  ],
+  "decisions": [
+    "Fenwick O(n) build: tree[i] += arr[i-1], then propagate to parent = i + (i & -i)",
+    "Skip List: track update[] predecessors at each level, insert node, update forward pointers",
+    "Consistent hash: bisect_right to find next position on ring, wrap to 0 if past end",
+    "HyperLogLog: small-range correction uses zeros count (linear counting), large-range uses log correction"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R41 exercises. Push to T9: B+ Tree, Rope (string), Van Emde Boas, or Cache-Oblivious B-Tree.",
+  "timestamp": "2026-04-08T18:50:38Z",
+  "unix_time": 1775674238.437092,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

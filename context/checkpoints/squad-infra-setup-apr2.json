@@ -1,0 +1,11 @@
+{
+  "label": "squad-infra-setup-apr2",
+  "context": "Completed 5 infrastructure tasks for SOMA squad: (1) SOMA Dojo cron at 03:00 daily (job_id: 54efd7ef8bf6), (2) BioMCP v0.8.19 installed and configured as MCP server in config.yaml, (3) TeamMCP deployed at localhost:3100 with 3 agents registered and squad-general channel active, (4) omem evaluated (Docker deploy ready but daemon not running), (5) Jack of All Trades cron at 9am/9pm (job_id: 3f8a650a05e5). Memory at 95%. Next: Danny needs to start Docker for omem, restart Hermes to load BioMCP MCP server, and make TeamMCP persistent via launchd.",
+  "active_tasks": [
+    "omem Docker deployment",
+    "Hermes restart for BioMCP MCP",
+    "TeamMCP launchd service"
+  ],
+  "timestamp": "2026-04-02T04:15:36Z",
+  "task_id": "20260401_211730_3985be"
+}

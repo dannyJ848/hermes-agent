@@ -1,0 +1,11 @@
+{
+  "label": "post-firecrawl-glm5v-setup",
+  "context": "Firecrawl API key configured in ~/.hermes/.env + config.yaml (web.backend: firecrawl). GLM-5V-Turbo research saved to knowledge/glm-5v-turbo.md and memory. SOMA build clean (0 TS errors). Hermes repo pulled latest (1438 lines). firecrawl-py 4.21.0 installed. Pending: restart Hermes to activate Firecrawl. Pending: decide on glm-5v-turbo migration. Pending: SOMA Squad profiles may need restart too.",
+  "active_tasks": [
+    "Configure Firecrawl (done, needs restart)",
+    "GLM-5V-Turbo migration decision",
+    "SOMA Squad monitoring"
+  ],
+  "timestamp": "2026-04-02T02:04:03Z",
+  "task_id": "20260331_220745_fe055c"
+}

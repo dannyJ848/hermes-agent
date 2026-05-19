@@ -1,0 +1,12 @@
+{
+  "label": "pre-0.7-update",
+  "context": "Completed: Iteration Engine (~/subconscious/iteration_engine.py) deployed and wired into brain.py. All 7 model calls wrapped with before/after tracking. Epistemic guard active. Brain v4 running on 3 crons every 2min. About to update Hermes to 0.7. Need to copy subconscious/ and skills to soma-coder, soma-researcher, soma-tester profiles.",
+  "active_tasks": [
+    "Save checkpoint",
+    "Copy subconscious/ to all 3 SOMA profiles",
+    "Copy relevant skills to all 3 profiles",
+    "Update Hermes to 0.7"
+  ],
+  "timestamp": "2026-04-04T00:24:44Z",
+  "task_id": "20260403_134459_9fb996"
+}

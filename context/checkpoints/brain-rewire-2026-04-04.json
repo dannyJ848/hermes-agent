@@ -1,0 +1,11 @@
+{
+  "label": "brain-rewire-2026-04-04",
+  "context": "Rewired the real-time brain pipeline. Fixed 3 critical bugs:\n\n1. pre_llm_call scoping bug: task_context was assigned inside if-tracker block but referenced outside it. Moved extraction BEFORE all engines. Was crashing EVERY LLM call - zero capability injection.\n\n2. Diagnostic detection: terminal tool showed 21% success because `cd && python3 -c` chains weren't detected as diagnostic. Added && chain parsing, full venv path matching, and substring detection.\n\n3. Session mastery tables: All 8 tables confirmed present in cerebrum_memory.db (5,939 total rows).\n\nStatus:\n- Honcho: running, 6 containers, deriver \"unhealthy\" is false positive (logs show vector sync completing)\n- Cerebrum: 3,832 semantic facts, 501 experiences today, 92 predictions, 998 tool call logs\n- All fixes synced to soma-coder, soma-researcher, soma-tester\n- Engines will load properly on gateway restart (lazy-init needs gateway context)\n\nFiles changed:\n- ~/.hermes/plugins/evey-tool-intelligence/__init__.py (2 patches)\n- Synced to ~/.hermes-profiles/{soma-coder,soma-researcher,soma-tester}/plugins/evey-tool-intelligence/__init__.py",
+  "active_tasks": [
+    "Fix tool-intelligence pre_llm_call scoping bug",
+    "Fix diagnostic detection for && chains",
+    "Sync fixes to squad profiles"
+  ],
+  "timestamp": "2026-04-05T02:56:13Z",
+  "task_id": "20260403_232453_811e81"
+}

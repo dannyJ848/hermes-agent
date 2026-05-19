@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r103-complete",
+  "context": "Training Gym R103 COMPLETE. Research→Distill→Build→Activate→Test→Integrate.\n\nRESEARCH: Self-evaluation & metacognition (structured self-refine v2 with multi-dimensional rubric, semantic consistency probing for confidence, PRM step-level verification, LLM-as-Judge with Platt scaling, STaR self-taught reasoner, metacognitive monitor architecture, Best-of-N+Verifier pattern).\n\nDISTILL: 8 tips inserted (1198→1206) across self-evaluation, metacognition domains.\n\nBUILD: Step Confidence Tracker + Metacognitive Monitor.\n- confidence_tracker.py in ~/subconscious/ — 10.3KB\n- Sliding window (20 outcomes) per-tool success rate tracking\n- Confidence thresholds: HIGH >= 0.8, LOW < 0.4\n- Escalation signals when tools drop below threshold\n- Task complexity estimation from description keywords\n- Records to confidence_tracker.db (tool_outcomes, tool_confidence, escalation_signals)\n\nWIRED INTO:\n- post_tool_call: records both success and error outcomes (lines ~612, ~620)\n- pre_llm_call: injects confidence summary + complexity estimate (line ~1253)\n\nACTIVATE: Plugin 1459 lines, gateway PID 7813.\n\nTEST: All systems pass — confidence_db OK, low confidence correctly detected at 14% with escalation, all modules present.\n\nTOTAL SUBCONSCIOUS MODULES: cascade_recovery (13KB), plan_monitor (10.4KB), confidence_tracker (10.3KB). 1206 tips.",
+  "active_tasks": [
+    "R103 complete, starting R104"
+  ],
+  "decisions": [
+    "R103: Built confidence tracker instead of Ebbinghaus decay — more immediately impactful",
+    "Track outcomes in both error and success paths for complete picture",
+    "Complexity estimation is keyword-based heuristic — no LLM cost"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/confidence_tracker.py",
+    "~/subconscious/confidence_tracker.db"
+  ],
+  "next_steps": "Start R104. Next high-impact builds: (1) Skill quality scoring with usage tracking, (2) Ebbinghaus memory decay for stale tips, (3) Cross-session learning transfer. Continue all-night loop.",
+  "timestamp": "2026-04-09T07:13:56Z",
+  "unix_time": 1775718836.839741,
+  "task_id": "20260408_220858_c2e2e3",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,11 @@
+{
+  "label": "reservoir-wired-into-compression",
+  "context": "CONTEXT RESERVOIR NOW WIRED INTO HERMES COMPRESSION PIPELINE. Patch applied to plugins/memory/cerebrum/provider.py on_pre_compress(). Two-phase: (1) evict all messages verbatim to reservoir, (2) extract high-salience facts. Next compression will automatically save everything to ~/.hermes/context_reservoir.db before summarizing. Still need: expose fault_in as a tool, inject handles into context. Module at ~/subconscious/context_reservoir.py. AGI cycle 210/1000. 320 knowledge files. Compression threshold 40%.",
+  "active_tasks": [
+    "Expose fault_in as a Hermes tool (reservoir_recall)",
+    "Inject retrieval handles into context on each turn",
+    "Test reservoir eviction on next compression cycle"
+  ],
+  "timestamp": "2026-04-05T17:23:22Z",
+  "task_id": "20260404_215806_7e676d"
+}

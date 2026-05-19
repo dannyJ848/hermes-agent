@@ -1,0 +1,18 @@
+{
+  "label": "injection-cleanup-apr7-v2",
+  "context": "Injection cleanup verified after gateway restart. Purged last 5 junk tips (IDs 1324, 1326, 1329, 1788, 1789 — wiki research speculation + weak duplicates). Now 24 clean operational tips remain, all real Hermes tools. [ITERATION LESSONS], [AGI CONTEXT], [MEMORY HEALTH] confirmed gone. [ACTIONABLE TIPS] now only has real tips. [DISTILLED TOOL RULES] and [TOOL INTELLIGENCE] still injecting (intentional). research_to_distillation.py still disabled. All pycache cleared.",
+  "active_tasks": [
+    "Verify clean injection in fresh session"
+  ],
+  "decisions": [
+    "Kept [DISTILLED TOOL RULES] and [TOOL INTELLIGENCE] — these are real operational data, not speculation",
+    "Purged all wiki research tips from distilled_tips table"
+  ],
+  "files_modified": [],
+  "next_steps": "Fresh session should show only real tool rules in DISTILLED TOOL RULES and real tips in ACTIONABLE TIPS. No research speculation, no fake tool names.",
+  "timestamp": "2026-04-07T22:15:01Z",
+  "unix_time": 1775600101.2682781,
+  "task_id": "20260407_170949_37e954",
+  "source": "manual",
+  "version": 2
+}

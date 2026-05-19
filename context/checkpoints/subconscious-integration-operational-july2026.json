@@ -1,0 +1,41 @@
+{
+  "label": "subconscious-integration-operational-july2026",
+  "context": "Subconscious integration FULLY COMPLETE and OPERATIONAL (July 2026). All 97 cognitive modules migrated from ~/subconscious/ to ~/hermes-agent/agent/ (177 files) and tools/ (106 files). Iteration engine wired into run_agent.py lines 10053-10154 (before_action/after_action on every tool call). Cognitive systems plugin at ~/.hermes/plugins/cognitive-systems/ v2.0.0 ENABLED and LOADED. Plugin coexists with learning-brain plugin (bundled). 6 hooks registered: on_session_start (2 handlers), pre_tool_call (4 handlers), post_tool_call (4 handlers), on_session_end (2 handlers), pre_llm_call (3 handlers), post_llm_call (1 handler), post_api_request (1 handler). 3 vision tools registered: screen_capture, gui_click, gui_type. Self-evolution pipeline with Elo tournaments, tip evolution, auto-distillation, reflection, hindsight. 3 databases healthy: cerebrum_memory.db, skill_rewards.db, distillation_buffer.db. ~/subconscious/ cleared on restart. Source fully cleaned: old init_subconscious_plugins() removed from run_agent.py, dead code removed from hermes_cli/plugins.py, self-imports fixed to agent. prefix. Git commit 0390d936d. Both plugins verified operational via venv python3 test. Python 3.11.14 in venv, 3.8.8 system. Gateway restart cleared learning-brain plugin injection issue that caused _vprint AttributeError.",
+  "active_tasks": [
+    "Verify cognitive-systems plugin loaded and hooks firing",
+    "Confirm vision tools registered",
+    "Verify database health",
+    "Confirm ~/subconscious/ cleared",
+    "Document final operational state"
+  ],
+  "decisions": [
+    "Cognitive systems load via Hermes plugin system alongside learning-brain",
+    "Both plugins coexist — handlers fire in sequence",
+    "Gateway restart clears plugin injection issues",
+    "Use venv python3 (3.11.14) for plugin testing, not system python3 (3.8.8)"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/cognitive-systems/__init__.py",
+    "~/.hermes/plugins/cognitive-systems/plugin.yaml",
+    "~/hermes-agent/agent/vision_loop.py",
+    "~/hermes-agent/agent/vision_tools.py",
+    "~/hermes-agent/agent/self_evolution.py",
+    "~/hermes-agent/agent/subconscious_plugin_loader.py",
+    "~/hermes-agent/hermes_cli/plugins.py",
+    "~/hermes-agent/run_agent.py",
+    "~/hermes-agent/agent/memory_cortex_bridge.py",
+    "~/hermes-agent/agent/subconscious_hook_wiring.py",
+    "~/hermes-agent/agent/auto_fallback_engine.py",
+    "~/hermes-agent/agent/hermes_enhancement_suite.py",
+    "~/hermes-agent/agent/proactive_memory_guard.py",
+    "~/hermes-agent/agent/tool_intelligence_tracker.py",
+    "~/hermes-agent/agent/subconscious_systems_manifest.py",
+    "~/hermes-agent/MASTER_DOC.md"
+  ],
+  "next_steps": "Use cognitive-systems plugin tools (screen_capture, gui_click, gui_type) for vision tasks. Run self-evolution pipeline periodically. Monitor for hook conflicts between learning-brain and cognitive-systems plugins.",
+  "timestamp": "2026-05-10T05:41:51Z",
+  "unix_time": 1778391711.76014,
+  "task_id": "20260509_223333_783cf4",
+  "source": "manual",
+  "version": 2
+}

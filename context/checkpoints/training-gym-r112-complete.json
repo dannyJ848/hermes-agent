@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r112-complete",
+  "context": "Training Gym R112 completed! ALL 4 PASS ON FIRST TRY!\n\nR112 RESULTS (all 10/10):\n1. word-search-001 (T8) - DFS backtrack. Mark visited with '#'. Restore after.\n2. walls-and-gates-001 (T8) - Multi-source BFS from gates. Fill INF cells.\n3. surrounded-regions-001 (T8) - BFS from border O's, mark safe 'S'. Flip O->X, S->O.\n4. pacific-atlantic-001 (T9) - Reverse BFS from each ocean. Intersection = answer.\n\nDB: 412 exercises, 687 attempts, avg 9.92, 96.2% perfect. 363 passed. Tier 9+ = 102, Tier 10 = 58.\n78+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R112 complete",
+    "R113 next"
+  ],
+  "decisions": [
+    "Word search: DFS with '#' mark. Restore after backtrack. O(m*n*4^L).",
+    "Walls and gates: multi-source BFS from all gates. Distance = level.",
+    "Surrounded regions: BFS from border O's marking safe. Then flip all O->X, S->O.",
+    "Pacific Atlantic: reverse BFS from ocean borders (water flows uphill). Intersection."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R113: Continue. Try: Meeting Rooms, Merge K Sorted Lists, Topological Sort, or Alien Dictionary.",
+  "timestamp": "2026-04-08T23:01:10Z",
+  "unix_time": 1775689270.362286,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

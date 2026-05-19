@@ -1,0 +1,19 @@
+{
+  "label": "r118-complete-apr8",
+  "context": "R118 complete. 458 tips, avg conf 0.829. Added Scaling TTC for Agents tip (4 findings: test-time compute helps agents, WHEN to reflect matters more than reflecting more, list-wise merging outperforms pairwise/voting, diversified rollouts improve outcomes. Combine parallel sampling + sequential revision + list-wise merging). Domain: test-time-compute. Round 118. ~05:42 AM. Danny sleeping. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R118 complete — 458 tips, 0.829 — ready for R119"
+  ],
+  "decisions": [
+    "Timing of reflection matters more than amount of reflection for agent TTC"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R119: Continue. Push toward 500 tips.",
+  "timestamp": "2026-04-08T09:29:38Z",
+  "unix_time": 1775640578.3630059,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,27 @@
+{
+  "label": "r33-testing-gym-complete",
+  "context": "R33 COMPLETE — Built and wired testing_gym.py (AgentBench/GAIA/Galileo benchmark framework).\n\nMODULE: ~/subconscious/testing_gym.py (~700 lines)\n- 5 domains × 2 tasks × 2 sets = 20 benchmark tasks (search, coding, reasoning, tool_use, planning)\n- 3-axis scoring: outcome 60% + efficiency 20% + tool selection 20%\n- Oracle types: exact_match, state_diff, behavioral, invariant\n- Paired-calibration with Welch's t-test + Cohen's d\n- Regression guard + memorization detection (cross-entropy proxy)\n- Production gates: dev 70%, staging 85%, production 95%\n- Cortex integration: benchmark_result node_type for trend tracking\n- Self-test passes: all 5 test categories green\n\nWIRED AS R33:\n- post_tool_call: records trajectory steps when benchmark is active\n- pre_llm_call: injects benchmark status hint (step count, remaining, expected tools)\n\nTIPS: 4 inserted to Cortex (agent_evaluation domain, GAIA/Galileo sources)\n\nPLUGIN: 3,875 lines. All syntax/import checks passed. Gateway restarted.\n\nPREVIOUS STATE (from friendliai-migration checkpoint):\n- Token bloat audit: 6 optimizations applied, ~14K tokens/session saved\n- 7 plugins disabled, 3 LCM tools removed, injection governor at 1500 chars\n- Tool count: 90 (from ~103)\n- FriendliAI GLM-5.1 provider active with prefix caching",
+  "active_tasks": [
+    "R34: Continue training gym — run actual baseline benchmarks on 10 baseline tasks",
+    "R34: Wire testing gym into distillation pre/post round hooks for automated validation",
+    "R35+: Continue training gym with benchmark-validated evolution cycles"
+  ],
+  "decisions": [
+    "Trajectory > outcome scoring per Galileo framework",
+    "5 domains × 2 tasks × 2 sets = 20 benchmark tasks",
+    "3-axis composite: 60% outcome + 20% efficiency + 20% tool selection",
+    "Paired-calibration with Welch's t-test + Cohen's d for significance",
+    "Regression guard: improvement on hard must not regress easy",
+    "Production gates: dev 70%, staging 85%, production 95%"
+  ],
+  "files_modified": [
+    "~/subconscious/testing_gym.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "R34: Run actual baseline benchmarks on 10 baseline tasks to establish pre-module baselines, then continue training gym rounds with benchmark validation",
+  "timestamp": "2026-04-15T16:10:43Z",
+  "unix_time": 1776269443.060815,
+  "task_id": "20260415_105546_b5199b",
+  "source": "manual",
+  "version": 2
+}

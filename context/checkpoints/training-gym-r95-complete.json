@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r95-complete",
+  "context": "Training Gym R95 completed! ALL 4 PASS ON FIRST TRY!\n\nR95 RESULTS (all 10/10):\n1. course-schedule-topo-001 (T9) - Kahn's algo. BFS with in-degree. Count processed = num_courses = no cycle.\n2. subarray-sum-equals-k-001 (T9) - Prefix sum + hash map. count += seen[prefix_sum - k]. seen[0]=1.\n3. number-of-islands-001 (T8) - DFS flood fill. When '1' found: count++, mark all connected as '0'.\n4. climbing-stairs-dp-001 (T6) - Fibonacci variant. a,b=1,2. b=a+b rolling.\n\nDB: 372 exercises, 619 attempts, avg 9.91, 95.8% perfect. 323 passed. Tier 9+ = 94, Tier 10 = 53.\n61+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R95 complete",
+    "R96 next"
+  ],
+  "decisions": [
+    "Topological sort: Kahn's BFS. Build in-degree + adjacency. Process 0-indegree nodes. If count==n: no cycle.",
+    "Subarray sum K: prefix_sum + hashmap. seen[prefix_sum-k] tells how many subarrays end here with sum k.",
+    "Number of islands: DFS flood fill. Mark visited by setting to '0'. Count separate DFS calls.",
+    "Climbing stairs: Fibonacci. Rolling a,b. O(n) time O(1) space."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R96: Continue. Try: Validate Binary Search Tree, Sort Colors, or Product of Array Except Self.",
+  "timestamp": "2026-04-08T22:17:38Z",
+  "unix_time": 1775686658.55851,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

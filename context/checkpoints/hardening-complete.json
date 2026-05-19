@@ -1,0 +1,26 @@
+{
+  "label": "hardening-complete",
+  "context": "HARDENING AUDIT COMPLETE. Three major deliverables:\n\n1. SECURITY FIX 1 — Credentials → env vars:\n   - Added CORTEX_DSN to ~/.hermes/.env\n   - cortex_compat_shim.py line 37: now reads os.environ.get('CORTEX_DSN', fallback)\n   - cortex_access.py line 29: same pattern\n   - Added `import os` to cortex_access.py\n\n2. SECURITY FIX 2 — SQL injection → parameterized:\n   - cortex_compat_shim.py line 485: f-string SQL → %s placeholder + params prepend\n   - cortex_compat_shim.py line 495: same fix for no-WHERE branch\n   - Both now prepend (node_type,) to params tuple before execute()\n   - Verified: shim SELECT with/without WHERE both work\n\n3. CORTEX SENTINEL — Continuous Diagnostic Apparatus:\n   - ~/subconscious/cortex_sentinel.py (820 lines, 32KB)\n   - 14 health checks: PG connectivity, latency, dead tuples, cache hit, embedding coverage, lock waits, connections, replication, embedding server, disk, memory (macOS-aware free+inactive), CPU, active nodes, watched processes\n   - Runs every 60s (deep metrics every 5min)\n   - Background daemon: PID 92428, log at /tmp/cortex_sentinel.log\n   - State file: ~/.hermes/sentinel_state.json\n   - Cron job: sentinel-health-check every 30min (checks status, restarts daemon if dead, alerts V on crit/warn)\n   - macOS memory fix: uses free+inactive pages for accurate \"available\" metric\n   - All 14 checks passing (verified live)",
+  "active_tasks": [
+    "Security fixes — COMPLETE",
+    "Sentinel daemon — COMPLETE"
+  ],
+  "decisions": [
+    "Credentials via os.environ.get() with fallback for dev",
+    "SQL injection fixed with %s placeholders + params tuple prepend",
+    "Sentinel daemon runs continuously, cron monitors it every 30min",
+    "macOS memory: free+inactive = available (not just free)"
+  ],
+  "files_modified": [
+    "~/.hermes/.env (added CORTEX_DSN)",
+    "~/subconscious/cortex_compat_shim.py (credentials + SQL injection)",
+    "~/subconscious/cortex_access.py (credentials + import os)",
+    "~/subconscious/cortex_sentinel.py (NEW — 820 lines)"
+  ],
+  "next_steps": "System hardened. Sentinel watching. Ready for R167+ training gym or other directives.",
+  "timestamp": "2026-04-13T23:39:47Z",
+  "unix_time": 1776123587.274026,
+  "task_id": "20260413_171007_ab89d0",
+  "source": "manual",
+  "version": 2
+}

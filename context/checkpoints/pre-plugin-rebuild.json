@@ -1,0 +1,13 @@
+{
+  "label": "pre-plugin-rebuild",
+  "context": "REBUILDING distillation plugin from scratch after corruption. Original was 5902 lines, accidentally overwritten with write_file. No backup exists (backup script excludes ~/.hermes/plugins/). .pyc also destroyed. Recovery attempts: decompyle3, pycdc, py-spy — all failed for Python 3.11 bytecode.\n\nHAVE available for reconstruction:\n- CORTEX_FLYWHEEL_BLUEPRINT.md (392 lines, complete architecture)\n- CORTEX_FLYWHEEL_DIAGNOSTICS.md (228 lines, 5 bugs documented)\n- Session transcripts with detailed function structures:\n  - register() at L5861 (3 hooks: post_tool_call, pre_llm_call, pre_tool_call)\n  - _on_post_tool_call() at L659 (~2000+ lines: tool records, R-modules, SDPO, circuit breaker, credit, chains)\n  - _on_pre_llm_call() at L2970 (3-priority injection: P1 max3, P2 max2, P3 max1, 1500 char budget)\n  - _on_pre_tool_call() at L1305 (world model, circuit breaker, cache)\n  - _on_post_api_request() at L2110 (token usage, cost, latency, rate-limit detection)\n- All ~/subconscious/ R-modules (436 .py files intact)\n- Mythos_enhancements.py (673 lines, still in plugin dir)\n- Memory notes about all 5 bugs and fixes\n\n5 BUGS TO FIX IN REBUILD:\n1. INJECTION 97.6% DEAD: keyword matching too weak, budget too tight → hybrid_search, 2400 chars, 8 tips max\n2. WORLD MODEL SIM 0%: should_simulate never fires → add 10% random base rate\n3. METACOG 0 ROUNDS: per-process singleton → store in cortex_nodes\n4. EPISODIC MEMORY EMPTY: build_injection returns empty → wire retrieve() into injection\n5. CREDIT ASSIGNMENT: skill_rewards uses SQLite int tip_id → add cortex_tip_id column\n\nCORTEX STATE: 377 tips, 13 domains, 97%+ embeddings, daemon running, 23/23 audit pass",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Reconstruct distillation plugin __init__.py from scratch with all 5 fixes incorporated. Build in phases: core framework, hooks, R-module wiring, then test.",
+  "timestamp": "2026-04-15T20:43:31Z",
+  "unix_time": 1776285811.913962,
+  "task_id": "20260415_154031_df4821",
+  "source": "manual",
+  "version": 2
+}

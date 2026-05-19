@@ -1,0 +1,13 @@
+{
+  "label": "usmile-filtered-deck-complete",
+  "context": "UWorld Pipeline COMPLETE. 396 cloze Anki cards created in deck \"UWorld Weak Subtopics\" from 186 UWorld quizzes, filtered to Danny's 38 weakest Step 1 subtopics. Combined with Phase 1 (4,077 NBME cards), Danny now has ~4,473 targeted Anki cards for Step 1 prep (~May 7).\n\nKey technical breakthrough: The POST body for getTestByQuestionIndexes requires PascalCase fields with STRING TestRecordId: {\"TestRecordId\": \"421548864\", \"QbankId\": 1, \"QuestionIndexes\": [1507, ...]}. Also, correctAnswer is a STRING while choiceNumber is an INT, requiring int() conversion.\n\nThe pipeline is split into Phase 1 (uworld_phase1.py — scans 186 tests, saves matches) and Phase 2 (uworld_phase2.py — fetches full content, creates Anki cards). Both require Chrome CDP on port 9222 for auth extraction and API calls via fetch() to avoid CORS.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Inform Danny that the UWorld pipeline is complete with 396 cards. Ask if he wants to verify the cards in Anki or needs anything else for Step 1 prep.",
+  "timestamp": "2026-04-14T05:10:15Z",
+  "unix_time": 1776143415.822627,
+  "task_id": "20260413_215447_795a06",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,39 @@
+{
+  "label": "training-gym-r165-130-streak",
+  "context": "Training Gym R161-R165 completed! ALL 10/10!\n\nR161: topk(T8), kthlarg(T8), primes(T8), slidmax(T10)\nR162: coinch(T9), lis(T9), islands(T9), cloneg(T9)\nR163: longcons(T9), wordsearch(T9), prodexc(T9), rotimg(T8)\nR164: mergeint(T8), jump2(T9), rainwat(T10), misspos(T10)\nR165: mediansorted(T10), regexpmatch(T10), maxwater(T9), subconcat(T10)\n\nDB: 519 exercises, 908 attempts, avg 9.94, 97.1% perfect. 470 passed. Tier 9+ = 188, Tier 10 = 88.\n130 consecutive rounds all 10/10!",
+  "active_tasks": [
+    "R165 130-streak milestone complete",
+    "R166 next"
+  ],
+  "decisions": [
+    "Top K frequent: bucket sort by frequency.",
+    "Kth largest: min-heap of size k.",
+    "Count primes: Sieve of Eratosthenes.",
+    "Sliding window max: monotonic deque.",
+    "Coin change: DP bottom-up. dp[i] = min(dp[i-c]+1).",
+    "LIS: patience sorting with binary search.",
+    "Number of islands: BFS flood fill.",
+    "Clone graph: BFS with visited map.",
+    "Longest consecutive: set-based. Only count from sequence start.",
+    "Word search: DFS backtracking with temp mark.",
+    "Product except self: prefix + suffix pass.",
+    "Rotate image: transpose then reverse rows.",
+    "Merge intervals: sort by start, merge overlapping.",
+    "Jump game II: greedy BFS. Track curr_end and farthest.",
+    "Trapping rain water: two pointers with left_max and right_max.",
+    "First missing positive: cyclic sort in-place.",
+    "Median two sorted: binary search on partition.",
+    "Regex match: DP. Handle * with zero or more occurrences.",
+    "Container most water: two pointers, move shorter.",
+    "Substring concat all words: sliding window with word chunks."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R166: Continue. Try: Longest Palindromic Substring, N-Queens, Sudoku Solver.",
+  "timestamp": "2026-04-09T01:02:52Z",
+  "unix_time": 1775696572.115171,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

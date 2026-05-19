@@ -1,0 +1,13 @@
+{
+  "label": "ready-for-score-reports",
+  "context": "## Session: UWorld Exhibit Investigation COMPLETE\n\n### What's resolved:\n- **Exhibit href ≠ media file ID**: The href ID in `<a href=\"42465\">exhibit</a>` does NOT map to the image URL. Q15555 href=42465 but real image is U67968.png. Q316 exhibit maps to U47837.png. Only way to get real URLs is clicking exhibit in Chrome and grabbing mat-dialog-container img src.\n- **30 wrong uw_exhibit_* files DELETED** from Anki media — they were random UWorld images at the wrong URLs\n- **1 card fixed**: note 1776178154478 had broken inline img L47016.jpg → replaced with local uw_L47016.jpg\n- **49 exhibit cards**: left as `<a href>` links (2.7% of deck, negligible)\n- **CSS fixed**: Cloze desktop front=16px, back=1.0rem, mobile=15px/1.0rem\n- **Port conflict fixed**: killed stale http.server 8765\n\n### Tomorrow's plan (4 score reports):\n1. Danny provides 4 score reports\n2. Analyze top 5 weakest subtopics\n3. Scan UWorld for NEW questions in those subtopics (skip existing by checking `uworld::q{ID}` tags)\n4. Create only NEW cards and add to \"UWorld Weak Subtopics\" deck\n5. Do NOT re-pull existing 1800+ cards — just add on top\n6. Handle inline `<img>` tags (download via CDP, store locally) — skip exhibit `<a>` links (2.7% negligible)\n7. Budget: $23 credits remaining — use CDP+Anki (free) not delegation\n\n### Key files:\n- Phase 1 scan: ~/Desktop/uworld_phase1_broad.py\n- Phase 2 card creation: ~/Desktop/uworld_phase2_broad_v2.py\n- UWorld API skill: ~/.hermes/skills/devops/uworld-api-extraction/SKILL.md\n- Exhibit→QID mapping: /tmp/exhibit_to_qid_map.json\n\n### UWorld API reminders:\n- CORS: all calls MUST go through Chrome CDP Runtime.evaluate fetch()\n- JWT expires ~1hr, refresh via location.reload()\n- getTestByQuestionIndexes: PascalCase, STRING TestRecordId\n- Chrome CDP on port 9222, user-data-dir=/tmp/chrome-uworld\n- webhook-client installed in hermes venv\n- Tag format: uworld::q{questionId}",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "When Danny provides 4 score reports: (1) parse them to identify weakest subtopics, (2) run Phase 1 scan for those subtopics filtering out already-tagged question IDs, (3) run Phase 2 to create new cards only, (4) download inline images via CDP, (5) add to deck",
+  "timestamp": "2026-04-16T04:17:29Z",
+  "unix_time": 1776313049.91058,
+  "task_id": "20260415_205415_473e89",
+  "source": "manual",
+  "version": 2
+}

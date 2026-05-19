@@ -1,0 +1,31 @@
+{
+  "label": "training-gym-r143-complete",
+  "context": "Training Gym R141-R143 completed! All 10/10!\n\nR141: med2(T10), nqueens(T9), paint(T8), ladder(T9)\nR142: trie(T9), numarr(T9), tasksched(T8), gas(T8)\nR143: lfu_cache(T10), slidemax(T9), minwin(T9), longk(T8)\n\nDB: 471 exercises, 811 attempts, avg 9.93, 96.8% perfect. 423 passed. Tier 9+ = 145, Tier 10 = 71.\n109+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R143 complete",
+    "R144 next"
+  ],
+  "decisions": [
+    "Median two sorted: binary search on shorter array. Track left/right partitions.",
+    "N-Queens: backtracking with col/diag1/diag2 sets.",
+    "Paint house: DP. Track min cost per color.",
+    "Word ladder: BFS. Generate all 1-char variants.",
+    "Trie: dict children + is_end flag.",
+    "Fenwick tree: _add(i,delta) with i+=i&(-i). prefix_sum similar.",
+    "Task scheduler: (max_count-1)*(n+1)+ties vs len(tasks).",
+    "Gas station: track surplus. Reset when negative.",
+    "LFU cache: freq-keyed OrderedDicts. Evict from min_freq.",
+    "Sliding window max: monotonic deque. Pop smaller, pop expired.",
+    "Min window substring: sliding window with have_count/need_count.",
+    "Longest K distinct: sliding window. Shrink when len(counts)>k."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R144: Continue. Try: Serialize/Deserialize Binary Tree, Merge K Sorted Lists, or Sudoku Solver.",
+  "timestamp": "2026-04-09T00:10:26Z",
+  "unix_time": 1775693426.246346,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

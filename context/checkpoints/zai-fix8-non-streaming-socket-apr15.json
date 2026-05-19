@@ -1,0 +1,24 @@
+{
+  "label": "zai-fix8-non-streaming-socket-apr15",
+  "context": "Training gym session continuing from r27-r30-complete-apr15 checkpoint.\n\nCOMPLETED THIS SESSION:\n  Fix 8: Non-streaming socket liveness + 120s stale cap for Z.AI dead socket bug.\n    - ROOT CAUSE: Non-streaming API path (used by glm-5.1 via Z.AI coding endpoint) had NO socket liveness detection and 300s stale timeout. When Z.AI's LB killed the TCP connection, CLI froze for 2-5 min.\n    - FIX: Added _ns_check_socket_liveness() to non-streaming path (10s interval), capped stale timeout at 120s, also sped up streaming socket check from 30s to 10s.\n    - FILE: ~/hermes-agent/run_agent.py (lines ~4900-5025 new code, ~5673 interval change)\n    - Gateway restarted. Fix takes effect in new CLI sessions.\n\nSTATE (unchanged from restored checkpoint):\n  Plugin: 3,747 lines\n  Cortex tips: 4,134 (avg Elo 1089, max 2329)\n  Modules in ~/subconscious/: 232 .py files\n  Wired imports in plugin: 53\n  LCM: 0 compressions, ~47K/200K prompt tokens\n\nFROM RESTORED CHECKPOINT (R27-R30 already done):\n  R27: World Model (world_model_r27.py) — SPA + Foresight Failure\n  R28: PredictionVerifier (prediction_verifier_r28.py) — WAV arXiv:2604.01985\n  R29: CuriosityExplorer (curiosity_explorer_r29.py) — CovQValue arXiv:2604.05159\n  R30: StructuredReflector (structured_reflector_r30.py) — arXiv:2509.18847\n  R31 RESEARCH DONE BUT NOT BUILT: Memory Management (2505.16067)\n\nFILES MODIFIED THIS SESSION:\n  ~/hermes-agent/run_agent.py (Fix 8 — non-streaming socket liveness + stale cap)\n\nDANNY REQUESTED: Deploy GLM-5V-Turbo vision analysis of architecture diagram after every round. cortex-architecture-diagram skill loaded.",
+  "active_tasks": [
+    "Generate architecture diagram and run GLM-5V vision gap analysis",
+    "R31: Build from arXiv:2505.16067 (memory management / experience-following / error propagation)",
+    "Continue training gym R32+",
+    "Visual gap analysis after every round going forward"
+  ],
+  "decisions": [
+    "Fix 8 applied: non-streaming path now has socket liveness + 120s cap",
+    "Streaming socket check interval reduced from 30s to 10s",
+    "Danny wants GLM-5V architecture diagram vision analysis after every round"
+  ],
+  "files_modified": [
+    "~/hermes-agent/run_agent.py"
+  ],
+  "next_steps": "1. Generate cortex_architecture.html diagram with current R27-R30 state\n2. Open in Chrome + screenshot\n3. Base64 encode + send to GLM-5V-Turbo for gap analysis\n4. Build R31 from arXiv:2505.16067\n5. Visual gap analysis after R31\n6. Continue R32+ with vision-guided gap filling",
+  "timestamp": "2026-04-15T02:11:05Z",
+  "unix_time": 1776219065.423647,
+  "task_id": "20260414_210012_759c47",
+  "source": "manual",
+  "version": 2
+}

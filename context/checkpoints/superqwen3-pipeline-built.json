@@ -1,0 +1,13 @@
+{
+  "label": "superqwen3-pipeline-built",
+  "context": "Built the full SuperQwen3.6 pipeline — 3 new files totaling ~2500 lines that implement Jiunsong's (songjunkr) \"Super\" methodology for Qwen3.6-35B-A3B on DGX Spark.\n\nNEW FILES in ~/dgx-spark-prep/:\n1. superqwen3-super.sh (868 lines) — Main orchestrator. 8-phase pipeline: P0 Delimit (5-layer) → P1 Restore SFT → P2 Baseline Validation → P3 Generic SFT → P4 GRPO → P5 Post-Training Validation → P6 Merge → P7 Stability Refresh → repeat P3-P7. Replaces dual-training-orchestrator.sh as recommended path.\n2. superqwen3-restore-data.py (812 lines) — Generates 148+ targeted SFT examples across 10 categories (false premise correction, exact JSON, tool calls, sentinel extraction, identity anti-leak, loop determinism, tool integrity, unicode hygiene, hallucination guard, clean refusals). Uses low LR (5e-6) + small LoRA (r=8, alpha=16) for precise behavior restoration after abliteration. Runs BEFORE generic SFT.\n3. superqwen3-validate.py (806 lines) — 42 behavioral tests: 9 capability + 20 reliability + 13 red-team. Tests JSON exactness, tool calls, sentinel extraction, hallucination guard, loop resistance, false premise correction, identity consistency, prompt hygiene, CJK probes, unicode attacks, injection resistance, tool fabrication, and more. Exit code 1 if score < 80%.\n\nAll 3 scripts tested: restore-data.py runs clean with augmentation (148 examples), validate.py passes syntax check, super.sh has all phases wired.\n\nQUICKREF.md updated with new Super pipeline section replacing old self-training section.\n\nAlso researched EXO disaggregated prefill/decode architecture: Spark does prefill (100 TFLOPs), Mac Studio does decode (819 GB/s bandwidth) = 2.8x speedup. Danny's M2 Air 24GB is too small for meaningful decode benefit — needs Mac Studio M4 Ultra 512GB for this to shine. EXO 1.0 automates this.\n\nJiunsong (HF: Jiunsong, Twitter: songjunkr) is the author of \"Super\" models. SuperGemma4-26b-abliterated-multimodal on HF shows the methodology. His incoming SuperQwen3.6 will use same approach; we replicate it locally and don't need to download.\n\nDanny has one more thing to look into.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Danny wants to look into one more thing — ask what it is when resuming. All Super pipeline files are built and ready for launch day.",
+  "timestamp": "2026-04-18T16:29:19Z",
+  "unix_time": 1776529759.528203,
+  "task_id": "20260417_215727_387de3",
+  "source": "manual",
+  "version": 2
+}

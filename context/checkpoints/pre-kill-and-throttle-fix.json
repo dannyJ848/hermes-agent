@@ -1,0 +1,13 @@
+{
+  "label": "pre-kill-and-throttle-fix",
+  "context": "DIAGNOSED CLI STUCK ISSUE — Rate Limit Storm + Compaction Deadlock:\n- 4 Hermes CLI sessions sharing GLM-5.1 API → 429 rate limit storm → retry loops fill context → compaction triggered → compaction also needs API call → also 429'd → deadlock\n- Memory pressure: 16.8GB swap used, llama.cpp 2.8GB, system thrashing\n- Stuck session PID 61026 (ttys003, 33% CPU, deadlock)\n- Zombie session PID 18814 (ttys000, from yesterday)\n- Second agent PID 62823 (s001, still alive)\n- Migration v4 alive at tip 220/3411, 0.2/s, ~4h ETA\n\nNEXT: Kill zombie (18814) + stuck (61026), build rate-limit throttle into plugin.\n\nALL V0.8.0 INTEGRATION COMPLETE:\n- HindsightContextEngine at ~/hermes-agent/plugins/context_engine/hindsight/\n- Watch Patterns at ~/subconscious/watch_patterns_training.py\n- Delegate Reasoning at ~/subconscious/delegate_reasoning.py\n- MiniMax M2.7 wrapper on port 8084\n- Plugin 2293 lines, 3439 tips\n- Config: context.engine=hindsight, delegation.reasoning_effort=medium\n- Local models: Phi-3(8081,33tok/s), Llama(8082,17.5tok/s), Nomic(8083), MiniMax(8084)\n- VPS: 2.24.28.233, Hindsight healthy, migration in progress",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "1. Kill zombie PID 18814 and stuck PID 61026\n2. Build rate-limit throttle into distillation plugin pre_llm_call\n3. Restart gateway\n4. Verify everything stable",
+  "timestamp": "2026-04-11T15:18:16Z",
+  "unix_time": 1775920696.045057,
+  "task_id": "20260410_231220_230a8b",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,17 @@
+{
+  "label": "testing-gym-benchmark-design-start",
+  "context": "TESTING GYM — ready to build benchmark suite. 30 modules wired, ~4150 tips, zero proof of improvement. Need to build standardized tasks with scoring rubrics to measure if modules actually improve agent performance.\n\nRESEARCH DONE: Looked at AgentBench (8 environments), Galileo agent eval framework (7 dimensions, 25 sub-dims). Our benchmarks need to test the capabilities our modules target: tool routing, recovery, reasoning, self-critique, frontier task generation, etc.\n\nDESIGN DIRECTION: 10 tasks across domains (search, coding, reasoning, tool-use, debugging, planning). Single agent runs both BUILD and TEST phases. Pre/post scoring around training gym rounds.\n\nKEY FILES:\n  ~/subconscious/ — 234 .py modules\n  ~/.hermes/plugins/distillation/__init__.py — ~3,800 lines, all R-modules wired\n  /tmp/training-gym-status.md — round log\n\nSTATE: Was about to design 10 benchmark tasks and build testing_gym.py when Danny asked for restart.",
+  "active_tasks": [
+    "Build Testing Gym — standardized benchmark suite with pre/post scoring",
+    "Run baseline benchmarks before next training gym round",
+    "Continue training gym rounds WITH benchmark validation"
+  ],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "1. Design 10 standardized benchmark tasks across domains (research, debugging, planning, tool use, code)\n2. Build testing_gym.py with scoring rubric (0-10 per task)\n3. Run baseline benchmark — get starting scores\n4. Continue training gym R33+ WITH benchmark validation after each round",
+  "timestamp": "2026-04-15T03:34:52Z",
+  "unix_time": 1776224092.094202,
+  "task_id": "20260414_222406_2a38c8",
+  "source": "manual",
+  "version": 2
+}

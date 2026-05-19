@@ -1,0 +1,13 @@
+{
+  "label": "visual-diff-done",
+  "context": "Visual diff detection deployed at ~/subconscious/visual_diff.py. 6 severity levels for classifying screen changes. Uses Pillow for pixel comparison. AGI cycle 17+. Controller has 5 phases. All healthy.",
+  "active_tasks": [
+    "Wire visual diff into vision loop",
+    "Continue AGI cron cycles",
+    "Ground mid-trust facts",
+    "Set HERMES_CRON_TIMEOUT=300",
+    "Research more self-improvement"
+  ],
+  "timestamp": "2026-04-05T07:34:41Z",
+  "task_id": "20260404_215806_7e676d"
+}

@@ -1,0 +1,12 @@
+{
+  "label": "12-systems-scorecard",
+  "context": "Agent Scorecard deployed (system #12). Overall score: 52/100. Level 2 and 4 at max. Level 1 needs fix (empty call_log). Level 3 low (single model). Level 5 moderate. 7 papers saved. 178 knowledge files. AGI cycle 26+. All healthy.",
+  "active_tasks": [
+    "Fix scorecard to use distillation buffer for tool stats",
+    "Continue AGI cycles",
+    "Prepare for DEVELOPMENT domain",
+    "Monitor controller Phase 5"
+  ],
+  "timestamp": "2026-04-05T07:59:53Z",
+  "task_id": "20260404_215806_7e676d"
+}

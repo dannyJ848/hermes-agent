@@ -1,0 +1,21 @@
+{
+  "label": "r140-quality-cleanup-941-apr8",
+  "context": "R140. Hit 1000 tips then did quality cleanup. Purged 59 tips: 25 auto-generated 0.5 confidence duplicates (bulk \"When searching file contents via terminal\"), duplicate conditions, and tips below 0.7 confidence. Result: 941 tips at 0.8454 avg confidence — HIGHER quality than 1000 at 0.834. Range 0.7-0.95. DB vacuumed.\n\nSession totals:\n- 5 papers: TRACE, MatClaw, AgentGL, SkillX, Deep Researcher Agent\n- 6 findings saved\n- 941 high-quality tips\n- Key gap: functional-level chains added (6 workflow tips)\n- System: gateway PID 28336, caffeinate PID 82351, disk 5%, cerebrum DB vacuumed\n\nDanny at daylong test. Quality-first. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R140 QUALITY CLEANUP — 941 tips, 0.845 avg — cleaned and vacuumed"
+  ],
+  "decisions": [
+    "Quality cleanup is ongoing — purge duplicates and low-confidence tips every 20 rounds",
+    "941 at 0.845 > 1000 at 0.834 — quality matters more than count",
+    "0.7 confidence is the floor — nothing below survives cleanup"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (purged 59 tips, vacuumed)"
+  ],
+  "next_steps": "R141: Continue organic growth from clean 941 base. Target: 1000 at 0.845+ avg.",
+  "timestamp": "2026-04-08T16:52:35Z",
+  "unix_time": 1775667155.061045,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

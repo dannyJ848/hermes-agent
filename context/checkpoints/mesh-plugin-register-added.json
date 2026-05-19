@@ -1,0 +1,24 @@
+{
+  "label": "mesh-plugin-register-added",
+  "context": "Added register(ctx) function to mesh plugin at ~/.hermes/plugins/evey-mesh/__init__.py. The plugin had all 4 tool functions (mesh_status, mesh_message, mesh_task, mesh_lock) but no register() entry point, so Hermes couldn't load any of them. Added register() that calls ctx.register_tool() for each with proper JSON schemas. Also fixed plugin.yaml to use provides_hooks instead of hooks, and cleared all __pycache__ for both mesh and distillation plugins. The distillation plugin also needs gateway restart (pre_tool_call hook wasn't loading due to stale .pyc cache from previous session).",
+  "active_tasks": [
+    "Mesh plugin register() added — needs gateway restart to activate",
+    "Distillation pre_tool_call hook — needs gateway restart (pyc cache cleared)"
+  ],
+  "decisions": [
+    "Added register() with 4 ctx.register_tool() calls for mesh_status, mesh_message, mesh_task, mesh_lock",
+    "Each tool has proper JSON schema with required fields, descriptions, enums, and defaults",
+    "DB init happens inside register() after tools are registered"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/evey-mesh/__init__.py",
+    "~/.hermes/plugins/evey-mesh/plugin.yaml",
+    "~/hermes-agent/plugins/evey-mesh/__init__.py"
+  ],
+  "next_steps": "Restart gateway, verify both mesh tools (4 tools) and distillation hooks (2 hooks) load in gateway.log",
+  "timestamp": "2026-04-06T21:07:36Z",
+  "unix_time": 1775509656.920067,
+  "task_id": "20260406_160108_7494c4",
+  "source": "manual",
+  "version": 2
+}

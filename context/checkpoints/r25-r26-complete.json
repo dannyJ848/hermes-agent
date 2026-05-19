@@ -1,0 +1,25 @@
+{
+  "label": "r25-r26-complete",
+  "context": "R25 + R26 COMPLETE in one session. Vision-guided training gym loop confirmed.\n\nR25: Episodic Memory (GSW arXiv:2511.07587)\n- ~/subconscious/episodic_memory.py (15KB)\n- Operator captures tool outcomes, Reconciler clusters every 50 calls, Retriever queries Cortex DB\n- Wired in BOTH hooks (post_tool line ~862, pre_llm line ~3270)\n- Activated 17K dormant Cortex nodes, 6 tips distilled\n\nR26: Novelty Detector (SuS arXiv:2601.10349)\n- ~/subconscious/novelty_detector_r26.py (13KB)\n- PredictionEngine → SurpriseCalculator → NoveltyMemory → ExplorationBonus\n- Detects stagnation (unique_ratio < 0.4 in last 20 calls) and low surprise (avg < 0.15)\n- Injects exploration bonus: \"Break the loop: try different tools\"\n- Wired in BOTH hooks (post_tool line ~876, pre_llm line ~3284)\n- 4 tips distilled\n\nGLM-5V VISION PIPELINE (confirmed working):\n  1. Generate diagram → ~/Desktop/cortex_architecture.html\n  2. open -a \"Google Chrome\" + screencapture -x /tmp/cortex.png\n  3. base64 encode → send to https://api.z.ai/api/paas/v4/ model=glm-5v-turbo\n  4. MUST use base64 (data:image/png;base64,{b64}), NOT URLs\n\nCURRENT STATE:\n  Plugin: ~3,640 lines (was 3,597)\n  Wired modules: 24 (R25+R26 each wired in 2 hooks = +4)\n  Cortex: 24,170 nodes, 325 tips, Elo max 2273\n  Research papers: 17 (added GSW + SuS)\n  Balance: 7/10 (GLM-5V rated)\n  Next gaps: world model, inter-agent protocol\n\nTOKENS: ~102K/120K threshold. Compression imminent. One more round max.",
+  "active_tasks": [
+    "R27: World model or next gap from GLM-5V analysis"
+  ],
+  "decisions": [
+    "R26 novelty_detector uses SuS paper prediction-mismatch approach",
+    "Named file novelty_detector_r26.py to avoid collision with existing novelty_tracker.py stub",
+    "Stagnation threshold 0.6, min surprise 0.15 — tuned from simulation",
+    "Both R25+R26 wired in both hooks — pattern established for all future modules"
+  ],
+  "files_modified": [
+    "~/subconscious/episodic_memory.py (R25, 15KB)",
+    "~/subconscious/novelty_detector_r26.py (R26, 13KB)",
+    "~/.hermes/plugins/distillation/__init__.py (R25+R26 wired)",
+    "~/Desktop/cortex_architecture.html (R25 state diagram)"
+  ],
+  "next_steps": "1. ONE more round (R27) before compression at 120K tokens\n2. R27 target: world model (state estimation for environment)\n3. Or skip R27 and save checkpoint — compression will hit soon\n4. After compression: restore r25-r26-complete checkpoint and continue",
+  "timestamp": "2026-04-15T00:06:32Z",
+  "unix_time": 1776211592.4142022,
+  "task_id": "20260414_183956_d3ed13",
+  "source": "manual",
+  "version": 2
+}

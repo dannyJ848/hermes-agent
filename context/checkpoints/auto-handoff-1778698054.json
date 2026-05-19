@@ -1,0 +1,14 @@
+{
+  "label": "auto-handoff-1778698054",
+  "timestamp": 1778698054.014833,
+  "context": {
+    "timestamp": 1778698054.014804,
+    "session_id": "20260513_004940_7419c5",
+    "compression_count": 5,
+    "message_count": 85,
+    "model": "kimi-for-coding",
+    "system_prompt_preview": "You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and in",
+    "todo_snapshot": "[Your active task list was preserved across context compression]\n- [>] 1. Build DistillationBridge class for distillation_bridge.py (in_progress)\n- [ ] 2. Build SubconsciousHookWiring class for subconscious_hook_wiring.py (pending)\n- [ ] 3. Build TrainingGym class for training_gym.py (pending)\n- [ ] 4. Update orchestrator initializers to use new classes (pending)\n- [ ] 5. Fix CortexDB duplicate key errors in skill_tracker (pending)\n- [ ] 6. Fix flywheel eval schema (round_id column) (pending)\n- [ ] 7. Run full live test \u2014 verify 14/14 active (pending)\n- [ ] 8. Clean up any remaining issues (pending)"
+  },
+  "session_id": "20260513_004940_7419c5"
+}

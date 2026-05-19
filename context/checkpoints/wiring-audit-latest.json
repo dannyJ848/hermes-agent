@@ -1,0 +1,63 @@
+{
+  "plugins": {
+    "error": "No module named 'agent.plugin_loader'"
+  },
+  "hooks": {
+    "error": "No module named 'agent.plugin_loader'"
+  },
+  "tools": {
+    "total": 103,
+    "x_tools": [],
+    "vision_tools": [],
+    "has_x_tweet_fetch": false,
+    "has_x_search": false,
+    "has_x_user_tweets": false
+  },
+  "databases": {
+    "distillation_buffer": {
+      "exists": true,
+      "tables": 7,
+      "healthy": true
+    },
+    "tool_capability": {
+      "exists": true,
+      "tables": 4,
+      "healthy": true
+    },
+    "cerebrum": {
+      "exists": true,
+      "tables": 10,
+      "healthy": true
+    }
+  },
+  "providers": {
+    "vision_custom": {
+      "resolved": true,
+      "client_type": "OpenAI",
+      "model": "glm-5v-turbo"
+    }
+  },
+  "files": {
+    "x_tool": {
+      "exists": true,
+      "size": 14810
+    },
+    "self_evolution": {
+      "exists": true,
+      "size": 21886
+    },
+    "delegate_tool": {
+      "exists": true,
+      "size": 111738
+    },
+    "auxiliary_client": {
+      "exists": true,
+      "size": 171245
+    },
+    "config_yaml": {
+      "exists": true,
+      "size": 15163
+    }
+  },
+  "overall": "FAIL"
+}

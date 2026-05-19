@@ -1,0 +1,28 @@
+{
+  "label": "distillation-v2-plugin-fixed",
+  "context": "DISTILLATION V2 — FULL SESSION CONTEXT (Apr 6, ~3:30-4:00 PM)\n\nCOMPLETED WORK:\n1. Rewrote extract_tip_heuristic() in ~/subconscious/distillation_bridge.py — extracts task intent from arg VALUES not arg KEY NAMES\n2. Added _is_noise_lesson() filter + DB-level noise guard before INSERT (lines 462-471)\n3. Rewrote epoch_synthesis() to categorize errors by root cause, produce behavioral rules\n4. Purged 967 noise tips → 18 clean tips (0% noise, 100% actionable)\n5. 100-cycle validator passes ALL quality gates (noise<10%, actionable>80%, meta 0 noise)\n6. Created distillation plugin — BUT HAD TWO BUGS:\n   - Put it in ~/hermes-agent/plugins/distillation/ (WRONG — that's internal only)\n   - Used register_hooks() instead of register() (WRONG — plugin system expects register())\n   - Used \"hooks:\" in plugin.yaml instead of \"provides_hooks:\" (WRONG)\n\nFIXES APPLIED (this is the current state):\n- Plugin moved to ~/.hermes/plugins/distillation/ (correct user plugin dir)\n- Function renamed to register(ctx) \n- plugin.yaml key changed to provides_hooks:\n- Files synced to both locations as backup\n\nCURRENT STATE:\n- Gateway JUST RESTARTED (second restart). Plugin should now load.\n- DB has 18 clean tips, 0 noise\n- Controller cron is KILLED (pkill -f controller.py)\n- JSONL buffer is EMPTY\n- Plugin is at ~/.hermes/plugins/distillation/ with correct register() function\n\nVERIFICATION NEEDED (first thing in new session):\n- Check if plugin loaded: make a tool call, then check tip count\n- sqlite3 ~/.hermes/cerebrum_memory.db \"SELECT COUNT(*) FROM distilled_tips;\"\n- Count should go up after tool calls if plugin is working\n\nFILES MODIFIED:\n- ~/subconscious/distillation_bridge.py (extraction + synthesis rewrite + noise guard)\n- ~/subconscious/distillation_100.py (rewritten validator)\n- ~/.hermes/plugins/distillation/__init__.py (plugin with register())\n- ~/.hermes/plugins/distillation/plugin.yaml (provides_hooks)\n- ~/hermes-agent/plugins/distillation/__init__.py (backup copy)\n- ~/hermes-agent/plugins/distillation/plugin.yaml (backup copy)\n\nKEY LESSONS LEARNED:\n1. Plugin discovery scans ~/.hermes/plugins/ NOT ~/hermes-agent/plugins/\n2. Plugin entry point must be register(ctx) not register_hooks(ctx)\n3. plugin.yaml uses \"provides_hooks:\" not \"hooks:\"\n4. Controller cron has old code cached — must be killed AND buffer cleared after code changes\n5. Noise guard at DB INSERT level is critical — stale processes bypass Python code\n6. __pycache__ must be cleared after patching distillation_bridge.py\n7. The memory plugin at ~/hermes-agent/plugins/memory/ is a hardcoded internal path, NOT discoverable by the plugin system\n\nDANNY'S SYSTEMWIDE ASSESSMENT (still active):\nPriority order: (1) bottom-up + top-down distillation line-by-line logic audit of ALL code [DONE], (2) 100-cycle validation [DONE], (3) black hat extraction, (4) AGI cycles. Audit is COMPLETE. Next is black hat extraction.\n\nINJECTED CONTEXT (what was in context at end of session):\n- Tool intelligence showing weak tools: cerebrum (0%), knowledge_search (0%), delegate_parallel (0%)\n- Proven tools: search_files (89%), verify_repo (81%)\n- Active inference recommending 3d_rendering domain (score 0.53)\n- Perspective diversity LOW (0.0/1.0)\n- Token tracker: 896 calls, ~333k tokens in 6h\n- read_file has 49% failure rate\n- Self-debug: 123 unknown errors, 11 syntax errors, 9 sqlite errors\n- AGI Cycle 217/1000, Domain=REASONING\n- Iteration lessons: think:217 (2758x), think_json:350 (2095x), terminal (389x)\n- Memory at 10.2% (5098 chars)",
+  "active_tasks": [
+    "Distillation V2 deployed — plugin moved to correct directory, needs verification after restart"
+  ],
+  "decisions": [
+    "Plugin goes in ~/.hermes/plugins/ not ~/hermes-agent/plugins/",
+    "register() not register_hooks()",
+    "provides_hooks: not hooks: in plugin.yaml",
+    "Controller cron must be killed + buffer cleared after code changes",
+    "DB-level noise guard is mandatory — Python-level guards get bypassed by stale processes"
+  ],
+  "files_modified": [
+    "~/subconscious/distillation_bridge.py",
+    "~/subconscious/distillation_100.py",
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/.hermes/plugins/distillation/plugin.yaml",
+    "~/hermes-agent/plugins/distillation/__init__.py",
+    "~/hermes-agent/plugins/distillation/plugin.yaml"
+  ],
+  "next_steps": "Verify distillation plugin loaded in new session by: (1) making a tool call, (2) checking distilled_tips count before/after. If plugin loaded, tip count should increase from live tool calls. Then move to next priority: black hat extraction.",
+  "timestamp": "2026-04-06T20:50:27Z",
+  "unix_time": 1775508627.4380858,
+  "task_id": "20260406_150705_941e09",
+  "source": "manual",
+  "version": 2
+}

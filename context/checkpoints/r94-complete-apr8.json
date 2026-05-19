@@ -1,0 +1,20 @@
+{
+  "label": "r94-complete-apr8",
+  "context": "R94 complete. 338 tips, avg conf 0.825. Added Context Engineering tip (5 context quality criteria: relevance, sufficiency, isolation, economy, provenance. Context = agent OS. Cumulative pyramid: PE -> CE -> IE -> SE. Whoever controls context controls behavior). New domain: context-management. Round 94. ~04:01 AM. Danny sleeping. Loop continues. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R94 complete — 338 tips, 0.825 — ready for R95"
+  ],
+  "decisions": [
+    "Context engineering is a discipline above prompt engineering — manages entire informational environment",
+    "5 quality criteria (relevance, sufficiency, isolation, economy, provenance) define context quality"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R95: Continue. Push into tool learning or skill acquisition.",
+  "timestamp": "2026-04-08T08:43:46Z",
+  "unix_time": 1775637826.073996,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

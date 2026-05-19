@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r50-milestone",
+  "context": "Training Gym R50 MILESTONE completed! ALL 4 CLEAN ON FIRST TRY!\n\nR50 RESULTS (all 10/10, all clean):\n1. tarjan-scc-001 (T9) - SCC with low-link, on_stack tracking. 5 tests. Clean!\n2. segment-tree-lazy-001 (T9) - Range sum + range add with lazy propagation. 5 tests. Clean!\n3. floyd-warshall-001 (T7) - APSP with next_hop reconstruction. 5 tests. Clean!\n4. gaussian-elimination-001 (T8) - Partial pivoting, determinant. 5 tests. Clean!\n\n=== CUMULATIVE STATS ===\nTotal: 439 attempts, avg 9.88\n10/10 scores: 413 (94.1%)\nSub-10 scores: 25 (5.9%)\nAlways perfect exercises: 387\nClean first-try: 364\n13 consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R50 MILESTONE COMPLETE",
+    "R51 next"
+  ],
+  "decisions": [
+    "Tarjan SCC: low[v]=min(low[v], disc[u]) when u is on stack (not low[u])",
+    "Segment tree lazy: push before every access, propagate to children only if not leaf",
+    "Floyd-Warshall: intermediate k is outermost loop. O(V^3).",
+    "Gaussian: partial pivoting prevents division by near-zero. Track sign for determinant."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R51 exercises. Try: Hopcroft-Karp bipartite matching, Tarjan Bridge finding, Aho-Corasick, or Bloom Filter.",
+  "timestamp": "2026-04-08T19:31:06Z",
+  "unix_time": 1775676666.323735,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

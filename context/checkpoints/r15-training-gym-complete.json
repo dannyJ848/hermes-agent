@@ -1,0 +1,20 @@
+{
+  "label": "r15-training-gym-complete",
+  "context": "R15 COMPLETE. Built interaction_logger.py (turn-level quality tracking). Loop detection (4+ same tool in 10 turns), error streak detection (3+/5 failures), low diversity detection. Wired as R181 in both post_tool_call and pre_llm_call. 2 tips.\n\nFINAL 16-MODULE STACK (14 wired + 2 stored):\n  WIRED: R168 self_critic, R169 reasoning_discover, R170 task_frontier, R171 uncertainty_reward, R172 tool_adaptor, R173 meta_reasoner, R174 reflection_synth, R175 curriculum, R176 tool_router, R177 heuristic_matcher, R178 recovery_selector, R179 confidence_estimator, R180 task_decomposer, R181 interaction_logger\n  STORED: context_governor\n  Plugin: 3,499 lines. 106 total tips. Compressions: 1 of 16.\n\nRESEARCH SOURCES: SelfDiscover(2402.03620), Tool-R0(2602.21320), SELAUR(2602.21158), DRAFT(2410.08197), ARES(2603.07915), Externalization(2604.08224), GVU(2512.02731), E2H Curriculum(2506.06632), Select-then-Solve(2604.06753), ERL(2603.24639), PALADIN(2509.25238), Confidence-First(2603.05881).",
+  "active_tasks": [
+    "R16+: Continue training gym until 16 compactions"
+  ],
+  "decisions": [
+    "Interaction problems only injected when detected — silent when healthy"
+  ],
+  "files_modified": [
+    "~/subconscious/interaction_logger.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "R16+: Keep building modules. Check context after each round.",
+  "timestamp": "2026-04-14T21:29:58Z",
+  "unix_time": 1776202198.059016,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

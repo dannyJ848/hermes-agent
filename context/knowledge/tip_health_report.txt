@@ -1,0 +1,22 @@
+TIP HEALTH REPORT — 2026-04-07 21:43
+==================================================
+
+Health Score: 10/10
+
+Total Tips: 109
+Avg Confidence: 0.87
+High Confidence (>=0.8): 102 (94%)
+Low Confidence (<0.6): 1 (1%)
+Dead Tips (never voted): 85 (78%)
+Tools Covered: 10
+Tip Type Diversity: 15
+
+ISSUES:
+  - DEAD TIPS: 85/109 never voted on
+
+TOP TOOLS BY TIP COUNT:
+  reasoning: 62 tips, avg conf 0.87
+  execute_code: 24 tips, avg conf 0.89
+  terminal: 5 tips, avg conf 0.94
+  read_file: 4 tips, avg conf 0.96
+  search_files: 4 tips, avg conf 0.79

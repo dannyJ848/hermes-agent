@@ -1,0 +1,27 @@
+{
+  "label": "r265-operational-audit-complete",
+  "context": "R265 OPERATIONAL AUDIT COMPLETE. Training gym ready for continuation.\n\nSYSTEM STATUS:\n- Cerebrum: 1,696 tips, avg conf 0.89, 34 types, 269 domains\n- Confidence dist: 253 at 0.95+, 492 at 0.90-0.94, 866 at 0.80-0.89, 72 at 0.70-0.79, 13 at 0.50-0.69\n- Hindsight: LOCAL Mac PostgreSQL healthy at localhost:8890, VPS at 2.24.28.233:8890 also healthy\n- Gateway: PID 47649, 19MB RAM, restarted at 9:43PM, zero errors in log\n- Local inference: ALL 4 servers UP (Phi-3:8081, Llama3:8082, Nomic:8083, MiniMax:8084)\n- Subconscious: 180 modules total\n- Distillation plugin: 158 lines, post_tool_call + pre_tool_call hooks registered\n- Disk: 2.2GB .hermes, 12MB cerebrum DB, 3.9MB knowledge\n- Last round: R264 (Elo flywheel + splicer + proximity credit + gym strategy)\n- Tips created today: 1 (just 1 hindsight sync)\n- Recent distill scripts: R260-R264 exist at /tmp/\n\nISSUES IDENTIFIED:\n1. browser_navigate: 0% success - CLI process cached old CAMOFOX_URL env. Need new CLI session.\n2. cached_delegate: 0% success - missing evey_utils module (needs new CLI session too)\n3. knowledge_search: 11% success - needs investigation\n4. Hindsight local API responding on port 8890 (healthy)\n5. Gemini 3 Flash / MiMo V2 Pro delegation: BLOCKED by OpenRouter credits (402 insufficient credits)\n6. Only 1 tip created today - training loop has stalled since R264\n\nTRAINING GYM READINESS:\n- Distillation pipeline: OPERATIONAL (post_tool_call hook extracts tips from tool outcomes)\n- Eval flywheel: EXISTS but no eval_results directory (hasn't been run recently)\n- Trajectory splicer: EXISTS, wired\n- Intrinsic metacognition: EXISTS, wired\n- Elo 3-judge panel: Built in R264, needs next tournament run\n- Tip growth stalled: R190 was last major injection, R264 was just 5 tips\n\nNEXT STEPS for training continuation:\n1. Start new CLI session to fix browser_navigate + cached_delegate + knowledge_search\n2. Create R265 distillation script with fresh research findings\n3. Run eval_flywheel tournament to rate recent tips\n4. Consider: what's the next training frontier? (R265+)\n\nNEW MODULES BUILT THIS SESSION:\n- ~/subconscious/local_vision.py - screen capture + GLM-5V-turbo analysis (TESTED AND WORKING)\n\nFILES MODIFIED:\n- ~/.hermes/config.yaml - delegation max_iterations reduced to 50\n- ~/.hermes/.env - CAMOFOX_URL commented out (line 24)\n- ~/subconscious/local_vision.py - NEW, local vision system",
+  "active_tasks": [
+    "1. Fix Hermes browser tools - need NEW CLI session (CAMOFOX_URL env cached)",
+    "2. Local screen capture - DONE, working",
+    "3. Gemini 3 Flash delegation - BLOCKED: needs Google API key or OR credits",
+    "4. MiMo V2 Pro - BLOCKED: same OR credits issue",
+    "5. Qwen 3.5 local deployment - ready to deploy on M2 Air 24GB"
+  ],
+  "decisions": [
+    "Local vision uses screencapture + GLM-5V-turbo (confirmed working)",
+    "Gemini 3 Flash / MiMo V2 Pro delegation blocked by OpenRouter credits - need Google API key from aistudio.google.com as alternative",
+    "Delegation config reverted to GLM-5.1/zai to avoid breaking subagent tasks"
+  ],
+  "files_modified": [
+    "~/.hermes/config.yaml",
+    "~/.hermes/.env",
+    "~/subconscious/local_vision.py"
+  ],
+  "next_steps": "Start new CLI session to fix browser tools (CAMOFOX_URL cache), then continue training gym at R265 with fresh research distillation and eval tournament.",
+  "timestamp": "2026-04-13T03:20:21Z",
+  "unix_time": 1776050421.563485,
+  "task_id": "20260412_191932_edf6e1",
+  "source": "manual",
+  "version": 2
+}

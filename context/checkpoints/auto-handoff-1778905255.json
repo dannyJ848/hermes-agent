@@ -1,0 +1,14 @@
+{
+  "label": "auto-handoff-1778905255",
+  "timestamp": 1778905255.190916,
+  "context": {
+    "timestamp": 1778905255.1908941,
+    "session_id": "20260515_115320_46fb4e",
+    "compression_count": 6,
+    "message_count": 136,
+    "model": "kimi-for-coding",
+    "system_prompt_preview": "You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and in",
+    "todo_snapshot": "[Your active task list was preserved across context compression]\n- [>] 1. Create comprehensive session checkpoint with full context (in_progress)\n- [ ] 2. Update memory with DGX deployment facts (pending)\n- [ ] 3. Update skill: vllm-dgx-qwen36-dflash-deployment with new findings (pending)\n- [ ] 4. Update skill: hermes-agent with plugins fix (pending)\n- [ ] 5. Save knowledge base finding: DGX Hermes 20-subsystems (pending)\n- [ ] 6. Update SOUL.md with new behavior rules (pending)\n- [ ] 7. Git commit all changes to DGX repo (pending)\n- [ ] 8. Verify all persistence layers updated (pending)"
+  },
+  "session_id": "20260515_115320_46fb4e"
+}

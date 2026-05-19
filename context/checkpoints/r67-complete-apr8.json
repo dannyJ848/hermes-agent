@@ -1,0 +1,20 @@
+{
+  "label": "r67-complete-apr8",
+  "context": "R67 complete. 163 tips, avg conf 0.803. Added SoK Agentic RAG tip (retrieval loops as POMDPs, 4 systemic risks: hallucination compounding, memory poisoning, retrieval misalignment, cascading tool failures). Round 67. 02:48 AM. Danny sleeping. Loop continues.",
+  "active_tasks": [
+    "R67 complete — ready for R68"
+  ],
+  "decisions": [
+    "Agentic RAG must be formalized as POMDP — not just ad hoc retrieval+generation",
+    "4 systemic risks in autonomous retrieval loops need active mitigation"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R68: Continue. Try agent evaluation, benchmarking, or meta-learning.",
+  "timestamp": "2026-04-08T07:50:38Z",
+  "unix_time": 1775634638.4906769,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

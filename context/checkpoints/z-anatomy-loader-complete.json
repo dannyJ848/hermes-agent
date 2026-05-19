@@ -1,0 +1,9 @@
+{
+  "label": "z-anatomy-loader-complete",
+  "context": "Built ZAnatomyLoader.ts \u2014 full Z-Anatomy model loading system for SOMA. Includes 6-layer enum (ZAnatomyLayer), TA2-to-layer mapping (15 categories), LAYER_CONFIGS with SSS profiles, parallel GLB loading with Meshopt/Draco, structure registry with bounding boxes, region queries, and GPU memory disposal. Renamed to ZAnatomyLayer to avoid collision with existing AnatomyLayer type in AnatomyActionExecutor.ts. All logic errors resolved; remaining TS errors are ES5 node_modules config issue.",
+  "active_tasks": [
+    "p4-growth"
+  ],
+  "timestamp": "2026-04-02T21:28:15Z",
+  "task_id": "20260402_152751_4b5e7b"
+}

@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r106-complete",
+  "context": "Training Gym R106 completed! ALL 4 PASS ON FIRST TRY!\n\nR106 RESULTS (all 10/10):\n1. longest-common-subseq-001 (T8) - 2D DP. Match: dp[i-1][j-1]+1. Else: max(dp[i-1][j], dp[i][j-1]).\n2. edit-distance-001 (T9) - 2D DP. Match: dp[i-1][j-1]. Else: 1+min(del,ins,rep).\n3. palindromic-substrings-001 (T8) - Expand center odd+even. Count every match.\n4. partition-equal-subset-sum-001 (T9) - Target=sum/2. 0/1 knapsack. dp[j] = dp[j] or dp[j-num].\n\nDB: 403 exercises, 663 attempts, avg 9.92, 96.1% perfect. 354 passed. Tier 9+ = 104, Tier 10 = 58.\n72+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R106 complete",
+    "R107 next"
+  ],
+  "decisions": [
+    "LCS: 2D DP. match=dp[i-1][j-1]+1, else max(left,up).",
+    "Edit distance: dp[i][j]=1+min(del,ins,rep). Match=no cost.",
+    "Palindromic substrings: expand center. Count every palindrome found.",
+    "Partition equal sum: 0/1 knapsack. dp[j] going backwards. dp[0]=True."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R107: Continue. Try: Graph BFS/DFS, Top K Frequent, or Find Median from Data Stream.",
+  "timestamp": "2026-04-08T22:44:13Z",
+  "unix_time": 1775688253.9988868,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

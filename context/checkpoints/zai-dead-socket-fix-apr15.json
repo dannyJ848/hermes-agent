@@ -1,0 +1,23 @@
+{
+  "label": "zai-dead-socket-fix-apr15",
+  "context": "Fixed Z.AI dead socket freeze bug in run_agent.py. Two patches applied:\n\n1. Stale timeout hard cap at 120s (was 300s for 100K+ context). Lines ~5553-5564.\n2. Socket liveness detector: every 30s checks select()+recv(MSG_PEEK) on underlying TCP socket. If keepalive killed it (EOF/error), immediately kills connection + reconnects. Lines ~5566-5659.\n\nRoot cause: at training gym context sizes (100K+), stale timeout scaled to 300s. Z.AI drops connection → keepalive detects dead socket at ~75s → but nothing checked socket state → session froze for 5+ minutes.\n\nworld_model_r27.py is built but the OTHER CLI hung testing it. Module itself is fine (confirmed working in isolated test). The hang was the Z.AI connection dying mid-response, not the Python code.\n\nTraining gym state: R25+R26 complete, 24 wired modules, 3650 plugin lines, 325 tips, Elo max 2273. R27 (world_model_r27.py) built but NOT yet wired into plugin. Next step after restart: wire R27 into distillation plugin hooks, continue R28+.",
+  "active_tasks": [
+    "Wire R27 world_model into plugin hooks",
+    "Continue training gym R28+ (inter-agent protocol next gap)"
+  ],
+  "decisions": [
+    "Stale timeout capped at 120s hard — 300s was too generous for Z.AI",
+    "Socket liveness check every 30s — balance between overhead and detection speed",
+    "world_model_r27.py code is fine — hang was Z.AI connection death, not Python bug"
+  ],
+  "files_modified": [
+    "~/hermes-agent/run_agent.py (stale timeout cap + socket liveness detector)",
+    "~/subconscious/world_model_r27.py (built R27, not yet wired)"
+  ],
+  "next_steps": "1. After gateway restart, restore checkpoint zai-dead-socket-fix-apr15\n2. Wire R27 world_model into distillation plugin (post_tool_call + pre_llm_call)\n3. Continue training gym R28+",
+  "timestamp": "2026-04-15T01:27:07Z",
+  "unix_time": 1776216427.919913,
+  "task_id": "20260414_201919_dab32e",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,13 @@
+{
+  "label": "dgx-hermes-tool-calling-fix-may17",
+  "context": "DGX Hermes deployment session - May 17 2026. Key issues discovered and resolved:\n\n1. Qwen3.6-27B-Uncensored tool calling issue: The model generates tool calls in XML-like format (<tool_call><function=name><parameter=...>) but vLLM's Hermes parser expects JSON format. This causes tool_calls array to be empty even though model outputs tool-calling text.\n\n2. vLLM Hermes parser error: JSONDecodeError when parsing Qwen's tool output format. Parser at /usr/local/lib/python3.12/site-packages/vllm/tool_parsers/hermes_tool_parser.py fails on Qwen's XML-style tool calls.\n\n3. Autonomous mode working: Created text-based tool execution wrapper that parses Qwen's XML format and executes tools manually. Running in screen session 'hermes_auto'.\n\n4. All daemons stopped: hermes-dgx-daemon.service, hermes-dgx-interactive.service, hermes-dgx.service all disabled and stopped. Using screen-based persistent sessions instead.\n\n5. Full capabilities verified: SSH to macbook, file write, web access, browser automation (Playwright+Chromium), Git, Docker all working on DGX.\n\n6. vLLM running with: Qwen3.6-27B-Uncensored base + dynamic LoRA (custom-model) + DFlash speculative decoding (num_speculative_tokens=5) + tool calling enabled.\n\n7. Model inventory on DGX: Qwen3.6-27B-Uncensored, Qwen3.5-27B-DFlash (draft), Qwen3.6-27B-DFlash-vLLM-Compatible (training log only), Qwen36-FrankenV8-FullFT, and others.\n\n8. Config fix: Model name must be full path /data/models/Qwen3.6-27B-Uncensored in config.yaml, not just Qwen3.6-27B-Uncensored.\n\n9. Speed: ~6.2 tok/s with speculative decoding, ~12 tok/s without. Acceptance rate 40-68% with num_speculative_tokens=5.\n\n10. Critical file paths: /data/SpecForge/hermes-agent/run_autonomous_hermes.py (async version, broken), /tmp/autonomous_runner_v2.py (working sync version), /tmp/hermes_auto_v2.txt (log), /tmp/hermes_dgx_requests.jsonl (request queue).",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "1. Fix Qwen tool calling by either: (a) using a Qwen model variant that supports OpenAI function calling format, (b) creating a custom vLLM tool parser for Qwen's XML format, or (c) using text-based tool execution wrapper. 2. Verify autonomous mode is running overnight. 3. Check logs in morning.",
+  "timestamp": "2026-05-17T05:38:06Z",
+  "unix_time": 1778996286.896649,
+  "task_id": "20260515_234937_7065dc",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,33 @@
+{
+  "label": "wiki-expansion-blame-attribution",
+  "context": "Expanded wiki from ~50 to 60 pages (107KB). Key additions: inference-time-scaling (6 categories from Raschka), screen-understanding-directshell, skill-supply-chain-security (341 malicious skills on ClawHub!), multi-layer-memory-agents (3-layer working/episodic/semantic), byterover-agent-native-memory, evotool-self-evolving-tool-use.\n\nBuilt skill_scanner.py at ~/subconscious/skill_scanner.py — scans skills + plugins for security threats. 868 files, 974 findings (mostly false positives in docs). Only 1 real finding: evey-telegram-ux external POST.\n\nWIRED EvoTool blame attribution into distillation plugin:\n- Added _classify_failure_stage() to ~/.hermes/plugins/distillation/__init__.py\n- Classifies errors as: planner, selector, caller, synthesizer, or unknown\n- Added failure_stage field to distillation_bridge.py's JSONL buffer entry\n- Updated bottom_up_store signature to accept failure_stage\n- Cleared __pycache__ — changes take effect on next gateway restart\n\nDistillation bridge is SATURATED: 0 new tips from latest 60-page scan. All extractable patterns captured.\n\nAll 7 crons healthy. AGI loop running every 3 min. Brain stats: 109 semantic facts, 204 reasoning traces, 10 patterns, 19 failures.",
+  "active_tasks": [
+    "Wiki expansion: 60 pages / 107KB",
+    "Skill security scanner built",
+    "EvoTool blame attribution wired into distillation plugin",
+    "Distillation bridge saturated — 0 new tips"
+  ],
+  "decisions": [
+    "EvoTool blame attribution added to classify failures by stage (planner/selector/caller/synthesizer)",
+    "Skill scanner built but needs refinement — too many false positives from documentation files",
+    "Paywall bypass shelved per Danny's directive",
+    "Distillation bridge saturated — needs new extraction logic for security/memory content"
+  ],
+  "files_modified": [
+    "~/wiki/concepts/inference-time-scaling.md",
+    "~/wiki/concepts/screen-understanding-directshell.md",
+    "~/wiki/concepts/skill-supply-chain-security.md",
+    "~/wiki/concepts/multi-layer-memory-agents.md",
+    "~/wiki/concepts/byterover-agent-native-memory.md",
+    "~/wiki/concepts/evotool-self-evolving-tool-use.md",
+    "~/subconscious/skill_scanner.py",
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/distillation_bridge.py"
+  ],
+  "next_steps": "Continue autonomous research. Next domains to explore: (1) agent security — build actual skill vetting system, (2) reasoning techniques — test different CoT/ToT strategies on Evey's actual tasks, (3) memory architecture — implement adaptive retrieval gating from multi-layer memory paper. Could also restart gateway to activate blame attribution, but Danny is studying so avoid disruption.",
+  "timestamp": "2026-04-07T06:51:05Z",
+  "unix_time": 1775544665.712228,
+  "task_id": "20260406_193318_f8f2c8",
+  "source": "manual",
+  "version": 2
+}

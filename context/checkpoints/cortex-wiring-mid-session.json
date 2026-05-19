@@ -1,0 +1,34 @@
+{
+  "label": "cortex-wiring-mid-session",
+  "context": "Danny asked to \"fully wire everything into one common thread\" — Cortex as single source of truth. The previous session (13 compressions) made major progress but ran out of context before completing.\n\nCOMPLETED:\n1. cortex_compat_shim.py — Universal SQLite→Cortex proxy WRITTEN and TESTED. Handles:\n   - Connection-level interception of sqlite3.connect('cerebrum_memory.db')\n   - TABLE_MAP for 25+ SQLite tables → Cortex tables\n   - SELECT: translates table names, injects node_type filters, converts ? → %s\n   - INSERT: parses SQL, maps to Cortex schema via _insert_to_cortex()\n   - UPDATE/DELETE: basic translation\n   - Unknown tables → cortex_kv_store generic KV\n   - Fallback to SQLite if Postgres unreachable\n   - _ORIGINAL_CONNECT at module level (prevents infinite recursion)\n\n2. MONKEY-PATCHED (cortex_compat_shim.patch_sqlite3() added to top of each file):\n   - brain.py\n   - meta_loop.py\n   - distillation plugin (__init__.py)\n   - evey-tool-intelligence plugin (__init__.py)\n   - __pycache__ dirs cleaned\n\n3. TIP BACKFILL — 1,869 tips backfilled from SQLite → Cortex (0 errors). Cortex now has 2,780+ tips.\n\n4. INFRASTRUCTURE:\n   - cortex_backup.sh — Python psycopg2-based backup (no pg_dump binary needed), 30.7MB backup created\n   - Log rotation added to cortex_daemon.py\n   - Launchd plist created but NOT loaded\n\n5. VERIFIED WORKING:\n   - SELECT from mapped tables returns correct filtered counts (tips=3739, facts=1080, predictions=5251)\n   - INSERT lands in Cortex (verified via direct psycopg2 check)\n   - Non-cerebrum SQLite still works normally\n   - brain.py boot simulation passed\n\nPENDING/INCOMPLETE:\n1. Restart cortex daemon with updated shim — was about to do this when session ended (line 1423)\n2. Daemon restart command: cd ~/hermes-agent && source venv/bin/activate && nohup python3 ~/subconscious/cortex_daemon.py >> /tmp/cortex_daemon.log 2>&1 &\n3. End-to-end verification: run brain.py for real, run distillation cycle, confirm all reads/writes go through Cortex\n4. Fix timestamp handling: to_timestamp() in backfill had issues with ISO strings — ts_to_pg() written in backfill script but NOT integrated into shim\n5. Reconcile tip gap: was 966 Cortex vs 1869 SQLite, now backfilled but need to verify final counts\n6. Load launchd plist for auto-restart\n7. Test that cortex_daemon.py actually works through the shim\n8. The session transcript ends at line 1423 with \"preparing terminal\" — about to restart daemon\n\nKEY FILES:\n- ~/subconscious/cortex_compat_shim.py — the universal shim (614+ lines)\n- ~/subconscious/brain.py — monkey-patched\n- ~/subconscious/meta_loop.py — monkey-patched\n- ~/.hermes/plugins/distillation/__init__.py — monkey-patched\n- ~/.hermes/plugins/evey-tool-intelligence/__init__.py — monkey-patched\n- ~/subconscious/cortex_backup.sh — Python-based backup script\n- ~/subconscious/com.hermes.cortex-daemon.plist — launchd plist (NOT loaded)\n- /tmp/backfill_tips.py — backfill script (completed, can be cleaned up)\n\nCORTEX CONNECTION: psycopg2.connect('postgresql://hindsight:hindsight@localhost:5432/cortex')",
+  "active_tasks": [
+    "Restart cortex daemon with updated shim",
+    "End-to-end verification (brain.py + distillation through shim)",
+    "Integrate ts_to_pg() from backfill into shim",
+    "Load launchd plist for daemon auto-restart",
+    "Verify final tip counts in Cortex"
+  ],
+  "decisions": [
+    "Connection-level monkey-patch approach (not per-table)",
+    "Schema-aware INSERT translation (not SQL-to-SQL)",
+    "node_type injection for SELECT on cortex_nodes",
+    "Python psycopg2 backup instead of pg_dump binary",
+    "Fallback to SQLite when Postgres unreachable"
+  ],
+  "files_modified": [
+    "~/subconscious/cortex_compat_shim.py",
+    "~/subconscious/brain.py",
+    "~/subconscious/meta_loop.py",
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/.hermes/plugins/evey-tool-intelligence/__init__.py",
+    "~/subconscious/cortex_backup.sh",
+    "~/subconscious/com.hermes.cortex-daemon.plist",
+    "/tmp/backfill_tips.py"
+  ],
+  "next_steps": "1. Restart cortex daemon: kill old process, start with updated shim\n2. Verify daemon is running and reading/writing through Cortex\n3. Run a quick distillation cycle to verify end-to-end\n4. Load launchd plist\n5. Final tip count reconciliation",
+  "timestamp": "2026-04-13T21:58:39Z",
+  "unix_time": 1776117519.113018,
+  "task_id": "20260413_165729_77ca1e",
+  "source": "manual",
+  "version": 2
+}

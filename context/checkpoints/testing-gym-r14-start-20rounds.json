@@ -1,0 +1,13 @@
+{
+  "label": "testing-gym-r14-start-20rounds",
+  "context": "## Testing Gym V2 — Starting R14-R33 (20 rounds of refinement)\n\n### Current State (end of R13):\n- 1657 lines, 40 tasks (L1-L4), baseline 9.5/10 (L1-L3) + 8.7/10 (L4)\n- Weakest L4: tool_use 7.2, coding 7.9\n- Weakest L1-L3: coding 8.8\n- L4 scoring fully wired with adversarial/synthesis/quantitative/compilation checks\n- Cortex integration working (7 benchmark_result nodes)\n- Patch tool has 43% success rate — prefer execute_code for complex edits\n\n### Strategy for 20 rounds:\n- Focus on tightening the gap between L4 weak spots and the 10.0 ceiling\n- Each round: identify issue → fix → verify → move on\n- Use execute_code for file edits (patch unreliable at 43%)\n- Track per-round changes\n\n### Known issues to address:\n1. tool_use L4: cross_check scoring too strict (0.5 neutral when only 1 file exists)\n2. coding L4: tool_selection penalizes legitimate tool choices (patch is valid)\n3. Search L4: synthesis scoring counts transitional phrases — easy to game\n4. Reasoning L4: exact_match with answer_ranges may be too generous\n5. Need holdout baselines for all 40 tasks",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Run R14-R33 systematically, fixing one scoring/task issue per round",
+  "timestamp": "2026-04-15T23:11:34Z",
+  "unix_time": 1776294694.602387,
+  "task_id": "20260415_174839_f68c7d",
+  "source": "manual",
+  "version": 2
+}

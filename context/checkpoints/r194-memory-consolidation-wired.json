@@ -1,0 +1,29 @@
+{
+  "label": "r194-memory-consolidation-wired",
+  "context": "Training gym R190-R194 complete. R190: 9 tips from DGM/Speculative Actions/Memory Consolidation. R191: Wired R186-R189 (PASTE, ToolTree, PE-EMP, I-MCTS) into plugin post_tool_call. R192: Gateway restart + verify. R193: Built DGM version archive + Speculative Action pre-executor modules, 12 tips distilled. R194: Built Memory Consolidation pipeline (episodic→semantic→procedural), 1203 tips → 126 clusters → 115 skills. ALL modules wired into plugin. Plugin: 2768 lines. Tips: ~1199 active (conf≥0.3). Gateway running. Modules built this session: paste_executor.py, tooltree_planner.py, empirical_mcts_peemp.py, imcts_introspective.py, dgm_version_archive.py, speculative_actions.py, memory_consolidation.py. All in ~/subconscious/. DBs: paste_patterns.db, tooltree_scores.db, empirical_mcts.db, imcts_introspective.db, dgm_versions.db, speculative_actions.db, memory_consolidation.db.",
+  "active_tasks": [
+    "R195: Research round 3 — more frontier papers"
+  ],
+  "decisions": [
+    "PASTE executor triggers 10% of calls for pattern mining",
+    "ToolTree dual-evaluate runs every call for scoring",
+    "PE-EMP pairwise comparison at 5% rate",
+    "I-MCTS introspective at 5% rate",
+    "DGM snapshots at 0.2% rate (~1/500 calls)",
+    "Speculative Actions records every call for transition learning",
+    "Memory Consolidation runs at 0.3% rate (~1/333 calls)",
+    "All new modules use try/except guards with individual imports"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/dgm_version_archive.py",
+    "~/subconscious/speculative_actions.py",
+    "~/subconscious/memory_consolidation.py"
+  ],
+  "next_steps": "R195: Research round 3 — find more frontier papers on agent self-improvement, tool learning, or trajectory optimization. Extract tips, build modules, wire into plugin. Continue autonomous training loop.",
+  "timestamp": "2026-04-12T06:18:26Z",
+  "unix_time": 1775974706.041735,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

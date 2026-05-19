@@ -1,0 +1,11 @@
+{
+  "label": "chrome-x-bridge-v3",
+  "context": "Built chrome_x_bridge.py v3.1 at ~/subconscious/chrome_x_bridge.py. Chrome DOM extraction via JXA works perfectly for X/Twitter. 24 tweets from 5 queries in AI news scan. Key: use JXA (JavaScript for Automation) with proper string escaping, NOT AppleScript with escaped quotes. API approach (GraphQL) returns empty body due to CF protection. Also updated evey_toolkit.py BrowserExtractor to scan ALL Chrome profiles and handle .x.com domain. Also extracted 161 fresh GraphQL hashes from main.a1191e0a.js.",
+  "active_tasks": [
+    "chrome_x_bridge.py v3.1 working",
+    "Update cron scanner to use Chrome bridge",
+    "Update chrome-x-scraper skill"
+  ],
+  "timestamp": "2026-04-05T21:46:17Z",
+  "task_id": "20260405_152554_311967"
+}

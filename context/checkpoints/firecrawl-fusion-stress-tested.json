@@ -1,0 +1,9 @@
+{
+  "label": "firecrawl-fusion-stress-tested",
+  "context": "FIRECRAWL FUSION STRESS TEST COMPLETE. 14/15 API tests pass, 4/4 gateway dispatch tests pass. web_interact confirmed working through full Hermes tool dispatch pipeline. Files: tools/browser_providers/firecrawl_fusion.py, tools/web_tools.py (web_interact tool), tools/browser_tool.py (registry), toolsets.py, model_tools.py, run_agent.py, agent/prompt_builder.py, agent/display.py, config.yaml. Gateway PID 51564. Credits: ~2490. Only gap: Browserbase fallback is stub code. X/Twitter blocked by Firecrawl policy (expected).",
+  "active_tasks": [
+    "Danny's massive project"
+  ],
+  "timestamp": "2026-04-05T19:07:36Z",
+  "task_id": "20260404_215806_7e676d"
+}

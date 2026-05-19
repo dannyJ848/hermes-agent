@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r24-complete",
+  "context": "Training Gym R22-R24 completed. 12/12 exercises pass with real pytest verification.\n\nR22 (4/4): graph, events, error chains, async runner\nR23 (4/4): JSON parser, memoization, lazy streams, plugin registry  \nR24 (4/4): FSM, expression interpreter, thread-safe pubsub, wire protocol\n\nKEY LEARNINGS ACCUMULATED:\n- hash(key) for dict key testing, not TypeError catching\n- map()/filter() for iterator chaining, not generator expressions\n- Nested try/except needs explicit variable assignment\n- Recursive descent: right-associative operators need recursive call\n- Thread-safe: use Queue for pubsub delivery, Lock for subscriber list\n- Binary protocols: varint encoding + CRC32 checksums for integrity\n\nDB: 172 exercises, 335 attempts, avg 9.8",
+  "active_tasks": [
+    "R22-R24 complete",
+    "R25 next"
+  ],
+  "decisions": [
+    "Built complete expression interpreter with recursive descent",
+    "Thread-safe pubsub uses Queue + Lock pattern",
+    "Binary protocol uses varint + CRC32"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R25 exercises. Consider: regex engine subset, LRU cache with TTL, rate limiter, circuit breaker.",
+  "timestamp": "2026-04-08T17:07:34Z",
+  "unix_time": 1775668054.062067,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

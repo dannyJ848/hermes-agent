@@ -1,0 +1,20 @@
+{
+  "label": "r14-training-gym-complete",
+  "context": "R14 COMPLETE. Built task_decomposer.py (planning decomposition). Action verb counting + conjunction detection + parallelism identification. Wired as R180 in pre_llm_call. 2 tips.\n\n15-MODULE STACK (13 wired + 2 stored):\n  WIRED: R168-R180\n  STORED: context_governor\n  Plugin: 3,482 lines. 102 total tips. Compressions: 1 of 16.",
+  "active_tasks": [
+    "R15: Continue training gym"
+  ],
+  "decisions": [
+    "Decomposition only for 3+ sub-tasks — below that is over-engineering"
+  ],
+  "files_modified": [
+    "~/subconscious/task_decomposer.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "R15: Continue. Near compression #2.",
+  "timestamp": "2026-04-14T21:28:17Z",
+  "unix_time": 1776202097.9752471,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cortex Architecture Diagram</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #020617; color: #e2e8f0; font-family: 'JetBrains Mono', monospace; padding: 24px; min-height: 100vh; }
+  .container { max-width: 1400px; margin: 0 auto; }
+  .header { text-align: center; margin-bottom: 24px; }
+  .header h1 { font-size: 20px; font-weight: 600; color: #f1f5f9; }
+  .header .dot { display: inline-block; width: 8px; height: 8px; background: #34d399; border-radius: 50%; margin-right: 8px; animation: pulse 2s infinite; }
+  .header p { font-size: 11px; color: #64748b; margin-top: 6px; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .diagram-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(51, 65, 85, 0.5); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(51, 65, 85, 0.5); border-radius: 8px; padding: 16px; }
+  .card h3 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 10px; }
+  .card li { font-size: 11px; color: #94a3b8; list-style: none; padding: 2px 0; }
+  .card li::before { content: "• "; color: #334155; }
+  .footer { text-align: center; font-size: 9px; color: #475569; padding-top: 16px; border-top: 1px solid rgba(51, 65, 85, 0.3); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1><span class="dot"></span>Cortex Unified Architecture</h1>
+  <p>25 Cognitive Modules • 26K Nodes • 369K Edges • 310 Elo-Rated Tips • 15 Research Papers</p>
+</div>
+
+<div class="diagram-card">
+<svg viewBox="0 0 1400 1080" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', monospace">
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(30,41,59,0.3)" stroke-width="0.5"/>
+    </pattern>
+    <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#475569"/>
+    </marker>
+    <marker id="arrow-cyan" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee"/>
+    </marker>
+    <marker id="arrow-emerald" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#34d399"/>
+    </marker>
+    <marker id="arrow-violet" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#a78bfa"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#fb923c"/>
+    </marker>
+    <marker id="arrow-rose" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#fb7185"/>
+    </marker>
+  </defs>
+
+  <!-- Background grid -->
+  <rect width="1400" height="1080" fill="#020617"/>
+  <rect width="1400" height="1080" fill="url(#grid)"/>
+
+  <!-- ===== CONNECTION ARROWS (drawn first, behind boxes) ===== -->
+
+  <!-- Hermes Agent → Plugin -->
+  <line x1="210" y1="70" x2="210" y2="120" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+  <text x="220" y="100" font-size="7" fill="#64748b">hook calls</text>
+
+  <!-- Plugin → Self-Critic layer -->
+  <line x1="140" y1="195" x2="140" y2="235" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
+  <text x="96" y="220" font-size="7" fill="#64748b">post_tool_call</text>
+
+  <!-- Plugin → Meta-Reasoning layer -->
+  <line x1="310" y1="195" x2="310" y2="445" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
+  <text x="316" y="330" font-size="7" fill="#64748b">pre_llm_call</text>
+
+  <!-- Self-Critic → Trajectory Intel -->
+  <line x1="115" y1="320" x2="115" y2="360" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+  <line x1="170" y1="320" x2="170" y2="360" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+
+  <!-- Trajectory Intel → Distillation -->
+  <line x1="140" y1="425" x2="140" y2="465" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrow-violet)"/>
+  <text x="148" y="448" font-size="7" fill="#64748b">extract tips</text>
+
+  <!-- Meta-Reasoning → Context Governor -->
+  <line x1="340" y1="530" x2="340" y2="565" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+
+  <!-- Distillation → Cortex DB -->
+  <path d="M 200 500 Q 500 500 530 620" stroke="#a78bfa" stroke-width="1.5" fill="none" marker-end="url(#arrow-violet)"/>
+  <text x="340" y="545" font-size="7" fill="#64748b">store tips/experiences</text>
+
+  <!-- Context Governor → Cortex DB -->
+  <path d="M 400 600 Q 500 600 530 640" stroke="#a78bfa" stroke-width="1.5" fill="none" marker-end="url(#arrow-violet)"/>
+
+  <!-- Meta-Reasoning → Cortex DB -->
+  <path d="M 400 490 Q 500 490 530 630" stroke="#a78bfa" stroke-width="1.5" fill="none" marker-end="url(#arrow-violet)"/>
+
+  <!-- Cortex DB → Eval Flywheel -->
+  <line x1="680" y1="660" x2="760" y2="660" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+  <text x="695" y="652" font-size="7" fill="#64748b">tips</text>
+
+  <!-- Eval Flywheel → LLM Judge -->
+  <line x1="930" y1="660" x2="990" y2="660" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+  <text x="940" y="652" font-size="7" fill="#64748b">evaluate</text>
+
+  <!-- LLM Judge → Cortex DB (back) -->
+  <path d="M 1080 700 Q 1080 750 680 750 Q 600 750 600 710" stroke="#fb7185" stroke-width="1.5" fill="none" stroke-dasharray="4,4" marker-end="url(#arrow-rose)"/>
+  <text x="800" y="745" font-size="7" fill="#fb7185">elo updates</text>
+
+  <!-- Cortex DB → Tip Injection -->
+  <path d="M 600 710 Q 600 790 340 810" stroke="#34d399" stroke-width="1.5" fill="none" marker-end="url(#arrow-emerald)"/>
+  <text x="430" y="790" font-size="7" fill="#64748b">elo-rated tips</text>
+
+  <!-- Tip Injection → Hermes Agent -->
+  <path d="M 180 810 Q 100 810 100 400 Q 100 70 140 70" stroke="#34d399" stroke-width="1.5" fill="none" stroke-dasharray="4,4" marker-end="url(#arrow-emerald)"/>
+  <text x="42" y="450" font-size="7" fill="#34d399">inject tips into context</text>
+
+  <!-- Cortex Daemon → Cortex DB -->
+  <line x1="610" y1="890" x2="610" y2="710" stroke="#475569" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+  <text x="618" y="810" font-size="7" fill="#64748b">maintenance</text>
+
+  <!-- Cortex Daemon ← Backup -->
+  <line x1="450" y1="920" x2="530" y2="920" stroke="#475569" stroke-width="1" marker-end="url(#arrow)"/>
+
+  <!-- ===== REGION: Input Layer ===== -->
+  <rect x="60" y="30" width="310" height="50" rx="12" fill="rgba(8, 51, 68, 0.15)" stroke="#22d3ee" stroke-width="1" stroke-dasharray="8,4"/>
+  <text x="80" y="25" font-size="8" fill="#22d3ee" font-weight="500">INPUT LAYER</text>
+
+  <!-- Hermes Agent Box -->
+  <rect x="80" y="40" width="160" height="32" rx="6" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+  <rect x="80" y="40" width="160" height="32" rx="6" fill="#0f172a" opacity="0.6"/>
+  <text x="160" y="57" font-size="11" fill="#22d3ee" text-anchor="middle" font-weight="500">Hermes Agent</text>
+  <text x="160" y="67" font-size="8" fill="#64748b" text-anchor="middle">GLM-5.1 / Z.AI</text>
+
+  <!-- Session Context -->
+  <rect x="260" y="40" width="90" height="32" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="305" y="57" font-size="10" fill="#94a3b8" text-anchor="middle">LCM Engine</text>
+  <text x="305" y="67" font-size="8" fill="#64748b" text-anchor="middle">context mgmt</text>
+
+  <!-- ===== Plugin ===== -->
+  <rect x="60" y="125" width="310" height="65" rx="6" fill="rgba(6, 78, 59, 0.3)" stroke="#34d399" stroke-width="1.5"/>
+  <rect x="60" y="125" width="310" height="65" rx="6" fill="#0f172a" opacity="0.5"/>
+  <text x="215" y="150" font-size="12" fill="#34d399" text-anchor="middle" font-weight="500">Distillation Plugin</text>
+  <text x="215" y="162" font-size="8" fill="#64748b" text-anchor="middle">~3,600 lines • 21 modules wired</text>
+  <text x="215" y="182" font-size="8" fill="#64748b" text-anchor="middle">post_tool_call + pre_llm_call hooks</text>
+
+  <!-- ===== SELF-CRITIC LAYER (post_tool_call) ===== -->
+  <rect x="40" y="235" width="220" height="180" rx="8" fill="rgba(6, 78, 59, 0.1)" stroke="#34d399" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="60" y="232" font-size="8" fill="#34d399" font-weight="500">POST_TOOL_CALL</text>
+
+  <!-- Row 1 -->
+  <rect x="50" y="245" width="95" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="97" y="259" font-size="9" fill="#34d399" text-anchor="middle">self_critic</text>
+  <text x="97" y="268" font-size="7" fill="#475569" text-anchor="middle">R168</text>
+
+  <rect x="155" y="245" width="95" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="202" y="259" font-size="9" fill="#34d399" text-anchor="middle">tool_adaptor</text>
+  <text x="202" y="268" font-size="7" fill="#475569" text-anchor="middle">R172</text>
+
+  <!-- Row 2 -->
+  <rect x="50" y="280" width="95" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="97" y="294" font-size="9" fill="#34d399" text-anchor="middle">exec_tracer</text>
+  <text x="97" y="303" font-size="7" fill="#475569" text-anchor="middle">R182</text>
+
+  <rect x="155" y="280" width="95" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="202" y="294" font-size="9" fill="#34d399" text-anchor="middle">skill_gap</text>
+  <text x="202" y="303" font-size="7" fill="#475569" text-anchor="middle">R183</text>
+
+  <!-- Row 3 - Trajectory -->
+  <rect x="50" y="315" width="95" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="97" y="329" font-size="8" fill="#34d399" text-anchor="middle">traj_intel</text>
+  <text x="97" y="338" font-size="7" fill="#475569" text-anchor="middle">R166</text>
+
+  <rect x="155" y="315" width="95" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="202" y="329" font-size="8" fill="#34d399" text-anchor="middle">fail_exemplar</text>
+  <text x="202" y="338" font-size="7" fill="#475569" text-anchor="middle">R165</text>
+
+  <!-- Row 4 -->
+  <rect x="50" y="350" width="95" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="97" y="364" font-size="8" fill="#34d399" text-anchor="middle">interaction_log</text>
+  <text x="97" y="373" font-size="7" fill="#475569" text-anchor="middle">R181</text>
+
+  <rect x="155" y="350" width="95" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="202" y="364" font-size="8" fill="#34d399" text-anchor="middle">reward_evolver</text>
+  <text x="202" y="373" font-size="7" fill="#475569" text-anchor="middle">R185</text>
+
+  <!-- Row 5 -->
+  <rect x="50" y="385" width="95" height="22" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="97" y="399" font-size="8" fill="#34d399" text-anchor="middle">tool_diversity R188</text>
+
+  <rect x="155" y="385" width="95" height="22" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="202" y="399" font-size="8" fill="#34d399" text-anchor="middle">output_quality R189</text>
+
+  <!-- ===== DISTILLATION BRIDGE ===== -->
+  <rect x="60" y="465" width="200" height="35" rx="5" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.2"/>
+  <text x="160" y="480" font-size="10" fill="#fbbf24" text-anchor="middle" font-weight="500">Distillation Bridge</text>
+  <text x="160" y="492" font-size="7" fill="#64748b" text-anchor="middle">tip extraction → Cortex storage</text>
+
+  <!-- ===== META-REASONING LAYER (pre_llm_call) ===== -->
+  <rect x="280" y="445" width="240" height="180" rx="8" fill="rgba(6, 78, 59, 0.1)" stroke="#34d399" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="300" y="442" font-size="8" fill="#34d399" font-weight="500">PRE_LLM_CALL</text>
+
+  <!-- Row 1 -->
+  <rect x="290" y="455" width="105" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="342" y="469" font-size="8" fill="#34d399" text-anchor="middle">reason_discover</text>
+  <text x="342" y="478" font-size="7" fill="#475569" text-anchor="middle">R169 SelfDiscover</text>
+
+  <rect x="405" y="455" width="105" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="457" y="469" font-size="8" fill="#34d399" text-anchor="middle">task_frontier</text>
+  <text x="457" y="478" font-size="7" fill="#475569" text-anchor="middle">R170 Tool-R0</text>
+
+  <!-- Row 2 -->
+  <rect x="290" y="490" width="105" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="342" y="504" font-size="8" fill="#34d399" text-anchor="middle">uncert_reward</text>
+  <text x="342" y="513" font-size="7" fill="#475569" text-anchor="middle">R171 SELAUR</text>
+
+  <rect x="405" y="490" width="105" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="457" y="504" font-size="8" fill="#34d399" text-anchor="middle">meta_reasoner</text>
+  <text x="457" y="513" font-size="7" fill="#475569" text-anchor="middle">R173 ARES</text>
+
+  <!-- Row 3 -->
+  <rect x="290" y="525" width="105" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="342" y="539" font-size="8" fill="#34d399" text-anchor="middle">reflect_synth</text>
+  <text x="342" y="548" font-size="7" fill="#475569" text-anchor="middle">R174 GVU</text>
+
+  <rect x="405" y="525" width="105" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="457" y="539" font-size="8" fill="#34d399" text-anchor="middle">curriculum</text>
+  <text x="457" y="548" font-size="7" fill="#475569" text-anchor="middle">R175 E2H</text>
+
+  <!-- Row 4 -->
+  <rect x="290" y="560" width="105" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="342" y="574" font-size="8" fill="#34d399" text-anchor="middle">tool_router</text>
+  <text x="342" y="583" font-size="7" fill="#475569" text-anchor="middle">R176</text>
+
+  <rect x="405" y="560" width="105" height="28" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="457" y="574" font-size="8" fill="#34d399" text-anchor="middle">heuristic_match</text>
+  <text x="457" y="583" font-size="7" fill="#475569" text-anchor="middle">R177 ERL</text>
+
+  <!-- Row 5 -->
+  <rect x="290" y="595" width="105" height="22" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="342" y="609" font-size="8" fill="#34d399" text-anchor="middle">recovery_sel R178</text>
+
+  <rect x="405" y="595" width="105" height="22" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.2"/>
+  <text x="457" y="609" font-size="8" fill="#34d399" text-anchor="middle">confidence_est R179</text>
+
+  <!-- ===== CONTEXT GOVERNOR ===== -->
+  <rect x="280" y="640" width="240" height="35" rx="5" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.2"/>
+  <text x="400" y="655" font-size="10" fill="#fbbf24" text-anchor="middle" font-weight="500">Context Governor</text>
+  <text x="400" y="667" font-size="7" fill="#64748b" text-anchor="middle">R186 budget + R187 adaptation + R180 decomposer</text>
+
+  <!-- Meta Controller -->
+  <rect x="290" y="680" width="220" height="22" rx="5" fill="rgba(136, 19, 55, 0.3)" stroke="#fb7185" stroke-width="1.2"/>
+  <text x="400" y="694" font-size="8" fill="#fb7185" text-anchor="middle">meta_controller R190 — orchestrates all modules</text>
+
+  <!-- ===== CORTEX DB (center) ===== -->
+  <rect x="540" y="580" width="220" height="130" rx="8" fill="rgba(76, 29, 149, 0.15)" stroke="#a78bfa" stroke-width="1.5"/>
+  <rect x="540" y="580" width="220" height="130" rx="8" fill="#0f172a" opacity="0.4"/>
+  <text x="650" y="602" font-size="12" fill="#a78bfa" text-anchor="middle" font-weight="600">Cortex DB</text>
+  <text x="650" y="615" font-size="8" fill="#64748b" text-anchor="middle">PostgreSQL + pgvector</text>
+  <line x1="555" y1="622" x2="745" y2="622" stroke="rgba(167,139,250,0.3)" stroke-width="0.5"/>
+  <text x="560" y="636" font-size="8" fill="#94a3b8">cortex_nodes</text>
+  <text x="720" y="636" font-size="8" fill="#a78bfa" text-anchor="end">26,434</text>
+  <text x="560" y="650" font-size="8" fill="#94a3b8">cortex_edges</text>
+  <text x="720" y="650" font-size="8" fill="#a78bfa" text-anchor="end">369,285</text>
+  <text x="560" y="664" font-size="8" fill="#94a3b8">cortex_eval_history</text>
+  <text x="720" y="664" font-size="8" fill="#a78bfa" text-anchor="end">23,469</text>
+  <text x="560" y="678" font-size="8" fill="#94a3b8">cortex_flywheel</text>
+  <text x="720" y="678" font-size="8" fill="#a78bfa" text-anchor="end">3,789</text>
+  <text x="560" y="692" font-size="8" fill="#94a3b8">tips (Elo-rated)</text>
+  <text x="720" y="692" font-size="8" fill="#a78bfa" text-anchor="end">310</text>
+  <text x="560" y="706" font-size="8" fill="#64748b">26 tables • 444MB • HNSW index</text>
+
+  <!-- ===== EVAL FLYWHEEL ===== -->
+  <rect x="770" y="630" width="150" height="60" rx="6" fill="rgba(251, 146, 60, 0.15)" stroke="#fb923c" stroke-width="1.5"/>
+  <rect x="770" y="630" width="150" height="60" rx="6" fill="#0f172a" opacity="0.5"/>
+  <text x="845" y="652" font-size="10" fill="#fb923c" text-anchor="middle" font-weight="500">Eval Flywheel</text>
+  <text x="845" y="664" font-size="7" fill="#64748b" text-anchor="middle">Elo tournament engine</text>
+  <text x="845" y="678" font-size="7" fill="#64748b" text-anchor="middle">1,292 evals • 970 repairs</text>
+  <text x="845" y="688" font-size="7" fill="#64748b" text-anchor="middle">626 LLM-judged matches</text>
+
+  <!-- ===== LLM JUDGE ENSEMBLE ===== -->
+  <rect x="990" y="600" width="170" height="120" rx="8" fill="rgba(136, 19, 55, 0.1)" stroke="#fb7185" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="1010" y="597" font-size="8" fill="#fb7185" font-weight="500">LLM JUDGE ENSEMBLE</text>
+
+  <rect x="1000" y="610" width="150" height="26" rx="5" fill="rgba(136, 19, 55, 0.3)" stroke="#fb7185" stroke-width="1.2"/>
+  <text x="1075" y="624" font-size="9" fill="#fb7185" text-anchor="middle">MiniMax M2.7</text>
+  <text x="1075" y="633" font-size="7" fill="#475569" text-anchor="middle">direct API</text>
+
+  <rect x="1000" y="642" width="150" height="26" rx="5" fill="rgba(136, 19, 55, 0.3)" stroke="#fb7185" stroke-width="1.2"/>
+  <text x="1075" y="656" font-size="9" fill="#fb7185" text-anchor="middle">Gemini 2.5 Flash</text>
+  <text x="1075" y="665" font-size="7" fill="#475569" text-anchor="middle">OpenRouter</text>
+
+  <rect x="1000" y="674" width="150" height="26" rx="5" fill="rgba(136, 19, 55, 0.3)" stroke="#fb7185" stroke-width="1.2"/>
+  <text x="1075" y="688" font-size="9" fill="#fb7185" text-anchor="middle">GPT-4.1 Mini</text>
+  <text x="1075" y="697" font-size="7" fill="#475569" text-anchor="middle">OpenRouter</text>
+
+  <!-- ===== TIP INJECTION ===== -->
+  <rect x="140" y="790" width="200" height="35" rx="5" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+  <rect x="140" y="790" width="200" height="35" rx="5" fill="#0f172a" opacity="0.5"/>
+  <text x="240" y="806" font-size="10" fill="#34d399" text-anchor="middle" font-weight="500">Tip Injection</text>
+  <text x="240" y="818" font-size="7" fill="#64748b" text-anchor="middle">top-K tips → Hermes context</text>
+
+  <!-- ===== CORTEX DAEMON ===== -->
+  <rect x="540" y="860" width="180" height="50" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="630" y="880" font-size="10" fill="#94a3b8" text-anchor="middle" font-weight="500">Cortex Daemon</text>
+  <text x="630" y="892" font-size="7" fill="#64748b" text-anchor="middle">dedup • embed • normalize</text>
+  <text x="630" y="902" font-size="7" fill="#64748b" text-anchor="middle">Elo math • backfill</text>
+
+  <!-- ===== BACKUP SYSTEM ===== -->
+  <rect x="310" y="900" width="140" height="35" rx="5" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1"/>
+  <text x="380" y="916" font-size="9" fill="#94a3b8" text-anchor="middle">Daily Backup</text>
+  <text x="380" y="928" font-size="7" fill="#64748b" text-anchor="middle">3am cron • 7-day retention</text>
+
+  <!-- ===== RESEARCH SOURCES ===== -->
+  <rect x="780" y="750" width="380" height="145" rx="8" fill="rgba(8, 51, 68, 0.1)" stroke="#22d3ee" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="800" y="748" font-size="8" fill="#22d3ee" font-weight="500">RESEARCH PAPERS (15)</text>
+
+  <text x="795" y="772" font-size="8" fill="#94a3b8">SelfDiscover (2402.03620) — reasoning structure</text>
+  <text x="795" y="786" font-size="8" fill="#94a3b8">Tool-R0 (2602.21320) — frontier task generation</text>
+  <text x="795" y="800" font-size="8" fill="#94a3b8">SELAUR (2602.21158) — uncertainty reward</text>
+  <text x="795" y="814" font-size="8" fill="#94a3b8">DRAFT (2410.08197) — tool failure learning</text>
+  <text x="795" y="828" font-size="8" fill="#94a3b8">ARES (2603.07915) — difficulty estimation</text>
+  <text x="795" y="842" font-size="8" fill="#94a3b8">GVU (2512.02731) — rule synthesis</text>
+  <text x="795" y="856" font-size="8" fill="#94a3b8">E2H (2506.06632) — progressive curriculum</text>
+  <text x="795" y="870" font-size="8" fill="#64748b">+ PALADIN, ERL, Confidence-First, AgentTrace,</text>
+  <text x="795" y="884" font-size="8" fill="#64748b">Co-Evolution, Synapse, Externalization</text>
+
+  <!-- ===== DATA FLOW LABELS ===== -->
+  <rect x="780" y="920" width="380" height="70" rx="6" fill="rgba(30, 41, 59, 0.3)" stroke="rgba(51,65,85,0.5)" stroke-width="1"/>
+  <text x="800" y="938" font-size="8" fill="#64748b" font-weight="500">DATA FLOW</text>
+  <text x="800" y="954" font-size="8" fill="#34d399">━━ self_critic → traj_intel → distill → cortex</text>
+  <text x="800" y="968" font-size="8" fill="#a78bfa">━━ cortex → flywheel → judge → elo update</text>
+  <text x="800" y="982" font-size="8" fill="#34d399">╌╌ elo tips → injection → hermes context</text>
+
+  <!-- ===== LEGEND ===== -->
+  <rect x="1180" y="780" width="200" height="120" rx="6" fill="rgba(30, 41, 59, 0.3)" stroke="rgba(51,65,85,0.5)" stroke-width="1"/>
+  <text x="1200" y="798" font-size="9" fill="#94a3b8" font-weight="500">Legend</text>
+  <rect x="1200" y="808" width="12" height="8" rx="2" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1"/>
+  <text x="1220" y="816" font-size="8" fill="#94a3b8">Frontend / Input</text>
+  <rect x="1200" y="822" width="12" height="8" rx="2" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1"/>
+  <text x="1220" y="830" font-size="8" fill="#94a3b8">Cognitive Module</text>
+  <rect x="1200" y="836" width="12" height="8" rx="2" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1"/>
+  <text x="1220" y="844" font-size="8" fill="#94a3b8">Database / Storage</text>
+  <rect x="1200" y="850" width="12" height="8" rx="2" fill="rgba(251, 146, 60, 0.3)" stroke="#fb923c" stroke-width="1"/>
+  <text x="1220" y="858" font-size="8" fill="#94a3b8">Message Bus / Pipeline</text>
+  <rect x="1200" y="864" width="12" height="8" rx="2" fill="rgba(136, 19, 55, 0.3)" stroke="#fb7185" stroke-width="1"/>
+  <text x="1220" y="872" font-size="8" fill="#94a3b8">Security / Evaluation</text>
+  <rect x="1200" y="878" width="12" height="8" rx="2" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1"/>
+  <text x="1220" y="886" font-size="8" fill="#94a3b8">Infrastructure</text>
+
+</svg>
+</div>
+
+<!-- Summary Cards -->
+<div class="cards">
+  <div class="card">
+    <h3>Cognitive Modules</h3>
+    <li>25 total (21 wired + 4 standalone)</li>
+    <li>15 research papers implemented</li>
+    <li>R168-R190 training gym rounds</li>
+    <li>~3,600 line distillation plugin</li>
+  </div>
+  <div class="card">
+    <h3>Cortex Database</h3>
+    <li>26,434 nodes across 26 tables</li>
+    <li>369,285 edges (knowledge graph)</li>
+    <li>310 Elo-rated tips (1066-2186)</li>
+    <li>444MB PostgreSQL + pgvector</li>
+  </div>
+  <div class="card">
+    <h3>Evaluation Engine</h3>
+    <li>23,469 evaluation matches</li>
+    <li>3-judge ensemble (M2.7/GF4.1/GPT)</li>
+    <li>1,292 eval + 970 repair flywheel cycles</li>
+    <li>HNSW vector index (0.3ms queries)</li>
+  </div>
+  <div class="card">
+    <h3>Infrastructure</h3>
+    <li>Cortex daemon (maintenance)</li>
+    <li>Daily backup (3am, 7-day)</li>
+    <li>226 subconscious module files</li>
+    <li>LCM context engine (120K threshold)</li>
+  </div>
+</div>
+
+<div class="footer">
+  Cortex Unified Architecture • Built with Cocoon AI Diagram Skill • 22,803 nodes • 369K edges • Apr 2026
+</div>
+
+</div>
+</body>
+</html>

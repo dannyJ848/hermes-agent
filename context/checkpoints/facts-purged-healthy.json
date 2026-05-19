@@ -1,0 +1,13 @@
+{
+  "label": "facts-purged-healthy",
+  "context": "Purged 102 operational log entries from semantic_facts. 578 real facts remain. Trust distribution: 38.7% high, 59.2% mid, 2.1% low. Bidirectional distillation fully wired with 4 controller streams. AGI cycle 14/1000. 7 tips, 187 JSONL entries. All healthy. Danny sleeping.",
+  "active_tasks": [
+    "Continue AGI cron cycles",
+    "Ground mid-trust facts (342 remaining)",
+    "Wire LLM tip extraction into controller",
+    "Sync distillation bridge to squad profiles",
+    "Build visual diff detection"
+  ],
+  "timestamp": "2026-04-05T07:18:04Z",
+  "task_id": "20260404_215806_7e676d"
+}

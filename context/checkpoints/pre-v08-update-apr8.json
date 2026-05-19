@@ -1,0 +1,24 @@
+{
+  "label": "pre-v08-update-apr8",
+  "context": "STATE: 1154 distilled tips, 0.8528 avg confidence. post_tool_call fix verified working (6 skill_rewards, 106 call_log entries since gateway restart at 20:24).\n\nVERSION UPDATE ASSESSMENT for v0.8.0:\n- 67 commits behind (ff6a86cb → 3baafea3)\n- 5 files with local mods: cli.py, gateway/run.py, run_agent.py, agent/context_compressor.py, plugins/distillation/\n- run_agent.py: HIGH conflict risk (22 hunks, _save_oversized_tool_result removed, moved to tool_result_storage)\n- cli.py: MEDIUM (session boundary hooks added upstream)\n- gateway/run.py: MEDIUM (session hooks, reasoning_effort cleanup)\n- context_compressor.py: NO upstream changes (safe)\n- plugins/distillation/: NO upstream changes (safe)\n\nKEY INSIGHT: Upstream v0.8 does NOT have post_tool_call hook — only pre_api_request, post_api_request, post_llm_call, on_session_end, on_session_finalize, on_session_reset. Our post_tool_call is custom and must be re-applied after update.\n\nNEW FEATURES TO NOTE:\n- on_session_finalize/on_session_reset hooks (could benefit distillation plugin)\n- unified spawn-per-call execution model (may affect terminal behavior)\n- reasoning_effort unified to config.yaml only\n- maybe_persist_tool_result replaces _save_oversized_tool_result\n- on_session_end hook (new cleanup opportunity)\n\nBACKUPS saved to /tmp/ (will do before stash)\nGATEWAY PID: running since 20:24:40\nCAFFEINATE PID: 82351",
+  "active_tasks": [
+    "Update to v0.8.0",
+    "Re-apply post_tool_call hooks to new run_agent.py",
+    "Re-apply restore-context to cli.py",
+    "Re-apply mesh+distillation to gateway/run.py",
+    "Clear caches, restart, verify all hooks fire"
+  ],
+  "decisions": [
+    "All our patches are additive insertions — auto-merge should work for most",
+    "post_tool_call hook is still custom (not upstream) — must re-apply",
+    "run_agent.py _save_oversized_tool_result → maybe_persist_tool_result change is biggest merge risk",
+    "context_compressor.py and plugins/distillation/ are conflict-free"
+  ],
+  "files_modified": [],
+  "next_steps": "1. Save backups of all patched files to /tmp/\n2. git stash push our modified files\n3. git pull origin main\n4. git stash pop and resolve any conflicts\n5. Re-apply post_tool_call hooks if auto-merge fails\n6. pip install -e '.[all]'\n7. Clear __pycache__\n8. Restart gateway + new CLI\n9. Verify all hooks fire",
+  "timestamp": "2026-04-09T02:10:49Z",
+  "unix_time": 1775700649.041461,
+  "task_id": "20260408_202443_c92947",
+  "source": "manual",
+  "version": 2
+}

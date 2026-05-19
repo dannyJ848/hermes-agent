@@ -1,0 +1,14 @@
+{
+  "label": "ktx2-research-cycle",
+  "context": "Researched KTX2/Basis Universal texture compression for SOMA mobile. Key findings: Use KTX2 (not raw .basis) with Basis Universal transcoder. ETC1S for diffuse (smallest), UASTC for normals (quality). 6-8x VRAM reduction vs PNG. gltf-transform CLI handles both Draco geometry + KTX2 texture compression in one pipeline. Combined with Draco: 50MB anatomy GLB \u2192 3-5MB download, 8-12MB VRAM. Next cycle: research Meshopt vs Draco for mobile decode speed OR research WebGPU compute shaders for medical volume rendering OR begin LODManager.ts implementation.",
+  "active_tasks": [
+    "SOMA LODManager implementation (THREE.LOD + Draco + KTX2) - research complete for both geo+tex",
+    "SOMA bilingual term system (UMLS CUI architecture)",
+    "SSS shader implementation",
+    "SOMA dual-renderer architecture (WebGPU/WebGL2)",
+    "Meshopt vs Draco benchmark for mobile decode speed",
+    "WebGPU compute shaders for medical volume rendering"
+  ],
+  "timestamp": "2026-04-05T17:59:11Z",
+  "task_id": "3be14daa-d6c3-47c1-a5e7-b4c5d52c2d73"
+}

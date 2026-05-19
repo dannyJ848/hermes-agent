@@ -1,0 +1,21 @@
+{
+  "label": "r9-training-gym-complete",
+  "context": "R9 COMPLETE. Built curriculum.py (E2H curriculum, arXiv 2506.06632). 5-level progressive difficulty, promote at 75% success, demote at 35%, sliding window 30 per level. Wired as R175 in post_tool_call + pre_llm_call. 4 tips.\n\n10-MODULE COMPLETE STACK:\n  GVU Core: R170 Generator → R168 Verifier → R171+R172+R174 Updater\n  Input: R173 meta_reasoner → R169 reasoning_discover\n  Learning: R175 curriculum → R174 reflection_synth → R172 tool_adaptor\n  Governance: context_governor (stored)\n\nPlugin: 3,421 lines. 69 total tips this session. 8 modules wired + gateway running.",
+  "active_tasks": [
+    "R10: Continue training gym"
+  ],
+  "decisions": [
+    "E2H curriculum with 75/35 asymmetric thresholds prevents oscillation",
+    "Sliding window of 30 outcomes per level balances stability and responsiveness"
+  ],
+  "files_modified": [
+    "~/subconscious/curriculum.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "R10: Continue. Context is getting large — approaching compression territory.",
+  "timestamp": "2026-04-14T21:16:46Z",
+  "unix_time": 1776201406.838034,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

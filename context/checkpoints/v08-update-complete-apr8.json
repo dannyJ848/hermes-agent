@@ -1,0 +1,28 @@
+{
+  "label": "v08-update-complete-apr8",
+  "context": "HERMES v0.8.0 UPDATE COMPLETE — Updated from commit 99ff375f to 6e3f7f36 (67 commits, 249 files changed).\n\nCONFLICT RESOLUTION:\n- run_agent.py: 2 conflicts resolved — kept BOTH our post_tool_call hooks AND upstream's new maybe_persist_tool_result (replaces _save_oversized_tool_result)\n- cli.py: auto-merged clean (restore-context + restart marker survived)\n- gateway/run.py: auto-merged clean (Agent Mesh + distillation disabled comment + restart marker survived)\n- agent/context_compressor.py: no upstream changes (throwaway greeting patch intact)\n- plugins/distillation/: no upstream changes (fully intact)\n\nVERIFICATION:\n- Version confirmed: 0.8.0\n- Gateway restarted at 21:36:39 — all 36/37 plugins loaded\n- Distillation hooks: post_tool_call, pre_llm_call, post_api_request all registered\n- Mesh plugin: all 4 tools registered\n- Telemetry + Tool Intelligence: loaded\n- call_log receiving data (18 entries in first minute)\n- api_analytics receiving data (2 entries)\n\nLOCAL PATCHES (still applied, tracked in git):\n1. cli.py — restore-context injection (~L6310) + restart marker banner (~L6970)\n2. gateway/run.py — distillation disabled comment + Agent Mesh injection (~L2341) + restart marker (~L2429)\n3. run_agent.py — post_tool_call hooks (2 spots, ~L6344 + ~L6663) + greeting strip (~L5877) + greeting break (~L7169)\n4. agent/context_compressor.py — throwaway greeting patterns + _is_throwaway_greeting()\n\nKEY NEW UPSTREAM FEATURES WE SHOULD LEVERAGE:\n- on_session_finalize / on_session_reset hooks — distillation plugin could use these for cleanup/init\n- on_session_end hook — cleanup opportunity\n- unified spawn-per-call execution model for terminal\n- reasoning_effort now config.yaml only (no env var)\n- tool_result_storage module replaces inline _save_oversized_tool_result\n- maybe_persist_tool_result + enforce_turn_budget imported from tools.tool_result_storage\n\nBACKUPS at /tmp/: cli.py.backup, run.py.backup, run_agent.py.backup, context_compressor.py.backup, distillation-backup/\nPATCHES at /tmp/: cli-local.patch, run-local.patch, run_agent-local.patch, context_compressor-local.patch\n\nCAFFEINATE PID: 82351\nGateway PID: fresh (started 21:36:39)",
+  "active_tasks": [
+    "1154 tips, 0.8528 avg, 24 chains",
+    "v0.8.0 update complete — verified",
+    "Fresh CLI session needed to activate new run_agent.py",
+    "Continue training gym with active feedback loop"
+  ],
+  "decisions": [
+    "Both post_tool_call AND maybe_persist_tool_result needed — hook fires before persistence",
+    "All patches are additive insertions — safe for future updates",
+    "on_session_finalize/reset hooks available for distillation plugin enhancement"
+  ],
+  "files_modified": [
+    "~/hermes-agent/run_agent.py (resolved 2 merge conflicts)",
+    "~/hermes-agent/cli.py (auto-merged)",
+    "~/hermes-agent/gateway/run.py (auto-merged)",
+    "~/hermes-agent/agent/context_compressor.py (no conflict)",
+    "~/.hermes/plugins/distillation/ (unchanged)"
+  ],
+  "next_steps": "Start fresh CLI session to activate v0.8.0 run_agent.py, then verify post_tool_call fires with real tool calls from the new session",
+  "timestamp": "2026-04-09T03:07:51Z",
+  "unix_time": 1775704071.750209,
+  "task_id": "20260408_202443_c92947",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,22 @@
+{
+  "label": "zero-downtime-patches-applied",
+  "context": "ZERO DOWNTIME PATCHES applied to run_agent.py — all timeout/detection values tuned aggressively:\n- TCP keepalive idle: 30s → 15s\n- TCP keepalive interval: 10s → 5s\n- Socket liveness check: every 10s → every 5s\n- Stale timeout (stream): 120s → 45s\n- Stale timeout (non-stream): 120s → 45s\n- Stale timeout (100K+ ctx): 120s → 60s\n- Stream read timeout: 90s → 45s\n- Stream stale base: 90s → 45s\nDetection timeline now: keepalive fires at 15s → probe at 20s → dead socket detected by ~25s → liveness check catches within 5s → max freeze ~30s.\n\nROOT CAUSE DIAGNOSIS of today's freezes:\n1. hermes update pulled 9 upstream commits this morning\n2. That broke our keepalive patch (pool kwarg passed to HTTPTransport instead of httpx.Timeout)\n3. Hermes couldn't even initialize — every CLI session crashed\n4. Danny used OpenClaw to fix the HTTPTransport issue (~10 AM)\n5. After fix: keepalive works again, but 120s stale timeout meant long waits on Z.AI server latency\n6. NOT caused by Tailscale (confirmed: not exit node, Z.AI traffic goes direct)\n7. NOT caused by code regression — our patches survived the update (322 lines uncommitted diff)\n\nBackup: run_agent.py.bak.pre-zero-downtime\n\nTRAINING GYM STATE (from prebuild investigation):\n- Plugin: ~/.hermes/plugins/distillation/__init__.py (3,797 lines, 14 R-modules wired)\n- Subconscious: ~/subconscious/ (235 .py files)\n- Cortex DB: 30,914 nodes (4,190 tips, 16,649 experiences, 5,924 circuit breakers)\n- Elo: avg 1185, max 2361.6\n- R168-R181 modules built (15 rounds total on Apr 15)\n- Skills files: 3.2MB total (~800K tokens) — major context bloat source\n- LCM threshold: 0.60 (120K of 200K)\n\nUSER REQUEST: Was about to start training gym prebuild when freeze issue interrupted. After restart, continue with training gym setup.",
+  "active_tasks": [
+    "zero-downtime patches: APPLIED",
+    "training gym prebuild: PENDING"
+  ],
+  "decisions": [
+    "Aggressive timeout tuning (45s caps) over conservative 120s — Danny wants zero wait time",
+    "Keepalive idle 15s is safe for Z.AI — not too aggressive to trigger false positives",
+    "Tailscale ruled out as freeze cause — not exit node, Z.AI traffic goes direct"
+  ],
+  "files_modified": [
+    "~/hermes-agent/run_agent.py"
+  ],
+  "next_steps": "Restart CLI session. The zero-downtime patches are applied. Start training gym prebuild work.",
+  "timestamp": "2026-04-15T03:12:08Z",
+  "unix_time": 1776222728.92521,
+  "task_id": "20260414_214323_5a9d43",
+  "source": "manual",
+  "version": 2
+}

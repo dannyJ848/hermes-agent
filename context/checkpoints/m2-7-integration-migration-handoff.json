@@ -1,0 +1,28 @@
+{
+  "label": "m2.7-integration-migration-handoff",
+  "context": "Danny's other Hermes session (PID 18814 on ttys000) is working on the cerebrum→Hindsight migration. DO NOT duplicate that work.\n\nMINIMAX M2.7 CONFIRMED WORKING:\n- Base URL: https://api.minimax.io/v1 (NOT api.minimax.chat)\n- Model name: \"MiniMax-M2.7\"\n- Key: sk-cp-VO7xuyBPKUexhr1rhr2pEJj9J3WUpgM66ZJlFuZ7ex7zM_0FKH3fR03TTDAXnoCTuky_E8qUUZ9uO4fRmxoVGZfOqkBHbee6C2jqZMujUhTKEg_SFxg1OyU\n- Max plan, valid ~4 days (expires ~Apr 14)\n- It's a thinking/reasoning model (outputs <think/> tags)\n\nZ.AI GLM-5.1 KEY: Stored in ~/.hermes/.env as GLM_API_KEY. 49 chars. Confirmed working.\nZ.AI base URL: https://api.z.ai/api/coding/paas/v4\n\nVPS STATUS (2.24.28.233):\n- Hermes gateway: running (systemd, handles Telegram)\n- Hindsight: healthy at port 8890, using Z.AI glm-5.1, bank=hermes-cerebrum\n- Migration: only 29 docs migrated out of ~2600 tips. OTHER SESSION handling this.\n- PostgreSQL + pgvector running\n\nMAC STATUS:\n- Local models ALL UP: Phi-3(8081), Llama3.1(8082), Nomic Embed(8083)\n- Mac Hindsight(8890) healthy\n- Echo proxy(9082) running\n- Zombie session PID 18814 on ttys000 — DO NOT KILL, Danny's using it\n\nMIGRATION SCRIPTS (for reference, not to run):\n- /tmp/migrate_tips_to_hindsight.py — M2.7 version (broken, JSON parsing issues)\n- /tmp/migrate_glm_vps.py — GLM-5.1 version (GLM returns empty content on coding endpoint for non-code prompts)\n- VPS has /tmp/run_migration.py — the original that got 100 tips via OpenRouter before credits ran out. It posts directly to Hindsight /memories endpoint (no LLM extraction needed). This is the better approach.\n\nBEST APPROACH for migration: The old script on VPS (/tmp/run_migration.py) just formats tips as text and pushes directly to Hindsight's /memories endpoint — no LLM needed. It worked for 100 tips before OpenRouter credits died. If other session needs to resume, copy the DB to VPS and run it there with Z.AI as Hindsight's backend.\n\nM2.7 BEST USE CASES (for after migration):\n- Training gym reward model (reasoning quality evaluation)\n- Tip quality scoring (multi-factor evaluation)\n- Trajectory analysis (deep reasoning)\n- NOT for migration (overkill, thinking tokens waste)",
+  "active_tasks": [
+    "VPS Hindsight migration — OTHER SESSION (PID 18814) handling",
+    "Integrate M2.7 into training gym as reward/scoring model",
+    "Set up reverse SSH tunnel Mac→VPS for local model access",
+    "Wire local inference into training gym (R141)"
+  ],
+  "decisions": [
+    "MiniMax M2.7 base URL is api.minimax.io (NOT api.minimax.chat)",
+    "Model name is 'MiniMax-M2.7' (case sensitive)",
+    "M2.7 is better for reward model/scoring, GLM-5.1 is better for migration",
+    "Migration should use direct tip→Hindsight push (no LLM needed) like the original /tmp/run_migration.py on VPS",
+    "Don't duplicate migration work — other session (PID 18814) is on it"
+  ],
+  "files_modified": [
+    "/tmp/migrate_tips_to_hindsight.py (M2.7 version, has issues)",
+    "/tmp/migrate_glm_vps.py (GLM version, GLM returns empty)",
+    "/tmp/test_glm.py (test script)"
+  ],
+  "next_steps": "Wait for other session to finish migration. Then: (1) integrate M2.7 as training gym reward model via ~/subconscious/local_inference.py bridge, (2) set up reverse SSH tunnel Mac→VPS so VPS Hindsight can use local models, (3) continue R141+ training gym.",
+  "timestamp": "2026-04-11T04:46:10Z",
+  "unix_time": 1775882770.553925,
+  "task_id": "20260410_231220_230a8b",
+  "source": "manual",
+  "version": 2
+}

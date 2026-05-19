@@ -1,0 +1,14 @@
+{
+  "label": "auto-handoff-1778705551",
+  "timestamp": 1778705551.591964,
+  "context": {
+    "timestamp": 1778705551.591939,
+    "session_id": "20260513_004940_7419c5",
+    "compression_count": 12,
+    "message_count": 185,
+    "model": "kimi-for-coding",
+    "system_prompt_preview": "You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and in",
+    "todo_snapshot": "[Your active task list was preserved across context compression]\n- [ ] infra-1. Build telemetry bridge for DGX training (real-time loss visibility) (pending)\n- [ ] infra-2. Quantize trained model to 4-bit GGUF for inference (pending)\n- [ ] infra-3. Fix cron system (corrupted SQLite database) (pending)\n- [ ] infra-4. Build regression test harness for cognitive subsystems (pending)\n- [ ] infra-5. Git commit all changes with CHANGELOG (pending)\n- [ ] infra-6. Dynamic config system for cognitive parameters (hot-reloadable YAML) (pending)\n- [ ] infra-7. Monitoring daemon for training job health (pending)"
+  },
+  "session_id": "20260513_004940_7419c5"
+}

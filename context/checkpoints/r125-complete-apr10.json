@@ -1,0 +1,22 @@
+{
+  "label": "r125-complete-apr10",
+  "context": "R125 TRAINING GYM COMPLETE. Error predictor module built and wired into distillation plugin.\n\nBuilt: ~/subconscious/error_predictor.py (285 lines, 5-factor model: tool_complexity 0.2, death_spiral 0.3, recent_error_rate 0.25, context_pressure 0.15, tool_historical_rate 0.1).\nAll 8 tests pass: clean=LOW 6%, death_spiral=CRITICAL 78%, recovery=MODERATE 40%.\n\nWIRED INTO PLUGIN:\n1. post_tool_call: record_outcome after R115 (line ~713) - records tool/status/error for sliding window\n2. pre_llm_call: build_injection after R124 (line ~1543) - injects risk hints when elevated error rates detected\n\nAPI: ErrorPredictor has methods: predict_failure, record_outcome, build_injection, get_prediction_stats. NO predict_risk method.\n\nCurrent state:\n- 1555 tips in cerebrum\n- 1844-line distillation plugin\n- Gateway PID 77632 running\n- 12+ subconscious modules (cascade_recovery, plan_monitor, confidence_tracker, experience_replay, reward_shaping, think_budget, knowledge_retrieval, knowledge_compiler, memory_selector, error_predictor, arg_feedback, tip_inserter)\n- Previous rounds R100-R124 built all these modules\n- R112 distill script at /tmp/r112_distill.py may still need insertion (check)\n\nNEVER kill gateway PID - it IS Hermes. Use hermes gateway restart or tip_queue daemon for DB writes.",
+  "active_tasks": [
+    "R126 training gym round - next in cycle"
+  ],
+  "decisions": [
+    "R125 uses error_predictor.py with 5-factor model, NOT a simpler approach",
+    "API is predict_failure/build_injection/record_outcome - NO predict_risk method",
+    "Both hooks wired: post_tool_call for recording, pre_llm_call for injection"
+  ],
+  "files_modified": [
+    "~/subconscious/error_predictor.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "Continue training gym. Pick next round (R126). Research new frontier topic, distill tips (use tip_queue daemon or nohup bg), build new module, wire in, restart, verify.",
+  "timestamp": "2026-04-10T08:22:43Z",
+  "unix_time": 1775809363.9593549,
+  "task_id": "20260409_133802_fc4fc7",
+  "source": "manual",
+  "version": 2
+}

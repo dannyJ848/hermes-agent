@@ -1,0 +1,25 @@
+{
+  "label": "echo-bug-fix-v3-gateway-restart",
+  "context": "Fixed echo bug #5 (ghost injection from pasted terminal output). The stale paste detector in the plugin was returning empty string \"\" instead of an explicit warning, so I still saw and acted on pasted old terminal output. Also expanded detection signals from 6 to 13 patterns and lowered threshold to 1 signal in pastes >1000 chars. Plugin is 1999 lines, syntax checked. NEEDS gateway restart to apply. Also built R140 advantage_estimator.py and wired it into plugin pre_llm_call and post_tool_call. DB has 1741 tips. Training gym state: R140 cycle complete, plugin syntax OK, not yet gateway-restarted. Danny is studying Apr-May, wants autonomous mode. Hardware decided: Hostinger KVM 2 (~$15/mo). Local inference: llama.cpp built with Metal, 3 models downloaded but llama-server test hung.",
+  "active_tasks": [
+    "R140 advantage_estimator built + wired — needs gateway restart",
+    "Echo bug fix v3 deployed — needs gateway restart",
+    "llama-server hung during test — needs debugging",
+    "Hostinger KVM 2 setup — Danny has SSH info from interrupted session"
+  ],
+  "decisions": [
+    "Stale paste detector now returns explicit [STALE PASTE DETECTED] warning instead of empty string",
+    "Expanded detection signals to 13 patterns, lowered threshold to 1 signal in pastes >1000 chars",
+    "Hardware: Hostinger KVM 2 (2vCPU/8GB) for 24/7 agent, M2 Air for local inference"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/advantage_estimator.py"
+  ],
+  "next_steps": "Restart gateway via `hermes gateway restart` to apply echo bug fix v3 and R140 wiring. Then verify the stale paste detector works. After that, continue training gym R141+.",
+  "timestamp": "2026-04-10T21:10:23Z",
+  "unix_time": 1775855423.690746,
+  "task_id": "20260409_133802_fc4fc7",
+  "source": "manual",
+  "version": 2
+}

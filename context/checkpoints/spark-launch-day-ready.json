@@ -1,0 +1,13 @@
+{
+  "label": "spark-launch-day-ready",
+  "context": "SPARK DAY-1 FULLY READY + MAXPERF + vLLM v0.19.1 INTEGRATED.\n\nvLLM v0.19.1 (released Apr 18 2026) ADDS:\n- Transformers v4 → v5.5.4 (6.6x MoE weight loading via HF_ENABLE_PARALLEL_LOADING=1)\n- Quantized MoE support (benefits Qwen3.6-FP8)\n- Gemma4 Eagle3 speculative decoding\n- All 3 HF env vars added to both Docker run commands\n- v0.19.1 Docker image added to pull list + fallback chain (after base, before custom)\n\nCHANGES TO spark-day1.sh (now 1273 lines):\n- Docker pulls: added vllm/vllm-openai:v0.19.1 + tagged as vllm-spark:v0191\n- Image fallback chain: tq → base → v0191 → custom → community → stock\n- BF16 server: gpu_mem 0.80→0.95, batch_tokens 16384→32768, kv-dtype fp8→fp8_e5m2, added -O2, added 3 HF env vars\n- FP8 server: gpu_mem 0.70→0.95, max_model_len 262144→131072, kv-dtype fp8→fp8_e5m2, added -O2, added 3 HF env vars\n- Phase 9: sources spark-maxperf.sh (7-layer optimization)\n- Next Steps updated: wire→chat→train→lilac\n\nCHANGES TO spark-maxperf.sh (690 lines):\n- Added 3 Transformers v5 env vars: HF_ENABLE_PARALLEL_LOADING=1, HF_DEACTIVATE_ASYNC_LOAD=0, HF_HUB_ENABLE_HF_TRANSFER=1\n\nLAUNCH DAY = ONE COMMAND: spark-day1.sh (9 phases, fully automated including maxperf + v0.19.1)",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "When DGX Spark arrives in 2 days: (1) bash macbook-transfer-helper.sh --enable-ssh, (2) bash spark-day1.sh --macbook <IP> --usb, (3) bash wire-spark-to-hermes.sh <SPARK_IP>, (4) spark-quality chat, (5) dual-training-orchestrator.sh",
+  "timestamp": "2026-04-18T16:01:38Z",
+  "unix_time": 1776528098.6092181,
+  "task_id": "20260417_215727_387de3",
+  "source": "manual",
+  "version": 2
+}

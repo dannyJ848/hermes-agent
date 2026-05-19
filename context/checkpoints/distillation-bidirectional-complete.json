@@ -1,0 +1,24 @@
+{
+  "label": "distillation-bidirectional-complete",
+  "context": "DISTILLATION BIDIRECTIONAL PIPELINE -- COMPLETE\n\nSession restored checkpoint 'distillation-bidirectional-complete' and completed the feedback loop wiring.\n\nWhat was done:\n1. Fixed dict unpacking bug in engineering_audit_v3.py (3-column query into 2-tuple)\n2. Ran 100-cycle audit -- 5/5 gates passed, L4 (4.10/5.00)\n3. Purged noisy tips -- 62 → 57 clean tips\n4. Built feedback loop in distillation plugin (~/.hermes/plugins/distillation/__init__.py):\n   - pre_tool_call: returns tool-specific RULE guidance via direct SQL (no LLM)\n   - post_tool_call: calls _update_tip_confidence() -- success +0.005, failure -0.002\n5. Validated end-to-end -- pre-call injection works, confidence updates work\n6. Cleared __pycache__ for plugin\n\nKey files:\n- ~/.hermes/plugins/distillation/__init__.py -- updated plugin with feedback loop\n- ~/subconscious/engineering_audit_v3.py -- fixed dict unpacking\n- ~/subconscious/engineering_feedback_loop.py -- standalone validation script\n- ~/subconscious/engineering_audit_v3_report.json -- latest audit report\n\nStatus: Plugin is ready but needs GATEWAY RESTART to activate. The feedback loop will only start working once the gateway loads the updated plugin code.\n\nAudit results: 5/5 gates, L4, 4.10/5.00, 0.5% noise, 57 clean tips, 25 mastery scores synced\n\nRemaining \"KNOWS BUT DOESN'T DO\" tools: terminal (28%), execute_code (61%), read_file (49%) -- these have tips but need live feedback loop running to shift behavior.",
+  "active_tasks": [
+    "Gateway restart to activate updated distillation plugin",
+    "Monitor tip confidence changes after restart to verify feedback loop works live"
+  ],
+  "decisions": [
+    "Feedback loop uses asymmetric update: +0.005 success, -0.002 failure (slow growth, slow decay)",
+    "Pre-call injection limited to top 3 tips per tool, confidence >= 0.3",
+    "Post-call feedback loop is non-critical -- wrapped in try/except to never break the main hook"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/engineering_audit_v3.py",
+    "~/subconscious/engineering_feedback_loop.py"
+  ],
+  "next_steps": "Restart gateway to activate the updated distillation plugin with feedback loop. Then monitor tool success rates over next session to see if the loop actually improves behavior.",
+  "timestamp": "2026-04-06T22:47:19Z",
+  "unix_time": 1775515639.380338,
+  "task_id": "20260406_160029_bb40d1",
+  "source": "manual",
+  "version": 2
+}

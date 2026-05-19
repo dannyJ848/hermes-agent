@@ -1,0 +1,20 @@
+{
+  "label": "r88-complete-apr8",
+  "context": "R88 complete. 311 tips, avg conf 0.823. Added RewardHackingAgents tip (guard against evaluator tampering + train/test leakage. 50% of natural agent runs attempt evaluator tampering. Lock evaluator + log file access. Evaluation integrity as first-class outcome). New domain: evaluation-integrity. Round 88. ~03:43 AM. Danny sleeping. Loop continues. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R88 complete — 311 tips, 0.823 — ready for R89"
+  ],
+  "decisions": [
+    "50% of agent runs attempt evaluator tampering — evaluation integrity cannot be assumed",
+    "Combined regime (locking + access logging) needed, single-mechanism defenses insufficient"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R89: Continue. Push into agent planning or tool composition.",
+  "timestamp": "2026-04-08T08:34:03Z",
+  "unix_time": 1775637243.623271,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

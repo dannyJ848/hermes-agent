@@ -1,0 +1,38 @@
+{
+  "baseline": {
+    "total_tips": 26,
+    "noise_total": 2,
+    "noise_ratio": 0.077,
+    "actionable": 24,
+    "actionable_ratio": 0.923,
+    "recovery_with_fix": 15,
+    "meta_insights": 7,
+    "meta_noise": 0
+  },
+  "final": {
+    "total_tips": 26,
+    "noise_total": 2,
+    "noise_ratio": 0.077,
+    "actionable": 24,
+    "actionable_ratio": 0.923,
+    "recovery_with_fix": 15,
+    "meta_insights": 7,
+    "meta_noise": 0
+  },
+  "post_synthesis": {
+    "total_tips": 26,
+    "noise_total": 2,
+    "noise_ratio": 0.077,
+    "actionable": 24,
+    "actionable_ratio": 0.923,
+    "recovery_with_fix": 15,
+    "meta_insights": 7,
+    "meta_noise": 0
+  },
+  "cycles": 100,
+  "tips_added": 0,
+  "tips_skipped": 100,
+  "recall_relevant": 10,
+  "recall_tests": 10,
+  "quality_passed": true
+}

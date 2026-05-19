@@ -1,0 +1,36 @@
+{
+  "label": "training-gym-r153-500-milestone",
+  "context": "Training Gym R152-R153 completed! ALL 10/10! R153 hit 500 EXERCISE MILESTONE!\n\nR152: twosum(T8), valparen(T8), maxsub(T8), mergel(T8)\nR153: stock1(T8), bsearch(T8), climb(T8), longpal(T9), threesum(T9), container(T8), longsubstr(T9), regexmatch(T10), minpath(T8), uniqpath(T8), editdist(T10), subsets(T8), permute(T9)\n\nDB: 500 exercises, 860 attempts, avg 9.94, 97.0% perfect. 451 passed. Tier 9+ = 165, Tier 10 = 79.\n118+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R153 500 milestone complete",
+    "R154 next"
+  ],
+  "decisions": [
+    "Two sum: hash map for complements. One pass.",
+    "Valid parentheses: stack. Pop and check matching.",
+    "Kadane: track current and global max.",
+    "Merge sorted lists: dummy head, iterative.",
+    "Stock: track min price, max profit.",
+    "Binary search: classic lo/hi/mid.",
+    "Climbing stairs: fibonacci. a,b=b,a+b.",
+    "Longest palindrome: expand around center. Check odd/even.",
+    "3Sum: sort + two pointers. Skip duplicates.",
+    "Container: two pointers. Move shorter side.",
+    "Longest substr no repeat: sliding window with set.",
+    "Regex match: DP. dp[i][j] = match up to s[i], p[j]. Handle * specially.",
+    "Min path sum: DP in-place grid.",
+    "Unique paths: 1D DP. dp[j] += dp[j-1].",
+    "Edit distance: DP. 1+min(delete,insert,replace).",
+    "Subsets: iterative. result += [s+[num] for s in result].",
+    "Permutations: backtracking. Swap or remaining list."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R154: Continue past 500. Try: Letter Combinations, Generate Parentheses, Next Permutation.",
+  "timestamp": "2026-04-09T00:33:38Z",
+  "unix_time": 1775694818.117467,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

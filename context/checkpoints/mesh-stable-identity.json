@@ -1,0 +1,22 @@
+{
+  "label": "mesh-stable-identity",
+  "context": "Fixed mesh plugin to use stable agent identity instead of PID-based identity. Previously os.getpid() was used as default agent ID, which changed on every execute_code call, creating phantom duplicate agents in the mesh.\n\nChanges:\n1. Replaced _AGENT_ID = os.environ.get(\"HERMES_MESH_ID\", f\"agent-{os.getpid()}\") with _stable_agent_id() function\n2. _stable_agent_id() uses 3-tier lookup: HERMES_MESH_ID env var → ~/.hermes/.mesh-identity file → hash of hostname+username\n3. Identity file pre-created: ~/.hermes/.mesh-identity contains \"agent-dannygomez-b20137a0\"\n4. _get_session_id() also patched to not use PID\n5. DB cleaned — all stale duplicate entries removed from presence/activity/messages tables\n6. Plugin __pycache__ cleared\n\nAlso done this session:\n- Added register(ctx) to mesh plugin with 4 tool registrations (mesh_status, mesh_message, mesh_task, mesh_lock)\n- Fixed distillation plugin — pre_tool_call hook now loads (was stale .pyc cache)\n- Both plugins confirmed working in gateway.log at 16:09:53\n- plugin.yaml files fixed for both plugins (provides_hooks declarations)",
+  "active_tasks": [
+    "Gateway restart needed to load stable identity patch"
+  ],
+  "decisions": [
+    "Stable identity via file hash instead of PID",
+    "3-tier lookup: env var > identity file > hostname hash",
+    "Pre-created ~/.hermes/.mesh-identity with agent-dannygomez-b20137a0"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/evey-mesh/__init__.py",
+    "~/.hermes/.mesh-identity"
+  ],
+  "next_steps": "Restart gateway, then verify all mesh calls show as agent-dannygomez-b20137a0 (single identity). Check with mesh_status.",
+  "timestamp": "2026-04-06T21:24:51Z",
+  "unix_time": 1775510691.89358,
+  "task_id": "20260406_160108_7494c4",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,48 @@
+{
+  "label": "pre-audit-marathon",
+  "context": "CORTEX UNIFIED DB — FULL REBUILD COMPLETE (Apr 13).\n\nSYSTEM STATE:\n- Cortex Postgres DB on localhost:5432, ~15,715 cortex_nodes\n- Daemon running under launchd (PID 37049, KeepAlive=true)\n- 4 files monkey-patched with cortex_compat_shim: brain.py, meta_loop.py, distillation plugin, evey-tool-intelligence\n- E2E verified: INSERT/SELECT through shim lands in Cortex with column remapping\n- 22 indexes, 384-dim embeddings, md5 hash dedup, Elo K=40\n- LLM judge: gemini-2.5-flash via OpenRouter ($0.0003/1M tokens)\n- Backup: ~/subconscious/backups/cortex_20260413.sql.gz (30.7MB)\n\nAUDITS ALREADY COMPLETED:\n- Performance audit (all paths <1ms except pg_trgm 47ms)\n- Enhancement audit (4 gaps → LLM judge, tip normalizer, research extraction, embeddings)\n- Wiring & redundancy audit (4 critical files wired, 151 ~/subconscious/ modules still SQLite-only)\n- End-to-end distillation cycle test (INSERT/SELECT verified through shim)\n\nNEXT: COMPREHENSIVE AUDIT MARATHON — 10 audits covering every millimeter:\nTIER 1 (Must-do): Data Integrity, Concurrency, Failure Mode & Recovery, Shim Query Correctness\nTIER 2 (Should-do): Elo System Quality, Embedding Coverage, Backup & Restore, Security\nTIER 3 (Nice-to-have): Capacity Planning, Dependency Graph\n\nKEY CONNECTIONS/FILES:\n- psycopg2.connect('postgresql://hindsight:hindsight@localhost:5432/cortex')\n- OpenRouter key: config.auxiliary.approval.api_key, model google/gemini-2.5-flash\n- ~/subconscious/cortex_compat_shim.py (28K+ bytes, column remap: condition→metadata->>'condition')\n- ~/subconscious/cortex_access.py (zero sqlite3, pure psycopg2)\n- ~/subconscious/cortex_daemon.py (uses cortex_access directly, no shim)\n- ~/subconscious/cortex_flywheel.py, llm_judge.py, tip_normalizer.py, research_to_tips.py\n- ~/subconscious/com.hermes.cortex-daemon.plist (LOADED in launchd)\n- ~/subconscious/cortex_backup.sh (Python psycopg2-based)\n- Daemon: PID ~/subconscious/cortex_daemon.pid, Log ~/subconscious/cortex_daemon.jsonl, Heartbeat ~/subconscious/cortex_daemon.heartbeat\n\nCORTEX SCHEMA:\n- cortex_nodes: id, text, domain, confidence, node_type, elo, elo_matches, tags, is_active, provenance, trust, frequency, salience, metadata(JSONB), embedding, content_hash, created_at, updated_at\n- cortex_elo_ratings: id, node_id, elo, elo_matches, last_matched_at\n- cortex_predictions: id, input_context, prediction, outcome, confidence, created_at, resolved_at\n- cortex_eval_history: id, tip_a, tip_b, winner, judge_reasoning, created_at\n- cortex_documents: id, original_text, content_hash, doc_type, domain, source_url, metadata, tags, created_at, updated_at\n- cortex_chunks: id, document_id, chunk_text, chunk_index, embedding, created_at\n- cortex_kv_store: id, table_name, key, data(JSONB), created_at\n- Distribution: experience:8157, tip:3739, fact:1080, prediction:5251, observation:1618, world:1008, entity:187, etc.\n\nSQLITE SOURCE (for reconciliation):\n- ~/.hermes/cerebrum_memory.db (13MB, 80+ tables)\n- Key tables: distilled_tips (1,869 rows), tip_elo, semantic_facts, predictions, episodic_memory, self_model\n\nSHIM TABLE_MAP:\n- distilled_tips→cortex_nodes(tip), semantic_facts→cortex_nodes(fact), episodic_memory→cortex_nodes(experience), predictions→cortex_predictions, tip_elo→cortex_elo_ratings\n\nSHIM GOTCHAS (all fixed):\n- _ORIGINAL_CONNECT at module level (prevents infinite recursion)\n- INSERT uses cortex_access.insert_node() with schema mapping\n- SELECT injects WHERE node_type='X' filter\n- Column remap: condition→metadata->>'condition', recommendation→metadata->>'recommendation', etc.\n- (?<!>) lookbehind prevents double-remap",
+  "active_tasks": [
+    "Data Integrity Audit — row count reconciliation SQLite vs Cortex, hash spot-checks, FK validity, NULLs, timestamps",
+    "Concurrency Audit — multi-writer behavior, transaction isolation, lock contention, deadlocks",
+    "Failure Mode & Recovery Audit — Postgres down simulation, shim fallback, data divergence, daemon crash recovery",
+    "Shim Query Correctness Audit — test every SQL pattern (SELECT/INSERT/UPDATE/DELETE with WHERE/ORDER/LIMIT/GROUP/JOIN/COUNT)",
+    "Elo System Quality Audit — rating convergence/drift, tip activation accuracy, LLM judge consistency, rating inflation",
+    "Embedding Coverage Audit — % nodes with embeddings, cosine similarity sanity check",
+    "Backup & Restore Audit — test actual restore from backup file, completeness check",
+    "Security Audit — credentials exposure, SQL injection via shim regex, file permissions",
+    "Capacity Planning Audit — growth rate, disk projections, index strategy at scale",
+    "Dependency Graph Audit — external service dependencies, blast radius mapping"
+  ],
+  "decisions": [
+    "Connection-level shim over per-table mapping",
+    "_ORIGINAL_CONNECT at module level",
+    "INSERT via cortex_access.insert_node()",
+    "SELECT with node_type injection + metadata->> column remap",
+    "launchd KeepAlive=true for daemon",
+    "Python psycopg2 backup (no pg_dump)",
+    "LLM judge gemini-2.5-flash via OpenRouter",
+    "Run all 10 audits: Data Integrity, Concurrency, Failure Mode, Shim Correctness, Elo Quality, Embedding Coverage, Backup/Restore, Security, Capacity, Dependency Graph"
+  ],
+  "files_modified": [
+    "~/subconscious/cortex_compat_shim.py",
+    "~/subconscious/cortex_daemon.py",
+    "~/subconscious/cortex_access.py",
+    "~/subconscious/cortex_flywheel.py",
+    "~/subconscious/llm_judge.py",
+    "~/subconscious/tip_normalizer.py",
+    "~/subconscious/research_to_tips.py",
+    "~/subconscious/cortex_backup.sh",
+    "~/subconscious/run_cortex_daemon.sh",
+    "~/subconscious/com.hermes.cortex-daemon.plist",
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/.hermes/plugins/evey-tool-intelligence/__init__.py",
+    "~/subconscious/brain.py",
+    "~/subconscious/meta_loop.py"
+  ],
+  "next_steps": "Start Audit 1: Data Integrity — reconcile every mapped table between SQLite and Cortex. Write /tmp/audit_1_data_integrity.py script.",
+  "timestamp": "2026-04-13T22:09:45Z",
+  "unix_time": 1776118185.405616,
+  "task_id": "20260413_135506_962792",
+  "source": "manual",
+  "version": 2
+}

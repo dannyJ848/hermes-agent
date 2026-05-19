@@ -1,0 +1,12 @@
+{
+  "label": "agi-reservoir-active-missing-retrieval",
+  "context": "Reservoir v2 deployed and active for eviction. Missing: fault_in tool, handle injection, tool stubbing. Good enough to continue AGI. Danny wants full speed AGI buildout. Cycle 210/1000, in REASONING domain. 320 knowledge files. Compression threshold 40%. Gateway PID 36485.",
+  "active_tasks": [
+    "Wire fault_in as Hermes tool (reservoir_recall)",
+    "Inject retrieval handles into context",
+    "Wire tool stubbing into Hermes schema loading",
+    "Continue AGI roadmap - REASONING domain (cycle 210/1000)"
+  ],
+  "timestamp": "2026-04-05T17:54:50Z",
+  "task_id": "20260404_215806_7e676d"
+}

@@ -1,0 +1,129 @@
+{
+  "scan_date": "2026-04-21T20:06:00Z",
+  "source": "X/Twitter AI News Scanner (merged sources)",
+  "methods_used": [
+    "chrome_x_bridge.py scan 5 -> FAILED (Chrome 0 windows)",
+    "x_api_client.py search -> 0 results (CF blocked)",
+    "twitter_bridge.py -> 3 new tracked tweets SUCCESS",
+    "Merged with existing 14:13 scan (80 tweets, 9 queries)"
+  ],
+  "total_tweets_scanned": 83,
+  "top_5_findings": [
+    {
+      "rank": 1,
+      "priority": "HIGH",
+      "category": "Hermes Agent / Nous Research milestone",
+      "author": "@sudoingX",
+      "author_name": "Sudo su",
+      "tweet_link": "https://x.com/sudoingX/status/2045744024389324924",
+      "time": "2026-04-19T05:59:00Z",
+      "engagement": {"likes": "292", "retweets": "15", "replies": "20"},
+      "summary": "Nous Research went from 4.5K GitHub stars to 100K in under a month with Hermes Agent, described as 'completely ate the lobster.' Now climbing past 100K as the top general agent framework.",
+      "flags": ["Hermes/Nous mention", "major milestone", "100K stars"]
+    },
+    {
+      "rank": 2,
+      "priority": "HIGH",
+      "category": "Hermes Agent product update",
+      "author": "@NousResearch",
+      "author_name": "Nous Research",
+      "tweet_link": "https://x.com/NousResearch/status/2046300755683098910",
+      "time": "2026-04-20T18:51:00Z",
+      "engagement": {"likes": "794", "retweets": "35", "replies": "42"},
+      "summary": "Kimi K2.6 is now available in Hermes Agent. Users can simply run `hermes update` and use `hermes model` to select a compatible provider hosting the model. Official product integration announcement.",
+      "flags": ["Hermes/Nous mention", "product update", "Kimi K2.6"]
+    },
+    {
+      "rank": 3,
+      "priority": "HIGH",
+      "category": "Hermes Agent visibility / ranking",
+      "author": "@RoundtableSpace",
+      "author_name": "0xMarioNawfal",
+      "tweet_link": "https://x.com/RoundtableSpace/status/2045906520672461309",
+      "time": "2026-04-19T16:45:00Z",
+      "engagement": {"likes": "3082", "retweets": "446", "replies": "43"},
+      "summary": "TOP FIVE GITHUB REPOSITORIES THIS WEEK listed HERMES-AGENT as #2, alongside Andrej Karpathy skills, Claude-mem, and Evolver. Extremely high visibility (3K+ likes) for the Hermes project in crypto/tech influencer circles.",
+      "flags": ["Hermes mention", "high engagement", "top GitHub repo"]
+    },
+    {
+      "rank": 4,
+      "priority": "normal",
+      "category": "New product from major AI lab",
+      "author": "@testingcatalog",
+      "author_name": "TestingCatalog News",
+      "tweet_link": "https://x.com/testingcatalog/status/2046587417398825278",
+      "time": "2026-04-21T13:50:00Z",
+      "engagement": {"likes": "95", "retweets": "11", "replies": "5"},
+      "summary": "OpenAI is working on a new Agents platform for ChatGPT that allows users to create, configure, and manage their own 24/7, always-on agents. Roles mentioned: 'Data Analyst', 'Chief of Staff,' etc. Competitive threat to self-hosted agents like Hermes.",
+      "flags": ["OpenAI", "managed agents", "competitive threat"]
+    },
+    {
+      "rank": 5,
+      "priority": "normal",
+      "category": "Platform integration breakthrough",
+      "author": "@Pirat_Nation",
+      "author_name": "Pirat_Nation",
+      "tweet_link": "https://x.com/Pirat_Nation/status/2046499427515564032",
+      "time": "2026-04-21T08:01:00Z",
+      "engagement": {"likes": "119", "retweets": "10", "replies": "21"},
+      "summary": "Microsoft has begun rolling out AI agent support in Windows 11 through new APIs in latest Release Preview builds. Third-party AI agents can now integrate into the Taskbar. Major OS-level platform shift for agent frameworks.",
+      "flags": ["Microsoft", "Windows 11", "platform shift", "agent APIs"]
+    }
+  ],
+  "new_tracked_tweets_since_last_scan": [
+    {
+      "priority": "HIGH",
+      "category": "Teknium / Nous Research signal",
+      "author": "@Teknium",
+      "tweet_link": "https://x.com/Teknium/status/2046676739460645046",
+      "time": "2026-04-21T19:45:34Z",
+      "engagement": {"likes": 69, "retweets": 3, "replies": 6},
+      "summary": "Teknium: 'It is a pretty awesome feeling to own your own stack in AI' — high-signal philosophical/product positioning from Hermes Agent project lead.",
+      "flags": ["Teknium mention", "Hermes ecosystem"]
+    },
+    {
+      "priority": "HIGH",
+      "category": "Nous Research signal",
+      "author": "@NousResearch",
+      "tweet_link": "https://x.com/NousResearch/status/2046651738388590897",
+      "time": "2026-04-21T18:06:14Z",
+      "engagement": {"likes": 299, "retweets": 16, "replies": 22},
+      "summary": "Nous Research posted 'What is born of light is light' with media. Cryptic but high-engagement post suggesting possible major upcoming announcement.",
+      "flags": ["Nous Research mention", "high engagement", "possible product tease"]
+    }
+  ],
+  "other_notable_mentions": [
+    {
+      "author": "@Teknium",
+      "summary": "Earlier tweet: 'codename Hermes instead of codename lobster' and 'Should we merge this? ^_^' — casual but high-signal posts from project lead.",
+      "link": "https://x.com/Teknium/status/2046576415697670616",
+      "engagement": "♥140 ↻6"
+    },
+    {
+      "author": "@aijoey",
+      "summary": "Hermes Agent on DGX Spark with 128GB unified memory and Blackwell 'starts feeling like a different species of agent.'",
+      "link": "https://x.com/aijoey/status/2046353844251291705",
+      "engagement": "♥133 ↻8"
+    },
+    {
+      "author": "@KSimback",
+      "summary": "X API for OpenClaw/Hermes became much more practical after recent pricing changes. Previously $1-2/day just to read own feed.",
+      "link": "https://x.com/KSimback/status/2046187275592106330",
+      "engagement": "♥792 ↻45"
+    },
+    {
+      "author": "@boxmining",
+      "summary": "Ranked AI models for Hermes Agent after 1 month testing: MIMO V2 Pro, GPT 5.4, Kimi 2.5, DeepSeek 3.2 compared on Orchestrator and Execution.",
+      "link": "https://x.com/boxmining/status/2045794486111101019",
+      "engagement": "♥453 ↻18"
+    },
+    {
+      "author": "@CardilloSamuel",
+      "summary": "Released qwen3.6 35b a3b 'carnice edition' finetuned for Hermes agent on unified memory hardware (Apple Silicon).",
+      "link": "https://x.com/CardilloSamuel/status/2045781133103902872",
+      "engagement": "♥268 ↻32"
+    }
+  ],
+  "high_priority_hermes_nous_mentions": 5,
+  "notes": "chrome_x_bridge.py failed due to 0 Chrome windows (cron environment). twitter_bridge.py succeeded for tracked accounts. Primary data from existing 14:13 scan (80 tweets). save_finding tool unavailable in current environment; findings persisted to JSON files."
+}

@@ -1,0 +1,20 @@
+{
+  "label": "r98-complete-apr8",
+  "context": "R98 complete. 357 tips, avg conf 0.827. Added CoT Length tip (inverted U-shape: performance improves then decreases. Optimal length scales with task difficulty, inversely with model capability. Overthinking is real. Length-aware filtering at inference). New domain: reasoning-optimization. Round 98. ~04:13 AM. Danny sleeping. Loop continues. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R98 complete — 357 tips, 0.827 — ready for R99"
+  ],
+  "decisions": [
+    "Overthinking is measurable and costly — inverted U-shape between CoT length and accuracy",
+    "More capable models should reason shorter — simplicity bias is a feature not a bug"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R99: Continue. Push into knowledge distillation or compression for agents.",
+  "timestamp": "2026-04-08T08:50:19Z",
+  "unix_time": 1775638219.4447901,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

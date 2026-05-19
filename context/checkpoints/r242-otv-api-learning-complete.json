@@ -1,0 +1,19 @@
+{
+  "label": "r242-otv-api-learning-complete",
+  "context": "R241-R242 complete. Evolving Orchestration, Acon context compression, OTV one-token verification, API Learning from Demonstrations. 22 tips. Total active: 1,934.\n\nPlugin: 3012 lines. Gateway running.\nKEY INSIGHTS: (1) Evolving Orchestration: RL-trained puppeteer for dynamic multi-agent sequencing. (2) Acon: dual compression (history + observation) with small model distillation. (3) OTV: single-token reasoning verification via LoRA + KV cache probing. (4) API Learning: learn tools from demos (calls + critiques), parameter filling is the critical challenge.\n\nPapers distilled R214-R242: 58 papers, 280+ tips across 29 rounds.",
+  "active_tasks": [
+    "R243: Continue autonomous training"
+  ],
+  "decisions": [
+    "OTV lightweight verification could be a cerebrum tip pre-filter",
+    "API Learning enables auto SKILL.md generation from tool call logs",
+    "Acon validates context_milestones module — add dual compression"
+  ],
+  "files_modified": [],
+  "next_steps": "R243: Continue autonomous loop. 1,934 tips.",
+  "timestamp": "2026-04-12T13:20:16Z",
+  "unix_time": 1776000016.374186,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

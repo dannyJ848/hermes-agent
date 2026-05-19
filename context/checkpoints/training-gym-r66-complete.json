@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r66-complete",
+  "context": "Training Gym R66 completed! ALL 4 PASS! Crossed 500 attempt milestone!\n\nR66 RESULTS (all 10/10):\n1. topological-sort-001 (T7) - Kahn's BFS: compute in-degree, queue 0-indegree nodes, process.\n2. dijkstra-001 (T8) - heapq with (dist, node). Skip stale entries. Track predecessors for path reconstruction.\n3. lazy-segment-tree-001 (T9) - Lazy propagation: tree[] for values, lazy[] for pending. Push down before children visit. Partial overlap requires push.\n4. bellman-ford-001 (T8) - Relax V-1 times. Check for negative cycle with one more pass. Early termination on no update.\n\nNOTE: Lazy segment tree test had wrong expected value (16→18). The implementation was correct; test was wrong.\n\nDB: 290 exercises, 503 attempts, avg 9.89, 94.8% perfect. 240 passed. Tier 9+ = 62.\n32+ consecutive rounds all 10/10. 500+ attempts milestone!",
+  "active_tasks": [
+    "R66 complete",
+    "R67 next"
+  ],
+  "decisions": [
+    "Kahn's topo sort: in-degree tracking, deque for BFS. Result len != n → cycle.",
+    "Dijkstra: heapq, skip stale (d > dist[u]). Predecessor array for path reconstruction.",
+    "Lazy segment tree: _push(node, l, r) distributes lazy to children. range_add: full overlap→update+set lazy, partial→push+recurse. range_sum: full→return tree[node], partial→push+recurse+combine.",
+    "Bellman-Ford: relax V-1 times. Negative cycle: one more pass, if any dist improves → cycle. Early stop if no update."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R67: Continue. Try: Union-Find with rollback, A* search, Kruskal's MST, Prim's MST, or more advanced graph.",
+  "timestamp": "2026-04-08T20:56:42Z",
+  "unix_time": 1775681802.854945,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

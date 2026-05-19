@@ -1,0 +1,9 @@
+{
+  "label": "cerebrum-needs-fresh-session",
+  "context": "Cerebrum memory provider is built, configured, and loads correctly in isolation (tested via venv Python). Config: memory.provider: cerebrum. Tool schema IS injected into this session (visible in system prompt). BUT the runtime dispatch fails: self._memory_manager is None at call time despite tools being injected. Diagnosis: the _memory_manager was likely created then GC'd or the init failed silently. FIX: Danny needs to close terminal completely and start `hermes` fresh (not just gateway restart \u2014 the CLI agent itself needs a fresh process). Cron jobs all running fine (8/8 OK). No code changes needed \u2014 just a clean session start.",
+  "active_tasks": [
+    "Start fresh Hermes session to activate Cerebrum memory provider"
+  ],
+  "timestamp": "2026-04-03T05:16:42Z",
+  "task_id": "20260403_000748_5d0741"
+}

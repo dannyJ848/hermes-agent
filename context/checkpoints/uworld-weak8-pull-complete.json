@@ -1,0 +1,13 @@
+{
+  "label": "uworld-weak8-pull-complete",
+  "context": "## Completed: UWorld Weak Area Pull from NBME Analysis\n\n### NBME SCORE ANALYSIS (4 forms):\n- F28(4/4): 65 EPC, 92% pass\n- F29(4/8): 61 EPC, 84% pass (dip)\n- F30(4/12): 65 EPC, 92% pass (recovered)\n- F32(4/16): 68 EPC, 95% pass (NEW HIGH - improving!)\n\n### 8 Weak Areas (gap > -8 composite):\n1. Pathology: avg 67, gap -8, composite 4.00\n2. Physiology: avg 66, gap -9, composite 3.24\n3. Microbiology & Immunology: avg 63, gap -10, composite 2.44\n4. Gross Anatomy & Embryology: avg 58, gap -12, composite 1.80\n5. Reproductive & Endocrine: avg 63, gap -12, composite 1.68\n6. Blood & Lymphoreticular/Immune: avg 61, gap -14, composite 1.54\n7. Behavioral Health & Neuro/Special Senses: avg 63, gap -11, composite 1.32\n8. Cardiovascular: avg 60, gap -14, composite 1.21\n\n### PHASE 1 SCAN:\n- 186 tests scanned, 3,665 total questions\n- 2,906 in weak areas, 1,771 already in Anki\n- 1,135 NEW questions found (131 system-level + 1,004 discipline-only)\n\n### PHASE 2 CARD CREATION:\n- 1,135 new cards created, 0 errors, 0 duplicates\n- Deck \"UWorld Weak Subtopics\" now at 2,958 cards total\n- Cards have Text (front: question+choices+cloze) + Back Extra (explanation)\n\n### IMAGE DOWNLOAD:\n- 1,284 images downloaded via CDP, 0 failures\n- 24 already local, 1,165 notes updated with local paths\n- 0 remaining remote images\n- 1,059 uw_* files in Anki media folder\n- exhibit <a href> links left as-is (2.7% negligible)\n\n### KEY FILES:\n- Phase 1 scan: /tmp/uworld_phase1_weak8.py\n- Phase 2 cards: /tmp/uworld_phase2_weak8.py\n- Image download: /tmp/uworld_batch_download_imgs.py\n- Match results: /tmp/uworld_weak8_new_matches.json\n- Image URL list: /tmp/uworld_img_urls.json\n- Download results: /tmp/uworld_img_download_results.json\n\n### GOTCHAS FOUND THIS SESSION:\n1. Chrome CDP page must be fully loaded (navigate to UWorld test list) before API calls work — otherwise returns 401 Unauthorized even with valid JWT\n2. <img> tags in UWorld HTML can have arbitrary attribute order (id, draggable, etc.) — regex must match `src=` anywhere in tag, not just after `<img`\n3. Image download regex v1/v2 failed because they assumed `src=` directly after `<img` — v3 with flexible regex worked perfectly",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Verify all 2,958 cards are working in Anki (spot check a few with images). Update USMLE memory with new NBME scores. If Danny wants to review or adjust card format, make changes. Otherwise, ready for next task.",
+  "timestamp": "2026-04-17T01:54:23Z",
+  "unix_time": 1776390863.001271,
+  "task_id": "20260416_202025_8504d4",
+  "source": "manual",
+  "version": 2
+}

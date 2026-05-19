@@ -1,0 +1,30 @@
+{
+  "label": "training-gym-r128-complete",
+  "context": "Training Gym R126-R128 all completed! 12 exercises, all 10/10 first try! \n\nR126: trap_water(T9), sliding_max(T9), lip(T10), nqueens(T10)\nR127: alien_dict(T9), dist_subseq(T10), ser_deser(T9), min_window(T9) \nR128: edit_dist(T9), gas_station(T8), lrh(T9), word_ladder(T9)\n\nDB: 450 exercises, 751 attempts, avg 9.93, 96.5% perfect. 402 passed. Tier 9+ = 130, Tier 10 = 65.\n94+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R128 complete",
+    "R129 next"
+  ],
+  "decisions": [
+    "Trapping rain water: two-pointer. Track left_max/right_max. Add diff when height < max.",
+    "Sliding window max: monotonic deque of indices. Pop right while smaller. Pop left if out of window.",
+    "LIP matrix: DFS+memo on each cell. 4 directions if strictly increasing.",
+    "N-Queens: sets for cols, diag1(r-c), diag2(r+c). Backtrack row by row.",
+    "Alien dict: build graph from adjacent word pairs. Topo sort.",
+    "Distinct subseq: dp[i][j] += dp[i-1][j-1] if chars match.",
+    "Min window: sliding window + counter. Track formed vs required.",
+    "Edit dist: dp[i][j] = 1 + min(insert, delete, replace).",
+    "Gas station: if total_gas >= total_cost, answer exists. Reset start when tank < 0.",
+    "Histogram: monotonic stack. Area = height * (i - stack[-1] - 1) on pop.",
+    "Word ladder: BFS. Try all 26 char changes per position."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R129: Continue. Try: Median of Two Sorted Arrays, Sudoku Solver, or First Missing Positive.",
+  "timestamp": "2026-04-08T23:38:09Z",
+  "unix_time": 1775691489.121664,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

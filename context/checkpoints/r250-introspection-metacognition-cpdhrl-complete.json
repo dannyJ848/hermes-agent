@@ -1,0 +1,19 @@
+{
+  "label": "r250-introspection-metacognition-cpdhrl-complete",
+  "context": "R249-R250 complete. Trace2Skill, Internal Reasoning Graph, IntrospectBench, Intrinsic Metacognition, CPD-HRL. 25 tips. Total active: 2,254.\n\nPlugin: 3012 lines. Gateway running.\n\nKEY INSIGHTS: (1) Trace2Skill: trajectory-local lessons → conflict-free skill directory via hierarchical merging with inductive reasoning. (2) IntrospectBench: LLMs exhibit emergent introspection without training — can predict own behavior. (3) Intrinsic Metacognition: three components (knowledge, planning, evaluation) — training gym is EXTRINSIC, needs INTRINSIC. (4) CPD-HRL: change point detection discovers natural subgoal boundaries from trajectories.\n\nSESSION STATS: R228-R250 = 23 rounds, 253 tips, ~16 papers, 4 checkpoints. 2,254 active tips.\n\nCRITICAL INSIGHT: Training gym needs intrinsic metacognition — currently fixed extrinsic loop. Let it evaluate own rounds, plan next research, reflect on what works.",
+  "active_tasks": [
+    "R251: Continue autonomous training"
+  ],
+  "decisions": [
+    "Training gym is extrinsic metacognition — needs intrinsic self-evaluation, self-planning, self-reflection",
+    "Trace2Skill hierarchical consolidation should be applied to flat cerebrum tips",
+    "CPD change point detection on tool call sequences can auto-discover task boundaries"
+  ],
+  "files_modified": [],
+  "next_steps": "R251: Continue autonomous loop. 2,254 tips. 77+ papers distilled.",
+  "timestamp": "2026-04-12T14:13:55Z",
+  "unix_time": 1776003235.989856,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

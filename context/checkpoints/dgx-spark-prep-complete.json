@@ -1,0 +1,15 @@
+{
+  "label": "dgx-spark-prep-complete",
+  "context": "DGX Spark arrives next week. ALL preparation complete for maximum BF16 Qwen3.6-35B-A3B deployment.\n\nRESEARCH DONE:\n- Scanned NVIDIA Developer Forums (7 threads), Reddit r/LocalLLaMA, GitHub repos (6), NVIDIA blog, Qwen docs, TurboQuant paper\n- Key finding: stock vLLM has CMake bug omitting SM121 kernels = 13 tok/s instead of 49 tok/s (3.65x)\n- 7-layer optimization stack documented: SM121 kernels > MTP-3 > FP8 KV+prefix > DFlash > FlashInfer > HF Kernels > GPU clock\n- NVFP4 CONFIRMED BROKEN on SM121 (ptxas errors, microscaling instructions missing)\n- Community-verified single Spark: BF16 ~40-49 tok/s with MTP, FP8 ~52-54 tok/s\n- Dual Spark FP8: ~64-78 tok/s (serapis benchmarks, Apr 16)\n\nREPOS CLONED (~/dgx-spark-prep/):\n1. vllm/ — upstream + SM121 CMake patch APPLIED (4/4 fixes verified: SCALED_MM, MLA, CUTLASS_MOE, FP4_ARCHS)\n2. hellohal2064-vllm/ — custom vLLM build (50 tok/s, branch feature/sm121-gb10-v019 checked out)\n3. spark_vllm_docker/ — bjk110 TurboQuant+WPH docker (branch feat/turboquant-rebase-20260417 checked out)\n4. asus-gx10-qwen35-speed-hack/ — phuongncn 102+ tok/s hybrid quant\n5. DGX_Spark_Qwen3.5-122B-A10B-AR-INT4/ — albond 122B hybrid+MTP patches\n6. qwen3.5-dgx-spark/ — adadrag deployment guide\n\nMODELS PRE-DOWNLOADED (~/dgx-spark-prep/models/):\n- Qwen3-Embedding-0.6B: 1.2GB complete\n- dflash-qwen36/: partial (gated repo, needs HF auth on Spark)\n\nSCRIPTS:\n- deploy-spark-day1.sh: full Day-1 deployment script (Docker, toolkit, models, build, launch, benchmark)\n- patch-cmake-sm121.py: cross-platform CMake patcher (tested + verified, 4/4 fixes)\n- patch-cmake-sm121.sh: shell version (has issues on macOS sed, Python version preferred)\n\nKNOWLEDGE SAVED:\n- ~/.hermes/knowledge/dgx-spark-qwen3-6-maximum-bf16-optimization.md (full 7-layer guide)\n- Skill: dgx-spark-qwen3-deployment v2.0 (updated with community benchmarks + gotchas)\n\nMUST DOWNLOAD ON SPARK (too large for MacBook):\n- Qwen3.6-35B-A3B BF16: ~70GB\n- Qwen3.6-35B-A3B-FP8: ~35GB\n- DFlash Qwen3.6: ~1GB (gated, hf login needed)\n- Docker images: vllm/vllm-openai:cu130-nightly, hellohal2064, scitrera SGLang\n\nDAY-1 PLAN: bash deploy-spark-day1.sh  (or --skip-build for community image first, then build custom)",
+  "active_tasks": [
+    "DGX Spark Day-1 deployment when unit arrives"
+  ],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "When DGX Spark arrives: (1) Transfer ~/dgx-spark-prep/ to Spark via scp/rsync, (2) Run deploy-spark-day1.sh, (3) Verify SM121 cubin count (50+), (4) Benchmark BF16 and FP8, (5) Wire Hermes config.yaml to Spark, (6) Kill Z.AI plan",
+  "timestamp": "2026-04-17T18:00:32Z",
+  "unix_time": 1776448832.118717,
+  "task_id": "20260417_124034_a25fb2",
+  "source": "manual",
+  "version": 2
+}

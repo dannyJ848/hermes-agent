@@ -1,0 +1,17 @@
+{
+  "label": "merge-upstream-pdf-compress-apr15",
+  "context": "Session started with user providing a terminal dump of another CLI session (20260414_145941_c9011e) that had frozen mid-work. \n\nDIAGNOSED: Z.AI CLOSE_WAIT socket freeze at 81.8K/200K tokens (41%). The TCP keepalive patches had been written to run_agent.py but the running process hadn't picked them up — needed restart to load.\n\nTHEN: User asked for PDF compression — installed Ghostscript via brew, compressed \"Mask Fit Test Pages.pdf\" from 14MB → 4.9MB (screen quality).\n\nTHEN: User asked to check Hermes upstream repo for new commits. Found 18 new commits since our last pull. Pulled all via git merge origin/main — clean merge, zero conflicts.\n\nVERIFIED POST-MERGE:\n- TCP keepalive patches: 9 refs intact in run_agent.py\n- Force close sockets: intact\n- Hindsight context engine: present at plugins/context_engine/hindsight/\n- Gateway proxy mode: new feature available via GATEWAY_PROXY_URL\n- Dashboard security: hardened (CVE fix, 3 compare_digest calls)\n- Plugin skill namespace: new feature for plugin skill bundles\n- Memory shutdown fix: /new and /reset now flush memory providers\n- All syntax checks: PASS\n\nAlso fixed: duplicate cortex daemon (2 instances → 1, kept PID 50070), cleared 2 stuck flywheel entries.\n\nTraining gym status: 3741 tips, 331 active, Elo 1053-1738, daemon running. Other CLI is handling training gym work.",
+  "active_tasks": [],
+  "decisions": [
+    "Pulled all 18 upstream commits — proxy mode is biggest new feature for VPS/Mac architecture",
+    "Clean merge with zero conflicts — our run_agent.py patches survived because upstream didn't touch it",
+    "Fixed duplicate daemon spawned by dead session's restart command"
+  ],
+  "files_modified": [],
+  "next_steps": "Session complete. No pending work. Other CLI is running training gym. Proxy mode available for future VPS/Mac split.",
+  "timestamp": "2026-04-14T20:49:12Z",
+  "unix_time": 1776199752.789,
+  "task_id": "20260414_141719_7e4044",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,9 @@
+{
+  "label": "fluid-reasoning-scope-fix",
+  "context": "Fixed Python scoping bug in tool-intelligence plugin: task_context was assigned inside `if tracker:` block but referenced outside at _classify_task_type. Moved task_context extraction to top level. Propagated to all 3 squad profiles. Gateway restart pending.",
+  "active_tasks": [
+    "Verify fluid reasoning layer is firing after restart"
+  ],
+  "timestamp": "2026-04-04T06:09:45Z",
+  "task_id": "20260403_232453_811e81"
+}

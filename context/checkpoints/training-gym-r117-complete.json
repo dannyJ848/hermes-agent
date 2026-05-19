@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r117-complete",
+  "context": "Training Gym R117 completed! ALL 4 PASS ON FIRST TRY! 3 T9 + 1 T10!\n\nR117 RESULTS (all 10/10):\n1. trapping-rain-water-001 (T9) - Two pointers. left_max/right_max. Water += max-height at shorter side.\n2. first-missing-positive-001 (T9) - Cyclic sort. Place nums[i] at index nums[i]-1. Scan for gap.\n3. minimum-window-substring-001 (T10) - Sliding window. Counter for need. Expand right, contract left. Track formed.\n4. serialize-deserialize-bst-001 (T9) - BFS level order with null markers. Trim trailing nulls.\n\nDB: 423 exercises, 707 attempts, avg 9.93, 96.3% perfect. 374 passed. Tier 9+ = 108, Tier 10 = 56.\n83+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R117 complete",
+    "R118 next"
+  ],
+  "decisions": [
+    "Trap water: two pointers. Process shorter side. left_max/right_max track walls.",
+    "First missing positive: cyclic sort. Swap nums[i] to nums[i]-1 index. Scan for nums[i]!=i+1.",
+    "Min window: sliding window with formed counter. Expand right until formed==required. Contract left.",
+    "Serialize tree: BFS with null markers. Deserialize: queue-based reconstruction."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R118: Continue. Try: Median of Two Sorted Arrays, Largest Rectangle in Histogram, or Binary Tree Max Path Sum.",
+  "timestamp": "2026-04-08T23:13:40Z",
+  "unix_time": 1775690020.460232,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

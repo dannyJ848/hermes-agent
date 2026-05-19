@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r85-complete",
+  "context": "Training Gym R85 completed! ALL 4 PASS ON FIRST TRY!\n\nR85 RESULTS (all 10/10):\n1. course-schedule-001 (T8) - Kahn's algorithm (topological sort via indegree). BFS from 0-indegree. Count visited.\n2. pacific-atlantic-001 (T9) - BFS from ocean edges INWARD. Water must go uphill (heights[nr][nc]>=heights[r][c]). Intersection of both.\n3. clone-linked-list-random-001 (T8) - Two-pass hash map. Pass 1: create all copies. Pass 2: set next/random via map.\n4. graph-valid-tree-001 (T8) - Union-Find with path compression + rank. Valid tree = n-1 edges + no cycles.\n\nDB: 339 exercises, 579 attempts, avg 9.91, 95.5% perfect. 290 passed. Tier 9+ = 76, Tier 10 = 46.\n51+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R85 complete",
+    "R86 next"
+  ],
+  "decisions": [
+    "Pacific Atlantic: BFS from ocean edges inward. Water flows uphill. Intersection of both reachable sets.",
+    "Course Schedule: Kahn's topological sort. Count processed. If count==n: no cycle.",
+    "Valid tree: n-1 edges check + Union-Find cycle detection. If any union returns False: cycle.",
+    "Copy random list: two-pass. First: {original: new_node}. Second: set next/random via map.get()."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R86: Continue. Try: Dijkstra's shortest path, Surrounded Regions, or Decode Ways.",
+  "timestamp": "2026-04-08T21:50:27Z",
+  "unix_time": 1775685027.608439,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

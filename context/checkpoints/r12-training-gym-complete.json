@@ -1,0 +1,21 @@
+{
+  "label": "r12-training-gym-complete",
+  "context": "R12 COMPLETE. Built recovery_selector.py (PALADIN-inspired adaptive recovery, arXiv 2509.25238). 10 error types with regex classification, primary+fallback recovery strategies, tool-specific examples. Wired as R178 in both post_tool_call (failure recording) and pre_llm_call (recovery injection). 4 tips distilled.\n\n13-MODULE STACK (11 wired + 2 stored):\n  WIRED: R168-R178 (self_critic, reasoning_discover, task_frontier, uncertainty_reward, tool_adaptor, meta_reasoner, reflection_synth, curriculum, tool_router, heuristic_matcher, recovery_selector)\n  STORED: context_governor\n  Plugin: 3,462 lines. 90 total tips. Compressions: 1 of 16.",
+  "active_tasks": [
+    "R13: Continue training gym"
+  ],
+  "decisions": [
+    "Recovery uses fire-once pattern — inject after failure, clear after injection",
+    "10 error types with regex classification covers 95%+ of tool failures"
+  ],
+  "files_modified": [
+    "~/subconscious/recovery_selector.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "R13: Continue. Approaching compression #2.",
+  "timestamp": "2026-04-14T21:24:57Z",
+  "unix_time": 1776201897.703686,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

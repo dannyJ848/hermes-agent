@@ -1,0 +1,24 @@
+{
+  "label": "clean-restart-apr7-1545",
+  "context": "CURRENT STATE (Apr 7, 15:45):\n- Two run_agent.py bugs FIXED: (1) has_tool_calls undefined at L9098 → simplified to just check _is_silent, (2) _aggressive_continue_enabled AttributeError at L8950 → changed to getattr(). These were causing all the \"Error during OpenAI-compatible API call\" crashes.\n- Ghost injection sections (ACTIVE INFERENCE, PERSPECTIVE DIVERSITY, TOKEN TRACKER, SELF-DEBUG, META-INSIGHTS) confirmed DEAD in code — direct plugin testing produces clean output. The ghosts Danny saw were from old session compressed history on restore, NOT from active code.\n- Distillation pipeline v2.2 live: 5 hooks (post_tool_call, pre_llm_call, post_api_request in distillation plugin + pre_llm_call, post_tool_call in evey-tool-intelligence)\n- Wiki: 135 pages, 267KB, saturated (0 new tips from new pages)\n- 249 distilled tips (237 high-conf)\n- 100-cycle bottom-up + top-down audits both passed\n- Greeting echo triple fix deployed\n- Context injection trimmed 60% (625→250 tokens)\n\nACTIVE INJECTION (what gets injected each turn, confirmed clean):\n1. [DISTILLED TOOL RULES] — from distillation plugin (ERL task-relevant + weakest tool tips)\n2. [TOOL INTELLIGENCE] — from evey-tool-intelligence (capability report)\n3. [ACTIONABLE TIPS] — from distillation_bridge top_down_recall\n4. [ITERATION LESSONS] — from distillation_bridge top_down_recall  \n5. [AGI CONTEXT] — from distillation_bridge top_down_recall\n6. [MEMORY HEALTH] — from distillation_bridge top_down_recall\n\nCURRENT PRIORITY (per Danny):\n1. Deep research → novel findings → integrate into bottom-up AND top-down distillation enhancements\n   - This is SEPARATE from the autonomous AGI cron (which runs its own cycles)\n   - Focus: actively looking at novel frontier AI research to improve distillation quality\n   - Both bottom-up (tool outcome → tips) and top-down (tips → context injection) need fresh research\n2. Black hat extraction — SHELVED (not worth the time per Danny)\n3. AGI cron cycles — autonomous, runs separately\n\nKEY FILES:\n- ~/hermes-agent/run_agent.py (2 bug fixes at L8950, L9098)\n- ~/.hermes/plugins/evey-tool-intelligence/__init__.py (pre_llm_call, post_tool_call)\n- ~/.hermes/plugins/distillation/__init__.py (pre_llm_call, post_tool_call, post_api_request)\n- ~/subconscious/distillation_bridge.py (top_down_recall, bottom_up_store)\n- ~/subconscious/tool_capability.db (tool stats)\n- ~/.hermes/cerebrum_memory.db (distilled_tips, experiences)\n\nNEXT STEPS:\n- Start fresh session (no restore from old checkpoint)\n- Begin deep research sweep for novel distillation improvements\n- Focus on papers/techniques that improve: tip extraction quality, context injection relevance, adaptive injection strategies",
+  "active_tasks": [
+    "Deep research for distillation enhancements (bottom-up + top-down)",
+    "Fix run_agent.py bugs (DONE - has_tool_calls + _aggressive_continue_enabled)",
+    "Kill ghost injection sections (DONE - confirmed dead in code, old history artifact)"
+  ],
+  "decisions": [
+    "Ghost sections are NOT in code - they're from old session compressed history on restore",
+    "Black hat extraction SHELVED per Danny",
+    "Deep research for distillation is the current active priority (NOT the autonomous AGI cron)",
+    "Fresh session needed to fully clear ghost artifacts"
+  ],
+  "files_modified": [
+    "/Users/dannygomez/hermes-agent/run_agent.py"
+  ],
+  "next_steps": "Start fresh hermes session. No restore needed — checkpoint context is recorded above. Begin deep research sweep for novel AI research to improve bottom-up and top-down distillation.",
+  "timestamp": "2026-04-07T20:59:16Z",
+  "unix_time": 1775595556.7487261,
+  "task_id": "20260406_193318_f8f2c8",
+  "source": "manual",
+  "version": 2
+}

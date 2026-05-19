@@ -1,0 +1,27 @@
+{
+  "label": "deepgemm-wired-upstream-synced-apr19",
+  "context": "DeepGEMM fully wired into all 5 DGX Spark scripts (Full Frankenstein mode). Hermes-agent upstream synced — 153 commits pulled via clean rebase, all local patches (AGENTS.md env gate, HindsightContextEngine, daily backups) survived. No breaking changes. Registry API internally renamed .tools → ._tools but public API unchanged. 9 delegate_tool.py commits are all merge noise, no logic changes. New upstream features: wakeAgent cron gate, browser_cdp, maps skill, webhook direct delivery, cron approval mode.\n\nSPARK LAUNCH DAY status: All scripts ready. 17 reasoning datasets across 3 tiers. DeepGEMM aggressive integration (VLLM_USE_DEEP_GEMM=1 default-on in vLLM). DFlash speculative decoding wired (falls back if breaks on GDN). Remaining runtime risks: DFlash+GDN untested, Docker v020-tq may need DFlash support test, PYTORCH_TUNABLEOP warm-up slow first inference.\n\nFiles modified this session: spark-day1.sh (step 2G DeepGEMM install), spark-maxperf.sh (VLLM_USE_DEEP_GEMM + DEEPGEMM_HOME + PYTHONPATH), superqwen3-super.sh (VLLM_USE_DEEP_GEMM + mount both containers), deploy-spark-day1.sh (same both containers), spark-grpo-train.sh (same GRPO container).",
+  "active_tasks": [
+    "DeepGEMM integration: COMPLETE",
+    "Upstream sync: COMPLETE — 153 commits pulled, clean rebase, all patches intact",
+    "Launch day prep: ALL scripts verified green"
+  ],
+  "decisions": [
+    "Full Frankenstein mode for DeepGEMM — aggressive integration with VLLM_USE_DEEP_GEMM=0 fallback",
+    "vLLM already has native DeepGEMM support via module deep_gemm_moe — no monkey-patch needed",
+    "No breaking changes in 153 upstream commits — safe to pull"
+  ],
+  "files_modified": [
+    "~/dgx-spark-prep/spark-day1.sh",
+    "~/dgx-spark-prep/spark-maxperf.sh",
+    "~/dgx-spark-prep/superqwen3-super.sh",
+    "~/dgx-spark-prep/deploy-spark-day1.sh",
+    "~/dgx-spark-prep/spark-grpo-train.sh"
+  ],
+  "next_steps": "Ready for Spark Launch Day. Resume with session_restore label=\"deepgemm-wired-upstream-synced-apr19\". Sequence: (1) macbook-transfer-helper.sh --enable-ssh, (2) spark-day1.sh --macbook <IP> --usb, (3) spark-maxperf.sh, (4) wire-spark-to-hermes.sh <SPARK_IP>, (5) spark-quality chat, (6) superqwen3-super.sh.",
+  "timestamp": "2026-04-19T16:46:44Z",
+  "unix_time": 1776617204.805541,
+  "task_id": "20260419_111404_be353c",
+  "source": "manual",
+  "version": 2
+}

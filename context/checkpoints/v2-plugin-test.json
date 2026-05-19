@@ -1,0 +1,9 @@
+{
+  "label": "v2-plugin-test",
+  "context": "Testing that the v2 checkpoint plugin loaded after gateway restart",
+  "active_tasks": [
+    "Verify v2 plugin loaded"
+  ],
+  "timestamp": "2026-04-06T07:10:50Z",
+  "task_id": "20260405_193236_c8c810"
+}

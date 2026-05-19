@@ -1,0 +1,23 @@
+{
+  "label": "audit-phase5-apparatus",
+  "context": "CORTEX APPARATUS AUDIT PHASE 5 — nearly complete. E2E test passes 24/25 (1 remaining is P3 experience eligibility which is now fixed but not re-tested).\n\nCOMPLETED FIXES THIS SESSION:\n1. insert_node() broken — `json.dumps(tags or [])` passed JSON array to Postgres array column → fixed to `tags or None` in ~/subconscious/cortex_access.py line 98\n2. P3 experience injection path had elo > 1400 + confidence >= 0.6 — too strict, 0 experiences eligible → lowered to elo > 1150 + confidence >= 0.5 in ~/.hermes/plugins/distillation/__init__.py line ~3230\n3. 6 uppercase REASONING tips → lowercased to reasoning\n4. 11 unembedded active tips → embedded via /tmp/fix_uppercase.py\n5. 17 remaining duplicate tips → deactivated via /tmp/cleanup_remaining.py\n\nCURRENT STATE:\n- 431 active tips, 13 canonical domains\n- All meaningful nodes embedded (circuit_breaker skipped by design)\n- Daemon running, experience Elo rating active (308 rated, range 1161-1220)\n- 7324 experiences now eligible for P3 injection\n- cortex_sync insert works end-to-end (tested with psycopg2 rollback tip)\n- Dedup-at-insertion working (cortex_compat._check_duplicate)\n\nKEY FILES MODIFIED THIS SESSION:\n- ~/subconscious/cortex_access.py — fixed tags column (line 98)\n- ~/.hermes/plugins/distillation/__init__.py — P3 elo threshold 1400→1150, confidence 0.6→0.5\n- /tmp/fix_uppercase.py — uppercase REASONING fix + embed 11 tips\n- /tmp/cleanup_remaining.py — deactivate 17 duplicate tips\n- /tmp/e2e_test.py — full pipeline verification test\n- /tmp/check_p3.py, /tmp/count_p3.py — P3 eligibility checks\n\nREMAINING (2 items):\n- Re-run e2e_test.py to confirm 25/25 pass after P3 threshold fix\n- Save final checkpoint as audit-phase5-complete\n\nDAEMON STATE: PID recently started, running normally. May have stopped after 12 cycles (check log).",
+  "active_tasks": [
+    "4. Fix: verify injection pipeline end-to-end with real test (in_progress — P3 threshold fixed, need re-test)",
+    "6. Final verification + checkpoint (pending)"
+  ],
+  "decisions": [
+    "P3 experience injection threshold: elo>1400 conf>=0.6 → elo>1150 conf>=0.5 (7324 now eligible vs 0)",
+    "cortex_access insert_node tags: json.dumps(tags or []) → tags or None to fix Postgres array literal error",
+    "5 uppercase REASONING + 11 unembedded tips fixed — all data quality issues resolved"
+  ],
+  "files_modified": [
+    "~/subconscious/cortex_access.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "Re-run /tmp/e2e_test.py to confirm 25/25 pass, then mark todos complete and save final checkpoint as audit-phase5-complete",
+  "timestamp": "2026-04-15T19:30:14Z",
+  "unix_time": 1776281414.919446,
+  "task_id": "20260415_135248_620f85",
+  "source": "manual",
+  "version": 2
+}

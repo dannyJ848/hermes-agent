@@ -1,0 +1,35 @@
+{
+  "label": "cerebrum-recovery-complete-may16-2026",
+  "context": "SESSION CONTEXT FOR HANDOFF — May 16, 2026\n\n## What Was Done This Session\n\n1. **Cerebrum Schema Recovery (CRITICAL FIX)**\n   - Discovered `distilled_tips` table had wrong schema (3 columns: judge_score, content, tags)\n   - Recovered 1,279 tips from corrupt backup using SQLite `.recover` → 16MB SQL dump\n   - Rebuilt table with canonical 15-column schema\n   - Migrated 3 tips from wrong-schema DB\n   - Final state: 1,282 tips, integrity ok, avg confidence 0.86\n   - evey-rag fallback queries now work\n\n2. **Hindsight Integration Clarification**\n   - Discovered Hindsight is NOT the active memory provider\n   - `memory.provider: cortex` in ~/.hermes/config.yaml\n   - Cortex (cerebrum SQLite) is the actual active provider\n   - Hindsight daemon starts on-demand IF switched to active\n   - evey-rag uses cerebrum fallback when Hindsight unavailable\n   - This was a major confusion from previous sessions\n\n3. **Propaganda Demystification Engine (\"The Lens\")**\n   - Project at ~/propaganda-demystifier/\n   - Pipeline: scanner.py → digest_generator.py → site_generator.py\n   - Multi-persona (left/center/right) X analysis\n   - Chrome extension built for cookie extraction (~/propaganda-demystifier/extract_x_cookies_extension/)\n   - Cron job ID 36b75b2cbe65 scheduled daily at 6 AM\n   - Blocker: need real X cookies for 3 persona accounts\n\n4. **Dataset Migration to DGX**\n   - tier2-reasoning (150GB) and tier3-health (133GB) transferred to DGX 8TB SSD\n   - DGX IP: 10.0.0.125 (currently unreachable — needs physical console access)\n   - Local dataset copies deleted after verification\n\n## All Persistence Layers Updated\n\n- **SOUL.md**: Added 3 learned behaviors (lines 13-15) about cerebrum schema verification, SQLite .recover, and Hindsight/cortex clarification\n- **goals.md**: Archived 3 completed goals, added 3 new active goals\n- **Skills**: Created `cerebrum-schema-recovery` (meta), updated `cortex-flywheel-diagnostics` with section 8\n- **Knowledge Base**: Added 2 findings — cerebrum-schema-disaster-may-2026.md and hindsight-vs-cortex-memory-provider-clarification.md\n- **Config**: Verified memory.provider=cortex, created hindsight/config.json for future use\n\n## Key Files and Paths\n\n- Cerebrum DB: ~/.hermes/cerebrum_memory.db (1,282 tips, canonical schema)\n- Recovery SQL: /tmp/cerebrum_recover.sql (16MB, retained)\n- Backups: ~/.hermes/cerebrum_memory.db.pre_rebuild_backup, .working, .new_schema_backup_*\n- Lens project: ~/propaganda-demystifier/\n- Chrome extension: ~/propaganda-demystifier/extract_x_cookies_extension/\n- Cron job: 36b75b2cbe65 (daily 6 AM)\n- Audit report: ~/.hermes/audit_reports/context_sync_audit_2026-05-16.json\n\n## Critical Decisions Made\n\n1. Keep canonical 15-column schema for distilled_tips (not the new 3-column schema)\n2. Cortex is the active memory provider; Hindsight is available but not active\n3. Keep WPS Office cache (107GB) for med school documents\n4. Use cookie-based X access (no paid API)\n5. Pseudonymous content creation persona: \"The Curator\"\n\n## Current Blockers / Next Steps\n\n1. **The Lens**: Need to install Chrome extension, extract auth_token/ct0/twid cookies for 3 personas, populate JSON files, run live pipeline\n2. **DGX**: Remote access lost after restart (SSH key likely reset). Needs physical console access at 10.0.0.125\n3. **Daily autonomous optimization**: Set up cron for cognitive apparatus maintenance\n4. **Langfuse**: Still not configured for cost tracking\n\n## Environment State\n\n- MacBook (local): Hermes Agent with cortex memory provider, 1,282 tips\n- DGX Spark: Unreachable via network shell. Has Qwen 27B model, vLLM, datasets on 8TB SSD\n- Ollama models kept: qwen3:14b, nomic-embed-text\n- Deepseek-v4-pro: Cloud API model (not local)\n- Root disk: 4% used (was 99% before cleanup)\n\n## Commands to Resume\n\nTo verify cerebrum is working:\n  sqlite3 ~/.hermes/cerebrum_memory.db \"SELECT COUNT(*), ROUND(AVG(confidence),2) FROM distilled_tips\"\n\nTo check goals:\n  cat ~/.hermes/goals.md\n\nTo load the new skill:\n  skill_view name=cerebrum-schema-recovery\n\nTo verify config:\n  grep \"provider:\" ~/.hermes/config.yaml\n\n## What NOT to Do\n\n- Do NOT attempt to start hindsight-api manually (standalone binary, wrong approach)\n- Do NOT DROP distilled_tips table without migration plan\n- Do NOT delete ~/.hermes/cerebrum_memory.db.corrupt_backup (recovery source)\n- Do NOT assume Hindsight is the active memory provider without checking config.yaml",
+  "active_tasks": [
+    "The Lens — need X cookies for 3 personas",
+    "DGX remote access lost — needs physical console",
+    "Daily cognitive apparatus optimization — needs cron setup",
+    "Langfuse cost tracking — needs configuration"
+  ],
+  "decisions": [
+    "Cortex (cerebrum SQLite) is the active memory provider, not Hindsight",
+    "Keep canonical 15-column schema for distilled_tips",
+    "Keep WPS Office cache for med school",
+    "Use cookie-based X access for The Lens",
+    "Pseudonymous persona: 'The Curator'"
+  ],
+  "files_modified": [
+    "~/.hermes/SOUL.md",
+    "~/.hermes/goals.md",
+    "~/.hermes/cerebrum_memory.db",
+    "~/.hermes/config.yaml",
+    "~/.hermes/hindsight/config.json",
+    "~/.hermes/knowledge/cerebrum-schema-disaster-may-2026.md",
+    "~/.hermes/knowledge/hindsight-vs-cortex-memory-provider-clarification.md",
+    "~/.hermes/skills/meta/cerebrum-schema-recovery/SKILL.md",
+    "~/.hermes/skills/cortex-flywheel-diagnostics/SKILL.md",
+    "~/.hermes/audit_reports/context_sync_audit_2026-05-16.json"
+  ],
+  "next_steps": "1. For The Lens project: Install Chrome extension, extract X cookies, populate personas/{left,center,right}_lens_cookies.json, run scanner.py live\n2. For DGX: Physical console access to restore SSH, verify dataset migration, restart vLLM if needed\n3. For daily optimization: Create cron job for cognitive apparatus maintenance (memory consolidation, skill curation, disk cleanup)\n4. For Langfuse: Configure API keys and enable cost tracking\n5. For next session: Run `hermes doctor` to verify full system health after all changes",
+  "timestamp": "2026-05-16T17:41:19Z",
+  "unix_time": 1778953279.579989,
+  "task_id": "20260515_225419_a0d3f0",
+  "source": "manual",
+  "version": 2
+}

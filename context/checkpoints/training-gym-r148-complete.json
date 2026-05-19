@@ -1,0 +1,31 @@
+{
+  "label": "training-gym-r148-complete",
+  "context": "Training Gym R146-R148 completed! All 10/10!\n\nR146: trapwater(T10), largesthist(T9), jump2(T8), candy(T9)\nR147: clonegraph(T9), mergeint(T8), insertint(T8), palpart(T9)\nR148: wordsearch(T9), islands(T8), lip(T10), coinchange(T8)\n\nDB: 480 exercises, 831 attempts, avg 9.94, 96.9% perfect. 432 passed. Tier 9+ = 155, Tier 10 = 74.\n114+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R148 complete",
+    "R149 next"
+  ],
+  "decisions": [
+    "Trap rain water: two pointers. Track left_max/right_max. Add diff when smaller side.",
+    "Largest rect histogram: monotonic stack. Append sentinel 0. Pop when decreasing.",
+    "Jump game II: greedy BFS. Track far/end. Jump when i==end.",
+    "Candy: two pass. Left-right then right-left. Take max.",
+    "Clone graph: DFS with visited map. Create copy on first visit.",
+    "Merge intervals: sort by start. Merge if start<=prev_end.",
+    "Insert interval: three phases - before, merge, after.",
+    "Palindrome partition: backtracking. Check palindrome at each substring.",
+    "Word search: DFS backtracking. Mark visited with '#'. Restore after.",
+    "Number of islands: BFS. Sink visited to '0'.",
+    "Longest increasing path: DFS + memo. Check 4 neighbors with greater value.",
+    "Coin change: DP. dp[i] = min(dp[i-c]+1) for each coin."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R149: Continue. Try: Meeting Rooms II, Rotate Image, Group Anagrams.",
+  "timestamp": "2026-04-09T00:19:25Z",
+  "unix_time": 1775693965.586313,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,22 @@
+{
+  "label": "r212-tip-consolidation-wired",
+  "context": "R212 complete. Researched ARM adaptive RAG memory (2601.02428) and Self-Organizing Agents (2603.28990). Distilled 10 tips (total 2315). Built tip_consolidation.py — ARM-inspired tip retrieval tracking with consolidation (frequent tips get decay protection) and decay candidate identification. Wired at 10% fire rate.\n\nPlugin: 2976 lines. Tips: 2315 active. Gateway running.\nNew DB: tip_consolidation.db.\n\nKEY INSIGHTS: (1) Sequential protocol (fixed order + autonomous roles) outperforms both centralized and fully autonomous. (2) Capability threshold determines if autonomy helps. (3) ARM consolidation protects frequently retrieved memories.",
+  "active_tasks": [
+    "R213: Continue autonomous training"
+  ],
+  "decisions": [
+    "Tip consolidation triggers every 5 injections with 0.02 confidence boost (max 0.15)",
+    "Decay candidates identified after 7 days without injection",
+    "Fires at 10% rate to track injection patterns without overhead"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/tip_consolidation.py"
+  ],
+  "next_steps": "R213: Continue autonomous loop. Research: hierarchical planning, tool composition, or agent verification.",
+  "timestamp": "2026-04-12T09:46:51Z",
+  "unix_time": 1775987211.154183,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

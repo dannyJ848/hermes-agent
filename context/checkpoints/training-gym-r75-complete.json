@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r75-complete",
+  "context": "Training Gym R75 completed! ALL 4 PASS ON FIRST TRY! Tier 9 Tarjan's SCC conquered!\n\nR75 RESULTS (all 10/10):\n1. bellman-ford-001 (T8) - Relax all edges n-1 times. Check negative cycle with one more pass.\n2. kruskal-mst-001 (T8) - Sort edges by weight. Union-Find. Add if different components. Stop at n-1 edges.\n3. strongly-connected-001 (T9) - Tarjan's: DFS with disc/low arrays. Push to stack. If low[u]==disc[u], pop SCC.\n4. dp-target-sum-001 (T8) - Convert to subset sum: P=(target+total)/2. Count subsets with dp.\n\nDB: 307 exercises, 539 attempts, avg 9.9, 95.2% perfect. 258 passed. Tier 9+ = 64.\n41+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R75 complete",
+    "R76 next"
+  ],
+  "decisions": [
+    "Bellman-Ford: relax all edges n-1 times. O(VE). Negative cycle check: one more pass, if any dist improves → cycle.",
+    "Kruskal MST: sort edges by weight. Union-Find for cycle detection. Take first n-1 edges that don't form cycle.",
+    "Tarjan SCC: disc[u]=low[u]=time++, push to stack, on_stack=True. DFS neighbors. low[u]=min(low[u],disc[v]) if on_stack. If low[u]==disc[u]: pop SCC.",
+    "Target Sum → Subset Sum: P=(target+total)/2. dp[s]=number of subsets summing to s. Count dp[P]."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R76: Continue. Try: Floyd-Warshall, Prim's MST, Euler Path, or Huffman coding.",
+  "timestamp": "2026-04-08T21:22:56Z",
+  "unix_time": 1775683376.509998,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

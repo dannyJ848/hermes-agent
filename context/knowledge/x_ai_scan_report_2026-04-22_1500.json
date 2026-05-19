@@ -1,0 +1,99 @@
+{
+  "scan_date": "2026-04-22T15:00:00Z",
+  "source": "X/Twitter AI News Scanner - twitter_bridge.py (chrome_x_bridge.py returned 0 tweets due to 0 Chrome windows)",
+  "total_new_tweets": 38,
+  "tracked_accounts": ["@Teknium", "@NousResearch"],
+  "top_5_findings": [
+    {
+      "rank": 1,
+      "priority": "HIGH",
+      "category": "Hermes Agent product update - TUI v2",
+      "author": "@Teknium",
+      "tweet_link": "https://x.com/Teknium/status/2047030824303005965",
+      "time": "2026-04-22T19:12:35Z",
+      "engagement": {"likes": 129, "retweets": 5, "replies": 29, "views": 3370},
+      "summary": "Teknium announced TUI v2 is coming for Hermes Agent. Major terminal UI upgrade from the project lead with high engagement. Signals significant UX improvements for the agent interface.",
+      "flags": ["Hermes mention", "Teknium", "TUI v2", "product update", "major update"]
+    },
+    {
+      "rank": 2,
+      "priority": "HIGH",
+      "category": "Hermes Agent product integration - GPT Image 2.0",
+      "author": "@NousResearch",
+      "tweet_link": "https://x.com/NousResearch/status/2046693872773062834",
+      "time": "2026-04-21T20:53:39Z",
+      "engagement": {"likes": 866, "retweets": 54, "replies": 61, "views": 70748},
+      "summary": "Nous Research announced GPT Image 2.0 is now available natively in Hermes Agent. Users can run `hermes update` and select image generation tool model. Extremely high engagement indicates major community interest in multimodal capabilities.",
+      "flags": ["Hermes mention", "Nous Research", "GPT Image 2.0", "multimodal", "product update"]
+    },
+    {
+      "rank": 3,
+      "priority": "HIGH",
+      "category": "Hermes Agent model update - Step 3.5 Flash",
+      "author": "@NousResearch",
+      "tweet_link": "https://x.com/NousResearch/status/2046811525118132557",
+      "time": "2026-04-22T04:41:10Z",
+      "engagement": {"likes": 464, "retweets": 24, "replies": 39, "views": 59168},
+      "summary": "Step 3.5 Flash is now live for Nous Portal users, free for the next 10 days. Hermes Agent users can run 'hermes update' and 'hermes model' to configure access. Partnership with StepFun_ai.",
+      "flags": ["Hermes mention", "Nous Research", "Step 3.5 Flash", "model update", "free tier"]
+    },
+    {
+      "rank": 4,
+      "priority": "HIGH",
+      "category": "Hermes Agent ecosystem - native macOS GUI (Scarf)",
+      "author": "@QingQ77 / @awizemann (RT by @Teknium)",
+      "tweet_link": "https://x.com/Teknium/status/2046733344235569291",
+      "time": "2026-04-21T23:30:30Z",
+      "engagement": {"likes": 0, "retweets": 31},
+      "summary": "Scarf - a native macOS GUI for Hermes AI agent built in Swift. Supports managing multiple local and remote Hermes servers simultaneously with real-time visualization of agent activity, sessions, configuration and system status. GitHub: https://github.com/awizemann/scarf",
+      "flags": ["Hermes mention", "Teknium RT", "Scarf", "macOS GUI", "community project", "new repo"],
+      "github_links": ["https://github.com/awizemann/scarf"]
+    },
+    {
+      "rank": 5,
+      "priority": "HIGH",
+      "category": "Hermes Agent novel real-world application",
+      "author": "@Teknium",
+      "tweet_link": "https://x.com/Teknium/status/2046785145076842708",
+      "time": "2026-04-22T02:56:20Z",
+      "engagement": {"likes": 99, "retweets": 2, "replies": 3, "views": 10576},
+      "summary": "Hermes Agent is being used to manage a utility substation - a significant industrial/IoT application of the agent framework. Notable use case expansion beyond software development into critical infrastructure management.",
+      "flags": ["Hermes mention", "Teknium", "industrial application", "utility substation", "IoT", "real-world deployment"]
+    }
+  ],
+  "other_notable": [
+    {
+      "author": "@Teknium",
+      "summary": "Hermes WebUI large update by @nesquena - image gen wired up, GPT Image Gen 2 works great. GitHub: github.com/nesquena/hermes-webui",
+      "link": "https://x.com/Teknium/status/2046792802139558332",
+      "flags": ["community project", "WebUI", "repo"]
+    },
+    {
+      "author": "@Teknium",
+      "summary": "Hermes Vault v0.2.0 released by @tonysimons_ - solves auth timeout issues for agents.",
+      "link": "https://x.com/Teknium/status/2046793305481183582",
+      "flags": ["community project", "auth", "vault"]
+    },
+    {
+      "author": "@Teknium",
+      "summary": "Hermes Agent Profiles documentation launched. hermes-agent.nousresearch.com/docs/user-guide/profiles",
+      "link": "https://x.com/Teknium/status/2046793490588438788",
+      "engagement": "♥219 ↻11",
+      "flags": ["documentation", "profiles"]
+    },
+    {
+      "author": "@Teknium",
+      "summary": "Sub-agent spawn depth and width uncapped - recursive sub-agent spawning now enabled.",
+      "link": "https://x.com/Teknium/status/2046754762734051510",
+      "flags": ["architecture", "sub-agents", "scaling"]
+    },
+    {
+      "author": "@AIatAMD",
+      "summary": "AMD officially promoting Hermes Agent running locally on AMD Ryzen AI Max+ processors and Radeon GPUs using LMStudio.",
+      "link": "https://x.com/Teknium/status/2046752827331219534",
+      "flags": ["AMD", "local inference", "hardware partnership"]
+    }
+  ],
+  "high_priority_hermes_nous_mentions": 9,
+  "notes": "chrome_x_bridge.py scan returned 0 tweets because Chrome has 0 open windows. twitter_bridge.py successfully fetched 38 tweets from tracked accounts. All top findings are HIGH priority Hermes/Nous/Teknium mentions."
+}

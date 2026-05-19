@@ -1,0 +1,38 @@
+{
+  "label": "audit-phase3-complete",
+  "context": "COMPLETED: Full system audit (16 audits, 22 fixes applied). \n\nPHASE 1-2 (Cortex DB Audit) — DONE:\n- tool_stats resynced from call_log (31,500→303 phantom calls) — root cause: old classifier bug\n- tip_elo reseeded from confidence (avg 1200→1667)\n- 19 dead tables dropped, perspective_diversity purged (23K→3.8K)\n- VACUUM (13.9→12.3MB), Elo-aware injection priority added\n- 5 new indexes added\n- 3-DB sync fix: UPDATE tool_stats SET total_calls = (SELECT COUNT(*) FROM call_log...)\n\nPHASE 3 (Module Health Audit) — DONE:\n- 436 .py files: 0 syntax errors\n- 267 wired modules: went from 53→158 effective (19.9%→62.2%, +198%)\n- Fixed 8 wrong-signature modules (build_injection(self) → build_injection(self, context=\"\"))\n- Broadened keywords for ~84 narrow-keyword modules (multi-word→single common words)\n- Unwired 13 infrastructure modules from plugin (no build_injection, replaced with pass)\n- Added stubs to 6 utility modules (eval_flywheel, episodic_memory, failure_exemplar_bank, feedback_loop, prompt_optimizer, trajectory_intel)\n- Plugin compiles clean, gateway running\n\nPHASE 4 (Other Findings) — DONE:\n- Calibration: 94.5% within 20% (651 entries, 12.4% avg error)\n- Self-debug sessions: 1,062\n- 222 self-referencing tips — FALSE ALARM (legit research refs, not noise)\n- Postgres: 508K rows, 58% vector coverage (42% nodes lack embeddings)\n- Controller/Daemon were NOT RUNNING — restarted\n\nREMAINING ACTION ITEMS (NOT YET DONE):\n1. POSTGRES VECTOR COVERAGE: 42% of cortex_nodes lack embeddings (39,185 total, only 22,742 embedded). Need embedding job to backfill.\n2. 55 STILL-EMPTY MODULES: Could unwire or give even broader keywords. List: agent_protocol_r32, architecture_snapshot, code_debug_policy, compression_guard, config_manager, constraint_verifier, cost_tracker, curiosity_explorer_r29, curriculum, dependency_resolver, episodic_memory, exec_tracer, feedback_amplifier, health_monitor, heuristic_matcher, integration_tester, intent_classifier, interaction_logger, load_balancer, memory_consolidator_r31 + 35 more\n3. MONTHLY 3-DB SYNC: Should be automated via cron. Command: UPDATE tool_stats SET total_calls = (SELECT COUNT(*) FROM call_log WHERE call_log.tool_name = tool_stats.tool_name)\n4. 25 CROSS-DOMAIN TIP MISMATCHES: Tips assigned to wrong tool domains (e.g., coding tips on research tool). Need manual review.\n5. TESTING GYM: Architecture designed (checkpoint: testing-gym-prebuild), code NOT built yet.\n\nKEY FILES MODIFIED:\n- ~/.hermes/cerebrum_memory.db (3-DB sync, tip_elo reseed, purges, indexes, VACUUM)\n- ~/.hermes/plugins/distillation/__init__.py (13 unwired blocks, Elo-aware injection)\n- ~/subconscious/*.py (8 signature fixes, ~84 keyword broadenings, 6 stubs added)\n\nCURRENT STATE:\n- Tips: 1,873, avg conf=0.885, avg elo=1667\n- SQLite: 73 tables, 12.3MB\n- Postgres: 508K rows, 58% vector coverage\n- Subconscious: 436 modules, 158 effective injection\n- Gateway: running, daemon: running (PID 9982)\n- Plugin compiles clean",
+  "active_tasks": [],
+  "decisions": [
+    "Module effectiveness 19.9% → 62.2% — broadened keywords was the biggest win",
+    "Infrastructure modules (no build_injection) should be unwired not stubbed — stubs just add overhead",
+    "3-DB sync must be monthly or tool_stats drifts wildly from call_log reality",
+    "tip_elo was meaningless at 1200 baseline — confidence seeding makes it functional",
+    "222 self-referencing tips are research refs not noise — don't purge them"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db",
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/eval_flywheel.py",
+    "~/subconscious/episodic_memory.py",
+    "~/subconscious/failure_exemplar_bank.py",
+    "~/subconscious/feedback_loop.py",
+    "~/subconscious/prompt_optimizer.py",
+    "~/subconscious/trajectory_intel.py",
+    "~/subconscious/task_frontier.py",
+    "~/subconscious/curriculum.py",
+    "~/subconscious/exec_tracer.py",
+    "~/subconscious/interaction_logger.py",
+    "~/subconscious/recovery_selector.py",
+    "~/subconscious/reflection_synth.py",
+    "~/subconscious/reward_evolver.py",
+    "~/subconscious/tool_diversity.py",
+    "~/subconscious/uncertainty_reward.py",
+    "~84 keyword-broadened modules in ~/subconscious/"
+  ],
+  "next_steps": "1. Fix Postgres vector coverage (42% nodes unembedded) — run embedding backfill job\n2. Handle 55 still-empty modules (unwire or broaden further)\n3. Automate monthly 3-DB sync via cron\n4. Fix 25 cross-domain tip mismatches\n5. Return to testing gym build (checkpoint: testing-gym-prebuild)",
+  "timestamp": "2026-04-15T18:39:58Z",
+  "unix_time": 1776278398.514861,
+  "task_id": "20260415_124324_50ea50",
+  "source": "manual",
+  "version": 2
+}

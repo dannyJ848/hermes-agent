@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r44-complete",
+  "context": "Training Gym R44 completed. ALL 4 CLEAN ON FIRST TRY - zero bugs!\n\nR44 RESULTS (all 10/10, all clean):\n1. tarjan-scc-001 (T8) - Tarjan SCC with index/lowlink/stack. 5 tests. Clean!\n2. dinic-maxflow-001 (T9) - Dinic max flow with level graph + blocking flow. 5 tests. Clean!\n3. kruskal-mst-001 (T7) - Kruskal MST with UF + forest variant. 5 tests. Clean!\n4. toposort-001 (T7) - Kahn + DFS toposort, cycle detection, all_toposorts. 5 tests. Clean!\n\nFirst round since R38 where ALL exercises were clean on first attempt.\n\nDB: 247 exercises, 415 attempts, avg 9.87\n7 consecutive rounds all 10/10. Graph algorithms are a strength.",
+  "active_tasks": [
+    "R44 complete",
+    "R45 next"
+  ],
+  "decisions": [
+    "Graph algorithms are a strong domain - Tarjan SCC, Dinic max flow, Kruskal MST all clean first try",
+    "All_toposorts uses backtracking with in-degree tracking - pick nodes with in_deg==0, recurse",
+    "Dinic's current_edge optimization (it array) prevents re-exploring dead edges"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R45 exercises. Try: LRU Cache with O(1), LFU Cache, Interval Tree, or Segment Tree with lazy propagation.",
+  "timestamp": "2026-04-08T19:09:01Z",
+  "unix_time": 1775675341.6949298,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

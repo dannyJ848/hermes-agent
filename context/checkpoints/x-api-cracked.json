@@ -1,0 +1,11 @@
+{
+  "label": "x-api-cracked",
+  "context": "MAJOR BREAKTHROUGH on X/Twitter API access:\n1. JXA Chrome Bridge API calls WORK (status 200) when:\n   - Running fetch/XHR from within Chrome's page context (JXA execute javascript)\n   - Adding X-Csrf-Token header = ct0 cookie value\n   - Using Bearer token + X-Twitter-Auth-Type: OAuth2Session\n2. UserByScreenName (queryId: BQ6xjFU6Mgm-WhEP3OiT9w) returns 200 with 2.6KB profile data\n3. UserTweets (queryId: V7H0Ap3_Hh2FyS75OCDO3Q) returns 200 with 224KB tweet data\n4. SearchTimeline (queryId: pCd62NDD9dlCDgEGgEVHMg) returns 404 with empty body - DISABLED\n5. DOM extraction (chrome_x_bridge.py scan) still works and got 25 tweets from 5 queries\n6. Scweet + curl_cffi approach STILL FAILS with 401 code 32 (session binding)\n7. Cookies valid in Profile 2: auth_token (40 chars), ct0 (160 chars), twid\n8. CF bypass server NOT needed - JXA approach bypasses everything by running inside Chrome",
+  "active_tasks": [
+    "X API auth: UserByScreenName + UserTweets work via JXA fetch with X-Csrf-Token header",
+    "X DOM extraction: chrome_x_bridge.py scan works, got 25 AI tweets",
+    "SearchTimeline 404: queryId correct but endpoint returns empty 404 - use DOM scraping for search"
+  ],
+  "timestamp": "2026-04-05T22:42:52Z",
+  "task_id": "20260405_152554_311967"
+}

@@ -1,0 +1,27 @@
+{
+  "label": "dgx-inference-deployment-complete",
+  "context": "DGX infrastructure is fully operational as of May 14, 2026 18:30 UTC:\n\n1. vLLM serving Qwen3.6-27B-Uncensored + LoRA adapter (r=256) on port 8000\n2. Context window: 131,072 tokens (was 65,536)\n3. Tool calling: ENABLED with qwen3_xml parser\n4. Hermes: 97 tools active, config updated for 128K context\n5. Training: STOPPED (user requested inference), can resume via systemd\n6. Distillation: Daemon v2 running, 59 tips from 247 experiences\n\nKey fixes applied:\n- vLLM: Added --enable-auto-tool-choice --tool-call-parser qwen3_xml\n- Hermes config: context_length changed from 65536 to 131072\n- LoRA adapter path: /data/SpecForge/custom_dflash/checkpoints/final_model/\n\nAll files synced between MacBook and DGX. 10 new agent modules from MacBook are on DGX.",
+  "active_tasks": [
+    "DGX vLLM inference server with 128K context and tool calling",
+    "DGX Hermes 97-tool deployment",
+    "DGX distillation daemon v2"
+  ],
+  "decisions": [
+    "Use qwen3_xml parser (not qwen25) for Qwen3.5/3.6 tool calling",
+    "Set max-model-len 131072 in vLLM AND context_length 131072 in Hermes config",
+    "Serve LoRA adapter separately (not merged weights) due to vision config issues",
+    "Use system Python for training (train-venv has CPU-only torch)"
+  ],
+  "files_modified": [
+    "~/.hermes/config.yaml",
+    "/data/SpecForge/hermes-agent/scripts/dgx_distillation_daemon.py",
+    "~/.hermes/skills/mlops/qwen27b-training-pipeline/SKILL.md",
+    "~/.hermes/knowledge/dgx-infrastructure-master-status---may-14-2026.md"
+  ],
+  "next_steps": "User can now start fresh Hermes session with 128K context. vLLM is ready. Training can be resumed if needed.",
+  "timestamp": "2026-05-15T02:39:59Z",
+  "unix_time": 1778812799.358939,
+  "task_id": "20260513_220517_f80727",
+  "source": "manual",
+  "version": 2
+}

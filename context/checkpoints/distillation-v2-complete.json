@@ -1,0 +1,24 @@
+{
+  "label": "distillation-v2-complete",
+  "context": "DISTILLATION V2 IS COMPLETE. All 7 tasks finished.\n\nWhat was done:\n1. Rewrote extract_tip_heuristic() in ~/subconscious/distillation_bridge.py — now extracts task intent from actual arg values instead of arg key names\n2. Added _is_noise_lesson() filter + DB-level noise guard before INSERT\n3. Rewrote epoch_synthesis() to categorize errors by root cause, produce behavioral rules\n4. Purged 967 noise tips → 16 clean tips (0% noise, 100% actionable)\n5. 100-cycle validator passes ALL quality gates (noise<10%, actionable>80%, meta-insights 0 noise)\n6. Created distillation plugin at ~/hermes-agent/plugins/distillation/ with post_tool_call hook\n7. Killed controller cron, cleared JSONL buffer to prevent stale noise re-insertion\n\nCURRENT STATE:\n- DB has 16 clean tips, 6 meta-insights, 0 noise\n- Controller cron is KILLED (pkill -f controller.py)\n- JSONL buffer is EMPTY (cleared)\n- Distillation plugin exists but is NOT LOADED (needs gateway restart)\n- No gateway restart has been done yet\n\nFILES MODIFIED:\n- ~/subconscious/distillation_bridge.py (extraction + synthesis rewrite)\n- ~/subconscious/distillation_100.py (rewritten validator)\n- ~/hermes-agent/plugins/distillation/__init__.py (new plugin)\n- ~/hermes-agent/plugins/distillation/plugin.yaml (new manifest)\n\nRESTART NEEDED: Yes — gateway restart required for distillation plugin to load into agent loop.\nAfter restart, the plugin will extract tips from every live tool call automatically.\n\nKNOWN ISSUE: Controller cron has old code cached. After restart, if controller cron restarts too, it will use updated code. But if it runs with old code before restart, it could insert noise from buffer (buffer is empty though, so should be safe).",
+  "active_tasks": [
+    "Distillation V2 complete — restart needed to activate plugin"
+  ],
+  "decisions": [
+    "Noise guard at DB INSERT level (not just extraction level) is critical — stale processes bypass Python code updates",
+    "Controller cron must be killed AND buffer cleared after code changes",
+    "Plugin hooks into post_tool_call for live extraction, skips utility tools (memory, watchdog, etc.)"
+  ],
+  "files_modified": [
+    "~/subconscious/distillation_bridge.py",
+    "~/subconscious/distillation_100.py",
+    "~/hermes-agent/plugins/distillation/__init__.py",
+    "~/hermes-agent/plugins/distillation/plugin.yaml"
+  ],
+  "next_steps": "Restart gateway to load distillation plugin, then verify plugin loads by making a few tool calls and checking distilled_tips table for new entries.",
+  "timestamp": "2026-04-06T20:32:38Z",
+  "unix_time": 1775507558.851584,
+  "task_id": "20260406_150705_941e09",
+  "source": "manual",
+  "version": 2
+}

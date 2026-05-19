@@ -1,0 +1,22 @@
+{
+  "label": "zai-freeze-fix-apr14",
+  "context": "DEBUGGED AND FIXED Z.AI TCP SOCKET FREEZE (CLI session ef124f that Danny reported frozen).\n\nROOT CAUSE: Z.AI load balancer drops TCP connections mid-stream. The `for chunk in stream:` loop in run_agent.py blocks on dead socket recv(). Previous keepalive patches (30s keepidle) detect dead sockets in ~75s, but the stale stream detector was set to 180s — too slow. Also, _force_close_tcp_sockets couldn't find individual sockets inside OpenAI SDK's SSE streaming wrapper.\n\nTHREE FIXES APPLIED to ~/hermes-agent/run_agent.py (syntax verified, 10962 lines):\n\n1. HERMES_STREAM_STALE_TIMEOUT: 180s → 90s (line ~5519) — matches keepalive detection window\n2. HERMES_STREAM_READ_TIMEOUT: 120s → 90s (line ~5133) — faster httpx read timeout\n3. _force_close_tcp_sockets (line ~4244) — added transport-level fallback: if individual socket walk finds nothing, force-close entire httpx transport. Guarantees blocked recv() thread gets unblocked.\n\nCLEANUP DONE: Killed 9 orphaned browser daemon node processes. Only gateway (74442) and Danny's other CLI (74466) remain running. PID 15002 (old session) already gone.\n\nCRON \"Unknown Model\" errors: Non-critical — auxiliary context summary failing on cron sessions. Jobs themselves run fine. Not fixed.\n\nTRAINING GYM STATE: R24 complete, 25 modules, 136 tips. R25 was about to start with Trajectory-Informed Memory Generation (2603.10600, IBM Research) — research was gathered but module not yet built. That's the next step after restart.",
+  "active_tasks": [
+    "R25: Build trajectory_memory module from 2603.10600",
+    "Verify patches work after gateway restart"
+  ],
+  "decisions": [
+    "Streaming stale timeout 180→90s matches keepalive detection window",
+    "Transport-level fallback is the nuclear option for force-closing dead SSE streams",
+    "Cron Unknown Model errors are non-critical — skip fixing"
+  ],
+  "files_modified": [
+    "~/hermes-agent/run_agent.py"
+  ],
+  "next_steps": "Restart gateway with `hermes gateway restart` for patches to take effect. Then continue training gym R25 — build trajectory_memory module from IBM Research paper 2603.10600.",
+  "timestamp": "2026-04-14T23:36:18Z",
+  "unix_time": 1776209778.504444,
+  "task_id": "20260414_180235_a6772d",
+  "source": "manual",
+  "version": 2
+}

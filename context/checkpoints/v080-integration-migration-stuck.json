@@ -1,0 +1,13 @@
+{
+  "label": "v080-integration-migration-stuck",
+  "context": "Danny reported the CLI keeps getting stuck when trying to build migration scripts. The paste shows:\n- Hermes v0.8.0 CLI session on ttys003\n- Session was processing a migration script (migrate_v4.py for cerebrum->VPS Hindsight)\n- The session was at 99% context compaction and got stuck\n- Multiple rate limit errors (HTTP 429) on GLM-5.1\n- The session was interrupted by Danny asking \"hello? did you get stuck?\"\n- A second Hermes agent was also running on s001 handling migration\n- Context kept filling up with tool calls and rate limit retries\n- Eventually hit context compaction and appears to have frozen\n\nAll v0.8.0 integration work is COMPLETE:\n- HindsightContextEngine built and wired\n- Watch Patterns module built and wired\n- Delegate Reasoning module built and wired\n- MiniMax M2.7 wrapper on port 8084\n- Local models optimized (Phi-3 33 tok/s, Llama 17.5 tok/s)\n- Plugin at 2293 lines, 3439 tips\n- Config: context.engine=hindsight, delegation.reasoning_effort=medium\n\nVPS state: 2.24.28.233, Hindsight at :8890, ~177/3385 docs migrated (stuck).\nLocal inference: 4 servers (8081-8084). Swap freed from 22.5GB to 12.2GB.\nZombie session: PID 18814 on ttys000 still exists.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "1. Restart gateway cleanly\n2. Investigate why CLI gets stuck — likely causes: (a) context compaction loop, (b) rate limit retry storm, (c) migration script generation taking too many turns\n3. Fix the root cause\n4. Resume migration if needed",
+  "timestamp": "2026-04-11T14:16:46Z",
+  "unix_time": 1775917006.256099,
+  "task_id": "20260410_231220_230a8b",
+  "source": "manual",
+  "version": 2
+}

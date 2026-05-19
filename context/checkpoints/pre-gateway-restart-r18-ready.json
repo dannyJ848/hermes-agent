@@ -1,0 +1,24 @@
+{
+  "label": "pre-gateway-restart-r18-ready",
+  "context": "R15-R17 complete. About to restart gateway to activate condition-aware voting in distillation plugin. Plugin file verified: ~/.hermes/plugins/distillation/__init__.py (44483 bytes, syntax OK). Pycache cleared. 37 tips in DB (was 113). Pre-restart snapshot at ~/subconscious/pre_condition_aware_snapshot.json.\n\nGATEWAY PID: 76555 (hermes_cli.main gateway run --replace)\nBIOMCP PIDs: 10781, 76566, 76713\nHERMES CLI PID: 76558 (this session)\n\nPOST-RESTART VALIDATION:\n1. Run: ~/hermes-agent/venv/bin/python3 ~/subconscious/tip_feedback_validator.py --snapshot\n2. Run: ~/hermes-agent/venv/bin/python3 ~/subconscious/tip_feedback_validator.py --compare\n3. Start R18 with skill-integrated reward wiring (SAGE paper)\n\nKEY FILES:\n- Plugin: ~/.hermes/plugins/distillation/__init__.py (condition-aware _update_tip_confidence at ~L622)\n- Tools: ~/subconscious/tip_health_monitor.py, tip_condition_rewriter.py, tip_feedback_validator.py\n- Snapshot: ~/subconscious/pre_condition_aware_snapshot.json\n- DB: ~/.hermes/cerebrum_memory.db (37 tips, conditions rewritten)",
+  "active_tasks": [
+    "Gateway restart to activate condition-aware voting",
+    "Post-restart validation with tip_feedback_validator",
+    "R18: Skill-integrated reward wiring"
+  ],
+  "decisions": [
+    "Condition-aware voting is the real fix for dead tips",
+    "37 high-quality tips is the target range",
+    "SAGE paper skill-integrated reward is next improvement"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/.hermes/cerebrum_memory.db"
+  ],
+  "next_steps": "Restart gateway (hermes gateway restart), then run tip_feedback_validator.py --snapshot and --compare to validate condition-aware voting is working",
+  "timestamp": "2026-04-08T03:31:54Z",
+  "unix_time": 1775619114.1823978,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

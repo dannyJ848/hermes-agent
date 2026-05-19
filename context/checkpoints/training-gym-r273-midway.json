@@ -1,0 +1,16 @@
+{
+  "label": "training-gym-r273-midway",
+  "context": "Training Gym R273 flywheel cycle. Running on GLM-5.1 via Z.AI.\n\nCOMPLETED THIS SESSION:\n- Restored from checkpoint training-gym-r272-midway\n- Deep sweep was already done: 783 rated tips, spread 131 (past target of 120)\n- Killed stalled high-depth sweep (proc_e0048a68c63c) that was stuck on inference timeout\n- Research round 1: Extracted GEA (2602.04837), MetaAgent (2508.00271), U-Mem (2602.22406), SSGM (2603.11768), GIFT (2510.23868), MetaClaw (2603.17187) -- 11 tips distilled\n- Research round 2: Extracted RoboPhD (2604.04347), PASTE (2603.18897) -- 6 tips distilled\n- Research round 3: Extracted Sovereign-OS (2603.14011), Skill Mining (2603.11808) -- 4 tips distilled  \n- Research round 4: Extracted MARCH (2603.24579), NabaOS (2603.10060) -- 4 tips distilled\n- Research round 5: Extracted Prompt Optimization study (2603.25169) -- 2 tips distilled\n- Total: 27 new tips from 10+ papers (1802 -> 1829 tips)\n\nCURRENTLY RUNNING:\n- Targeted eval sweep (proc_e991e7133b78, PID 54543) -- 237 rounds across 9 domains\n- Started ~7 min ago, estimated 25-35 min total\n- Has already rated 850 tips (up from 783 at start)\n- Domains: meta(50), heuristic(50), memory(35), REASONING(25), tool_usage(20), strategy(20), rl_training(15), optimization(12), architecture(10)\n\nKEY METRICS:\n- 1,829 total tips in distilled_tips table\n- ~850 Elo-rated (46% coverage)\n- Elo range: 1141-1272, spread: 131, avg: 1200\n- Hindsight: 9,945 nodes, 398K links, 6,313 docs -- healthy\n- All 4 inference servers UP (Phi-3:8081, Llama-8B:8082, Nomic:8083, MiniMax:8084)\n\nFILES:\n- ~/.hermes/cerebrum_memory.db -- Main DB\n- ~/subconscious/ -- Git repo (231+ files committed)\n- ~/.hermes/knowledge/training-gym-research-r273.md -- Research digest\n- ~/.hermes/knowledge/self-evolving-agents-april-2026.md -- Previous digest\n\nTODO STATE:\n- tg-1 (completed): Deep sweep\n- tg-5 (completed): Elo analysis (spread 131, target 120 HIT)\n- tg-6 (completed): Research round (10 papers, 27 tips)\n- tg-7 (completed): Distillation\n- tg-8 (in_progress): Targeted eval sweep running\n- tg-9 (pending): Git commit + checkpoint\n\nNEXT STEPS:\n1. Wait for proc_e991e7133b78 to complete (~20 more minutes)\n2. Check final Elo stats after sweep\n3. Git commit all new work\n4. Continue flywheel: another research -> distill -> eval cycle\n5. Target: reach 1000+ rated tips (55%+ coverage)",
+  "active_tasks": [
+    "tg-8: Targeted eval sweep running (proc_e991e7133b78)",
+    "tg-9: Git commit + checkpoint pending"
+  ],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Wait for targeted eval sweep (proc_e991e7133b78) to complete, then check final Elo stats, git commit, and start next flywheel cycle",
+  "timestamp": "2026-04-13T16:39:30Z",
+  "unix_time": 1776098370.2497332,
+  "task_id": "20260412_231834_f61c83",
+  "source": "manual",
+  "version": 2
+}

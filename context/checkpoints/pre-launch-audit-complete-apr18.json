@@ -1,0 +1,22 @@
+{
+  "label": "pre-launch-audit-complete-apr18",
+  "context": "DGX Spark Qwen3.6 deployment scripts fully audited and ready for launch day. All 6 serving scripts verified green for GDN safety flags. spark-maxperf.sh+superqwen3-super.sh both have DFlash speculative decoding wired (build+inject). GRPO has 7 CLI override args. Dangerous Docker fallbacks replaced with FATAL exit. GRAD_ACCUM_OVERRIDE now read by Python. Runtime uncertainties remain (DFlash+GDN untested, v020-tq DFlash support unknown, DFlash model still training). FriendliAI primary provider confirmed working.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [
+    "spark-day1.sh",
+    "spark-maxperf.sh",
+    "spark-grpo-train.sh",
+    "superqwen3-super.sh",
+    "deploy-spark-day1.sh",
+    "eval_loop.sh",
+    "spark-lora-train.sh",
+    "dual-training-orchestrator.sh"
+  ],
+  "next_steps": "Launch day: (1) macbook-transfer-helper.sh --enable-ssh, (2) spark-day1.sh --macbook <IP> --usb, (3) spark-maxperf.sh, (4) wire-spark-to-hermes.sh <SPARK_IP>, (5) spark-quality chat, (6) superqwen3-super.sh. Test DFlash on GDN, verify v020-tq has DFlash support, check DFlash model availability on HF.",
+  "timestamp": "2026-04-18T19:17:16Z",
+  "unix_time": 1776539836.258028,
+  "task_id": "20260418_124117_725065",
+  "source": "manual",
+  "version": 2
+}

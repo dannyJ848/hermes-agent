@@ -1,0 +1,22 @@
+{
+  "label": "cortex-audit-gauntlet-complete-apr15",
+  "context": "Completed a massive 35-audit gauntlet on the Cortex unified Postgres DB (localhost:5432/cortex). \n\nWhat was done (4 rounds):\n- Round 1: Shim fixes (condition/recommendation extraction, SQL injection validators, DELETE handler), embedding backfill to 100% (all-MiniLM-L6-v2, 384d), tip dedup (79 double-escaped), edge cleanup (8326 self-ref), KV purge (9462 rows), confidence clamp (1073 values), index creation (9 new).\n- Round 2: Semantic dedup (1083 tips, cosine>0.95), experience dedup (1053 exact), domain backfill (13889), orphan rescue (216 tips, 744 edges), HNSW vector index created (0.3ms queries), confidence type guard in shim.\n- Round 3: Eval history pruning (88285 wasted entries on inactive tips), circuit breaker dedup (12311 redundant), PG config tuning (random_page_cost 4→1.1 for SSD, work_mem 64MB→16MB).\n- Round 4: Final sweep — 7 empty tables documented, 14 indexes-larger-than-table audited, 5 duplicate index defs found (2 genuine dropped, 13MB freed), autovacuum healthy, 0 long transactions, tip Elo leaderboard verified.\n\nKey files modified:\n- ~/subconscious/cortex_compat_shim.py — confidence type guard, SQL injection validators\n- ~/subconscious/ — 3 git commits made\n\nFinal DB state: ~22,781 nodes, 369K edges, 8K evals, 444MB, 356 active tips (elo 1050-2014, top=1746).\nPG config changes need PG restart to take effect (random_page_cost, work_mem).",
+  "active_tasks": [],
+  "decisions": [
+    "HNSW index chosen over IVFFlat for vector similarity (simpler, no training step)",
+    "Circuit breakers deduped to 1 per tool per hour (was 12K identical records)",
+    "Evals on inactive tips pruned — 91.7% were waste",
+    "random_page_cost set to 1.1 for SSD optimization",
+    "work_mem reduced from 64MB to 16MB (was too high for 100 max_connections)",
+    "Semantic dedup threshold 0.95 — kept highest elo tip in each cluster"
+  ],
+  "files_modified": [
+    "~/subconscious/cortex_compat_shim.py"
+  ],
+  "next_steps": "Session is complete. The audit gauntlet is fully done. No pending work from this session.",
+  "timestamp": "2026-04-14T20:16:04Z",
+  "unix_time": 1776197764.6507971,
+  "task_id": "20260414_141719_7e4044",
+  "source": "manual",
+  "version": 2
+}

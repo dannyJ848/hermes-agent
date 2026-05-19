@@ -1,0 +1,30 @@
+{
+  "label": "r15-r17-complete-apr7",
+  "context": "R15-R17 training gym completed. CONDITION-AWARE VOTING is the key fix.\n\nSTATE OF THE DISTILLATION PLUGIN:\n- Location: ~/.hermes/plugins/distillation/__init__.py\n- Pycache: CLEARED\n- Syntax: VERIFIED OK\n- Key change: _update_tip_confidence (line ~622) now takes args dict and does 3-tier\n  condition matching before voting. Call site at line 388 passes args.\n- Tips: 37 total (was 113). 62 reasoning tips deleted, 18 duplicates merged.\n- 3 new research tips from HyperAgents + SAGE findings added.\n- Pre-restart snapshot saved at ~/subconscious/pre_condition_aware_snapshot.json.\n\nNEW TOOLS BUILT THIS SESSION:\n- ~/subconscious/tip_health_monitor.py\n- ~/subconscious/tip_condition_rewriter.py\n- ~/subconscious/tip_feedback_validator.py\n- ~/subconscious/tip_feedback_loop_analysis.txt\n\nTRAINING GYM TOTALS: R1-R17, ~136 exercises, ~1355/1360 points.\n\nNEXT STEPS:\n1. Gateway restart to activate condition-aware voting\n2. Run tip_feedback_validator.py --snapshot (post-restart)\n3. Run tip_feedback_validator.py --compare (pre vs post)\n4. R18: Wire skill-integrated reward (from SAGE paper — reward tip creation, not just outcomes)\n5. R18: More web_research exercises to continue closing research-to-tip gap\n\nFILES MODIFIED:\n- ~/.hermes/plugins/distillation/__init__.py (condition-aware voting + args passing)\n- ~/.hermes/cerebrum_memory.db (62 reasoning tips deleted, 18 dupes merged, 3 research tips added, 25 conditions rewritten)",
+  "active_tasks": [
+    "Gateway restart to activate condition-aware voting",
+    "R18: Post-restart validation with tip_feedback_validator",
+    "R18: Skill-integrated reward wiring (from SAGE paper)"
+  ],
+  "decisions": [
+    "Condition-aware voting is the real fix for dead tips (not condition generalization)",
+    "Delete all 62 reasoning tips — not a real tool, not actionable",
+    "Target 30-50 high-quality tips, not 100+ noisy ones",
+    "SAGE paper skill-integrated reward is next improvement target"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/tip_health_monitor.py",
+    "~/subconscious/tip_condition_rewriter.py",
+    "~/subconscious/tip_feedback_validator.py",
+    "~/subconscious/pre_condition_aware_snapshot.json",
+    "~/subconscious/tip_feedback_loop_analysis.txt",
+    "~/wiki/self-improvement-frontier-2026.md"
+  ],
+  "next_steps": "Gateway restart to activate condition-aware voting, then R18 post-restart validation with tip_feedback_validator.py",
+  "timestamp": "2026-04-08T03:23:40Z",
+  "unix_time": 1775618620.581624,
+  "task_id": "20260407_171527_b7e3d6",
+  "source": "manual",
+  "version": 2
+}

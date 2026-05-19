@@ -1,0 +1,20 @@
+{
+  "label": "r135-organic-research-apr8",
+  "context": "R135. 926 tips, 0.834 avg. Researched TRACE (arXiv:2604.05336) — capability-targeted agentic training with contrastive failure analysis and per-capability LoRA routing. Researched MatClaw (arXiv:2604.02688) — 4-layer memory, RAG over source code for 99% accuracy, tacit knowledge gap insight. Both search tools failed this session — used 3-tier fallback to arxiv directly. All new tips cite real papers or real tool failures. Danny at daylong test. Quality-first mode. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R135 ORGANIC RESEARCH — 926 tips, 0.834 — research-grounded growth"
+  ],
+  "decisions": [
+    "TRACE contrastive method: compare successful vs failed trajectories for same task to identify capability gaps",
+    "3-tier search fallback: web_research → web_search → direct URL extraction"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (+11 organic tips this round)"
+  ],
+  "next_steps": "R136: Continue research-grounded organic growth. Search for more agent self-improvement papers.",
+  "timestamp": "2026-04-08T16:33:16Z",
+  "unix_time": 1775665996.66566,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

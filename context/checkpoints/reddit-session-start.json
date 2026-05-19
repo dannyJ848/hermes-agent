@@ -1,0 +1,19 @@
+{
+  "label": "reddit-session-start",
+  "context": "User wants to start fresh CLI session for Reddit project. Does NOT need continuity context from propaganda engine project. Wants to verify that learning/memory system is working — that insights from previous sessions are available in new sessions. This is a test of the iteration pipeline.",
+  "active_tasks": [
+    "Verify learning persistence works across sessions",
+    "Start Reddit project"
+  ],
+  "decisions": [
+    "No continuity context needed for Reddit project",
+    "Learning/memory system should carry forward automatically"
+  ],
+  "files_modified": [],
+  "next_steps": "1) Confirm learning persistence is working by referencing insights from this session. 2) Start Reddit project fresh. 3) Apply lessons learned: use write_file for scripts, type-check JSON, modular pipeline, avoid browser_navigate for scraping.",
+  "timestamp": "2026-05-16T16:19:56Z",
+  "unix_time": 1778948396.82753,
+  "task_id": "20260515_225419_a0d3f0",
+  "source": "manual",
+  "version": 2
+}

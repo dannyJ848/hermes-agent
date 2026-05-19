@@ -1,0 +1,20 @@
+{
+  "label": "subconscious-source-fixed-pending-restart",
+  "context": "Subconscious integration source code complete. All 97 modules integrated into agent/ and tools/. All source files patched to use ~/hermes-agent/ paths instead of ~/subconscious/. However, the RUNNING hermes process (PID 49351, this session) still has the old path cached in memory and keeps recreating ~/subconscious/tool_capability.db. Killed old process 98882. Need to restart hermes to fully eradicate ~/subconscious/.",
+  "active_tasks": [
+    "Restart hermes",
+    "Verify ~/subconscious/ eradicated"
+  ],
+  "decisions": [],
+  "files_modified": [
+    "agent/cortex_flywheel.py",
+    "agent/cortex_compat.py",
+    "agent/cognitive_infrastructure_hooks.py"
+  ],
+  "next_steps": "Restart hermes process to load new code without ~/subconscious/ references. After restart, verify ~/subconscious/ does not recreate.",
+  "timestamp": "2026-05-10T03:26:09Z",
+  "unix_time": 1778383569.241894,
+  "task_id": "20260509_222020_f674a3",
+  "source": "manual",
+  "version": 2
+}

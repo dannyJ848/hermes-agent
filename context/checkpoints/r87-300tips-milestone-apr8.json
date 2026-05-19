@@ -1,0 +1,20 @@
+{
+  "label": "r87-300tips-milestone-apr8",
+  "context": "R87 MILESTONE. 303 tips, avg conf 0.822. Crossed 300 tip threshold. Added meta-d'/M-ratio metacognition tip (decompose confidence into Type-1 sensitivity vs Type-2 metacognitive sensitivity. ECE/Brier conflate them. Domain-specific metacognitive failures invisible to aggregate metrics). Round 87. ~03:40 AM. Danny sleeping. Loop continues. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R87 complete — 303 TIPS, crossed 300 threshold — ready for R88"
+  ],
+  "decisions": [
+    "Standard calibration metrics (ECE, Brier) are insufficient — they conflate knowing with knowing-what-you-know",
+    "Metacognitive efficiency is domain-specific — aggregate metrics hide weak domains"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R88: Continue. Push into agent reward hacking detection or tool use optimization.",
+  "timestamp": "2026-04-08T08:32:35Z",
+  "unix_time": 1775637155.388835,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,22 @@
+{
+  "label": "r198-self-debug-wired",
+  "context": "Training gym R198 complete. Researched PyCapsule (2502.02928) and ReMemR1 (2509.23040). Distilled 10 tips. Built self_debug_tracker.py — tracks debug attempts, detects diminishing returns after 2-3 failures, suggests strategy switches. Wired into plugin post_tool_call for patch/write_file/terminal tools.\n\nStats: Plugin 2835 lines, 1497 active tips, ~168 modules total.\nNew DB: self_debug_tracker.db in ~/subconscious/.\nAll R153-R198 modules operational. Gateway running.",
+  "active_tasks": [
+    "R199: Continue autonomous training — more research + build + wire"
+  ],
+  "decisions": [
+    "Self-debug tracker only activates for code tools (patch, write_file, terminal)",
+    "Diminishing returns detection triggers after 2+ consecutive failures",
+    "Strategy stats track per-error-type success rates for recommendation"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/self_debug_tracker.py"
+  ],
+  "next_steps": "R199: Continue autonomous loop. Research more papers. Consider building: revisitable memory callback module, process reward scorer per step, or code self-modification tracker.",
+  "timestamp": "2026-04-12T07:11:55Z",
+  "unix_time": 1775977915.296844,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

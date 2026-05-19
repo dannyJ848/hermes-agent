@@ -1,0 +1,30 @@
+{
+  "label": "autobrowse-r191-complete",
+  "context": "Session checkpoint for full context preservation. This session built and tested the Autobrowse R191 self-improvement system (4 modules: tracer, analyzer, synthesizer, graduator) and wired it into the distillation plugin. Also contains extensive training debugging history (LoRA rank iteration 1024→256 on DGX Spark, OOM fixes, SAE memory patches). User wants next CLI session to retain ALL of this context.",
+  "active_tasks": [
+    "Update all persistence layers",
+    "Capture full session context",
+    "Consolidate learnings to memory/skills/repo"
+  ],
+  "decisions": [
+    "Autobrowse R191 built as 4-module system",
+    "Wired into distillation plugin post_tool_call + pre_llm_call",
+    "All 6 tests passed",
+    "Training rank 256 was stablest but still died at step 390"
+  ],
+  "files_modified": [
+    "/Users/dannygomez/subconscious/autobrowse_tracer.py",
+    "/Users/dannygomez/subconscious/autobrowse_analyzer.py",
+    "/Users/dannygomez/subconscious/autobrowse_synthesizer.py",
+    "/Users/dannygomez/subconscious/autobrowse_graduator.py",
+    "/Users/dannygomez/subconscious/strategy.md",
+    "/Users/dannygomez/subconscious/SKILL.md",
+    "/Users/dannygomez/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "User wants to update all persistence layers: memory, skills, repo, strategy.md. Next action should be to run instant_context.py to capture full state, then consolidate all learnings into durable storage.",
+  "timestamp": "2026-05-08T03:34:56Z",
+  "unix_time": 1778211296.7008011,
+  "task_id": "20260506_193843_a855f5",
+  "source": "manual",
+  "version": 2
+}

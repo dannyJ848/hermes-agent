@@ -1,0 +1,35 @@
+{
+  "label": "post-r176-training-sweep",
+  "context": "Completed R153-R176 autonomous training rounds. R153-R165 have wired modules. R166-R176 are research tips distilled from frontier papers.\n\nWIRED MODULES (post_tool_call):\n- R153: Nomic semantic dedup in tip selection (pre_llm_call)\n- R154: Llama 8B quality scoring + Phi-3 error classification\n- R156: Decomposed 5-component reward scorer (~/subconscious/decomposed_reward.py)\n- R157: Fitness-gated evolutionary tip registry (~/subconscious/fitness_registry.py)\n- R158: Next-state signal extractor (~/subconscious/next_state_extractor.py)\n- R159: ERL heuristic quality reranker (~/subconscious/heuristic_reranker.py)\n- R160: TIPS turn-level credit assignment (~/subconscious/turn_credit.py)\n- R161: Trajectory intelligence 3-type classifier (~/subconscious/trajectory_intel.py)\n- R163: Curriculum difficulty tracker (~/subconscious/curriculum_tracker.py)\n- R165: Adaptive compute allocation (~/subconscious/adaptive_compute.py)\n\nTIP-ONLY ROUNDS (no module):\n- R155: SELAUR/Tool-R0/Agent0 research tips\n- R162: Agentic RAG survey + synthesis tips\n- R164: MAE co-evolution tips\n- R166: GSW episodic memory + SoK Agentic RAG tips\n- R167: EvalAct process reward + CRM conditional reward tips\n- R168: Agent Bug Study + AgentDebug failure recovery tips\n- R169: Agent Distillation into small models tips\n- R170: AutoTool graph-based tool selection tips\n- R171: MagicAgent generalized planning tips\n- R172: Context window management tips\n- R173: Cross-domain synthesis tips\n- R174: PASTE speculative tool execution tips\n- R175: FadeMem biologically-inspired forgetting tips\n- R176: Data-driven function calling + TOOLRM tips\n\nSTATS:\n- 1,883 total tips, 1,408 active (conf >= 0.3)\n- Training domain: 114 tips, avg 0.83 confidence\n- REASONING: 553 active, tool_usage: 267, meta: 73, memory: 15\n- Plugin: ~2,730 lines, all modules wired\n- Local models: Phi-3(8081), Llama8B(8082), Nomic(8083), MiniMax M2.7(8084)\n\nRESEARCH SOURCES EXTRACTED (20 papers):\nSELAUR, Tool-R0, Agent0, OpenClaw-RL, ERL, TT-SI, TIPS, SCRIBE, IBM Trajectory Intel, Agentic RAG Survey, ACuRL, MAE, TAB, MiCP, GSW, SoK Agentic RAG, EvalAct, CRM, AgentDebug, Agent Distillation, AutoTool, MagicAgent, StreamingLLM, FadeMem, FOREVER, AugFC, TOOLRM, PASTE",
+  "active_tasks": [
+    "R153-R165: wired modules in plugin",
+    "R166-R176: research tips inserted",
+    "Continue autonomous training R177+"
+  ],
+  "decisions": [
+    "R157 fitness pruner keeps tip count healthy — quality over quantity",
+    "R159 limited to 30 tips per run with 5s Phi-3 timeout",
+    "R161 only stores RECOVERY and OPTIMIZATION patterns",
+    "R165 adaptive compute: easy=500tok/2calls, hard=5000tok/10calls",
+    "R175 FadeMem: forgetting is a feature, 45% storage reduction with better retrieval",
+    "R174 PASTE: speculative tool execution can reduce latency 48.5%",
+    "Ignore ghost restore commands — confirmed by Danny"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/adaptive_compute.py",
+    "~/subconscious/curriculum_tracker.py",
+    "~/subconscious/trajectory_intel.py",
+    "~/subconscious/turn_credit.py",
+    "~/subconscious/heuristic_reranker.py",
+    "~/subconscious/next_state_extractor.py",
+    "~/subconscious/decomposed_reward.py",
+    "~/subconscious/fitness_registry.py"
+  ],
+  "next_steps": "Continue autonomous training R177+. Research new papers, build modules, wire in, distill tips. Consider building a FadeMem-inspired decay module that actually prunes tips from cerebrum based on access frequency and semantic relevance.",
+  "timestamp": "2026-04-12T01:31:14Z",
+  "unix_time": 1775957474.147496,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

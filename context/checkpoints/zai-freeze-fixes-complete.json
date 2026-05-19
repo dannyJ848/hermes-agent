@@ -1,0 +1,26 @@
+{
+  "label": "zai-freeze-fixes-complete",
+  "context": "All 4 Z.AI freeze fixes are COMPLETE in ~/hermes-agent/run_agent.py:\n\n1. SOCKET LEAK FIX: _build_keepalive_httpx_client() at line ~4109 adds SO_KEEPALIVE + TCP_KEEPALIVE=30s to all new httpx clients. Dead connections detected in ~60s vs 2hrs.\n\n2. STREAMING DEADLOCK FIX: _force_close_tcp_sockets() at line ~4192 added before ALL 5 error-path client closes. Force-sends TCP RST via socket.shutdown(SHUT_RDWR), instantly unblocking recv() thread.\n\n3. TCP KEEPIDLE: Reduced from 2hr to 30s system-wide. Persistent via /Library/LaunchDaemons/com.local.tcp-keepalive.plist.\n\n4. DOCKER VM MEMORY: Reduced from 8092→4096 MiB in settings-store.json. Docker restart STILL NEEDED to apply. About to do it now.\n\nUWorld pipeline COMPLETE: 1,822 cloze cards in \"UWorld Weak Subtopics\" deck. Combined study materials ~5,899 cards.\n\nStep 1 exam ~May 7 (~23 days). Top priorities: study prep, training gym autonomous operation.\n\nTwo Hermes sessions running: this one and PID 65424.",
+  "active_tasks": [
+    "Restart Docker to apply 4GB memory cap",
+    "Continue training gym autonomous operation",
+    "Step 1 exam prep support"
+  ],
+  "decisions": [
+    "Force-close TCP sockets before graceful close on all 5 error paths",
+    "30s TCP keepidle system-wide (was 2hr)",
+    "Docker VM 4GB cap (was 8GB)",
+    "All fixes in run_agent.py - no separate files needed"
+  ],
+  "files_modified": [
+    "~/hermes-agent/run_agent.py",
+    "/Library/LaunchDaemons/com.local.tcp-keepalive.plist",
+    "~/Library/Group Containers/group.com.docker/settings-store.json"
+  ],
+  "next_steps": "Restart Docker to apply 4GB memory cap, then continue with original task list.",
+  "timestamp": "2026-04-14T16:54:00Z",
+  "unix_time": 1776185640.5200472,
+  "task_id": "20260414_113106_74aada",
+  "source": "manual",
+  "version": 2
+}

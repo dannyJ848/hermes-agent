@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r87-complete",
+  "context": "Training Gym R87 completed! ALL 4 PASS! Tier 9+ = 80 milestone!\n\nR87 RESULTS (all 10/10):\n1. longest-consecutive-seq-001 (T8) - Set. For each num, if num-1 not in set (start of sequence), count forward.\n2. median-data-stream-001 (T9) - Two heaps. Push to max_heap, pop to min_heap, rebalance. max_heap always >= min_heap.\n3. task-scheduler-001 (T9) - Formula: (max_freq-1)*(n+1)+max_count. Take max with len(tasks).\n4. dp-longest-palindromic-substring-001 (T8) - Expand around center. Odd (i,i) and even (i,i+1).\n\nDB: 347 exercises, 587 attempts, avg 9.91, 95.6% perfect. 298 passed. Tier 9+ = 80, Tier 10 = 46.\n53+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R87 complete",
+    "R88 next"
+  ],
+  "decisions": [
+    "Task scheduler formula: (max_freq-1)*(n+1)+count_of_max_freq_tasks. Take max with len(tasks).",
+    "Median stream: two heaps. max_heap (lower, negate), min_heap (upper). max_heap.size >= min_heap.size.",
+    "Longest consecutive: set. Only start counting from sequence starts (num-1 not in set). O(n).",
+    "Longest palindrome: expand around center. Try both odd and even length at each position."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R88: Continue. Try: Min Window Substring, Maximal Square, or Binary Watch.",
+  "timestamp": "2026-04-08T21:56:41Z",
+  "unix_time": 1775685401.866882,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

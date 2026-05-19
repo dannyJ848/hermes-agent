@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r89-complete",
+  "context": "Training Gym R89 completed! ALL 4 PASS ON FIRST TRY!\n\nR89 RESULTS (all 10/10):\n1. merge-intervals-001 (T7) - Sort by start. If curr.start<=prev.end: merge. Else append.\n2. trapping-rain-water-001 (T10) - Two pointer. Move shorter side. Water += max_left/max_right - height[i].\n3. longest-substring-no-repeat-001 (T8) - Sliding window. char_index map. Jump left to last_seen+1.\n4. container-with-most-water-001 (T8) - Two pointer from ends. Area=min(h[l],h[r])*(r-l). Move shorter.\n\nDB: 354 exercises, 595 attempts, avg 9.91, 95.6% perfect. 305 passed. Tier 9+ = 83, Tier 10 = 48.\n55+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R89 complete",
+    "R90 next"
+  ],
+  "decisions": [
+    "Trapping rain water: two pointer. If h[left]<h[right]: process left (water+=max_left-h[left]). Move shorter side.",
+    "Longest substring: char_index map with last position. left = max(left, char_index[char]+1). Track max_len.",
+    "Container water: move shorter pointer inward. Greedy.",
+    "Merge intervals: sort by start. last_end = max(last_end, curr_end) for overlap."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R90: Continue. Try: Longest Increasing Subsequence, Coin Change, or Edit Distance.",
+  "timestamp": "2026-04-08T22:01:46Z",
+  "unix_time": 1775685706.9847748,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

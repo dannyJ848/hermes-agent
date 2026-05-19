@@ -1,0 +1,22 @@
+{
+  "label": "r136-organic-growth-apr8",
+  "context": "R136. 938 tips, 0.834 avg. Generated tips from ACTUAL tool errors: camofox down, secure_read whitelist, moltbook API key, macOS timeout missing, terminal partial results, search_files speed optimization. Also extracted 2 research papers: TRACE (capability-targeted training) and MatClaw (4-layer memory). Saved both findings to knowledge/. All new tips cite real tool performance data or real paper results. Danny at daylong test. Quality-first organic growth. 62 tips from 1000 milestone. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R136 ORGANIC GROWTH — 938 tips, 0.834 — experience-grounded"
+  ],
+  "decisions": [
+    "Only add tips from real failures, real performance data, or verified paper results",
+    "Every tip cites its source with call counts or paper IDs"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (+tips)",
+    "~/.hermes/knowledge/trace-capability-targeted-agentic-training-apr2026.md",
+    "~/.hermes/knowledge/matclaw-code-first-agent-memory-apr2026.md"
+  ],
+  "next_steps": "R137: Continue organic growth. Run real tasks, extract real failures, research real papers.",
+  "timestamp": "2026-04-08T16:36:48Z",
+  "unix_time": 1775666208.45328,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,21 @@
+{
+  "label": "r133-quality-audit-apr8",
+  "context": "R133. Danny corrected: tips must be HIGH QUALITY, non-speculative, ALL actionable. Purged 66 tips: 23 low-conf (<0.65), 39 meta/milestone, 4 philosophical. Rewrote 4 descriptive tips into imperative form. Added 10 ORGANIC tips from real session failures: arxiv category filtering, tip quality audit methodology, SQLite timeout resilience, SQL escaping, plugin pycache debug, batch insert performance, checkpoint pattern, tip provenance tracking, knowledge_search fallback routing, web_search→web_research routing. Every new tip starts with action verb, grounded in actual tool failures. Danny at daylong test. Autonomous mode. Quality-first approach going forward. Cron a81e43404f79 safety net. ~08:05 AM.",
+  "active_tasks": [
+    "R133 QUALITY AUDIT + ORGANIC GROWTH — 896 tips, 0.836, 224 domains"
+  ],
+  "decisions": [
+    "Quality > quantity. Purge speculative tips. Only add tips grounded in real failures/experience.",
+    "Every tip must start with action verb.",
+    "Audit for speculative language (should/could/might) monthly."
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (-66 purged, +10 organic, net 896)"
+  ],
+  "next_steps": "R134: Continue organic growth. Only add tips from real tool failures, verified research, or implementation experience. No speculative tips.",
+  "timestamp": "2026-04-08T16:25:05Z",
+  "unix_time": 1775665505.4441469,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

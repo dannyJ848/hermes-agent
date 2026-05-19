@@ -1,0 +1,12 @@
+{
+  "label": "webgpu-sss-native-complete",
+  "context": "Completed: WebGPU Canvas + Native SSS Node Material integration for SOMA.\n\nNew files:\n- src/anatomy/WebGPUAnatomyCanvas.tsx \u2014 R3F Canvas wrapper with WebGPU auto-fallback\n- src/anatomy/SubsurfaceScatteringTSL.ts \u2014 Native SSS via MeshSSSNodeMaterial (Three.js r182)\n- ~/.hermes/knowledge/tsl-webgpu-field-guide.md \u2014 TSL research findings\n- ~/.hermes/knowledge/threejs-webgpu-migration-2026.md \u2014 Migration guide\n\nKey discovery: Three.js r182 ships MeshSSSNodeMaterial with built-in SSS properties:\n- thicknessColorNode, thicknessDistortionNode, thicknessAmbientNode\n- thicknessAttenuationNode, thicknessPowerNode, thicknessScaleNode\nNo custom GLSL shaders needed for SSS!\n\nUpdated: src/anatomy/index.ts with all new exports.\nBuild: tsc --noEmit passes with 0 errors.\n\nNext steps:\n1. Swap SimplifiedAnatomyViewer.tsx Canvas with WebGPUAnatomyCanvas\n2. Replace GLSL injectSSS calls with createNativeSSSMaterial\n3. Test on mobile (iPhone 14+ Safari with WebGPU)\n4. Consider MeshSSSNodeMaterial for all tissue rendering",
+  "active_tasks": [
+    "WebGPU Canvas integration",
+    "Native SSS Node Material",
+    "TSL shader conversion",
+    "Mobile performance testing"
+  ],
+  "timestamp": "2026-04-02T23:02:10Z",
+  "task_id": "20260402_152751_4b5e7b"
+}

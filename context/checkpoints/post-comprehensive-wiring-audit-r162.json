@@ -1,0 +1,35 @@
+{
+  "label": "post-comprehensive-wiring-audit-r162",
+  "context": "Completed R158-R162 training rounds. All wired into distillation plugin at ~/.hermes/plugins/distillation/__init__.py.\n\nR158 — Next-State Signal Extractor (OpenClaw-RL): Extracts evaluative + directive signals from tool calls. Wired at post_tool_call after R156 decomposed reward block. Only stores non-empty directive hints.\n\nR159 — ERL Heuristic Quality Reranker: Uses Phi-3 to score tips on trigger specificity + actionability. Runs every 200th tool call as background thread. Built at ~/subconscious/heuristic_reranker.py.\n\nR160 — Turn-Level Credit Assignment (TIPS): Dense per-turn credit based on info gain, not just outcome. Tool type weighting (search > execution > write). Built at ~/subconscious/turn_credit.py.\n\nR161 — Trajectory Intelligence Extractor (IBM Research): 3-type classification (strategy/recovery/optimization) + decision attribution. Only stores non-strategy patterns. Built at ~/subconscious/trajectory_intel.py.\n\nR162 — Agentic RAG + synthesis tips: 7 tips from Agentic RAG survey (evaluator-optimizer pattern, explicit constraints, process evaluation, domain knowledge amplification, retrieval quality bottleneck).\n\nKey stats after R162:\n- 1,572 total tips (pruned from ~7,900 by R157 fitness gating)\n- 1,091 active (conf >= 0.3), avg confidence 0.54\n- Training domain: 41 tips, avg 0.83\n- Plugin: ~2,690 lines, all modules wired\n- Local models: Phi-3 (8081), Llama 8B (8082), Nomic Embed (8083), MiniMax M2.7 (8084)\n- VPS Hindsight: healthy, batch sync running",
+  "active_tasks": [
+    "R158 next-state signal extraction — WIRED",
+    "R159 ERL heuristic quality reranker — WIRED",
+    "R160 TIPS turn-level credit assignment — WIRED",
+    "R161 trajectory intelligence extractor — WIRED",
+    "R162 Agentic RAG tips — inserted",
+    "Continue R163+ training rounds"
+  ],
+  "decisions": [
+    "Fitness pruner (R157) slashed 6000+ tips — healthy pruning",
+    "R159 uses Phi-3 at 5s timeout, limited to 30 tips per run for speed",
+    "R161 only stores RECOVERY and OPTIMIZATION patterns (not STRATEGY which is too common)",
+    "Active tip count stabilized around 1000-1100 — quality saturation point",
+    "Subtask-level extraction adopted from IBM Research paper"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/heuristic_reranker.py",
+    "~/subconscious/turn_credit.py",
+    "~/subconscious/trajectory_intel.py",
+    "/tmp/r159_distill.py",
+    "/tmp/r160_distill.py",
+    "/tmp/r161_distill.py",
+    "/tmp/r162_distill.py"
+  ],
+  "next_steps": "Continue R163+ training rounds: research new papers, build modules, wire in, distill tips. Consider building SCRIBE-inspired skill prototype router for mid-level reward evaluation.",
+  "timestamp": "2026-04-12T00:41:02Z",
+  "unix_time": 1775954462.9471612,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

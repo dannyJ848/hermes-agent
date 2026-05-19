@@ -1,0 +1,28 @@
+{
+  "label": "uworld-api-breakthrough",
+  "context": "BREAKTHROUGH: Reverse-engineered UWorld's gateway API. Can now pull ALL question data via JSON API instead of browser scraping. This turns a 20+ hour project into minutes.\n\nAPI BASE: https://gateway-api.uworld.com/api/qbank/\nKEY ENDPOINTS:\n- GET GetTestRecordDetails/{testRecordId} - gets test metadata + question list\n- POST getTestByQuestionIndexes/ - gets full question content (text, answers, explanations, images)\n\nREQUIRED HEADERS (all 3 mandatory):\n1. Authorization: Bearer {JWT from uw_at_config cookie or sessionStorage.authInfo}\n2. api-uwsub-key: {RSA-encrypted key, captured from Chrome CDP}\n3. config-parameters: {\"configId\":7,\"deviceTypeId\":1,\"topLevelProductId\":1}\n4. Content-Type: text/json\n5. Accept: application/json, text/plain, */*\n6. Origin: https://apps.uworld.com\n7. Referer: https://apps.uworld.com/\n\nAUTH DETAILS:\n- JWT expires (exp field in token). Need to refresh via Chrome CDP if expired.\n- api-uwsub-key is a long RSA-encrypted blob - captured from Chrome, not derivable from cookies alone.\n- Both captured in /Users/dannygomez/Desktop/uworld_data/captured_headers.json\n- Also saved in cookies.json and headers.json\n\nCHROME SETUP:\n- Chrome running with: --remote-debugging-port=9222 --remote-allow-origins=* --user-data-dir=/tmp/chrome-uworld\n- Danny logged into UWorld, on Previous Tests page\n- CDP accessible at localhost:9222\n\nUSER ID: 5326037\nPRODUCT: STEP1 QBank (qbankId=1)\nTEST RECORD ID EXAMPLE: 421548864 (test 186, 23 questions)\nUSER CONFIG ID: 14592700\n\nFILES:\n- ~/Desktop/uworld_capture.py - CDP network interceptor (first attempt)\n- ~/Desktop/uworld_grab_cookies.py - cookie extractor\n- ~/Desktop/uworld_bearer_test.py - bearer token test\n- ~/Desktop/uworld_intercept_headers.py - the one that captured the real headers\n- ~/Desktop/uworld_data/ - output directory with captured_headers.json, cookies.json, headers.json, test_record_sample.json\n\nNEXT STEPS:\n1. Test GetTestRecordDetails API call with full headers - confirm JSON response structure\n2. Figure out how to get ALL 186 test record IDs (may need to scrape Previous Tests page or find a list API)\n3. For each test, get question metadata, filter to 38 weak subtopics\n4. Pull full question content via getTestByQuestionIndexes\n5. Create cloze Anki cards with images via AnkiConnect\n\n38 WEAK SUBTOPICS are in /tmp/usmle_search.txt (Anki tag format)\nDANNY'S EXAM: May 7, 2026 (~23 days)",
+  "active_tasks": [
+    "Test UWorld API access with captured headers",
+    "Build full question extraction pipeline",
+    "Filter questions to 38 weak subtopics",
+    "Create cloze Anki cards with images"
+  ],
+  "decisions": [
+    "API-first approach instead of browser scraping - 10x faster",
+    "Need all 3 auth headers (Bearer + api-uwsub-key + config-parameters)",
+    "Chrome CDP on localhost:9222 for token extraction/refresh"
+  ],
+  "files_modified": [
+    "/Users/dannygomez/Desktop/uworld_capture.py",
+    "/Users/dannygomez/Desktop/uworld_grab_cookies.py",
+    "/Users/dannygomez/Desktop/uworld_bearer_test.py",
+    "/Users/dannygomez/Desktop/uworld_intercept_headers.py",
+    "/Users/dannygomez/Desktop/uworld_data/captured_headers.json"
+  ],
+  "next_steps": "Test GetTestRecordDetails API call with the full captured headers to confirm JSON response. Then build the full pipeline script.",
+  "timestamp": "2026-04-14T03:34:29Z",
+  "unix_time": 1776137669.81083,
+  "task_id": "20260413_215447_795a06",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,276 @@
+{
+  "scan_time": "2026-04-22T21:00:00Z",
+  "total": 95,
+  "tweets": [
+    {
+      "text": "\u7ed9\u4e2d\u56fd\u7528\u6237\u7684\u597d\u6d88\u606f\uff1aHermes Agent \u73b0\u5728\u539f\u751f\u652f\u6301\u4e2a\u4eba\u5fae\u4fe1\u4e86\n\n\u5fae\u4fe1\u626b\u7801\u5373\u53ef\u8fde\u63a5\uff0c\u79c1\u804a\u7fa4\u804a\u90fd\u652f\u6301\u3002\u56fe\u7247\u3001\u89c6\u9891\u3001\u6587\u4ef6\u3001\u8bed\u97f3\u6d88\u606f\u5168\u8986\u76d6\uff0c\u957f\u8f6e\u8be2\u76f4\u8fde\uff0c\u4e0d\u9700\u8981\u516c\u7f51 IP\u3002\n\n\u8fd0\u884c 'hermes update' \u5373\u53ef\u4f53\u9a8c\n\n\u6587\u6863\uff1ahttps://t.co/nonIEoaF79\n\n\u611f\u8c22 @Bravohenry_ \u7684\u8d21\u732e https://t.co/xFir5yAN6G",
+      "handle": "@NousResearch",
+      "name": "Nous Research",
+      "tweet_id": "2042821620281053641",
+      "favs": 3369,
+      "rts": 573,
+      "query": "Nous Research OR Teknium OR Hermes agent min_faves:5"
+    },
+    {
+      "text": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open source model agnostic framework. \n\nHe studied the architecture, focused on the multi-agent orchestration layer (the coordinator that breaks goals into tasks, team https://t.co/nGAqQcZDW3",
+      "handle": "@ivanburazin",
+      "name": "Ivan Burazin",
+      "tweet_id": "2040112100597506107",
+      "favs": 3441,
+      "rts": 545,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "\ud83d\udea8 BREAKING: CHINA just released a Python framework for building AI agents. 100% OPEN SOURCE.\n\nIt has visual agent design, MCP tools, memory, RAG, and reasoning. All built in. All working together.\n\nIt's called AgentScope.\n\nYou describe your agent system. It builds the https://t.co/CCmL2uyUoy",
+      "handle": "@hasantoxr",
+      "name": "Hasan Toor",
+      "tweet_id": "2036531659378663490",
+      "favs": 2749,
+      "rts": 627,
+      "query": "MCP tools AI agent min_faves:10"
+    },
+    {
+      "text": "\u521a\u53d1\u73b0\u4e00\u4e2a\u75af\u72c2\u7684\u5f00\u6e90\u9879\u76ee\uff1aClaude-Code-Game-Studios\u3002\n\n11,574 stars\uff0c\u4eca\u5929\u6da8\u4e861,107\u661f\u3002\n\n\u5b83\u662f\u4ec0\u4e48\uff1f\n\n\u4e00\u4e2a\u5b8c\u5168\u7531AI Agent\u7ec4\u6210\u7684\u6e38\u620f\u5f00\u53d1\u5de5\u4f5c\u5ba4\u3002\n\n\u542c\u8d77\u6765\u5f88\u79d1\u5e7b\u5bf9\u5427\uff1f\n\u4f46\u4f60\u77e5\u9053\u8fd9\u89e3\u51b3\u4e86\u591a\u5927\u7684\u75db\u70b9\u5417\uff1f\n\u4ee5\u524d\u505a\u6e38\u620f\uff0c\u9700\u8981\u7a0b\u5e8f\u5458\u3001\u7f8e\u672f\u3001\u7b56\u5212\u3001\u6d4b\u8bd5...\n\u4e00\u4e2a\u5c0f\u56e2\u961f\u90fd\u89815-10\u4eba\u3002",
+      "handle": "@AI_jacksaku",
+      "name": "\u963f\u5ddd | AI thinking",
+      "tweet_id": "2045360925289361858",
+      "favs": 2078,
+      "rts": 333,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "Hermes Agent \u52bf\u5934\u5f88\u731b\uff0c\u8fd9\u51e0\u5929\u63a8\u8350\u7684\u4eba\u5f88\u591a\uff0c\u53ef\u4ee5\u5173\u6ce8\u4e00\u4e0b\u3002\u6211\u81ea\u5df1\u5b89\u88c5\u8bd5\u7528\u4e86\u8fd8\u53ef\u4ee5\u3002\n\nHermes Agent \u662f\u7531 Nous Research \u5728\u4eca\u5e74 2 \u6708\u5e95\u5f00\u6e90\u7684 AI \u667a\u80fd\u4f53\u6846\u67b6\uff0c\u4e0a\u7ebf\u4e0d\u5230\u4e24\u4e2a\u6708\uff0cGitHub \u661f\u6807\u5df2\u7ecf\u63a5\u8fd1\u4e09\u4e07\u3002\u8fd9\u4e2a\u9879\u76ee\u88ab\u793e\u533a\u8ba4\u4e3a\u662f OpenClaw\uff08\u9f99\u867e\uff09\u4e0a\u7ebf\u4ee5\u6765\uff0c\u7b2c\u4e00\u4e2a\u771f\u6b63\u610f\u4e49\u4e0a\u7684\u7ade\u4e89\u5bf9\u624b\u3002",
+      "handle": "@dotey",
+      "name": "\u5b9d\u7389",
+      "tweet_id": "2041585514873037167",
+      "favs": 1834,
+      "rts": 391,
+      "query": "Nous Research OR Teknium OR Hermes agent min_faves:5"
+    },
+    {
+      "text": "AWS released a new Multi-Agent AI framework!\n\nA flexible and powerful framework for managing multiple AI agents and handling complex conversations.\n\nIt let's you dynamically route LLM queries to the most suitable agent based on context.\n\n100% Open Source. https://t.co/22kNYSJwul",
+      "handle": "@Sumanth_077",
+      "name": "Sumanth",
+      "tweet_id": "1870834042473709572",
+      "favs": 1995,
+      "rts": 309,
+      "query": "AI agent framework new min_faves:20"
+    },
+    {
+      "text": "The Hermes Agent Creative Hackathon starts now\n\n16 Days, $25k in Prizes\n\nPresented by @Kimi_Moonshot &amp; @NousResearch \n\nFor the tinkerers pushing Hermes Agent into creative domains: video, image, audio, 3D, long-form writing, creative software, interactive media and more.\n\nShow us https://t.co/grqWJlXm3K",
+      "handle": "@NousResearch",
+      "name": "Nous Research",
+      "tweet_id": "2045225469088326039",
+      "favs": 1955,
+      "rts": 230,
+      "query": "Nous Research OR Teknium OR Hermes agent min_faves:5"
+    },
+    {
+      "text": "Kimi K2.6 raises the bar for open-source models. \n\n\ud83e\udd99 available on Ollama's cloud! \n\nTry it with OpenClaw: \nollama launch openclaw --model kimi-k2.6:cloud\n\nTry it with Hermes Agent: \nollama launch hermes --model kimi-k2.6:cloud\n\nTry it with Claude Code: \nollama launch claude",
+      "handle": "@ollama",
+      "name": "ollama",
+      "tweet_id": "2046361868076487155",
+      "favs": 1920,
+      "rts": 175,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "If Claude's quality has been falling off a cliff for you over the past few days, try:\n\nCLAUDE_CODE_DISABLE_1M_CONTEXT=1\nCLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1\nANTHROPIC_DEFAULT_OPUS_MODEL=\"claude-4-6-opus\"\n\nHave your agent save state, /clear, restart.",
+      "handle": "@spiritbuun",
+      "name": "buun",
+      "tweet_id": "2043040652380737931",
+      "favs": 2176,
+      "rts": 79,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "The Shopify CEO just endorsed an agent built by one developer in Austria over every funded AI coding tool on the market.\n\nPi has four tools. Read, Write, Edit, Bash. No MCP. No sub-agents. No plan mode. The shortest system prompt of any known agent harness.\n\nOpenClaw, the agent",
+      "handle": "@aakashgupta",
+      "name": "Aakash Gupta",
+      "tweet_id": "2019471840171946356",
+      "favs": 1879,
+      "rts": 103,
+      "query": "MCP tools AI agent min_faves:10"
+    },
+    {
+      "text": "&gt; 385ms average tool selection.\n&gt; 67 tools across 13 MCP servers.\n&gt; 14.5GB memory footprint.\n&gt; Zero network calls.\n\nLocalCowork is an AI agent that runs on a MacBook. Open source. \n\n\ud83e\uddf5 https://t.co/bnXupspSXc",
+      "handle": "@liquidai",
+      "name": "Liquid AI",
+      "tweet_id": "2029586519389086198",
+      "favs": 1540,
+      "rts": 152,
+      "query": "MCP tools AI agent min_faves:10"
+    },
+    {
+      "text": "AI agents can finally talk to your frontend!\n\nThe AG-UI Protocol bridges the critical gap between AI agents and frontend apps, making human-agent collaboration seamless.\n\nMCP: Agents to tools\nA2A:  Agents to agents\nAG-UI: Agents to users\n\n100% open-source. https://t.co/OImTiNB0AM",
+      "handle": "@akshay_pachaar",
+      "name": "Akshay \ud83d\ude80",
+      "tweet_id": "1963945302991450272",
+      "favs": 1191,
+      "rts": 232,
+      "query": "MCP tools AI agent min_faves:10"
+    },
+    {
+      "text": "this video will teach you a lot about Claude Code and other agent harnesses, even if you know a lot about them. the more you understand how these harnesses work, you'll have an easier time working with them.",
+      "handle": "@Hesamation",
+      "name": "\u210f\u03b5sam",
+      "tweet_id": "2043670864244150445",
+      "favs": 1446,
+      "rts": 91,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "CLAUDE CODE IS NOW ACTUALLY FREE.\n\nNot a trial, not a workaround, just a full coding agent stack running with models like GLM 5.1, Gemma 4, and Elephant Alpha.\n\nhttps://t.co/RPGWHAnDo7",
+      "handle": "@RoundtableSpace",
+      "name": "0xMarioNawfal",
+      "tweet_id": "2045989567556190285",
+      "favs": 1391,
+      "rts": 96,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "We just released Hermes Agent! In my humble opinion a very good blend between coding agents like Claude Code and generalist agents like Clawdbot.\n\nBeen working on this for the last month or so now - started as a way for us to have agentic primitives for datagen and RL and got",
+      "handle": "@Teknium",
+      "name": "Teknium \ud83e\udebd",
+      "tweet_id": "2026760653743206502",
+      "favs": 1304,
+      "rts": 90,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "Meta has begun rolling out software on U.S. employees\u2019 work laptops that records mouse movements, clicks, keystrokes, and occasional screen snapshots.\n\nThe data collected will train AI systems, particularly autonomous agents designed to handle routine computer tasks such as https://t.co/4nOAWZgPuK",
+      "handle": "@Pirat_Nation",
+      "name": "Pirat_Nation \ud83d\udd34",
+      "tweet_id": "2046695474615517668",
+      "favs": 913,
+      "rts": 175,
+      "query": "AI agents autonomous min_faves:20"
+    },
+    {
+      "text": "\ud83d\udea8BREAKING: Someone built a second brain for Claude Code that runs silently in the background and never lets it forget a thing.\n\nIt's called Claude Subconscious, and it solves the biggest problem with every AI coding agent the amnesia that hits the moment you close a session. https://t.co/ZGtnOwPAde",
+      "handle": "@ihtesham2005",
+      "name": "Ihtesham Ali",
+      "tweet_id": "2037484864090644653",
+      "favs": 885,
+      "rts": 137,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "the full Paperclip AI marketing stack\n\nskills, routines, and a feedback loop that makes the output get better over time\n\nstep 1: install skills into Claude Code\n\n&gt; Postiz for posting to social\n&gt; agent-media for UGC images\n&gt; Larry for TikTok slideshows\n&gt; Virlo for finding trends\n&gt; https://t.co/GHRkLWS0Se",
+      "handle": "@shannholmberg",
+      "name": "Shann\u00b3",
+      "tweet_id": "2040331061562073302",
+      "favs": 943,
+      "rts": 94,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "Today we're releasing the Factory desktop app. A native interface for autonomous AI agents that work across every part of your software business. https://t.co/17j06HMb2G",
+      "handle": "@FactoryAI",
+      "name": "Factory",
+      "tweet_id": "2041928406158471299",
+      "favs": 950,
+      "rts": 76,
+      "query": "AI agents autonomous min_faves:20"
+    },
+    {
+      "text": "So freaking huge: OpenAI is rumored to launch an \u201cAgent Builder\u201d - a native, no-code platform for creating autonomous AI agents. If true, it could replace the mix of tools like Zapier, n8n, and Vapi with a single, seamless OpenAI ecosystem.\n\nhttps://t.co/3lp4gvxvOX",
+      "handle": "@kimmonismus",
+      "name": "Chubby\u2668\ufe0f",
+      "tweet_id": "1975092180294516972",
+      "favs": 928,
+      "rts": 77,
+      "query": "AI agents autonomous min_faves:20"
+    },
+    {
+      "text": "Agentarium is a new Python framework for managing and orchestrating AI agents.\n\nFeatures include (from the repo):\n\n\u2022 \ud83e\udd16 Advanced Agent Management: Create and orchestrate multiple AI agents with different roles and capabilities\n\u2022 \ud83d\udd04 Robust Interaction Management: Coordinate https://t.co/Cy0I75Qip4",
+      "handle": "@omarsar0",
+      "name": "elvis",
+      "tweet_id": "1874113792067682620",
+      "favs": 771,
+      "rts": 126,
+      "query": "AI agent framework new min_faves:20"
+    },
+    {
+      "text": "startup idea for you - linkedin for ai agents\n\nlinkedin sold for $26.2b in 2016, what is the linkedin for ai agents worth in 2026?\n\n right now we have:\n\n  - MCP registries (smithery, mcpt) \u2192 discover tools and servers\n  - A2A agent cards \u2192 technical handshake protocol from https://t.co/ErPLQMpXkT",
+      "handle": "@gregisenberg",
+      "name": "GREG ISENBERG",
+      "tweet_id": "2020533115874103780",
+      "favs": 951,
+      "rts": 66,
+      "query": "MCP tools AI agent min_faves:10"
+    },
+    {
+      "text": "the fastest growing GitHub repos this week:\n\n1. affaan-m/everything-claude-code (+22.8K stars)\nagent harness optimization. skills, memory, security for Claude Code, Codex, Cursor and beyond.\n\n2. obra/superpowers (+17.0K stars)\nagentic skills framework that works. just crossed https://t.co/tF3STOutPQ",
+      "handle": "@sharbel",
+      "name": "Sharbel",
+      "tweet_id": "2037505418272841833",
+      "favs": 879,
+      "rts": 77,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "Access GPT Image 2.0 natively in Hermes Agent\n\nUpdate now to get access - just run `hermes update` and select your image generation tool model with `hermes tools`",
+      "handle": "@NousResearch",
+      "name": "Nous Research",
+      "tweet_id": "2046693872773062834",
+      "favs": 882,
+      "rts": 56,
+      "query": "Nous Research OR Teknium OR Hermes agent min_faves:5"
+    },
+    {
+      "text": "The 3 AI-native protocols:\n\n\u2022 MCP (Model Context Protocol): This protocol allows you to connect AI applications to external tools.\n\n\u2022 A2A (Agent-to-Agent Protocol): Enables AI agents to communicate and coordinate to solve complex tasks.\n\n\u2022 AG-UI (Agent-User Interaction https://t.co/fikR8PlgKN",
+      "handle": "@svpino",
+      "name": "Santiago",
+      "tweet_id": "1935657328931725747",
+      "favs": 670,
+      "rts": 126,
+      "query": "MCP tools AI agent min_faves:10"
+    },
+    {
+      "text": "Massive breakthrough for Agentic AI!\n\nFinally, your agents can learn from experience:\n\nAgent Lightning is a new open-source framework from Microsoft that lets you apply Reinforcement Learning (RL) to existing agents.\n\nYou don't need to rewrite your bot. You just need to light it https://t.co/kas9VW7Y5q",
+      "handle": "@techNmak",
+      "name": "Tech with Mak",
+      "tweet_id": "2012901015503384658",
+      "favs": 675,
+      "rts": 124,
+      "query": "AI agent framework new min_faves:20"
+    },
+    {
+      "text": "Did you know you can get your claude through hermes without any fancy tricks?\n\nJust type /claude-code &lt;prompt&gt;\n\nIn a new session. Hermes Agent can pilot a claude code session for you like it\u2019s nothing. Give it a try\n\nIt also doesn\u2019t break all the self improvement loop and",
+      "handle": "@Teknium",
+      "name": "Teknium \ud83e\udebd",
+      "tweet_id": "2040603975343542503",
+      "favs": 844,
+      "rts": 55,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "Karpathy buried the most important part of autoresearch in the README, and almost nobody read it.\n\nAbove the installation instructions, he wrote a short fiction piece set in the future. Autonomous swarms of AI agents running across compute cluster megastructures. Generation",
+      "handle": "@aakashgupta",
+      "name": "Aakash Gupta",
+      "tweet_id": "2036666385099870394",
+      "favs": 727,
+      "rts": 92,
+      "query": "AI agents autonomous min_faves:20"
+    },
+    {
+      "text": "JUST IN: Claude Code\u2019s full source code just leaked. \n\nhidden features found: \n\n&gt; kairos - an unreleased autonomous daemon mode with background sessions and memory consolidation. always on agent.\n&gt; buddy system - a full tamagotchi pet system. 18 species, rarity tiers, shiny https://t.co/AHfUa346e9",
+      "handle": "@birdabo",
+      "name": "sui \u2604\ufe0f",
+      "tweet_id": "2038914105436954980",
+      "favs": 829,
+      "rts": 58,
+      "query": "Claude Code OR Cursor agent OR Devin min_faves:20"
+    },
+    {
+      "text": "Kimi K2.6 is now available in Hermes Agent.\n\nSimply run `hermes update` and use `hermes model` to select a compatible provider hosting the model!",
+      "handle": "@NousResearch",
+      "name": "Nous Research",
+      "tweet_id": "2046300755683098910",
+      "favs": 865,
+      "rts": 39,
+      "query": "Nous Research OR Teknium OR Hermes agent min_faves:5"
+    }
+  ]
+}

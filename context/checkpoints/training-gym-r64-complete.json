@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r64-complete",
+  "context": "Training Gym R64 completed! ALL 4 PASS (LIS needed one fix for Python 3.10 bisect key arg).\n\nR64 RESULTS (all 10/10):\n1. fenwick-tree-001 (T8) - BIT with 1-indexed internal array. update: i+=lsb, query: i-=lsb.\n2. kmp-pattern-001 (T8) - LPS array for failure function. Search with skip on mismatch.\n3. disjoint-set-rank-001 (T7) - Path compression + union by rank. Track count for set counting.\n4. dp-longest-increasing-001 (T8) - Patience sorting O(n log n). Fixed: bisect_left doesn't take key= in Python 3.10. Used separate tails_values/tails_indices arrays.\n\nDB: 287 exercises, 495 attempts, avg 9.89, 94.7% perfect. 238 passed. Tier 9+ = 62.\n30+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R64 complete",
+    "R65 next"
+  ],
+  "decisions": [
+    "Fenwick: 1-indexed internally. update(i,delta): i+=i&(-i). query(i): s+=bit[i], i-=i&(-i). range_sum = query(r)-query(l-1).",
+    "KMP: build LPS where lps[i]=longest proper prefix of pattern[0..i] that is also suffix. On mismatch, j=lps[j-1].",
+    "DSU: path compression in find (parent[x]=find(parent[x])). Union by rank: attach shorter under taller.",
+    "LIS O(n log n): maintain tails_values + tails_indices arrays. bisect_left on values, track prev[]. bisect_left does NOT take key= in Python 3.10."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R65: Continue with more exercises. Try: Segment Tree, Suffix Array, Rabin-Karp, or more DP.",
+  "timestamp": "2026-04-08T20:49:19Z",
+  "unix_time": 1775681359.941411,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

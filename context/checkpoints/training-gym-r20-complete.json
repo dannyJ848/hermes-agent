@@ -1,0 +1,25 @@
+{
+  "label": "training-gym-r20-complete",
+  "context": "Training Gym Round 20 (R20) completed. Resumed from crashed training session. All 7 new real-verification exercises executed + 4 partial-score exercises re-run successfully.\n\nKEY STATE:\n- Training DB: ~/subconscious/training_gym.db\n- 156 exercises total (149 + 7 new), 319 attempts (11 new this session)\n- ALL 7 new exercises use REAL pytest/integration verification — not \"echo done\"\n- 4 previously partial-score exercises re-run and now score 10/10\n- 6 new tips extracted and added to injection_ready_tips.txt\n\nNEW EXERCISES (ALL with real verification):\n1. rv-001 (T3) - Merge sorted function with pytest: 10/10 PASS\n2. rv-002 (T3) - CSV parser verified by golden output: 10/10 PASS\n3. rv-003 (T4) - Fix 5 bugs in Flask app with pytest: 10/10 PASS\n4. rv-004 (T3) - URL validator with regex + 18 pytest cases: 10/10 PASS\n5. rv-005 (T4) - Concurrent task queue with stress test: 10/10 PASS\n6. rv-006 (T4) - LRU cache with O(1) verification + pytest: 10/10 PASS\n7. rv-007 (T5) - Mini SQL engine verified against SQLite: 10/10 PASS\n\nRERUN EXERCISES (all improved to 10/10):\n1. rvt-002 (T8) - Regex tool name extraction: 10/10 (was 7/10)\n2. r3-002 (T10) - Fix broken Python file: 10/10 (was 7/10)\n3. r3-001 (T9) - Build hermes config CLI: 10/10 (was 7/10)\n4. r7-002 (T17) - Lock-free counter with CAS: 10/10 (was 7/10)\n\nNEW TIPS ADDED:\n1. pytest: importlib.util for loading modules in pytest\n2. training_gym: real verification vs echo done (meta tip, 3 votes)\n3. csv_parsing: state machine for quoted field handling\n4. concurrent_programming: Lock > CAS for CPython\n5. sql_engine: verify against SQLite as ground truth\n6. flask_testing: test_client() fixture pattern\n\nKEY INSIGHTS:\n1. R20 is the first round with 100% real verification — all exercises use actual pytest/assertion/file checks\n2. Previous rounds (R1-R19) had 94% echo-done verification — measured confidence not competence\n3. The real verification caught 3 issues: import path (rv-001), CSV edge case (rv-002), quote parsing\n4. Lock-based counters in CPython: 2.97M ops/sec, faster than CAS for individual operations\n\nNEXT ROUND PRIORITIES:\n- Design adversarial exercises where the agent must resist incorrect hints\n- Build exercises that test multi-file refactoring with real pytest\n- Create exercises with deliberately flaky tests that need timing fixes\n- Add exercises that require reading existing hermes-agent code and modifying it\n- Continue building the real-verification exercise library",
+  "active_tasks": [
+    "Training gym R20 complete",
+    "Real verification exercise library growing",
+    "Tip quality improvement ongoing"
+  ],
+  "decisions": [
+    "Switched to 100% real verification for all new exercises",
+    "Re-ran 4 partial-score exercises - all now pass",
+    "Created new 'real_verification' category in training gym",
+    "Discovered importlib.util pattern is essential for pytest module loading"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db",
+    "~/subconscious/injection_ready_tips.txt"
+  ],
+  "next_steps": "Design R21 exercises focused on adversarial self-play and multi-file refactoring with real verification. Continue expanding the real-verification exercise library.",
+  "timestamp": "2026-04-08T16:37:29Z",
+  "unix_time": 1775666249.694853,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

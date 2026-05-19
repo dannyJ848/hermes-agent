@@ -1,0 +1,12 @@
+{
+  "label": "v2-checkpoint-system-live",
+  "context": "test",
+  "active_tasks": [
+    "Checkpoint plugin v2 written",
+    "Echo facts cleaned from DB",
+    "327 cron files pruned",
+    "Gateway restart needed for v2 plugin"
+  ],
+  "timestamp": "2026-04-06T07:09:21Z",
+  "task_id": "20260405_193236_c8c810"
+}

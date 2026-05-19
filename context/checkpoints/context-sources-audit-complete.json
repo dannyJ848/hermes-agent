@@ -1,0 +1,13 @@
+{
+  "label": "context-sources-audit-complete",
+  "context": "Completed full context source audit and remediation for Hermes v0.13.0. Created missing USER.md (user profile: Danny, medical student, The Curator persona, critical infrastructure warnings, work patterns). Created AGENTS.md (workspace conventions: session startup, memory rules, red lines, group chat behavior, heartbeat usage). Removed stale memories/ directory with old cortex-format MEMORY.md and lock files. All context sources now present and committed. Git commit 43fb0a3a3. Skills: 131 dirs (4 hermeshub, 14 superpowers, 5 obsidian, 108 other). Plugins: 43 total. 5 repos smoke-tested. 7 open PRs on NousResearch/hermes-agent.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Address cron stale issue (highest priority pending item)",
+  "timestamp": "2026-05-17T04:33:25Z",
+  "unix_time": 1778992405.2439191,
+  "task_id": "20260516_150530_58a475",
+  "source": "manual",
+  "version": 2
+}

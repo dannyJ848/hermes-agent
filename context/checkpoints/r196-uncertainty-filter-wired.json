@@ -1,0 +1,22 @@
+{
+  "label": "r196-uncertainty-filter-wired",
+  "context": "Training gym R196 complete. Researched 3 frontier papers: Self-Improving Coding Agent (2504.15228), EXIF Skill Discovery (2506.04287), TT-SI Test-Time Self-Improvement (2510.07841). Distilled 11 tips. Built uncertainty_filter.py module — tracks boundary cases (conf 0.3-0.7) and weak spots for focused improvement. Wired into plugin post_tool_call.\n\nFULL MODULE INVENTORY (all wired):\nR153 Nomic dedup, R154 Llama quality, R156 decomposed reward, R157 fitness evolution, R158 next-state signals, R159 ERL reranker, R160 turn credit, R161 trajectory intel, R163 curriculum tracker, R165 adaptive compute, R177 FadeMem decay, R186 PASTE executor, R187 ToolTree planner, R188 PE-EMP Borda, R189 I-MCTS introspective, R193a DGM version archive, R193b Speculative Actions, R194 Memory Consolidation, R195 AgentRR record/replay, R196 TT-SI uncertainty filter.\n\nPlugin: 2798 lines at ~/.hermes/plugins/distillation/__init__.py.\nTips: 1387 active (conf>=0.3).\nDBs in ~/subconscious/: paste_patterns.db, tooltree_scores.db, empirical_mcts.db, imcts_introspective.db, dgm_versions.db, speculative_actions.db, memory_consolidation.db, agent_rr.db, uncertainty_filter.db.\nGateway running. All modules operational.",
+  "active_tasks": [
+    "R197: Continue autonomous training — more research + build + wire"
+  ],
+  "decisions": [
+    "TT-SI uncertainty filter tracks every call — boundary cases (conf 0.3-0.7) get flagged for focused improvement",
+    "AgentRR records every call's tool sequence for replay matching",
+    "All modules use try/except guards with individual sys.path imports to avoid cascade failures"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/uncertainty_filter.py"
+  ],
+  "next_steps": "R197: Continue autonomous loop. Research more frontier papers. Build new modules from EXIF (exploration-first skill discovery) and self-improving coding agent concepts. Consider: skill discovery module, code self-modification tracker, test-time adaptation.",
+  "timestamp": "2026-04-12T06:48:56Z",
+  "unix_time": 1775976536.133312,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

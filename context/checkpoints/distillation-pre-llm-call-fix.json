@@ -1,0 +1,24 @@
+{
+  "label": "distillation-pre-llm-call-fix",
+  "context": "CRITICAL FIX: pre_tool_call returns are DISCARDED by model_tools.py:500. The gateway calls the hook but ignores the return value. Only pre_llm_call (run_agent.py:6962) actually captures and injects plugin returns into the agent's context.\n\nCHANGED the distillation plugin from pre_tool_call → pre_llm_call for the TOP-DOWN injection path. The plugin now:\n- post_tool_call: extracts tips + runs _update_tip_confidence feedback loop\n- pre_llm_call: injects [DISTILLED TOOL RULES] for the 3 weakest tools once per turn\n\nFiles modified:\n- ~/.hermes/plugins/distillation/__init__.py — added _on_pre_llm_call, switched register() from pre_tool_call to pre_llm_call\n- ~/.hermes/plugins/distillation/plugin.yaml — changed provides_hooks from pre_tool_call to pre_llm_call\n- Cache cleared: rm -rf __pycache__/\n\nPlugin tested locally — returns 434 chars of guidance for terminal + read_file rules.\n\nGATEWAY RESTART STILL NEEDED to activate. Command: launchctl kickstart -k gui/501/ai.hermes.gateway",
+  "active_tasks": [
+    "Gateway restart to activate pre_llm_call injection",
+    "Verify [DISTILLED TOOL RULES] appears in new session context",
+    "Monitor tip confidence changes over next few sessions"
+  ],
+  "decisions": [
+    "Switched from pre_tool_call to pre_llm_call because model_tools.py discards pre_tool_call return values",
+    "pre_llm_call fires once per turn (not per tool call) — actually better for giving the agent rules upfront",
+    "Injection limited to 3 weakest tools x 2 tips each = ~6 rules per turn to keep context lean"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/.hermes/plugins/distillation/plugin.yaml"
+  ],
+  "next_steps": "Restart gateway with launchctl kickstart -k gui/501/ai.hermes.gateway, then verify in new hermes chat session that [DISTILLED TOOL RULES] appears in the injected context.",
+  "timestamp": "2026-04-06T23:31:15Z",
+  "unix_time": 1775518275.81348,
+  "task_id": "20260406_160029_bb40d1",
+  "source": "manual",
+  "version": 2
+}

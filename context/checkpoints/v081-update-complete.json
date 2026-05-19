@@ -1,0 +1,21 @@
+{
+  "label": "v081-update-complete",
+  "context": "HERMES v0.8.1 UPDATE COMPLETE. 70+ commits pulled, rebase successful. Gateway restarted and verified.\n\nKey new features integrated:\n1. Skill loading 20% more aggressive (#8286) — Teknium's tweet. Skills now loaded even for tasks agent \"knows\" because skills encode USER PREFERENCES and CONVENTIONS\n2. 69 new hidden-gem tips (279 total platform tips, #8237)  \n3. /compress <focus> — guided compression with focus topic (#8017)\n4. /model picker — native modal for provider→model selection\n5. hermes backup/import commands (#7997)\n6. Gateway restart with graceful drain\n7. Xiaomi MiMo provider\n8. Multiple bug fixes (duplicate spam, empty model config, compression task logging)\n\ncli.py conflict resolved — kept both tips feature AND restart marker.\n\nTRAINING GYM STATE: 2,254 active tips at R250. Plugin: 3,012 lines.\nPapers distilled: 77+, across 35 rounds (R214-R250).\nMAJOR ARCHITECTURE VALIDATIONS: ATLAS, CBR, World Models, Agent Skills Survey.",
+  "active_tasks": [
+    "R251: Resume autonomous training after v0.8.1 update"
+  ],
+  "decisions": [
+    "v0.8.1 integrated cleanly — all features active",
+    "Skill loading improvement is the biggest win — 20% more likely to load right skill",
+    "Training gym at 2,254 tips — ready to resume R251+"
+  ],
+  "files_modified": [
+    "~/hermes-agent/cli.py (conflict resolved — kept both tips + restart marker)"
+  ],
+  "next_steps": "Resume R251+ autonomous training with v0.8.1 features active. 2,254 tips.",
+  "timestamp": "2026-04-12T14:50:55Z",
+  "unix_time": 1776005455.838024,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

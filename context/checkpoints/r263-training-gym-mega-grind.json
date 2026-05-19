@@ -1,0 +1,27 @@
+{
+  "label": "r263-training-gym-mega-grind",
+  "context": "TRAINING GYM MEGA GRIND — R262-R263 session. Building evaluation-driven flywheel + trajectory splicer + toolmaster trial engine.\n\nAUDIT RESULTS (all GREEN):\n- Cerebrum: 1,677 tips (was 1,668 + 8 from R262 + 1 from somewhere), avg conf 0.89, 25 types, integrity ok\n- Hindsight: 9,945 nodes, 398K links, 5,177 docs, localhost:8890\n- Inference: 4/4 UP (Phi-3:8081, Llama:8082, Nomic:8083, MiniMax:8084)\n- Plugin: 3,066 lines, syntax OK, 3 hooks wired\n- Gateway: restarted clean, PID alive\n\nBUILT THIS SESSION:\n1. eval_flywheel.py — Tournament-based tip evaluation. Single-judge Phi-3 (3s/call). FULL SWEEP DONE: 10 domains, 20 tournaments, 80s. All margins=1.0 (single-judge Borda). Win streaks track convergence. Schema: tool_trajectories + trajectory_splices tables.\n   - KEY GOTCHA: CoT prompts 16s/call vs simple winner-selection 3s/call. Must truncate tips to 80+100 chars for Phi-3 ctx=1024.\n   - WIRED into plugin post_tool_call (every 300 calls) + pre_llm_call stats injection.\n\n2. trajectory_splicer.py — Reuses successful tool chains. Progressive prefix matching (JSON arrays, NOT hashes). Chain-ending tools: terminal/write_file/patch/send_message. TESTED: correctly suggests terminal for failed web_search→web_extract→write_file chains (100% success rate from web_search→web_extract→terminal).\n   - KEY GOTCHA: Column index bug — row[0]=tool_sequence not row[1]. Must use isinstance guard before json.loads.\n   - WIRED into plugin post_tool_call (records chain outcomes on chain-ending tools).\n\n3. toolmaster_trial.py — Multi-variant tool trial engine. Schema created, NOT YET WIRED into plugin. Has TOOL_VARIANTS for web_search/web_extract/terminal. Record trial outcomes, get best variant. TESTED: correctly ranks academic>concise>broad for research web_search.\n\n4. R262 distillation: 8 tips inserted (evaluation, trajectory, debugging, architecture, A-Evolve patterns).\n\nPERFORMANCE GOTCHAS:\n- Phi-3 ctx=1024 — tips must be truncated to 80+100 chars in judge prompts or get HTTP 500\n- CoT prompts 16s/call vs simple winner-selection 3s/call\n- Llama 8B at 7 tok/s too slow for batch evaluation\n- Single-judge Borda always gives margin=1.0 (2:1 split) — use win streaks for convergence\n\nFILES:\n- ~/.hermes/plugins/distillation/__init__.py — 3,066 lines\n- ~/subconscious/eval_flywheel.py — 19,333 bytes, tournament evaluation\n- ~/subconscious/trajectory_splicer.py — 11,096 bytes, chain reuse\n- ~/subconscious/toolmaster_trial.py — 8,945 bytes, variant trial engine (NOT YET WIRED)\n- ~/.hermes/cerebrum_memory.db — 1,677 tips\n- /tmp/r262_distill.py — R262 batch (8 tips, DONE)\n\nNEXT STEPS:\n1. Wire toolmaster_trial.py into plugin\n2. Build proxmo_credit.py (per-step credit assignment)\n3. Run full training gym round with all 3 modules active\n4. Distill build findings (R263)\n5. Continue training grind rounds",
+  "active_tasks": [
+    "train3: GO MEGA HARD on training gym (in_progress) — wire toolmaster_trial, build proxmo_credit, run training round"
+  ],
+  "decisions": [
+    "Single-judge Phi-3 (3s/call) over CoT multi-judge (16s/call) for background evaluation",
+    "Progressive JSON prefix matching over hash matching for trajectory splicing",
+    "Chain-ending tools: terminal/write_file/patch/send_message for boundary detection",
+    "All margins=1.0 with single judge — use win streaks for convergence detection"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py (3,066 lines, added flywheel+splicer wiring)",
+    "~/subconscious/eval_flywheel.py (NEW, tournament evaluation)",
+    "~/subconscious/trajectory_splicer.py (NEW, chain reuse)",
+    "~/subconscious/toolmaster_trial.py (NEW, variant trial, NOT YET WIRED)",
+    "~/.hermes/cerebrum_memory.db (1,677 tips, +8 from R262)",
+    "~/.hermes/plugins/distillation/plugin.yaml (added pre_tool_call hook)"
+  ],
+  "next_steps": "Wire toolmaster_trial.py into plugin (pre_tool_call hook — suggest best variant), then build proxmo_credit.py for per-step credit assignment, then run full training gym round with all modules active.",
+  "timestamp": "2026-04-13T00:18:56Z",
+  "unix_time": 1776039536.048991,
+  "task_id": "20260412_105213_9a3360",
+  "source": "manual",
+  "version": 2
+}

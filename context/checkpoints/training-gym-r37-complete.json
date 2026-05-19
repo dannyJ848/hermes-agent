@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r37-complete",
+  "context": "Training Gym R37 completed. All 4 exercises 10/10 (3 required test fixes — wrong expected values).\n\nR37 RESULTS (all 10/10):\n1. kmp-001 (T6) - KMP with LPS/failure function. 6 tests. Bug: ABABABA has 3 occurrences of ABA not 2.\n2. topk-001 (T6) - Top-K Frequent via bucket sort. 6 tests. Bug: test expected wrong kth element.\n3. splay-001 (T8) - Splay Tree with zig/zag rotations. 5 tests. Bug: insert(k) sets value=None, search returns None for found keys — test used `is not None`.\n4. rabin-karp-001 (T6) - Rolling hash polynomial + Rabin-Karp search. 6 tests. First pass clean.\n\nKEY PATTERNS:\n- KMP LPS: when mismatch and length>0, backtrack to lps[length-1]\n- Bucket sort topk: buckets[count].sort() for tie-breaking, iterate from n down to 1\n- Splay search: track last-accessed node, splay it if not found. Use value=k to avoid None confusion.\n- Rolling hash: roll = (old - old_char * base^(len-1)) * base + new_char, all mod prime\n\nDB: 222 exercises, 387 attempts, avg 9.86",
+  "active_tasks": [
+    "R37 complete",
+    "R38 next"
+  ],
+  "decisions": [
+    "Splay tree: always use explicit value parameter in tests, never rely on None default",
+    "KMP: manually count overlapping pattern occurrences before writing assertions",
+    "Top-K: verify frequency map before asserting kth element",
+    "Rabin-Karp: always verify string match after hash collision to avoid false positives"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R38 exercises. Continue with: Segment Tree (range query), Bloom Filter, Aho-Corasick, or Trie with autocomplete.",
+  "timestamp": "2026-04-08T18:38:49Z",
+  "unix_time": 1775673529.7677948,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

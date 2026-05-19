@@ -1,0 +1,21 @@
+{
+  "label": "dgx-training-deadlock-debug",
+  "context": "DGX Spark GB10 training is blocked by a fundamental issue: Qwen3.5's linear attention architecture causes a deadlock when gradient checkpointing is enabled. Without gradient checkpointing, training OOMs at 117GB GPU even with seq_len=1024 and r=128 LoRA.\n\nKey findings:\n1. Model loads fine (51GB GPU)\n2. LoRA applies fine\n3. With gradient_checkpointing_enable(use_reentrant=False): Deadlock at first forward pass, process enters D state (uninterruptible sleep)\n4. With gradient_checkpointing_enable(use_reentrant=True): Same deadlock\n5. Without gradient checkpointing: OOM at 117GB during first forward+backward\n6. System has 121GB GPU, 128GB RAM\n7. The May 8 script (train_lora_sae_teacher_v1.py) supposedly worked with gradient checkpointing on same hardware - but that may have been a different model checkpoint or the deadlock is intermittent\n\nAttempted solutions that failed:\n- Custom training loop with/without gradient checkpointing\n- systemd service for process management\n- Reduced seq_len to 1024, r=128\n- 8-bit AdamW optimizer\n- Unsloth installation failed (GPU detection issue)\n\nNext steps to try in fresh session:\n1. Check if the May 8 script actually works (it has hardcoded log path /mnt/bigssd/)\n2. Try QLoRA with bitsandbytes 4-bit quantization\n3. Try installing flash-linear-attention package for the model\n4. Try using torch.compile() or different attention implementations\n5. Consider using a smaller base model (Qwen 7B/14B)\n6. Try the transformers Trainer with gradient_accumulation but no checkpointing\n\nCurrent files on DGX:\n- /data/SpecForge/custom_dflash/train_micro.py (r=128, seq=1024, no GC)\n- /data/SpecForge/custom_dflash/train_reentrant.py (r=256, seq=4096, GC with use_reentrant=True)\n- /data/SpecForge/custom_dflash/train_nogc_smallbatch.py (r=256, seq=2048, no GC)\n- /data/SpecForge/custom_dflash/train_lora_sae_teacher_v1.py (May 8 working script - has log path issues)\n- systemd service: /etc/systemd/system/qwen-training.service\n\nPre-tokenized data: /data/SpecForge/custom_dflash/preprocessed/tier1_preprocessed.jsonl (327k examples)",
+  "active_tasks": [
+    "Fix DGX training deadlock",
+    "Test May 8 script with corrected paths",
+    "Try QLoRA as fallback"
+  ],
+  "decisions": [
+    "Gradient checkpointing is incompatible with Qwen3.5 linear attention on this setup",
+    "Need to either fix the attention implementation or use quantization",
+    "Systemd is reliable for keeping training alive once it works"
+  ],
+  "files_modified": [],
+  "next_steps": "Start fresh CLI session. First action: fix the May 8 script's log path and test if it actually works with gradient checkpointing. If that fails, try QLoRA or flash-linear-attention installation.",
+  "timestamp": "2026-05-14T02:54:31Z",
+  "unix_time": 1778727271.612,
+  "task_id": "20260513_170648_7b623f",
+  "source": "manual",
+  "version": 2
+}

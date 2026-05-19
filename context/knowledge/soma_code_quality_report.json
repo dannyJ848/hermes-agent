@@ -1,0 +1,4733 @@
+{
+  "summary": {
+    "timestamp": "2026-04-05T01:49:59.714851",
+    "metrics": {
+      "total_lines": 291882,
+      "total_files": 676,
+      "ts_files": 403,
+      "tsx_files": 273
+    },
+    "issue_counts": {
+      "any_types": 257,
+      "todo_comments": 43,
+      "console_log": 427,
+      "large_functions": 168,
+      "empty_catch": 0,
+      "hardcoded_strings": 0,
+      "unused_imports_suspects": 0
+    },
+    "total_issues": 895,
+    "top_any_type_files": {
+      "src/services/ContentService.ts": 34,
+      "core/knowledge-graph/knowledge-index.ts": 14,
+      "src/components/panels/usePathologyContent.ts": 13,
+      "src/vitals/core/vitals/index.ts": 12,
+      "src/vitals/core/vitals/reference-ranges.ts": 12,
+      "src/utils/dataLoading.ts": 11,
+      "src/utils/performanceMonitor.ts": 8,
+      "src/brainContentRAG.ts": 7,
+      "src/AnatomyMainScreen/RegionalDetailView.tsx": 6,
+      "src/search/SearchEngine.ts": 6
+    },
+    "top_console_log_files": {
+      "src/anatomy/GLBAnatomyModel.tsx": 19,
+      "src/ragContentRetrieval.ts": 18,
+      "src/utils/SafariDebugSession.ts": 18,
+      "src/AnatomyViewer.tsx": 16,
+      "src/hooks/useVoiceNavigation.ts": 16,
+      "src/contentRetrieval.ts": 15,
+      "src/anatomy/ModelLoadingManager.ts": 15,
+      "src/utils/assetPathResolver.ts": 14,
+      "src/errors/logger.ts": 14,
+      "src/App.tsx": 13
+    },
+    "largest_functions": [
+      {
+        "file": "src/App.tsx",
+        "start_line": 195,
+        "lines": 1336,
+        "signature": "function App() {"
+      },
+      {
+        "file": "src/components/panels/PathologyPanel.tsx",
+        "start_line": 816,
+        "lines": 710,
+        "signature": "function PanelStyles() {"
+      },
+      {
+        "file": "src/settings/useSettings.tsx",
+        "start_line": 132,
+        "lines": 475,
+        "signature": "export function useSettings(): UseSettingsReturn {"
+      },
+      {
+        "file": "src/settings/DataManagement.tsx",
+        "start_line": 17,
+        "lines": 471,
+        "signature": "export function DataManagement() {"
+      },
+      {
+        "file": "src/ai/useAI.ts",
+        "start_line": 39,
+        "lines": 416,
+        "signature": "export function useAI() {"
+      }
+    ]
+  },
+  "details": {
+    "any_types": [
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 1,
+        "code": "export function createKnowledgeIndex(...args: any[]): any { return {}; }"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 2,
+        "code": "export const KnowledgeIndex: any = {};"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 40,
+        "code": "query(query: any): KnowledgeNode[];"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 41,
+        "code": "traverse(startId: string, options?: any): KnowledgeNode[];"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 43,
+        "code": "getSymptomsForCondition(conditionId: string): any[];"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 44,
+        "code": "getMedicationsForCondition(conditionId: string): any[];"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 45,
+        "code": "getProceduresForCondition(conditionId: string): any[];"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 46,
+        "code": "getSpecialistsForCondition(conditionId: string): any[];"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 48,
+        "code": "getAnatomyForSymptom(symptomId: string): any[];"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 49,
+        "code": "getConditionsForRegion(region: string): any[];"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 51,
+        "code": "getAnatomyForProcedure(procedureId: string): any[];"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 52,
+        "code": "getSystemsForMedication(medicationId: string): any[];"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 63,
+        "code": "query: (q: any) => [],"
+      },
+      {
+        "file": "core/knowledge-graph/knowledge-index.ts",
+        "line": 64,
+        "code": "traverse: (startId: string, opts?: any) => [],"
+      },
+      {
+        "file": "core/knowledge-graph/search-engine.ts",
+        "line": 1,
+        "code": "export function createSearchEngine(...args: any[]): any { return {}; }"
+      },
+      {
+        "file": "core/knowledge-graph/search-engine.ts",
+        "line": 2,
+        "code": "export const KnowledgeSearchEngine: any = {};"
+      },
+      {
+        "file": "core/knowledge-graph/search-engine.ts",
+        "line": 19,
+        "code": "[key: string]: any;"
+      },
+      {
+        "file": "core/knowledge-graph/search-engine.ts",
+        "line": 30,
+        "code": "node?: any;"
+      },
+      {
+        "file": "core/knowledge-graph/search-engine.ts",
+        "line": 38,
+        "code": "index(documents: any[]): void {}"
+      },
+      {
+        "file": "core/medical-simulation/medications/store.ts",
+        "line": 413,
+        "code": "affectedSystems: [...new Set(drug.mechanism?.physiologicalEffects.map((e) => e.s"
+      },
+      {
+        "file": "core/medical-simulation/encyclopedia/image-resolver.ts",
+        "line": 4,
+        "code": "export function getEntryImages(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "core/medical-simulation/encyclopedia/image-resolver.ts",
+        "line": 5,
+        "code": "export function searchImagesMultilingual(...args: any[]): any { return undefined"
+      },
+      {
+        "file": "core/content/content-action-router.ts",
+        "line": 4,
+        "code": "export function resolveConditionToEntry(...args: any[]): any { return undefined;"
+      },
+      {
+        "file": "core/content/content-action-router.ts",
+        "line": 5,
+        "code": "export function resolveContent(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "core/content/generated-image-index.ts",
+        "line": 22,
+        "code": "export const indexedImages = [{ \"id\": \"dummy\" } as any, {\"id\": \"anatomy-cardiova"
+      },
+      {
+        "file": "core/content/store.ts",
+        "line": 4,
+        "code": "export function getContentForLevel(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "core/content/store.ts",
+        "line": 5,
+        "code": "export function searchContent(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "core/content/vitals/index.ts",
+        "line": 4,
+        "code": "export function bloodPressure(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "core/content/vitals/index.ts",
+        "line": 5,
+        "code": "export function heartRate(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "core/content/vitals/index.ts",
+        "line": 6,
+        "code": "export function respiratoryRate(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "core/content/anatomy/anatomy-encyclopedia.ts",
+        "line": 4,
+        "code": "export function searchAnatomyRegions(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "core/content/symptoms/symptom-database.ts",
+        "line": 4,
+        "code": "export function searchSymptomsByName(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "core/ai/medical-dictation-matcher.ts",
+        "line": 11,
+        "code": "[key: string]: any;"
+      },
+      {
+        "file": "core/ai/medical-dictation-matcher.ts",
+        "line": 17,
+        "code": "[key: string]: any;"
+      },
+      {
+        "file": "core/i18n/medical-glossary.ts",
+        "line": 4,
+        "code": "export const MEDICAL_GLOSSARY: any = {};"
+      },
+      {
+        "file": "core/i18n/medical-glossary.ts",
+        "line": 6,
+        "code": "export function getPlainLanguage(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 210,
+        "code": "const isBrowserDev = typeof window !== 'undefined' && !(window as any).__TAURI_I"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 250,
+        "code": "const GlobalSearch = ({ onResultSelect, onOpenChange, defaultOpen }: any) => nul"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 251,
+        "code": "const KeyboardShortcutsHelp = ({ isOpen, onClose }: any) => null;"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 1123,
+        "code": "onNavigate={(view: any) => {"
+      },
+      {
+        "file": "src/MedicationExplorer.tsx",
+        "line": 689,
+        "code": "navigation.setViewPreset(anatomy.recommendedView as any);"
+      },
+      {
+        "file": "src/ContentViewer.tsx",
+        "line": 78,
+        "code": "level: parseInt((h.tagName as any).substring(1)),"
+      },
+      {
+        "file": "src/ContentViewer.tsx",
+        "line": 94,
+        "code": "const relevantText = (highlightedCitation.relevantText as any).substring(0, 50);"
+      },
+      {
+        "file": "src/ContentViewer.tsx",
+        "line": 99,
+        "code": "if (node.textContent?.includes((relevantText as any).substring(0, 30))) {"
+      },
+      {
+        "file": "src/AnatomyLaunchpad.tsx",
+        "line": 518,
+        "code": "onClick={(e) => handleRegionClick(regionId, e as any)}"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 50,
+        "code": "Object.values(anatomyModule).forEach((content: any) => {"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 57,
+        "code": "Object.values(histologyModule).forEach((content: any) => {"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 64,
+        "code": "Object.values(pathologyModule).forEach((content: any) => {"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 71,
+        "code": "Object.values(physiologyModule).forEach((content: any) => {"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 78,
+        "code": "Object.values(clinicalModule).forEach((content: any) => {"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 243,
+        "code": "function formatBrainContent(levelContent: any): string {"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 256,
+        "code": "levelContent.keyTerms.forEach((term: any) => {"
+      },
+      {
+        "file": "src/BodyCentricHome.tsx",
+        "line": 220,
+        "code": "const anatomyViewerRef = useRef<any>(null);"
+      },
+      {
+        "file": "src/EncyclopediaEntry.tsx",
+        "line": 518,
+        "code": "enableLayers(link.enableLayers as any);"
+      },
+      {
+        "file": "src/EncyclopediaEntry.tsx",
+        "line": 802,
+        "code": "<ReferenceItem key={(ref as any).referenceId ?? idx} reference={ref} index={idx}"
+      },
+      {
+        "file": "src/ModelLoader.tsx",
+        "line": 559,
+        "code": "const deviceMemory = (navigator as any).deviceMemory;"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 635,
+        "code": "controlsRef: React.RefObject<any>;"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 890,
+        "code": "const controlsRef = useRef<any>(null);"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 987,
+        "code": "const handleCanvasCreated = useCallback((state: any) => {"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 2244,
+        "code": "onSetRenderMode={(id, mode) => layerSystem.setLayerRenderMode(id as AnatomicalLa"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 2246,
+        "code": "onApplyPreset={(presetId) => layerSystem.applyPreset(presetId as any)}"
+      },
+      {
+        "file": "src/ModelAutoLoader.tsx",
+        "line": 47,
+        "code": "const win = window as any;"
+      },
+      {
+        "file": "src/ConditionSimulator.tsx",
+        "line": 1062,
+        "code": "const nameToResolve = language === 'es' && (comp as any).nameEs"
+      },
+      {
+        "file": "src/ConditionSimulator.tsx",
+        "line": 1063,
+        "code": "? (comp as any).nameEs"
+      },
+      {
+        "file": "src/vitals/VitalEducation.tsx",
+        "line": 62,
+        "code": "content: heartRate as any,"
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 3,
+        "code": "export function analyzeAllCorrelations(...args: any[]): any { return undefined; "
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 4,
+        "code": "export function analyzeTrend(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 5,
+        "code": "export function analyzeTrendsFromSummaries(...args: any[]): any { return undefin"
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 6,
+        "code": "export function detectBaselineShift(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 7,
+        "code": "export function filterAlerts(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 8,
+        "code": "export function formatVitalDate(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 9,
+        "code": "export function formatVitalValue(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 10,
+        "code": "export function getPersonalizedRange(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 11,
+        "code": "export function getReferenceRange(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 12,
+        "code": "export function mean(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 13,
+        "code": "export function processAllAlerts(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/vitals/core/vitals/index.ts",
+        "line": 14,
+        "code": "export function standardDeviation(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 4,
+        "code": "export const BLOOD_GLUCOSE_FASTING_RANGES: any = {};"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 5,
+        "code": "export const BLOOD_PRESSURE_DIASTOLIC_RANGES: any = {};"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 6,
+        "code": "export const BLOOD_PRESSURE_SYSTOLIC_RANGES: any = {};"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 7,
+        "code": "export const DEEP_SLEEP_RANGES: any = {};"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 8,
+        "code": "export const HEART_RATE_RANGES: any = {};"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 9,
+        "code": "export const HRV_RMSSD_RANGES: any = {};"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 10,
+        "code": "export const OXYGEN_SATURATION_RANGES: any = {};"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 11,
+        "code": "export const RECOVERY_SCORE_RANGES: any = {};"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 12,
+        "code": "export const REM_SLEEP_RANGES: any = {};"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 13,
+        "code": "export const RESPIRATORY_RATE_RANGES: any = {};"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 14,
+        "code": "export const SLEEP_DURATION_RANGES: any = {};"
+      },
+      {
+        "file": "src/vitals/core/vitals/reference-ranges.ts",
+        "line": 15,
+        "code": "export const TEMPERATURE_RANGES: any = {};"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "line": 1462,
+        "code": "bodySystems: [...systemMapping.anatomy, ...systemMapping.specialty.filter(s => !"
+      },
+      {
+        "file": "src/AnatomyMainScreen/RegionalDetailView.tsx",
+        "line": 469,
+        "code": "onLayerChange={handleLayerChange as any}"
+      },
+      {
+        "file": "src/AnatomyMainScreen/RegionalDetailView.tsx",
+        "line": 484,
+        "code": "conditions={patientDataForRegion.conditions as any}"
+      },
+      {
+        "file": "src/AnatomyMainScreen/RegionalDetailView.tsx",
+        "line": 485,
+        "code": "symptoms={patientDataForRegion.symptoms as any}"
+      },
+      {
+        "file": "src/AnatomyMainScreen/RegionalDetailView.tsx",
+        "line": 486,
+        "code": "medications={patientDataForRegion.medications as any}"
+      },
+      {
+        "file": "src/AnatomyMainScreen/RegionalDetailView.tsx",
+        "line": 487,
+        "code": "labs={patientDataForRegion.labs as any}"
+      },
+      {
+        "file": "src/AnatomyMainScreen/RegionalDetailView.tsx",
+        "line": 488,
+        "code": "imaging={patientDataForRegion.imaging as any}"
+      },
+      {
+        "file": "src/AnatomyMainScreen/core/labs/reference-ranges.ts",
+        "line": 4,
+        "code": "export const REFERENCE_RANGES: any = {};"
+      },
+      {
+        "file": "src/AnatomyMainScreen/core/labs/reference-ranges.ts",
+        "line": 6,
+        "code": "export function getApplicableReferenceRange(...args: any[]): any { return undefi"
+      },
+      {
+        "file": "src/AnatomyMainScreen/hooks/useRegionalEncyclopedia.ts",
+        "line": 427,
+        "code": ".getSpecialtiesForBodySystem(system as any)"
+      },
+      {
+        "file": "src/AnatomyMainScreen/hooks/usePatientDataForRegion.ts",
+        "line": 185,
+        "code": "const imaging = filterImaging(patientData.imaging as any, regionId);"
+      },
+      {
+        "file": "src/AnatomyMainScreen/hooks/useMedicationPharmacology.ts",
+        "line": 164,
+        "code": "const results = (searchMechanisms as any)(drugClass) as any[];"
+      },
+      {
+        "file": "src/AnatomyMainScreen/hooks/useMedicationPharmacology.ts",
+        "line": 180,
+        "code": "const entries = (getSideEffectsForDrug as any)(drugName) as any[];"
+      },
+      {
+        "file": "src/AnatomyMainScreen/hooks/useMedicationPharmacology.ts",
+        "line": 189,
+        "code": "const entries = (getInteractionsForDrug as any)(drugName) as any[];"
+      },
+      {
+        "file": "src/AnatomyMainScreen/hooks/useMedicationPharmacology.ts",
+        "line": 239,
+        "code": "const patientMechanism = (mechanismExplained as any)?.whatItDoes as string | und"
+      },
+      {
+        "file": "src/AnatomyMainScreen/hooks/useMedicationPharmacology.ts",
+        "line": 240,
+        "code": "const mechanismAnalogy = (mechanismExplained as any)?.analogy as string | undefi"
+      },
+      {
+        "file": "src/contexts/VoiceContext.tsx",
+        "line": 436,
+        "code": "availableVoices: availableVoicesRef.current as any,"
+      },
+      {
+        "file": "src/anatomy/PinningStorage.ts",
+        "line": 191,
+        "code": "migrate: (oldData: any): UserPin[] => {"
+      },
+      {
+        "file": "src/anatomy/PinningStorage.ts",
+        "line": 195,
+        "code": "return oldData.map((pin: any) => {"
+      },
+      {
+        "file": "src/anatomy/PinningStorage.ts",
+        "line": 222,
+        "code": "getVersion: (data: any): string | null => {"
+      },
+      {
+        "file": "src/anatomy/PinningSystem.tsx",
+        "line": 168,
+        "code": "const loadedPins = parsed.map((p: any) => ({"
+      },
+      {
+        "file": "src/anatomy/PinningSystem.tsx",
+        "line": 337,
+        "code": "const importedPins = data.pins.map((p: any) => ({"
+      },
+      {
+        "file": "src/anatomy/PinningSystem.tsx",
+        "line": 361,
+        "code": "const intersect = (event as any).intersections?.[0];"
+      },
+      {
+        "file": "src/anatomy/ProgressiveAnatomyModel.tsx",
+        "line": 586,
+        "code": "if (GLB_SYSTEMS.includes(structure.system as any)) return false;"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 334,
+        "code": "const gl = (window as any).webkitWebGLRenderingContext ||"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 335,
+        "code": "(window as any).WebGLRenderingContext;"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 372,
+        "code": "const hasWebGL = !!(window as any).webkitWebGLRenderingContext || !!(window as a"
+      },
+      {
+        "file": "src/anatomy/EnhancedCameraControls.tsx",
+        "line": 132,
+        "code": "controlsRef?: React.RefObject<any>;"
+      },
+      {
+        "file": "src/anatomy/HDREnvironmentSystem.tsx",
+        "line": 449,
+        "code": "const renderer = (scene as any).gl as THREE.WebGLRenderer;"
+      },
+      {
+        "file": "src/anatomy/CinematicCameraSystem.tsx",
+        "line": 380,
+        "code": "const controlsRef = useRef<any>(null);"
+      },
+      {
+        "file": "src/anatomy/CinematicCameraSystem.tsx",
+        "line": 555,
+        "code": "const controlsRef = useRef<any>(null);"
+      },
+      {
+        "file": "src/anatomy/CompleteAnatomyFeatures.tsx",
+        "line": 237,
+        "code": "(window as any).__completeAnatomyAPI = api;"
+      },
+      {
+        "file": "src/anatomy/CompleteAnatomyFeatures.tsx",
+        "line": 239,
+        "code": "delete (window as any).__completeAnatomyAPI;"
+      },
+      {
+        "file": "src/anatomy/AnatomyActionExecutor.ts",
+        "line": 667,
+        "code": "private controls: any | null = null;"
+      },
+      {
+        "file": "src/anatomy/AnatomyActionExecutor.ts",
+        "line": 708,
+        "code": "initialize(scene: THREE.Scene, camera: THREE.Camera, controls: any): void {"
+      },
+      {
+        "file": "src/anatomy/AnatomyActionExecutor.ts",
+        "line": 801,
+        "code": "error: new Error(`Unknown action type: ${(action as any).type}`),"
+      },
+      {
+        "file": "src/anatomy/AnatomyActionExecutor.ts",
+        "line": 1817,
+        "code": "initialize: (scene: THREE.Scene, camera: THREE.Camera, controls: any) => void;"
+      },
+      {
+        "file": "src/anatomy/AnatomyActionExecutor.ts",
+        "line": 1847,
+        "code": "const initialize = useCallback((scene: THREE.Scene, camera: THREE.Camera, contro"
+      },
+      {
+        "file": "src/anatomy/MeasurementSystem.tsx",
+        "line": 196,
+        "code": "<line ref={lineRef as any} geometry={geometry} material={material}>"
+      },
+      {
+        "file": "src/anatomy/performance/PerformanceMonitor.tsx",
+        "line": 209,
+        "code": "const perfMem = (performance as any).memory;"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 101,
+        "code": "const memory = (navigator as any).deviceMemory || 4;"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 139,
+        "code": "this.metrics.deviceMemory = (navigator as any).deviceMemory;"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 164,
+        "code": "const memory = (performance as any).memory;"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 344,
+        "code": "const firstEntry = entries[0] as any;"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 353,
+        "code": "if (!(entry as any).hadRecentInput) {"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 354,
+        "code": "cls += (entry as any).value;"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 390,
+        "code": "export function throttle<T extends (...args: any[]) => any>("
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 407,
+        "code": "export function debounce<T extends (...args: any[]) => any>("
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 130,
+        "code": "const memory = (window.performance as any).memory;"
+      },
+      {
+        "file": "src/utils/anatomy3DEventBus.ts",
+        "line": 125,
+        "code": "private listeners: Map<Anatomy3DEventType, Set<Anatomy3DEventHandler<any>>> = ne"
+      },
+      {
+        "file": "src/utils/anatomy3DEventBus.ts",
+        "line": 126,
+        "code": "private globalListeners: Set<Anatomy3DEventHandler<any>> = new Set();"
+      },
+      {
+        "file": "src/utils/anatomy3DEventBus.ts",
+        "line": 173,
+        "code": "onAll(handler: Anatomy3DEventHandler<any>): () => void {"
+      },
+      {
+        "file": "src/utils/intentEventBus.ts",
+        "line": 35,
+        "code": "private listeners: Map<IntentEventType, Set<IntentEventHandler<any>>> = new Map("
+      },
+      {
+        "file": "src/utils/intentEventBus.ts",
+        "line": 36,
+        "code": "private globalListeners: Set<IntentEventHandler<any>> = new Set();"
+      },
+      {
+        "file": "src/utils/intentEventBus.ts",
+        "line": 83,
+        "code": "onAll(handler: IntentEventHandler<any>): () => void {"
+      },
+      {
+        "file": "src/utils/reactOptimizations.tsx",
+        "line": 224,
+        "code": "export function useStableEventHandler<T extends (...args: any[]) => any>(handler"
+      },
+      {
+        "file": "src/utils/reactOptimizations.tsx",
+        "line": 359,
+        "code": "const changedProps: Partial<Record<keyof T, { from: any; to: any }>> = {};"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 40,
+        "code": "const pendingRequests = new Map<string, Promise<any>>();"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 68,
+        "code": "private cache = new Map<string, CacheEntry<any>>();"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 334,
+        "code": "fetch: () => Promise<any>;"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 348,
+        "code": "fetchFn: () => Promise<any>,"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 371,
+        "code": "async prefetchNow(key: string, fetchFn: () => Promise<any>): Promise<void> {"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 407,
+        "code": "(window as any).requestIdleCallback(processNext, { timeout: 2000 });"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 417,
+        "code": "(window as any).requestIdleCallback(processNext, { timeout: 1000 });"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 453,
+        "code": "reject: (error: any) => void;"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 457,
+        "code": "private queues: Map<LoadPriority, PrioritizedTask<any>[]> = new Map(["
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 488,
+        "code": "let task: PrioritizedTask<any> | undefined;"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 546,
+        "code": "let pendingPromises: Map<K, { resolve: (v: V) => void; reject: (e: any) => void "
+      },
+      {
+        "file": "src/search/SearchEngine.ts",
+        "line": 796,
+        "code": "return this.recentSearches.slice(0, limit).map((s: any) => s.query || s);"
+      },
+      {
+        "file": "src/search/SearchEngine.ts",
+        "line": 800,
+        "code": "const results = this.search({ query, limit } as any);"
+      },
+      {
+        "file": "src/search/SearchEngine.ts",
+        "line": 801,
+        "code": "return (results as any)?.results ?? [];"
+      },
+      {
+        "file": "src/search/SearchEngine.ts",
+        "line": 819,
+        "code": "return this.recentSearches.slice(0, limit).map((s: any) => s.query || s);"
+      },
+      {
+        "file": "src/search/SearchEngine.ts",
+        "line": 823,
+        "code": "const results = this.search({ query, limit } as any);"
+      },
+      {
+        "file": "src/search/SearchEngine.ts",
+        "line": 824,
+        "code": "return (results as any)?.results ?? [];"
+      },
+      {
+        "file": "src/search/core/searchIndex.ts",
+        "line": 9,
+        "code": "export const createSearchIndex: any = () => ({});"
+      },
+      {
+        "file": "src/search/core/searchIndex.ts",
+        "line": 15,
+        "code": "export function getPostings(_term: string): any[] {"
+      },
+      {
+        "file": "src/search/core/searchIndex.ts",
+        "line": 23,
+        "code": "export function getDocument(_id: string): any {"
+      },
+      {
+        "file": "src/search/core/searchIndex.ts",
+        "line": 27,
+        "code": "export function getAllDocuments(): any[] {"
+      },
+      {
+        "file": "src/search/components/SearchBar.tsx",
+        "line": 213,
+        "code": "(window as any).SpeechRecognition ||"
+      },
+      {
+        "file": "src/search/components/SearchBar.tsx",
+        "line": 214,
+        "code": "(window as any).webkitSpeechRecognition;"
+      },
+      {
+        "file": "src/search/components/SearchBar.tsx",
+        "line": 221,
+        "code": "recognition.onresult = (event: any) => {"
+      },
+      {
+        "file": "src/search/components/SearchFilters.tsx",
+        "line": 132,
+        "code": "setLocalFilters({} as any);"
+      },
+      {
+        "file": "src/search/components/SearchFilters.tsx",
+        "line": 134,
+        "code": "setFilters({} as any);"
+      },
+      {
+        "file": "src/search/components/SearchProvider.tsx",
+        "line": 114,
+        "code": "suggestions: action.payload.suggestions as any,"
+      },
+      {
+        "file": "src/search/components/SearchProvider.tsx",
+        "line": 268,
+        "code": "} as any);"
+      },
+      {
+        "file": "src/search/components/SearchProvider.tsx",
+        "line": 358,
+        "code": "} as any);"
+      },
+      {
+        "file": "src/dashboard/HealthDashboard.tsx",
+        "line": 267,
+        "code": "const result: Record<VitalType, VitalDataPoint | null> = {} as any;"
+      },
+      {
+        "file": "src/dashboard/HealthDashboard.tsx",
+        "line": 282,
+        "code": "const result: Record<VitalType, 'up' | 'down' | 'stable'> = {} as any;"
+      },
+      {
+        "file": "src/components/AIMedicalEncyclopedia.tsx",
+        "line": 943,
+        "code": "<span className=\"item-name\">{language === 'es' && (condition as any).nameEs ? (c"
+      },
+      {
+        "file": "src/components/ContentImageGallery.tsx",
+        "line": 291,
+        "code": "systems: systems || (tags as any)?.systems,"
+      },
+      {
+        "file": "src/components/ContentImageGallery.tsx",
+        "line": 304,
+        "code": "}, [contentId, tags, systems, category, maxImages, contentType, keywordsEs, keyw"
+      },
+      {
+        "file": "src/components/ConditionDetailView.tsx",
+        "line": 276,
+        "code": "<span className={`cdv-relevance-badge cdv-relevance-${(content.tags as any).clin"
+      },
+      {
+        "file": "src/components/ConditionDetailView.tsx",
+        "line": 277,
+        "code": "{(content.tags as any).clinicalRelevance as any} {loc('clinical relevance', 'rel"
+      },
+      {
+        "file": "src/components/settings/SettingsPage.tsx",
+        "line": 48,
+        "code": "value?: any;"
+      },
+      {
+        "file": "src/components/3d/EnhancedCameraControls.tsx",
+        "line": 326,
+        "code": "const controlsRef = useRef<any>(null);"
+      },
+      {
+        "file": "src/components/core/content/unified-image-bridge.ts",
+        "line": 7,
+        "code": "export function getImagesForContent(...args: any[]): any { return undefined; }"
+      },
+      {
+        "file": "src/components/core/content/specialties/specialty-map.ts",
+        "line": 6,
+        "code": "export const MEDICAL_SPECIALTIES: any = {};"
+      },
+      {
+        "file": "src/components/core/content/specialties/specialty-map.ts",
+        "line": 8,
+        "code": "export function getSpecialtiesByCategory(...args: any[]): any { return undefined"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 286,
+        "code": "]) as any[];"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 289,
+        "code": "(cvMod as any).cardiovascularConditions ?? [],"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 290,
+        "code": "(respMod as any).respiratoryConditions ?? [],"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 291,
+        "code": "(metabMod as any).metabolicConditions ?? [],"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 292,
+        "code": "(giMod as any).gastrointestinalConditions ?? [],"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 293,
+        "code": "(neuroMod as any).neurologicalConditions ?? [],"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 294,
+        "code": "(mhMod as any).mentalHealthConditions ?? [],"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 295,
+        "code": "(mskMod as any).musculoskeletalConditions ?? [],"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 296,
+        "code": "(oncoMod as any).oncologyConditions ?? [],"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 297,
+        "code": "(infectMod as any).infectiousConditions ?? [],"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 298,
+        "code": "(renalMod as any).renalConditions ?? [],"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 299,
+        "code": "(dermMod as any).dermatologyConditions ?? [],"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "line": 300,
+        "code": "(hemMod as any).hematologicConditions ?? [],"
+      },
+      {
+        "file": "src/ai/EducationalContextBuilder.ts",
+        "line": 2574,
+        "code": "status: c.status as any,"
+      },
+      {
+        "file": "src/ai/EducationalContextBuilder.ts",
+        "line": 2592,
+        "code": "status: l.status as any,"
+      },
+      {
+        "file": "src/ai/components/AIChatEnhanced.tsx",
+        "line": 256,
+        "code": "onChange={(e) => context.setExplanationLevel(e.target.value as any)}"
+      },
+      {
+        "file": "src/hooks/useVoiceFallback.ts",
+        "line": 169,
+        "code": "(window.SpeechRecognition || (window as any).webkitSpeechRecognition)"
+      },
+      {
+        "file": "src/hooks/useVoiceFallback.ts",
+        "line": 187,
+        "code": "(window as any).webkitSpeechRecognition ||"
+      },
+      {
+        "file": "src/hooks/usePerformance.ts",
+        "line": 130,
+        "code": "export function useThrottledCallback<T extends (...args: any[]) => any>("
+      },
+      {
+        "file": "src/hooks/usePerformance.ts",
+        "line": 150,
+        "code": "export function useDebouncedCallback<T extends (...args: any[]) => any>("
+      },
+      {
+        "file": "src/hooks/usePerformance.ts",
+        "line": 304,
+        "code": "export function useStableCallback<T extends (...args: any[]) => any>(callback: T"
+      },
+      {
+        "file": "src/hooks/useUserDemographics.ts",
+        "line": 100,
+        "code": "const isBrowserDev = typeof window !== 'undefined' && !(window as any).__TAURI_I"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 723,
+        "code": "return window.SpeechRecognition || (window as any).webkitSpeechRecognition || nu"
+      },
+      {
+        "file": "src/hooks/useUniversalContentRAG.ts",
+        "line": 59,
+        "code": "return getContentBySystem(system as any);"
+      },
+      {
+        "file": "src/hooks/useUniversalContentRAG.ts",
+        "line": 66,
+        "code": "return getContentByType(type as any);"
+      },
+      {
+        "file": "src/errors/ErrorUI.tsx",
+        "line": 64,
+        "code": "{(error.context as any)?.helpLink && ("
+      },
+      {
+        "file": "src/errors/ErrorUI.tsx",
+        "line": 65,
+        "code": "<a href={String((error.context as any).helpLink)} className=\"help-link\">"
+      },
+      {
+        "file": "src/performance/PerformanceMonitor.ts",
+        "line": 430,
+        "code": "(navigator as any).getBattery !== undefined ||"
+      },
+      {
+        "file": "src/performance/PerformanceMonitor.ts",
+        "line": 431,
+        "code": "(navigator as any).connection?.saveData === true ||"
+      },
+      {
+        "file": "src/performance/PerformanceMonitor.ts",
+        "line": 437,
+        "code": "memory: (navigator as any).deviceMemory || 4,"
+      },
+      {
+        "file": "src/accessibility/HighContrastMode.tsx",
+        "line": 475,
+        "code": "{...(rest as any)}"
+      },
+      {
+        "file": "src/data/loadEncyclopedia.ts",
+        "line": 418,
+        "code": "content: item as any,"
+      },
+      {
+        "file": "src/data/loadPharmacology.ts",
+        "line": 73,
+        "code": "interactionStore.set(drug.id, drug.interactions as any);"
+      },
+      {
+        "file": "src/data/loadPharmacology.ts",
+        "line": 468,
+        "code": "const interactionFromA = (drugA.interactions as any)?.find((i: { interactingDrug"
+      },
+      {
+        "file": "src/data/loadPharmacology.ts",
+        "line": 474,
+        "code": "const interactionFromB = (drugB.interactions as any)?.find((i: { interactingDrug"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 403,
+        "code": "const anatomyRegions = (anatomyMod as any).getAnatomyForCondition(conditionId);"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 404,
+        "code": "const glossaryEntry = (glossaryMod as any).getPlainLanguage(node.name);"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 425,
+        "code": "explanations = (educationMod as any).getAllLevelsForCondition(condKey);"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 451,
+        "code": "const entry = (symptomMod as any).getSymptomById(symptomId);"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 478,
+        "code": "const doNotMiss = (symptomMod as any).getDoNotMissConditions(symptomId);"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 516,
+        "code": "const symptomExpl = (symptomMod as any).getExplanation(topicId, level);"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 535,
+        "code": "return (educationMod as any).getConditionExplanation(condKey, level);"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 551,
+        "code": "const mod = await loadEducation() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 552,
+        "code": "return mod.EXPLANATION_LEVELS[level] as any as ExplanationLevel;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 559,
+        "code": "const mod = await loadEducation() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 570,
+        "code": "const mod = await loadEducation() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 605,
+        "code": "const mod = await loadSpecialties() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 610,
+        "code": "const mod = await loadSpecialties() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 615,
+        "code": "const mod = await loadSpecialties() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 620,
+        "code": "const mod = await loadSpecialties() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 626,
+        "code": "const mod = await loadSymptoms() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 631,
+        "code": "const mod = await loadSymptoms() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 636,
+        "code": "const mod = await loadSymptoms() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 641,
+        "code": "const mod = await loadSymptoms() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 646,
+        "code": "const mod = await loadSymptoms() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 652,
+        "code": "const mod = await loadProcedures() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 657,
+        "code": "const mod = await loadProcedures() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 662,
+        "code": "const mod = await loadProcedures() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 667,
+        "code": "const mod = await loadProcedures() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 673,
+        "code": "const mod = await loadAnatomy() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 678,
+        "code": "const mod = await loadAnatomy() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 683,
+        "code": "const mod = await loadAnatomy() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 688,
+        "code": "const mod = await loadAnatomy() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 694,
+        "code": "const mod = await loadTranslations() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 699,
+        "code": "const mod = await loadGlossary() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 704,
+        "code": "const mod = await loadGlossary() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 709,
+        "code": "const mod = await loadTranslations() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 715,
+        "code": "const mod = await loadEducation() as any;"
+      },
+      {
+        "file": "src/services/ContentService.ts",
+        "line": 716,
+        "code": "return mod.EXPLANATION_LEVELS as any as Record<ExplanationLevelNumber, Explanati"
+      },
+      {
+        "file": "src/offline/OfflineProvider.tsx",
+        "line": 330,
+        "code": "operation as any,"
+      }
+    ],
+    "todo_comments": [
+      {
+        "file": "src/LayerPanel.tsx",
+        "line": 752,
+        "code": "<button onClick={onShowAll} className=\"layer-action-btn\" title={loc('Show All', "
+      },
+      {
+        "file": "src/LayerPanel.tsx",
+        "line": 758,
+        "code": "<button onClick={onHideAll} className=\"layer-action-btn\" title={loc('Hide All', "
+      },
+      {
+        "file": "src/contexts/TimelineContext.tsx",
+        "line": 166,
+        "code": "// TODO: Implement actual data loading"
+      },
+      {
+        "file": "src/contexts/AuthContext.tsx",
+        "line": 100,
+        "code": "// TODO: Implement actual unlock with Tauri backend"
+      },
+      {
+        "file": "src/contexts/AuthContext.tsx",
+        "line": 146,
+        "code": "// TODO: Implement actual database creation with Tauri backend"
+      },
+      {
+        "file": "src/contexts/AuthContext.tsx",
+        "line": 167,
+        "code": "// TODO: Implement actual database check with Tauri backend"
+      },
+      {
+        "file": "src/contexts/DashboardContext.tsx",
+        "line": 181,
+        "code": "// TODO: Implement actual data loading from Tauri backend"
+      },
+      {
+        "file": "src/anatomy/UnifiedAnatomyControls.tsx",
+        "line": 164,
+        "code": "<span>\ud83d\uddd1 {loc('Clear All', 'Limpiar Todo')}</span>"
+      },
+      {
+        "file": "src/anatomy/MeasurementUI.tsx",
+        "line": 256,
+        "code": "aria-label={loc('Clear all', 'Limpiar todo')}"
+      },
+      {
+        "file": "src/anatomy/layers/data/lymphatic-structures.ts",
+        "line": 91,
+        "code": "\"es\": \"Via comun final para todo el drenaje linfatico de cabeza y cuello; presen"
+      },
+      {
+        "file": "src/anatomy/layers/data/endocrine-structures.ts",
+        "line": 145,
+        "code": "\"es\": \"Interfaz clave entre el hipotalamo y la hipofisis; las lesiones alteran t"
+      },
+      {
+        "file": "src/anatomy/layers/data/cardiovascular-structures.ts",
+        "line": 288,
+        "code": "bloodFlowEs: 'Sangre oxigenada del ventr\u00edculo izquierdo a todo el cuerpo',"
+      },
+      {
+        "file": "src/anatomy/layers/data/layer-cross-references.ts",
+        "line": 1367,
+        "code": "\"es\": \"Las neuronas GnRH hipotal\u00e1micas generan secreci\u00f3n puls\u00e1til de GnRH que im"
+      },
+      {
+        "file": "src/education/regionContentMapping.ts",
+        "line": 645,
+        "code": "descriptionEs: 'Una bomba muscular de cuatro c\u00e1maras que hace circular la sangre"
+      },
+      {
+        "file": "src/dashboard/TrendAnalysis.tsx",
+        "line": 55,
+        "code": "allTime: 'Todo el tiempo',"
+      },
+      {
+        "file": "src/dashboard/VitalsChart.tsx",
+        "line": 365,
+        "code": "{ value: 'all', labelEs: 'Todo', labelEn: 'All' },"
+      },
+      {
+        "file": "src/components/AIMedicalEncyclopedia.tsx",
+        "line": 418,
+        "code": "`La presi\u00f3n arterial alta afecta las paredes de los vasos sangu\u00edneos en todo el "
+      },
+      {
+        "file": "src/components/SmartNavigationSuggestions.tsx",
+        "line": 1209,
+        "code": "{loc('View all', 'Ver todo')}"
+      },
+      {
+        "file": "src/components/ComparisonView.tsx",
+        "line": 269,
+        "code": "{loc('Clear All', 'Borrar todo')}"
+      },
+      {
+        "file": "src/components/visualization/HealthMetricsChart.tsx",
+        "line": 79,
+        "code": "all: 'Todo',"
+      },
+      {
+        "file": "src/components/visualization/HealthMetricsChart.tsx",
+        "line": 419,
+        "code": "{ value: 'all', labelEs: 'Todo', labelEn: 'All' },"
+      },
+      {
+        "file": "src/export/ExportDialog.tsx",
+        "line": 215,
+        "code": "{loc('Select All', 'Seleccionar Todo')}"
+      },
+      {
+        "file": "src/i18n/translations/es/settings.ts",
+        "line": 208,
+        "code": "'settings.notifications.enableAll': 'Habilitar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/settings.ts",
+        "line": 209,
+        "code": "'settings.notifications.disableAll': 'Deshabilitar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/settings.ts",
+        "line": 351,
+        "code": "'settings.data.deleteEverything': 'Eliminar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/common.ts",
+        "line": 439,
+        "code": "'export.selectAll': 'Seleccionar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/dashboard.ts",
+        "line": 66,
+        "code": "'dashboard.alerts.allClear': 'Todo Bien',"
+      },
+      {
+        "file": "src/i18n/translations/es/bodyRegions.ts",
+        "line": 380,
+        "code": "'bodyRegions.layerController.showAll': 'Mostrar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/bodyRegions.ts",
+        "line": 381,
+        "code": "'bodyRegions.layerController.hideAll': 'Ocultar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/bodyRegions.ts",
+        "line": 690,
+        "code": "'bodyRegions.explorer.showAll': 'Mostrar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/bodyRegions.ts",
+        "line": 691,
+        "code": "'bodyRegions.explorer.hideAll': 'Ocultar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/anatomy.ts",
+        "line": 240,
+        "code": "'anatomy.personalized.showAll': 'Mostrar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/anatomy.ts",
+        "line": 241,
+        "code": "'anatomy.personalized.hideAll': 'Ocultar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/anatomy.ts",
+        "line": 289,
+        "code": "'anatomy.overlay.hideAll': 'Ocultar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/anatomy.ts",
+        "line": 290,
+        "code": "'anatomy.overlay.showAll': 'Mostrar Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/onboarding.ts",
+        "line": 125,
+        "code": "'onboarding.complete.title': '\u00a1Todo Listo!',"
+      },
+      {
+        "file": "src/i18n/translations/es/onboarding.ts",
+        "line": 137,
+        "code": "'onboarding.skipAll': 'Omitir Todo',"
+      },
+      {
+        "file": "src/i18n/translations/es/onboarding.ts",
+        "line": 157,
+        "code": "'onboarding.tutorial.search.description': 'Presione Ctrl+K para buscar en todo e"
+      },
+      {
+        "file": "src/data/loadEncyclopedia.ts",
+        "line": 140,
+        "code": "summaryEs: 'El coraz\u00f3n es un m\u00fasculo que bombea sangre por todo tu cuerpo.',"
+      },
+      {
+        "file": "src/data/loadEncyclopedia.ts",
+        "line": 149,
+        "code": "{ term: 'vasos sangu\u00edneos', definition: 'Los tubos que transportan la sangre por"
+      },
+      {
+        "file": "src/data/loadEncyclopedia.ts",
+        "line": 156,
+        "code": "summaryEs: 'El coraz\u00f3n es un \u00f3rgano muscular con cuatro cavidades que bombea san"
+      },
+      {
+        "file": "src/notifications/NotificationCenter.tsx",
+        "line": 274,
+        "code": "{loc('Mark all read', 'Marcar todo le\u00eddo')}"
+      },
+      {
+        "file": "src/notifications/NotificationCenter.tsx",
+        "line": 279,
+        "code": "{loc('Clear all', 'Borrar todo')}"
+      }
+    ],
+    "console_log": [
+      {
+        "file": "core/medical-simulation/encyclopedia/seed.ts",
+        "line": 1068,
+        "code": "console.log(`[Encyclopedia] Seeded ${ENTRIES.length} entries`);"
+      },
+      {
+        "file": "core/medical-simulation/encyclopedia/seed.ts",
+        "line": 1070,
+        "code": "console.warn('[Encyclopedia] Failed to seed:', err);"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 183,
+        "code": "console.warn('[SOMA] Unhandled view state - redirecting to body-centric');"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 212,
+        "code": "console.log('[DEV] Browser mode detected - bypassing auth + onboarding');"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 310,
+        "code": "console.error('Failed to check database:', err);"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 322,
+        "code": "console.error('Failed to load dashboard:', err);"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 338,
+        "code": "console.error('Failed to load timeline:', err);"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 1295,
+        "code": "<div className=\"vital-item\" role=\"button\" tabIndex={0} onClick={() => console.lo"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 1302,
+        "code": "<div className=\"vital-item\" onClick={() => console.log('Navigate to vitals')}>"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 1309,
+        "code": "<div className=\"vital-item\" onClick={() => console.log('Navigate to vitals')}>"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 1316,
+        "code": "<div className=\"vital-item\" onClick={() => console.log('Navigate to vitals')}>"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 1323,
+        "code": "<div className=\"vital-item\" onClick={() => console.log('Navigate to vitals')}>"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 1400,
+        "code": "<div className=\"card-list\" onClick={() => console.log('Navigate to conditions')}"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 1430,
+        "code": "<div className=\"card-list\" onClick={() => console.log('Navigate to medications')"
+      },
+      {
+        "file": "src/App.tsx",
+        "line": 1463,
+        "code": "<div className=\"labs-grid\" onClick={() => console.log('Navigate to labs')}>"
+      },
+      {
+        "file": "src/main.tsx",
+        "line": 58,
+        "code": "console.log('[GLB] Skipping model preload \u2014 no GLB files in project');"
+      },
+      {
+        "file": "src/InsightsPanel.tsx",
+        "line": 235,
+        "code": "console.error('Insights error:', err);"
+      },
+      {
+        "file": "src/BrainRegionTest.tsx",
+        "line": 30,
+        "code": "console.log(`[Brain Test] Clicked: ${item.id} - ${item.label}`);"
+      },
+      {
+        "file": "src/BrainRegionTest.tsx",
+        "line": 117,
+        "code": "console.log(`[Brain Test] No content mapping for: ${item.id}`);"
+      },
+      {
+        "file": "src/BrainRegionTest.tsx",
+        "line": 131,
+        "code": "console.warn(`[Brain Test] Content not found for: ${item.id}`);"
+      },
+      {
+        "file": "src/UniversalRegionIntegration.tsx",
+        "line": 41,
+        "code": "console.log(`[Universal RAG] Clicked: ${item.id} - ${item.label}`);"
+      },
+      {
+        "file": "src/UniversalRegionIntegration.tsx",
+        "line": 54,
+        "code": "console.warn(`[Universal RAG] Content not found for: ${item.id}`);"
+      },
+      {
+        "file": "src/integrationTests.ts",
+        "line": 46,
+        "code": "console.log('\ud83e\uddea Starting Integration Tests...\\n');"
+      },
+      {
+        "file": "src/integrationTests.ts",
+        "line": 108,
+        "code": "console.log('\\n\ud83d\udcca Test Results:');"
+      },
+      {
+        "file": "src/integrationTests.ts",
+        "line": 109,
+        "code": "console.log(`Passed: ${passed}`);"
+      },
+      {
+        "file": "src/integrationTests.ts",
+        "line": 110,
+        "code": "console.log(`Failed: ${failed}`);"
+      },
+      {
+        "file": "src/integrationTests.ts",
+        "line": 111,
+        "code": "console.log('\\nDetailed Results:');"
+      },
+      {
+        "file": "src/integrationTests.ts",
+        "line": 112,
+        "code": "results.forEach(r => console.log(r));"
+      },
+      {
+        "file": "src/SymptomEntryForm.tsx",
+        "line": 289,
+        "code": "console.error('Parse error:', err);"
+      },
+      {
+        "file": "src/LayerPanel.tsx",
+        "line": 149,
+        "code": "console.warn('Failed to load layer state:', e);"
+      },
+      {
+        "file": "src/LayerPanel.tsx",
+        "line": 162,
+        "code": "console.warn('Failed to save layer state:', e);"
+      },
+      {
+        "file": "src/AnatomyLaunchpad.tsx",
+        "line": 372,
+        "code": "console.log(`[AnatomyLaunchpad] Menu item clicked: ${item.id} - ${item.label}`);"
+      },
+      {
+        "file": "src/AnatomyChatPanel.tsx",
+        "line": 117,
+        "code": "console.error('Anatomy chat error:', err);"
+      },
+      {
+        "file": "src/regionMenuContentResolver.ts",
+        "line": 927,
+        "code": "console.log(`[Content Resolver] Resolving content for: ${menuId} (${label})`);"
+      },
+      {
+        "file": "src/regionMenuContentResolver.ts",
+        "line": 934,
+        "code": "console.log(`[Content Resolver] Found via direct mapping: ${encyclopediaId}`);"
+      },
+      {
+        "file": "src/regionMenuContentResolver.ts",
+        "line": 942,
+        "code": "console.log(`[Content Resolver] Found via direct ID: ${menuId}`);"
+      },
+      {
+        "file": "src/regionMenuContentResolver.ts",
+        "line": 954,
+        "code": "console.log(`[Content Resolver] Found via alias \"${alias}\": ${entry.entryId}`);"
+      },
+      {
+        "file": "src/regionMenuContentResolver.ts",
+        "line": 966,
+        "code": "console.log(`[Content Resolver] Found via label search: ${entry.entryId}`);"
+      },
+      {
+        "file": "src/regionMenuContentResolver.ts",
+        "line": 977,
+        "code": "console.log(`[Content Resolver] Found via description search: ${entry.entryId}`)"
+      },
+      {
+        "file": "src/regionMenuContentResolver.ts",
+        "line": 983,
+        "code": "console.log(`[Content Resolver] Creating placeholder for: ${menuId}`);"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 32,
+        "code": "console.log('[Brain RAG] Initializing content index...');"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 84,
+        "code": "console.log(`[Brain RAG] Indexed ${index.byId.size} content items`);"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 86,
+        "code": "console.error('[Brain RAG] Error loading content:', e);"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 141,
+        "code": "console.warn('[Brain RAG] Index not initialized');"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 177,
+        "code": "console.warn('[Brain RAG] Index not initialized');"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 191,
+        "code": "console.warn('[Brain RAG] Index not initialized');"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "line": 203,
+        "code": "console.warn('[Brain RAG] Index not initialized');"
+      },
+      {
+        "file": "src/BodyCentricHome.tsx",
+        "line": 107,
+        "code": "console.error('[BodyCentricHome]', msg, error, errorInfo);"
+      },
+      {
+        "file": "src/BodyCentricHome.tsx",
+        "line": 1436,
+        "code": "console.log('[BodyCentricHome] BodyViewerLoading fallback is rendering');"
+      },
+      {
+        "file": "src/tauri-invoke.ts",
+        "line": 67,
+        "code": "console.log(`[Browser Mode] Tauri command \"${cmd}\" called with args:`, args);"
+      },
+      {
+        "file": "src/tauri-invoke.ts",
+        "line": 260,
+        "code": "console.warn(`[Browser Mode] No mock data for command: ${cmd}`);"
+      },
+      {
+        "file": "src/tauri-invoke.ts",
+        "line": 271,
+        "code": "console.warn(`[iOS Fallback] Tauri command \"${cmd}\" failed, using mock data:`, e"
+      },
+      {
+        "file": "src/ChatView.tsx",
+        "line": 313,
+        "code": "console.error('Region context chat error:', err);"
+      },
+      {
+        "file": "src/ChatView.tsx",
+        "line": 385,
+        "code": "console.error('Chat error:', err);"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 45,
+        "code": "console.log('[Content Retrieval] Cardiology content not available');"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 55,
+        "code": "console.log('[Content Retrieval] Respiratory content not available');"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 65,
+        "code": "console.log('[Content Retrieval] Anatomy content not available');"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 75,
+        "code": "console.log('[Content Retrieval] Digestive content not available');"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 85,
+        "code": "console.log('[Content Retrieval] Musculoskeletal content not available');"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 121,
+        "code": "console.log(`[Content Retrieval] Searching for: ${name}`);"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 132,
+        "code": "console.log(`[Content Retrieval] Found ${results.length} results for: ${name}`);"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 154,
+        "code": "console.log(`[Content Retrieval] Searching by FMA ID: ${fmaId}`);"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 185,
+        "code": "console.log(`[Content Retrieval] Searching for condition: ${conditionName}`);"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 203,
+        "code": "console.log(`[Content Retrieval] Searching for lab test: ${labTestName}`);"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 255,
+        "code": "console.log(`[Content Retrieval] Searching for medication: ${medicationName}`);"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 304,
+        "code": "console.log(`[Content Retrieval] Searching for pathology: ${structureName}`);"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 433,
+        "code": "console.warn(`[Content Retrieval] Unknown vital type: ${vitalType}`);"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 437,
+        "code": "console.log(`[Content Retrieval] Searching for vital: ${vitalType}`);"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "line": 448,
+        "code": "console.log(`[Content Retrieval] Found ${results.length} results for ${vitalType"
+      },
+      {
+        "file": "src/unifiedMedicalKnowledge.ts",
+        "line": 102,
+        "code": "console.log(`[Medical Knowledge] Registered: ${node.title} (${node.type})`);"
+      },
+      {
+        "file": "src/universalContentRAG.ts",
+        "line": 54,
+        "code": "console.log('[Universal RAG] Initializing content index from encyclopedia...');"
+      },
+      {
+        "file": "src/universalContentRAG.ts",
+        "line": 66,
+        "code": "console.log(`[Universal RAG] Indexing ${allEntries.length} encyclopedia entries."
+      },
+      {
+        "file": "src/universalContentRAG.ts",
+        "line": 118,
+        "code": "console.log(`[Universal RAG] Indexing complete:`);"
+      },
+      {
+        "file": "src/universalContentRAG.ts",
+        "line": 119,
+        "code": "console.log(`  - Total entries: ${index.byId.size}`);"
+      },
+      {
+        "file": "src/universalContentRAG.ts",
+        "line": 120,
+        "code": "console.log(`  - By type: ${Array.from(index.byType.entries()).map(([t, arr]) =>"
+      },
+      {
+        "file": "src/universalContentRAG.ts",
+        "line": 121,
+        "code": "console.log(`  - By category: ${Array.from(index.byCategory.entries()).map(([c, "
+      },
+      {
+        "file": "src/ModelLoader.tsx",
+        "line": 95,
+        "code": "console.log('[ModelLoader] Initializing GLTF loader:', {"
+      },
+      {
+        "file": "src/ModelLoader.tsx",
+        "line": 159,
+        "code": "console.log(`[ModelLoader] Loading model: ${url} -> ${resolvedUrl}`);"
+      },
+      {
+        "file": "src/ModelLoader.tsx",
+        "line": 222,
+        "code": "console.error('[ModelLoader] Model load error:', {"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 871,
+        "code": "console.error('[EnhancedModelSafeWrapper] Caught render error:', error, errorInf"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 988,
+        "code": "console.log('[AnatomyViewer] Canvas created successfully');"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1018,
+        "code": "console.error('[AnatomyViewer] Failed to log WebGL context:', e);"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1025,
+        "code": "console.error('[AnatomyViewer] WebGL context lost!');"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1032,
+        "code": "console.log('[AnatomyViewer] WebGL context restored');"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1048,
+        "code": "console.error('[AnatomyViewer] Initial render failed:', renderError);"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1122,
+        "code": "console.error('[AnatomyViewer] Cannot enable enhanced mode:', err);"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1269,
+        "code": "console.log(`[Content Retrieval] Searching for pathology: ${structureName}`);"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1280,
+        "code": "console.log(`[Content Retrieval] Found pathology content: ${doc.title}`);"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1283,
+        "code": "console.warn(`[Content Retrieval] No pathology content found for: ${structureNam"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1310,
+        "code": "console.log('AI Query:', query, 'Context:', context);"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1315,
+        "code": "console.log('Open encyclopedia entry:', entryId);"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1535,
+        "code": "console.warn('[AnatomyViewer] WebGL context lost - iOS memory pressure likely');"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1554,
+        "code": "console.warn('[AnatomyViewer] Frequent context losses detected - activating memo"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1586,
+        "code": "console.log('[AnatomyViewer] WebGL context restored successfully');"
+      },
+      {
+        "file": "src/AnatomyViewer.tsx",
+        "line": 1936,
+        "code": "console.error('[AnatomyViewer] Enhanced model error, reverting to basic:', err);"
+      },
+      {
+        "file": "src/SimplifiedAnatomyViewer.tsx",
+        "line": 496,
+        "code": "console.warn('[SimplifiedAnatomyViewer] WebGL context lost - iOS memory pressure"
+      },
+      {
+        "file": "src/SimplifiedAnatomyViewer.tsx",
+        "line": 512,
+        "code": "console.warn('[SimplifiedAnatomyViewer] Frequent context losses detected - activ"
+      },
+      {
+        "file": "src/SimplifiedAnatomyViewer.tsx",
+        "line": 521,
+        "code": "console.log('[SimplifiedAnatomyViewer] WebGL context restored successfully');"
+      },
+      {
+        "file": "src/ComplexityLevel.tsx",
+        "line": 130,
+        "code": "console.warn('Failed to load complexity level:', e);"
+      },
+      {
+        "file": "src/ComplexityLevel.tsx",
+        "line": 140,
+        "code": "console.warn('Failed to save complexity level:', e);"
+      },
+      {
+        "file": "src/SymptomFollowUpChat.tsx",
+        "line": 548,
+        "code": "console.error('Error analyzing response:', error);"
+      },
+      {
+        "file": "src/SymptomFollowUpChat.tsx",
+        "line": 620,
+        "code": "console.error('AI analysis error:', error);"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 38,
+        "code": "console.log('[RAG Content] Initializing content index...');"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 51,
+        "code": "console.log(`[RAG Content] Loaded ${chunks.length} chunks from JSON backup`);"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 78,
+        "code": "console.log(`[RAG Content] Indexed ${groupedContent.length} unique content items"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 81,
+        "code": "console.warn('[RAG Content] Could not load from JSON backup, using dynamic loadi"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 85,
+        "code": "console.log('[RAG Content] Content index initialized');"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 292,
+        "code": "console.warn('[RAG Content] Index not initialized, content not registered');"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 319,
+        "code": "console.log(`[RAG Content] Registered: ${content.name} (${content.id})`);"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 327,
+        "code": "console.log(`[RAG Content] Batch registering ${contents.length} items...`);"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 329,
+        "code": "console.log(`[RAG Content] Batch registration complete`);"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 338,
+        "code": "console.warn('[RAG Content] Index not initialized');"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 352,
+        "code": "console.warn('[RAG Content] Index not initialized');"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 375,
+        "code": "console.warn('[RAG Content] Index not initialized');"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 388,
+        "code": "console.warn('[RAG Content] Index not initialized');"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 401,
+        "code": "console.warn('[RAG Content] Index not initialized');"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 501,
+        "code": "console.error(`[RAG Content] Error converting content: ${contentId}`, e);"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 599,
+        "code": "console.log(`[RAG Content] Importing ${contents.length} content items...`);"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 601,
+        "code": "console.log('[RAG Content] Import complete');"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "line": 611,
+        "code": "console.log('[RAG Content] Index cleared');"
+      },
+      {
+        "file": "src/MedicalEncyclopedia.tsx",
+        "line": 525,
+        "code": "console.log(`[MedicalEncyclopedia] Encyclopedia status: ${entryCount} entries, p"
+      },
+      {
+        "file": "src/MedicalEncyclopedia.tsx",
+        "line": 527,
+        "code": "console.warn('[MedicalEncyclopedia] Encyclopedia is empty! Seed function may not"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "line": 862,
+        "code": "onAskAI={(question) => ctx.onAskAI ? ctx.onAskAI(question) : console.log('[Patho"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "line": 886,
+        "code": "onAskAI={(question) => ctx.onAskAI ? ctx.onAskAI(question) : console.log('[Physi"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "line": 887,
+        "code": "onNavigateToRegion={(regionId) => ctx.onNavigateToRegion ? ctx.onNavigateToRegio"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "line": 912,
+        "code": "onAskAI={(question) => ctx.onAskAI ? ctx.onAskAI(question) : console.log('[Histo"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "line": 1390,
+        "code": "console.error('[AnatomyMainScreen] Failed to load region content:', err);"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "line": 1583,
+        "code": "console.warn('[AnatomyMainScreen] Could not copy share link to clipboard');"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "line": 1818,
+        "code": "console.log('[AnatomyMainScreen] Canvas created successfully');"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "line": 1842,
+        "code": "console.error('[AnatomyMainScreen] WebGL context lost!');"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "line": 1862,
+        "code": "console.log('[AnatomyMainScreen] WebGL context restored');"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "line": 1878,
+        "code": "console.error('[AnatomyMainScreen] Initial render failed:', renderError);"
+      },
+      {
+        "file": "src/AnatomyMainScreen/tabs/AnatomyTab.tsx",
+        "line": 852,
+        "code": "console.log('Opening 3D preview for:', structure.name);"
+      },
+      {
+        "file": "src/settings/PrivacySettings.tsx",
+        "line": 54,
+        "code": "console.log('Exporting data with options:', exportOptions);"
+      },
+      {
+        "file": "src/settings/PrivacySettings.tsx",
+        "line": 58,
+        "code": "console.error('Export failed:', error);"
+      },
+      {
+        "file": "src/settings/NotificationSettings.tsx",
+        "line": 338,
+        "code": "console.log('Sending test notification...');"
+      },
+      {
+        "file": "src/settings/settingsStorage.ts",
+        "line": 59,
+        "code": "console.warn('Failed to load settings from storage:', e);"
+      },
+      {
+        "file": "src/settings/settingsStorage.ts",
+        "line": 76,
+        "code": "console.warn('Failed to save settings to storage:', e);"
+      },
+      {
+        "file": "src/settings/settingsStorage.ts",
+        "line": 89,
+        "code": "console.warn('Failed to clear settings:', e);"
+      },
+      {
+        "file": "src/settings/settingsStorage.ts",
+        "line": 111,
+        "code": "console.warn('Failed to import settings:', e);"
+      },
+      {
+        "file": "src/settings/settingsStorage.ts",
+        "line": 149,
+        "code": "console.warn('Failed to create backup:', e);"
+      },
+      {
+        "file": "src/settings/settingsStorage.ts",
+        "line": 166,
+        "code": "console.warn('Failed to list backups:', e);"
+      },
+      {
+        "file": "src/settings/settingsStorage.ts",
+        "line": 181,
+        "code": "console.warn('Failed to restore backup:', e);"
+      },
+      {
+        "file": "src/settings/settingsStorage.ts",
+        "line": 199,
+        "code": "console.warn('Failed to delete backup:', e);"
+      },
+      {
+        "file": "src/settings/settingsStorage.ts",
+        "line": 241,
+        "code": "console.warn('Failed to calculate storage usage:', e);"
+      },
+      {
+        "file": "src/settings/settingsStorage.ts",
+        "line": 316,
+        "code": "console.log('Tauri sync not available, using localStorage only');"
+      },
+      {
+        "file": "src/settings/settingsStorage.ts",
+        "line": 330,
+        "code": "console.log('Tauri load not available');"
+      },
+      {
+        "file": "src/settings/DataManagement.tsx",
+        "line": 104,
+        "code": "console.error('Export error:', err);"
+      },
+      {
+        "file": "src/settings/DataManagement.tsx",
+        "line": 133,
+        "code": "console.log('Importing data:', data);"
+      },
+      {
+        "file": "src/settings/DataManagement.tsx",
+        "line": 137,
+        "code": "console.error('Import error:', err);"
+      },
+      {
+        "file": "src/settings/DataManagement.tsx",
+        "line": 169,
+        "code": "console.error('Delete error:', err);"
+      },
+      {
+        "file": "src/settings/settingsMigration.ts",
+        "line": 162,
+        "code": "console.log(`Migrating settings from v${currentVersion} to v${SETTINGS_VERSION}`"
+      },
+      {
+        "file": "src/settings/settingsMigration.ts",
+        "line": 170,
+        "code": "console.log(`Applying migration: v${migration.fromVersion} -> v${migration.toVer"
+      },
+      {
+        "file": "src/settings/settingsMigration.ts",
+        "line": 173,
+        "code": "console.error(`Migration failed: v${migration.fromVersion} -> v${migration.toVer"
+      },
+      {
+        "file": "src/settings/settingsMigration.ts",
+        "line": 257,
+        "code": "console.warn('Repairing invalid settings:', validation.errors);"
+      },
+      {
+        "file": "src/settings/useSettings.tsx",
+        "line": 115,
+        "code": "console.warn(`Failed to load ${key} from storage:`, e);"
+      },
+      {
+        "file": "src/settings/useSettings.tsx",
+        "line": 124,
+        "code": "console.warn(`Failed to save ${key} to storage:`, e);"
+      },
+      {
+        "file": "src/settings/useSettings.tsx",
+        "line": 171,
+        "code": "console.log('Tauri not available, using localStorage only');"
+      },
+      {
+        "file": "src/settings/useSettings.tsx",
+        "line": 196,
+        "code": "console.log('Tauri not available, saved to localStorage only');"
+      },
+      {
+        "file": "src/settings/useSettings.tsx",
+        "line": 458,
+        "code": "console.log('Some export data unavailable (Tauri not connected)');"
+      },
+      {
+        "file": "src/settings/useSettings.tsx",
+        "line": 488,
+        "code": "console.log('Some data import unavailable (Tauri not connected)');"
+      },
+      {
+        "file": "src/settings/useSettings.tsx",
+        "line": 513,
+        "code": "console.log('Tauri clear unavailable');"
+      },
+      {
+        "file": "src/error-handling/utils/errorLogger.ts",
+        "line": 55,
+        "code": "console.warn('Failed to save error logs to storage');"
+      },
+      {
+        "file": "src/error-handling/utils/errorLogger.ts",
+        "line": 203,
+        "code": "console.log('Message:', entry.message);"
+      },
+      {
+        "file": "src/error-handling/utils/errorLogger.ts",
+        "line": 204,
+        "code": "console.log('User Message:', entry.userMessage);"
+      },
+      {
+        "file": "src/error-handling/utils/errorLogger.ts",
+        "line": 205,
+        "code": "console.log('Category:', entry.category);"
+      },
+      {
+        "file": "src/error-handling/utils/errorLogger.ts",
+        "line": 206,
+        "code": "console.log('Timestamp:', new Date(entry.timestamp).toISOString());"
+      },
+      {
+        "file": "src/error-handling/utils/errorLogger.ts",
+        "line": 208,
+        "code": "console.log('Context:', entry.context);"
+      },
+      {
+        "file": "src/error-handling/utils/errorLogger.ts",
+        "line": 211,
+        "code": "console.log('Stack:', entry.stack);"
+      },
+      {
+        "file": "src/contexts/VoiceActionBridge.ts",
+        "line": 36,
+        "code": "try { handler(action); } catch (e) { console.error('[VoiceActionBridge]', e); }"
+      },
+      {
+        "file": "src/contexts/VoiceContext.tsx",
+        "line": 456,
+        "code": "console.warn('Voice health check failed:', err);"
+      },
+      {
+        "file": "src/contexts/AuthContext.tsx",
+        "line": 172,
+        "code": "console.error('Failed to check database:', err);"
+      },
+      {
+        "file": "src/contexts/VoiceCommandContext.tsx",
+        "line": 434,
+        "code": "*       onNavigateToRegion={(id) => console.log('Navigate to', id)}"
+      },
+      {
+        "file": "src/anatomy/useProgressiveLoader.ts",
+        "line": 225,
+        "code": "console.warn(`Failed to upgrade quality: ${err}`);"
+      },
+      {
+        "file": "src/anatomy/useProgressiveLoader.ts",
+        "line": 397,
+        "code": "console.error(`Failed to load system ${system}:`, err);"
+      },
+      {
+        "file": "src/anatomy/PinningStorage.ts",
+        "line": 36,
+        "code": "console.error('Failed to save pins:', error);"
+      },
+      {
+        "file": "src/anatomy/PinningStorage.ts",
+        "line": 51,
+        "code": "console.error('Failed to load pins:', error);"
+      },
+      {
+        "file": "src/anatomy/PinningStorage.ts",
+        "line": 158,
+        "code": "console.error('Failed to save pin groups:', error);"
+      },
+      {
+        "file": "src/anatomy/PinningStorage.ts",
+        "line": 170,
+        "code": "console.error('Failed to load pin groups:', error);"
+      },
+      {
+        "file": "src/anatomy/PinningSystem.tsx",
+        "line": 176,
+        "code": "console.error('Failed to load pins:', e);"
+      },
+      {
+        "file": "src/anatomy/PinningSystem.tsx",
+        "line": 188,
+        "code": "console.error('Failed to load pin groups:', e);"
+      },
+      {
+        "file": "src/anatomy/PinningSystem.tsx",
+        "line": 348,
+        "code": "console.error('Failed to import pins:', err);"
+      },
+      {
+        "file": "src/anatomy/EnhancedMaterials.tsx",
+        "line": 1184,
+        "code": "console.warn(`Material preset \"${presetKey}\" not found, using default`);"
+      },
+      {
+        "file": "src/anatomy/EnhancedAnatomyModel.tsx",
+        "line": 285,
+        "code": "console.log('[EnhancedAnatomyModel] All structures:', structures.length);"
+      },
+      {
+        "file": "src/anatomy/EnhancedAnatomyModel.tsx",
+        "line": 286,
+        "code": "console.log('[EnhancedAnatomyModel] Enabled systems:', enabledSystems);"
+      },
+      {
+        "file": "src/anatomy/EnhancedAnatomyModel.tsx",
+        "line": 303,
+        "code": "console.log('[EnhancedAnatomyModel] Visible structures:', filtered.map(s => `${s"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 328,
+        "code": "console.log('[ModelLoadingManager] Initialized with platform:', platformInfo);"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 329,
+        "code": "console.log('[ModelLoadingManager] Using Draco decoder from:', dracoPath);"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 330,
+        "code": "console.log('[ModelLoadingManager] Memory budget:', MEMORY_BUDGET_MB, 'MB (dynam"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 343,
+        "code": "console.log(`[ModelLoadingManager] Safari WebGL detected. Max texture size: ${ma"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 345,
+        "code": "console.warn('[ModelLoadingManager] Safari WebGL: MAX_TEXTURE_SIZE not available"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 422,
+        "code": "console.warn(`[ModelLoadingManager] Texture size estimate (${estimatedTextureSiz"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 441,
+        "code": "console.warn(`[ModelLoadingManager] Cannot fit model ${sizeMB}MB: used=${stats.u"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 474,
+        "code": "console.warn(`[ModelLoadingManager] Model not found: ${modelId}`);"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 482,
+        "code": "console.warn(`[ModelLoadingManager] Not enough memory for ${modelId} (${modelInf"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 536,
+        "code": "console.warn(`[ModelLoadingManager] No model for region: ${region}`);"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 572,
+        "code": "console.warn(`[ModelLoadingManager] No model for system: ${system}`);"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 665,
+        "code": "console.log(`[ModelLoadingManager] Loading model:`, {"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 685,
+        "code": "console.log(`[ModelLoadingManager] Successfully loaded on iOS: ${task.url}`);"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 705,
+        "code": "console.error(`[ModelLoadingManager] Failed to load model:`, errorDetails);"
+      },
+      {
+        "file": "src/anatomy/ModelLoadingManager.ts",
+        "line": 715,
+        "code": "console.error('[ModelLoadingManager] iOS-specific debug info:', {"
+      },
+      {
+        "file": "src/anatomy/DissectionUI.tsx",
+        "line": 203,
+        "code": "console.log('Next step');"
+      },
+      {
+        "file": "src/anatomy/DissectionUI.tsx",
+        "line": 208,
+        "code": "console.log('Previous step');"
+      },
+      {
+        "file": "src/anatomy/DissectionUI.tsx",
+        "line": 283,
+        "code": "console.log('Toggle cut lines', e.target.checked);"
+      },
+      {
+        "file": "src/anatomy/DissectionUI.tsx",
+        "line": 295,
+        "code": "console.log('Toggle layer boundaries', e.target.checked);"
+      },
+      {
+        "file": "src/anatomy/DissectionUI.tsx",
+        "line": 307,
+        "code": "console.log('Toggle auto reveal', e.target.checked);"
+      },
+      {
+        "file": "src/anatomy/Enhanced3DAnatomy.ts",
+        "line": 688,
+        "code": "console.log(`Label: ${name}`);"
+      },
+      {
+        "file": "src/anatomy/content-completeness-validator.ts",
+        "line": 294,
+        "code": "console.log('=== SOMA Content Coverage Report ===');"
+      },
+      {
+        "file": "src/anatomy/content-completeness-validator.ts",
+        "line": 295,
+        "code": "console.log(`Total: ${report.totalStructures}`);"
+      },
+      {
+        "file": "src/anatomy/content-completeness-validator.ts",
+        "line": 296,
+        "code": "console.log(`Mapped: ${report.mappedStructures} (${report.coveragePercentage.toF"
+      },
+      {
+        "file": "src/anatomy/content-completeness-validator.ts",
+        "line": 297,
+        "code": "console.log(`Unmapped: ${report.unmappedStructures}`);"
+      },
+      {
+        "file": "src/anatomy/content-completeness-validator.ts",
+        "line": 298,
+        "code": "console.log('');"
+      },
+      {
+        "file": "src/anatomy/content-completeness-validator.ts",
+        "line": 299,
+        "code": "console.log('By System:');"
+      },
+      {
+        "file": "src/anatomy/content-completeness-validator.ts",
+        "line": 301,
+        "code": "console.log(`  ${system}: ${data.mapped}/${data.total} (${data.coverage.toFixed("
+      },
+      {
+        "file": "src/anatomy/content-completeness-validator.ts",
+        "line": 303,
+        "code": "console.log('');"
+      },
+      {
+        "file": "src/anatomy/content-completeness-validator.ts",
+        "line": 304,
+        "code": "console.log('High Priority Gaps:');"
+      },
+      {
+        "file": "src/anatomy/content-completeness-validator.ts",
+        "line": 306,
+        "code": "console.log(`  - ${gap.structureName}: ${gap.missingContent.join(', ')}`);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel-fixed.tsx",
+        "line": 48,
+        "code": "console.log('[GLB] Stage: SUSPENSE_FALLBACK rendered - model is loading');"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel-fixed.tsx",
+        "line": 99,
+        "code": "console.error('[GLB] Stage: ERROR_BOUNDARY caught:', errorDetail);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel-fixed.tsx",
+        "line": 163,
+        "code": "console.log(logMsg);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel-fixed.tsx",
+        "line": 177,
+        "code": "console.log(`[GLB] Stage: LOADED ${modelName} successfully`);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel-fixed.tsx",
+        "line": 317,
+        "code": "console.log(`[GLB] Stage: LOADING ${modelName} from ${url}`);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel-fixed.tsx",
+        "line": 326,
+        "code": "console.log(`[GLB] SystemModel: ${system} loaded successfully`);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel-fixed.tsx",
+        "line": 338,
+        "code": "console.error(`[GLB] Stage: FAILED ${modelName}:`, {"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 327,
+        "code": "console.log(logMsg);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 337,
+        "code": "console.log(`[GLB] Stage: LOADING ${modelName} from ${resolvedUrl}`);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 344,
+        "code": "console.log(`[GLB] Stage: LOADED ${modelName} successfully`);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 360,
+        "code": "console.log(`[GLB] Stage: SUSPENSE ${modelName} - loading in progress`);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 367,
+        "code": "console.error(`[GLB] Stage: FAILED ${modelName}:`, {"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 472,
+        "code": "console.log('[GLB] Stage: SUSPENSE_FALLBACK rendered - model is loading');"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 520,
+        "code": "console.error('[GLB] Stage: ERROR_BOUNDARY caught:', errorDetail);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 571,
+        "code": "console.log(logMsg);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 609,
+        "code": "console.log(`[GLB] SystemModel: ${system} loaded successfully`);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 616,
+        "code": "console.error(`[GLB] SystemModel: ${system} failed - ${error}`);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 627,
+        "code": "console.error(`[GLB] ErrorBoundary caught for ${system}: ${error.message}`);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 813,
+        "code": "console.log(logMsg);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 853,
+        "code": "console.log('[LOD] Preload requested:', lodLevels, 'for', structureIds.length, '"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 964,
+        "code": "console.log(logMsg);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 971,
+        "code": "console.log('[GLB] No skeletal models configured to preload');"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 978,
+        "code": "console.log(`[GLB] Will preload ${modelsToPreload.length} model(s) after ${prelo"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 986,
+        "code": "console.log(`[GLB] Preloading model ${index + 1}/${modelsToPreload.length}: ${mo"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 991,
+        "code": "console.log(`[GLB] Preload queued: ${modelName}`);"
+      },
+      {
+        "file": "src/anatomy/GLBAnatomyModel.tsx",
+        "line": 995,
+        "code": "console.error(`[GLB] Preload FAILED: ${modelName} - ${errorMsg}`);"
+      },
+      {
+        "file": "src/anatomy/layers/LayerManager.ts",
+        "line": 295,
+        "code": "console.error('[LayerManager] Event handler error:', err);"
+      },
+      {
+        "file": "src/navigation/NavigationProvider.tsx",
+        "line": 412,
+        "code": "console.error('Navigation event listener error:', error);"
+      },
+      {
+        "file": "src/navigation/NavigationProvider.tsx",
+        "line": 430,
+        "code": "console.error('Navigation guard error:', error);"
+      },
+      {
+        "file": "src/navigation/NavigationProvider.tsx",
+        "line": 455,
+        "code": "console.warn(`Route not found: ${routeId}`);"
+      },
+      {
+        "file": "src/navigation/NavigationProvider.tsx",
+        "line": 567,
+        "code": "console.warn(`Invalid path: ${path}`);"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 113,
+        "code": "console.log(`[Performance] Device tier: ${this.deviceTier} (memory: ${memory}GB,"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 283,
+        "code": "console.log('Device Tier:', this.deviceTier);"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 284,
+        "code": "console.log('Metrics:', this.metrics);"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 288,
+        "code": "console.log('\u2705 Performance budget passed');"
+      },
+      {
+        "file": "src/utils/performanceMonitor.ts",
+        "line": 290,
+        "code": "console.warn('\u26a0\ufe0f Performance budget violations:', budget.violations);"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 41,
+        "code": "console.log('[AssetResolver] Using build-time platform:', buildTimePlatform);"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 52,
+        "code": "console.log('[AssetResolver] iOS detected via tauri:// protocol');"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 62,
+        "code": "console.log('[AssetResolver] iOS detected via tauri.localhost + user agent');"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 65,
+        "code": "console.log('[AssetResolver] Android detected via tauri.localhost');"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 72,
+        "code": "console.log('[AssetResolver] iOS detected via user agent fallback');"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 76,
+        "code": "console.log('[AssetResolver] Android detected via user agent fallback');"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 90,
+        "code": "console.log('[AssetResolver] Platform detection:', {"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 127,
+        "code": "console.log('[AssetResolver] Browser mode, resolved:', result);"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 139,
+        "code": "console.log('[AssetResolver] Resolving path:', {"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 155,
+        "code": "console.log('[AssetResolver] Mobile resolved URL:', resolvedUrl);"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 165,
+        "code": "console.log('[AssetResolver] Mobile fallback URL:', resolvedUrl);"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 170,
+        "code": "console.warn('[AssetResolver] No origin available, using relative path (may fail"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 177,
+        "code": "console.log('[AssetResolver] Desktop resolved URL:', resolvedUrl);"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "line": 195,
+        "code": "console.warn('[AssetResolver] resolveFilePath called in browser mode');"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 110,
+        "code": "console.log('[SafariDebug] Session started');"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 111,
+        "code": "console.log(`Device Tier: ${tier}, Budget: ${currentSession.memory.budgetMB}MB`)"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 161,
+        "code": "console.warn('[SafariDebug] No active session to log action');"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 182,
+        "code": "console.warn(`[SafariDebug] HIGH MEMORY USAGE: ${memorySnapshot.percentUsed.toFi"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 193,
+        "code": "console.log(`[SafariDebug] ${action.toUpperCase()}: ${component} - ${description"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 215,
+        "code": "console.error('[SafariDebug] Cannot log crash - no active session');"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 235,
+        "code": "console.error('[SafariDebug] CRASH DETECTED');"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 236,
+        "code": "console.error(`Error: ${error.message}`);"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 238,
+        "code": "console.error('Context:', context);"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 253,
+        "code": "console.log(`[SafariDebug] Checkpoint saved. Report entries: ${currentSession.ac"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 255,
+        "code": "console.error('[SafariDebug] Failed to save checkpoint:', e);"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 318,
+        "code": "console.error('[SafariDebug] Failed to parse crash report:', e);"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 341,
+        "code": "console.log(`[SafariDebug] Cleared ${keysToDelete.length} crash reports`);"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 364,
+        "code": "console.error('[SafariDebug] Failed to save final report:', e);"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 368,
+        "code": "console.log(`[SafariDebug] Session ended. Duration: ${(duration / 1000).toFixed("
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 369,
+        "code": "console.log(`[SafariDebug] Total actions: ${currentSession.actions.length}`);"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 370,
+        "code": "console.log(`[SafariDebug] Status: ${hadError ? 'CRASHED' : 'Ended normally'}`);"
+      },
+      {
+        "file": "src/utils/SafariDebugSession.ts",
+        "line": 372,
+        "code": "console.error(`[SafariDebug] SESSION CRASHED after ${(duration / 1000).toFixed(2"
+      },
+      {
+        "file": "src/utils/anatomy3DEventBus.ts",
+        "line": 202,
+        "code": "console.log('[Anatomy3DEventBus]', eventType, payload);"
+      },
+      {
+        "file": "src/utils/anatomy3DEventBus.ts",
+        "line": 211,
+        "code": "console.error(`[Anatomy3DEventBus] Error in handler for ${eventType}:`, error);"
+      },
+      {
+        "file": "src/utils/anatomy3DEventBus.ts",
+        "line": 220,
+        "code": "console.error(`[Anatomy3DEventBus] Error in global handler:`, error);"
+      },
+      {
+        "file": "src/utils/intentEventBus.ts",
+        "line": 112,
+        "code": "console.log('[IntentEventBus]', eventType, payload);"
+      },
+      {
+        "file": "src/utils/intentEventBus.ts",
+        "line": 121,
+        "code": "console.error(`[IntentEventBus] Error in handler for ${eventType}:`, error);"
+      },
+      {
+        "file": "src/utils/intentEventBus.ts",
+        "line": 130,
+        "code": "console.error(`[IntentEventBus] Error in global handler:`, error);"
+      },
+      {
+        "file": "src/utils/reactOptimizations.tsx",
+        "line": 371,
+        "code": "console.log(`[WhyDidYouUpdate] ${componentName}:`, changedProps);"
+      },
+      {
+        "file": "src/utils/performanceCollector.ts",
+        "line": 24,
+        "code": "console.warn(`No start mark found for: ${name}`);"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 378,
+        "code": "console.warn(`[Prefetch] Failed to prefetch ${key}:`, error);"
+      },
+      {
+        "file": "src/utils/dataLoading.ts",
+        "line": 400,
+        "code": "console.warn(`[Prefetch] Failed: ${task.key}`, error);"
+      },
+      {
+        "file": "src/search/SearchResults.tsx",
+        "line": 167,
+        "code": "console.log('Search for:', suggestion);"
+      },
+      {
+        "file": "src/search/GlobalSearch.tsx",
+        "line": 633,
+        "code": "console.log('Voice search triggered - implementation pending');"
+      },
+      {
+        "file": "src/search/components/SearchProvider.tsx",
+        "line": 228,
+        "code": "console.error('Failed to load search history:', error);"
+      },
+      {
+        "file": "src/search/components/SearchProvider.tsx",
+        "line": 237,
+        "code": "console.error('Failed to save search history:', error);"
+      },
+      {
+        "file": "src/components/VoiceSymptomForm.tsx",
+        "line": 25,
+        "code": "onRecordingStart={() => console.log(\"Recording started\")}"
+      },
+      {
+        "file": "src/components/VoiceSymptomForm.tsx",
+        "line": 26,
+        "code": "onRecordingStop={() => console.log(\"Recording stopped\")}"
+      },
+      {
+        "file": "src/components/AIMedicalEncyclopedia.tsx",
+        "line": 1272,
+        "code": "console.error('Encyclopedia chat error:', err);"
+      },
+      {
+        "file": "src/components/PremiumUIExample.tsx",
+        "line": 346,
+        "code": "console.log('Confirmed!');"
+      },
+      {
+        "file": "src/components/SmartNavigationSuggestions.tsx",
+        "line": 759,
+        "code": "console.warn('AI suggestions failed:', error);"
+      },
+      {
+        "file": "src/components/VoiceFeedback.tsx",
+        "line": 350,
+        "code": "return command ? <CommandConfirmation command={command} onConfirm={onConfirm || "
+      },
+      {
+        "file": "src/components/VoiceFeedback.tsx",
+        "line": 354,
+        "code": "return command ? <CommandSuccessToast command={command} onDismiss={onDismiss || "
+      },
+      {
+        "file": "src/components/VoiceMedicalInput.tsx",
+        "line": 892,
+        "code": "*   onTranscript={(text) => console.log('Transcript:', text)}"
+      },
+      {
+        "file": "src/components/VoiceMedicalInput.tsx",
+        "line": 893,
+        "code": "*   onQuestionDetected={(q, type) => console.log('Question:', q, 'Type:', type)}"
+      },
+      {
+        "file": "src/components/OnboardingTutorial.tsx",
+        "line": 101,
+        "code": "console.error('Failed to save onboarding state:', e);"
+      },
+      {
+        "file": "src/components/OnboardingTutorial.tsx",
+        "line": 111,
+        "code": "console.error('Failed to save onboarding state:', e);"
+      },
+      {
+        "file": "src/components/3d/EnhancedCameraControls.tsx",
+        "line": 434,
+        "code": "console.warn(`Camera preset \"${presetName}\" not found`);"
+      },
+      {
+        "file": "src/components/panels/SmartPanelManager.tsx",
+        "line": 601,
+        "code": "console.warn('Failed to restore panel state:', error);"
+      },
+      {
+        "file": "src/components/panels/SmartPanelManager.tsx",
+        "line": 619,
+        "code": "console.warn('Failed to save panel state:', error);"
+      },
+      {
+        "file": "src/components/panels/HistologyPanel.tsx",
+        "line": 577,
+        "code": "console.log('View in 3D clicked - feature coming soon');"
+      },
+      {
+        "file": "src/components/voice/VoiceButton.tsx",
+        "line": 222,
+        "code": "console.error('Failed to start recording:', err);"
+      },
+      {
+        "file": "src/voice/VoiceCommandParser.ts",
+        "line": 775,
+        "code": "* console.log(result);"
+      },
+      {
+        "file": "src/ai/AINavigationProvider.tsx",
+        "line": 220,
+        "code": "console.log('[AINavigation]', ...args);"
+      },
+      {
+        "file": "src/ai/AnatomyIntentRecognizer.ts",
+        "line": 388,
+        "code": "console.warn('AI recognition failed, using rule-based fallback:', error);"
+      },
+      {
+        "file": "src/ai/components/AIHistologyPanel.tsx",
+        "line": 180,
+        "code": "console.log(`Quiz completed with score: ${score}/${total}`);"
+      },
+      {
+        "file": "src/ai/components/AIChatVoiceInput.tsx",
+        "line": 180,
+        "code": "*   onSendMessage={(text) => console.log('Message:', text)}"
+      },
+      {
+        "file": "src/ai/components/AIChatVoiceInput.tsx",
+        "line": 181,
+        "code": "*   onNavigateToRegion={(region) => console.log('Navigate:', region)}"
+      },
+      {
+        "file": "src/ai/components/SmartAnatomyResponse.tsx",
+        "line": 310,
+        "code": "*   onNavigate={(target) => console.log('Navigate to:', target)}"
+      },
+      {
+        "file": "src/ai/components/AIEncyclopediaSearch.tsx",
+        "line": 78,
+        "code": "console.error('Search enhancement failed:', err);"
+      },
+      {
+        "file": "src/ai/components/AIEncyclopediaSearch.tsx",
+        "line": 118,
+        "code": "console.error('Failed to generate explanation:', err);"
+      },
+      {
+        "file": "src/hooks/useLearningProgress.ts",
+        "line": 43,
+        "code": "console.error('Failed to load progress:', e);"
+      },
+      {
+        "file": "src/hooks/useLearningProgress.ts",
+        "line": 54,
+        "code": "console.error('Failed to save progress:', e);"
+      },
+      {
+        "file": "src/hooks/useContent.ts",
+        "line": 135,
+        "code": "*   console.log(info.symptoms.map(s => s.name));"
+      },
+      {
+        "file": "src/hooks/useContent.ts",
+        "line": 196,
+        "code": "*   console.log('Possible causes:', info.entry.possibleCauses);"
+      },
+      {
+        "file": "src/hooks/useContent.ts",
+        "line": 197,
+        "code": "*   console.log('Do not miss:', info.doNotMiss);"
+      },
+      {
+        "file": "src/hooks/usePerformance.ts",
+        "line": 289,
+        "code": "console.log(`[Render] ${componentName}: ${renderCount.current}`);"
+      },
+      {
+        "file": "src/hooks/useTheme.ts",
+        "line": 60,
+        "code": "console.error('Failed to load theme:', e);"
+      },
+      {
+        "file": "src/hooks/useTheme.ts",
+        "line": 96,
+        "code": "console.error('Failed to save theme:', e);"
+      },
+      {
+        "file": "src/hooks/useTheme.ts",
+        "line": 106,
+        "code": "console.error('Failed to save theme:', e);"
+      },
+      {
+        "file": "src/hooks/useComparison.ts",
+        "line": 30,
+        "code": "console.warn(`Cannot add more than ${maxItems} items to comparison`);"
+      },
+      {
+        "file": "src/hooks/useFavorites.ts",
+        "line": 32,
+        "code": "console.error('Failed to load favorites:', e);"
+      },
+      {
+        "file": "src/hooks/useFavorites.ts",
+        "line": 43,
+        "code": "console.error('Failed to save favorites:', e);"
+      },
+      {
+        "file": "src/hooks/useNetworkStatus.ts",
+        "line": 104,
+        "code": "console.log('[NetworkStatus] Device came online');"
+      },
+      {
+        "file": "src/hooks/useNetworkStatus.ts",
+        "line": 138,
+        "code": "console.log('[NetworkStatus] Device went offline');"
+      },
+      {
+        "file": "src/hooks/useNetworkStatus.ts",
+        "line": 206,
+        "code": "console.log('[NetworkStatus] Cannot sync while offline');"
+      },
+      {
+        "file": "src/hooks/useUserDemographics.ts",
+        "line": 191,
+        "code": "console.log('Tauri not available, using localStorage');"
+      },
+      {
+        "file": "src/hooks/useUserDemographics.ts",
+        "line": 230,
+        "code": "console.log('Tauri not available, saved to localStorage only');"
+      },
+      {
+        "file": "src/hooks/useUserDemographics.ts",
+        "line": 270,
+        "code": "console.log('Tauri not available');"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 17,
+        "code": "*   onNavigate: (regionId) => console.log('Navigate to:', regionId),"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 18,
+        "code": "*   onLayerChange: (layer) => console.log('Layer:', layer),"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 691,
+        "code": "*   onResult: (text, confidence) => console.log(text, confidence),"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 887,
+        "code": "*   onNavigate: (regionId) => console.log('Navigate:', regionId),"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 906,
+        "code": "console.log('[useCommandProcessor] Processing:', text);"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 915,
+        "code": "console.log('[useCommandProcessor] Confidence too low:', parsedCommand.confidenc"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 925,
+        "code": "console.log('[useCommandProcessor] Intent:', intent);"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 954,
+        "code": "console.error('[useCommandProcessor] Error:', error);"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 1056,
+        "code": "console.log('[useVoiceNavigation] Already processing, ignoring:', text);"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 1065,
+        "code": "console.log('[useVoiceNavigation] Recognized:', text, 'confidence:', confidence)"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 1074,
+        "code": "console.log('[useVoiceNavigation] Confidence too low:', command.confidence);"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 1085,
+        "code": "console.log('[useVoiceNavigation] Intent:', intent);"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 1114,
+        "code": "console.error('[useVoiceNavigation] Error:', error);"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 1163,
+        "code": "console.log('[useVoiceNavigation] Processing command:', text);"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 1170,
+        "code": "console.log('[useVoiceNavigation] Intent:', intent);"
+      },
+      {
+        "file": "src/hooks/useVoiceNavigation.ts",
+        "line": 1199,
+        "code": "console.error('[useVoiceNavigation] Error:', error);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 79,
+        "code": "console.warn('Failed to load persisted error logs');"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 92,
+        "code": "console.warn('Failed to persist error logs');"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 217,
+        "code": "console.log('Message:', entry.error.message);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 218,
+        "code": "console.log('User Message:', entry.error.userMessage);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 219,
+        "code": "console.log('Severity:', entry.error.severity);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 220,
+        "code": "console.log('Category:', entry.error.category);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 221,
+        "code": "console.log('Retryable:', entry.error.retryable);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 222,
+        "code": "console.log('Recovery Strategy:', entry.error.recoveryStrategy);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 225,
+        "code": "console.log('Metadata:', entry.metadata);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 229,
+        "code": "console.log('Context:', entry.error.context);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 233,
+        "code": "console.log('Stack Trace:', entry.error.stack);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 236,
+        "code": "console.log('Session ID:', entry.sessionId);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 237,
+        "code": "console.log('Timestamp:', entry.timestamp);"
+      },
+      {
+        "file": "src/errors/logger.ts",
+        "line": 263,
+        "code": "console.debug('[Analytics] Would send:', payload);"
+      },
+      {
+        "file": "src/i18n/I18nContext.tsx",
+        "line": 73,
+        "code": "console.error('Failed to load translations:', error);"
+      },
+      {
+        "file": "src/i18n/loader.ts",
+        "line": 235,
+        "code": "console.warn(`Failed to load translations for ${language}/${namespace}:`, error)"
+      },
+      {
+        "file": "src/i18n/loader.ts",
+        "line": 285,
+        "code": "console.warn(`Failed to preload translations for ${language}:`, error);"
+      },
+      {
+        "file": "src/views/MedicalEncyclopediaView.tsx",
+        "line": 438,
+        "code": "console.error('Search failed:', err);"
+      },
+      {
+        "file": "src/notifications/NotificationContext.tsx",
+        "line": 175,
+        "code": "console.error(`Error loading ${key} from storage:`, e);"
+      },
+      {
+        "file": "src/notifications/NotificationContext.tsx",
+        "line": 185,
+        "code": "console.error(`Error saving ${key} to storage:`, e);"
+      },
+      {
+        "file": "src/onboarding/OnboardingProvider.tsx",
+        "line": 382,
+        "code": "console.error('Failed to load onboarding state:', error);"
+      },
+      {
+        "file": "src/onboarding/OnboardingProvider.tsx",
+        "line": 392,
+        "code": "console.error('Failed to save onboarding state:', error);"
+      },
+      {
+        "file": "src/onboarding/OnboardingFlow.tsx",
+        "line": 1193,
+        "code": "console.error('Failed to save onboarding data:', error);"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 82,
+        "code": "console.log(`[ContentCache] Cached ${type}:${id}`);"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 107,
+        "code": "console.warn('[ContentCache] Failed to fetch, using stale cache:', error);"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 136,
+        "code": "console.warn('[ContentCache] Network failed, using cache:', error);"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 170,
+        "code": "console.log(`[ContentCache] Revalidated ${type}:${id}`);"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 172,
+        "code": "console.warn(`[ContentCache] Failed to revalidate ${id}:`, error);"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 220,
+        "code": "console.log(`[ContentCache] Prefetched ${item.type}:${item.id}`);"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 222,
+        "code": "console.warn(`[ContentCache] Failed to prefetch ${item.id}:`, error);"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 255,
+        "code": "console.log(`[ContentCache] Cached asset: ${url} (${this.formatBytes(blob.size)}"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 257,
+        "code": "console.warn(`[ContentCache] Failed to cache asset ${url}:`, error);"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 287,
+        "code": "console.log(`[ContentCache] Prefetching ${modelUrls.length} anatomy models...`);"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 301,
+        "code": "console.log(`[ContentCache] Caching ${items.length} ${type} items...`);"
+      },
+      {
+        "file": "src/offline/contentCache.ts",
+        "line": 364,
+        "code": "console.log('[ContentCache] All cached content cleared');"
+      },
+      {
+        "file": "src/offline/indexedDB.ts",
+        "line": 109,
+        "code": "console.error('Failed to open IndexedDB:', request.error);"
+      },
+      {
+        "file": "src/offline/indexedDB.ts",
+        "line": 115,
+        "code": "console.log('IndexedDB initialized successfully');"
+      },
+      {
+        "file": "src/offline/cacheManager.ts",
+        "line": 96,
+        "code": "console.log(`[CacheManager] Cached ${key} (${this.formatBytes(size)})`);"
+      },
+      {
+        "file": "src/offline/cacheManager.ts",
+        "line": 111,
+        "code": "console.log(`[CacheManager] Cache expired for ${key}`);"
+      },
+      {
+        "file": "src/offline/cacheManager.ts",
+        "line": 142,
+        "code": "console.log(`[CacheManager] Removed ${key} from cache`);"
+      },
+      {
+        "file": "src/offline/cacheManager.ts",
+        "line": 145,
+        "code": "console.warn(`[CacheManager] Failed to remove ${key}:`, error);"
+      },
+      {
+        "file": "src/offline/cacheManager.ts",
+        "line": 156,
+        "code": "console.log('[CacheManager] Cache cleared');"
+      },
+      {
+        "file": "src/offline/cacheManager.ts",
+        "line": 164,
+        "code": "console.log(`[CacheManager] Cleared ${count} expired items`);"
+      },
+      {
+        "file": "src/offline/cacheManager.ts",
+        "line": 271,
+        "code": "console.log(`[CacheManager] Evicted items to free ${this.formatBytes(bytesToFree"
+      },
+      {
+        "file": "src/offline/OfflineContent.tsx",
+        "line": 134,
+        "code": "console.warn('[OfflineContent] Failed to refresh:', err);"
+      },
+      {
+        "file": "src/offline/OfflineContent.tsx",
+        "line": 301,
+        "code": "console.error('[OfflineContentList] Failed to load items:', err);"
+      },
+      {
+        "file": "src/offline/syncManager.ts",
+        "line": 47,
+        "code": "console.log(`[SyncManager] Queued ${operation} with ID: ${id}`);"
+      },
+      {
+        "file": "src/offline/syncManager.ts",
+        "line": 62,
+        "code": "console.log('[SyncManager] Sync already in progress');"
+      },
+      {
+        "file": "src/offline/syncManager.ts",
+        "line": 73,
+        "code": "console.log('[SyncManager] Offline, skipping sync');"
+      },
+      {
+        "file": "src/offline/syncManager.ts",
+        "line": 96,
+        "code": "console.log(`[SyncManager] Starting sync with ${queue.length} items`);"
+      },
+      {
+        "file": "src/offline/syncManager.ts",
+        "line": 100,
+        "code": "console.log('[SyncManager] Sync aborted');"
+      },
+      {
+        "file": "src/offline/syncManager.ts",
+        "line": 120,
+        "code": "console.log(`[SyncManager] Max retries exceeded for ${item.id}`);"
+      },
+      {
+        "file": "src/offline/syncManager.ts",
+        "line": 136,
+        "code": "console.error('[SyncManager] Sync error:', error);"
+      },
+      {
+        "file": "src/offline/syncManager.ts",
+        "line": 152,
+        "code": "console.log(`[SyncManager] Sync complete: ${result.syncedCount} synced, ${result"
+      },
+      {
+        "file": "src/offline/contentPrefetch.ts",
+        "line": 111,
+        "code": "console.log('[Prefetch] Offline, cannot prefetch');"
+      },
+      {
+        "file": "src/offline/contentPrefetch.ts",
+        "line": 145,
+        "code": "console.log(`[Prefetch] Starting prefetch of ${this.queue.length} items`);"
+      },
+      {
+        "file": "src/offline/contentPrefetch.ts",
+        "line": 168,
+        "code": "console.log('[Prefetch] Prefetch cancelled');"
+      },
+      {
+        "file": "src/offline/contentPrefetch.ts",
+        "line": 214,
+        "code": "console.log(`[Prefetch] Completed ${item.id}`);"
+      },
+      {
+        "file": "src/offline/contentPrefetch.ts",
+        "line": 222,
+        "code": "console.log(`[Prefetch] Retrying ${item.id} (attempt ${item.retryCount})`);"
+      },
+      {
+        "file": "src/offline/contentPrefetch.ts",
+        "line": 228,
+        "code": "console.warn(`[Prefetch] Failed ${item.id}:`, err.message);"
+      },
+      {
+        "file": "src/offline/contentPrefetch.ts",
+        "line": 318,
+        "code": "console.log("
+      },
+      {
+        "file": "src/offline/OfflineProvider.tsx",
+        "line": 145,
+        "code": "console.log('[OfflineProvider] Device came online');"
+      },
+      {
+        "file": "src/offline/OfflineProvider.tsx",
+        "line": 164,
+        "code": "console.log('[OfflineProvider] Device went offline');"
+      },
+      {
+        "file": "src/offline/OfflineProvider.tsx",
+        "line": 251,
+        "code": "console.error('[OfflineProvider] Failed to get cache status:', error);"
+      },
+      {
+        "file": "src/offline/OfflineProvider.tsx",
+        "line": 257,
+        "code": "console.log('[OfflineProvider] Cannot prefetch while offline');"
+      },
+      {
+        "file": "src/offline/OfflineProvider.tsx",
+        "line": 304,
+        "code": "console.error('[OfflineProvider] Failed to mark content viewed:', error);"
+      },
+      {
+        "file": "src/offline/OfflineProvider.tsx",
+        "line": 384,
+        "code": "console.log('[OfflineProvider] Initialized');"
+      },
+      {
+        "file": "src/offline/OfflineProvider.tsx",
+        "line": 386,
+        "code": "console.error('[OfflineProvider] Failed to initialize:', error);"
+      },
+      {
+        "file": "src/offline/OfflineProvider.tsx",
+        "line": 434,
+        "code": "console.log('[OfflineProvider] Cache size exceeded, cleaning up...');"
+      }
+    ],
+    "large_functions": [
+      {
+        "file": "core/medical-simulation/encyclopedia/seed.ts",
+        "start_line": 71,
+        "lines": 62,
+        "signature": "function leads to heart failure, arrhythmias, or arrest.',\n "
+      },
+      {
+        "file": "core/medical-simulation/encyclopedia/seed.ts",
+        "start_line": 134,
+        "lines": 62,
+        "signature": "function leads to respiratory failure.',\n    lastUpdated: ne"
+      },
+      {
+        "file": "src/App.tsx",
+        "start_line": 195,
+        "lines": 1336,
+        "signature": "function App() {"
+      },
+      {
+        "file": "src/StructureInfoPanel.tsx",
+        "start_line": 660,
+        "lines": 67,
+        "signature": "function createSampleInfo(id: string, name: string): Structu"
+      },
+      {
+        "file": "src/SelectionManager.tsx",
+        "start_line": 24,
+        "lines": 92,
+        "signature": "export function useSelectionManager() {"
+      },
+      {
+        "file": "src/SymptomEntryForm.tsx",
+        "start_line": 229,
+        "lines": 65,
+        "signature": "async function parseNaturalLanguage() {"
+      },
+      {
+        "file": "src/LayerPanel.tsx",
+        "start_line": 170,
+        "lines": 187,
+        "signature": "export function useLayerState() {"
+      },
+      {
+        "file": "src/regionMenuContentResolver.ts",
+        "start_line": 816,
+        "lines": 56,
+        "signature": "function encyclopediaEntryToDocument(entry: EncyclopediaEntr"
+      },
+      {
+        "file": "src/regionMenuContentResolver.ts",
+        "start_line": 918,
+        "lines": 61,
+        "signature": "export async function resolveMenuItemContent(\n  menuId: stri"
+      },
+      {
+        "file": "src/brainContentRAG.ts",
+        "start_line": 27,
+        "lines": 67,
+        "signature": "export async function initializeBrainContentIndex(): Promise"
+      },
+      {
+        "file": "src/BodyCentricHome.tsx",
+        "start_line": 775,
+        "lines": 98,
+        "signature": "const renderContent = () => {"
+      },
+      {
+        "file": "src/anatomicalRegionMenu.ts",
+        "start_line": 360,
+        "lines": 59,
+        "signature": "export function getRegionMenu(region: AnatomicalRegion, pati"
+      },
+      {
+        "file": "src/tauri-invoke.ts",
+        "start_line": 65,
+        "lines": 406,
+        "signature": "export async function invoke<T>(cmd: string, args?: Record<s"
+      },
+      {
+        "file": "src/tauri-invoke.ts",
+        "start_line": 473,
+        "lines": 189,
+        "signature": "function generateMockAIResponse(userMessage: string): string"
+      },
+      {
+        "file": "src/tauri-invoke.ts",
+        "start_line": 674,
+        "lines": 99,
+        "signature": "function generateMockRAGResponse(userMessage: string, struct"
+      },
+      {
+        "file": "src/ClippingPlanes.tsx",
+        "start_line": 126,
+        "lines": 97,
+        "signature": "export function useClippingPlanes() {"
+      },
+      {
+        "file": "src/ChatView.tsx",
+        "start_line": 338,
+        "lines": 55,
+        "signature": "async function sendMessage() {"
+      },
+      {
+        "file": "src/contentRetrieval.ts",
+        "start_line": 29,
+        "lines": 64,
+        "signature": "async function loadAllContent(): Promise<(EducationalContent"
+      },
+      {
+        "file": "src/universalContentRAG.ts",
+        "start_line": 49,
+        "lines": 79,
+        "signature": "export async function initializeUniversalContentIndex(): Pro"
+      },
+      {
+        "file": "src/ModelLoader.tsx",
+        "start_line": 80,
+        "lines": 231,
+        "signature": "export function useModelLoader() {"
+      },
+      {
+        "file": "src/ConditionSimulator.tsx",
+        "start_line": 731,
+        "lines": 123,
+        "signature": "const renderConditionDetail = () => {"
+      },
+      {
+        "file": "src/ConditionSimulator.tsx",
+        "start_line": 857,
+        "lines": 67,
+        "signature": "const renderOverviewTab = () => {"
+      },
+      {
+        "file": "src/ConditionSimulator.tsx",
+        "start_line": 927,
+        "lines": 118,
+        "signature": "const renderTimelineTab = () => {"
+      },
+      {
+        "file": "src/ConditionSimulator.tsx",
+        "start_line": 1048,
+        "lines": 63,
+        "signature": "const renderComplicationsTab = () => {"
+      },
+      {
+        "file": "src/ConditionSimulator.tsx",
+        "start_line": 1114,
+        "lines": 126,
+        "signature": "const renderTreatmentsTab = () => {"
+      },
+      {
+        "file": "src/ragContentRetrieval.ts",
+        "start_line": 33,
+        "lines": 57,
+        "signature": "export async function initializeContentIndex(): Promise<Cont"
+      },
+      {
+        "file": "src/vitals/VitalsTracker.tsx",
+        "start_line": 250,
+        "lines": 120,
+        "signature": "const renderTabContent = () => {"
+      },
+      {
+        "file": "src/vitals/VitalEducation.tsx",
+        "start_line": 56,
+        "lines": 72,
+        "signature": "function buildVitalContentMap(loc: <T>(en: T, es?: T) => T):"
+      },
+      {
+        "file": "src/AnatomyMainScreen/RegionalContextMenu.tsx",
+        "start_line": 313,
+        "lines": 103,
+        "signature": "function createRegionalMenuItems(hasPatientData: boolean, t:"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "start_line": 437,
+        "lines": 131,
+        "signature": "function returned by useTranslation */\ntype TFn = (key: stri"
+      },
+      {
+        "file": "src/AnatomyMainScreen/AnatomyMainScreen.tsx",
+        "start_line": 1088,
+        "lines": 99,
+        "signature": "function CategoryPanelButtons() {"
+      },
+      {
+        "file": "src/AnatomyMainScreen/utils.ts",
+        "start_line": 268,
+        "lines": 199,
+        "signature": "export function createBridge(patientData: BiologicalSelf): A"
+      },
+      {
+        "file": "src/AnatomyMainScreen/MedicationTargets.tsx",
+        "start_line": 87,
+        "lines": 51,
+        "signature": "function resolvePharmacology(\n  target: MedicationTarget,\n  "
+      },
+      {
+        "file": "src/AnatomyMainScreen/tabs/PathologyTab.tsx",
+        "start_line": 55,
+        "lines": 78,
+        "signature": "function getConditionContent(condition: ExtendedConditionInf"
+      },
+      {
+        "file": "src/AnatomyMainScreen/hooks/useRegionalEncyclopedia.ts",
+        "start_line": 381,
+        "lines": 208,
+        "signature": "export function useRegionalEncyclopedia(regionId: string): U"
+      },
+      {
+        "file": "src/AnatomyMainScreen/hooks/useRegionalEncyclopedia.ts",
+        "start_line": 396,
+        "lines": 77,
+        "signature": "const fetchContent = async () => {"
+      },
+      {
+        "file": "src/AnatomyMainScreen/hooks/useMedicationPharmacology.ts",
+        "start_line": 204,
+        "lines": 172,
+        "signature": "export function useMedicationPharmacology(\n  medications: Pa"
+      },
+      {
+        "file": "src/settings/AccessibilitySettings.tsx",
+        "start_line": 17,
+        "lines": 302,
+        "signature": "export function AccessibilitySettings() {"
+      },
+      {
+        "file": "src/settings/PrivacySettings.tsx",
+        "start_line": 17,
+        "lines": 309,
+        "signature": "export function PrivacySettings() {"
+      },
+      {
+        "file": "src/settings/NotificationSettings.tsx",
+        "start_line": 32,
+        "lines": 319,
+        "signature": "export function NotificationSettings() {"
+      },
+      {
+        "file": "src/settings/DataManagement.tsx",
+        "start_line": 17,
+        "lines": 471,
+        "signature": "export function DataManagement() {"
+      },
+      {
+        "file": "src/settings/ComplexitySettings.tsx",
+        "start_line": 15,
+        "lines": 209,
+        "signature": "export function ComplexitySettings() {"
+      },
+      {
+        "file": "src/settings/ProfileSettings.tsx",
+        "start_line": 54,
+        "lines": 66,
+        "signature": "function DemographicsTab() {"
+      },
+      {
+        "file": "src/settings/ProfileSettings.tsx",
+        "start_line": 126,
+        "lines": 215,
+        "signature": "function ConditionsTab() {"
+      },
+      {
+        "file": "src/settings/ProfileSettings.tsx",
+        "start_line": 347,
+        "lines": 215,
+        "signature": "function MedicationsTab() {"
+      },
+      {
+        "file": "src/settings/ProfileSettings.tsx",
+        "start_line": 568,
+        "lines": 219,
+        "signature": "function AllergiesTab() {"
+      },
+      {
+        "file": "src/settings/ProfileSettings.tsx",
+        "start_line": 793,
+        "lines": 231,
+        "signature": "function FamilyHistoryTab() {"
+      },
+      {
+        "file": "src/settings/ProfileSettings.tsx",
+        "start_line": 1030,
+        "lines": 127,
+        "signature": "function EmergencyContactTab() {"
+      },
+      {
+        "file": "src/settings/ProfileSettings.tsx",
+        "start_line": 1163,
+        "lines": 59,
+        "signature": "export function ProfileSettings() {"
+      },
+      {
+        "file": "src/settings/AppearanceSettings.tsx",
+        "start_line": 52,
+        "lines": 188,
+        "signature": "export function AppearanceSettings() {"
+      },
+      {
+        "file": "src/settings/LanguageSettings.tsx",
+        "start_line": 51,
+        "lines": 166,
+        "signature": "export function LanguageSettings() {"
+      },
+      {
+        "file": "src/settings/useSettings.tsx",
+        "start_line": 132,
+        "lines": 475,
+        "signature": "export function useSettings(): UseSettingsReturn {"
+      },
+      {
+        "file": "src/textures/ProceduralTextures.ts",
+        "start_line": 93,
+        "lines": 62,
+        "signature": "function createNoiseGenerator(seed: number = 12345) {"
+      },
+      {
+        "file": "src/textures/ProceduralTextures.ts",
+        "start_line": 364,
+        "lines": 54,
+        "signature": "function generateMuscleTexture(\n  size: number,\n  options: P"
+      },
+      {
+        "file": "src/textures/ProceduralTextures.ts",
+        "start_line": 675,
+        "lines": 61,
+        "signature": "function generateNormalMapFromDiffuse(\n  diffuseData: ImageD"
+      },
+      {
+        "file": "src/textures/ProceduralTextures.ts",
+        "start_line": 744,
+        "lines": 56,
+        "signature": "function generateProceduralNormalMap(\n  size: number,\n  text"
+      },
+      {
+        "file": "src/error-handling/utils/errorRecovery.ts",
+        "start_line": 43,
+        "lines": 53,
+        "signature": "function createRecoveryStrategy(\n  action: RecoveryAction,\n "
+      },
+      {
+        "file": "src/error-handling/utils/errorParser.ts",
+        "start_line": 25,
+        "lines": 51,
+        "signature": "export function parseError(error: unknown): ErrorInfo {"
+      },
+      {
+        "file": "src/error-handling/utils/stackTrace.ts",
+        "start_line": 68,
+        "lines": 59,
+        "signature": "function parseStackFrame(line: string): StackFrame | null {"
+      },
+      {
+        "file": "src/contexts/VoiceContext.tsx",
+        "start_line": 104,
+        "lines": 76,
+        "signature": "function voiceReducer(state: VoiceState, action: VoiceAction"
+      },
+      {
+        "file": "src/contexts/AdaptiveUIContext.tsx",
+        "start_line": 74,
+        "lines": 64,
+        "signature": "function adaptiveUIReducer(state: AdaptiveUIState, action: A"
+      },
+      {
+        "file": "src/contexts/VoiceCommandContext.tsx",
+        "start_line": 282,
+        "lines": 75,
+        "signature": "function parseVoiceCommand(\n  text: string,\n  cmdConfidence:"
+      },
+      {
+        "file": "src/anatomy/useProgressiveLoader.ts",
+        "start_line": 373,
+        "lines": 54,
+        "signature": "export function useSystemLoader(): UseSystemLoaderResult {"
+      },
+      {
+        "file": "src/anatomy/AnatomyAnimationSystem.tsx",
+        "start_line": 507,
+        "lines": 134,
+        "signature": "function calculateHeartState(\n  time: number,\n  config: Hear"
+      },
+      {
+        "file": "src/anatomy/AnatomyAnimationSystem.tsx",
+        "start_line": 712,
+        "lines": 98,
+        "signature": "function calculateRespiratoryState(\n  time: number,\n  config"
+      },
+      {
+        "file": "src/anatomy/AnatomyAnimationSystem.tsx",
+        "start_line": 994,
+        "lines": 60,
+        "signature": "function calculateDigestiveState(\n  time: number,\n  config: "
+      },
+      {
+        "file": "src/anatomy/InstancedAnatomySystem.tsx",
+        "start_line": 198,
+        "lines": 52,
+        "signature": "export function createRedBloodCellGeometry(radius: number = "
+      },
+      {
+        "file": "src/anatomy/InstancedAnatomySystem.tsx",
+        "start_line": 807,
+        "lines": 60,
+        "signature": "export function usePerformanceMonitor(\n  targetFPS: number ="
+      },
+      {
+        "file": "src/anatomy/EnhancedMaterials.tsx",
+        "start_line": 1237,
+        "lines": 51,
+        "signature": "export function createCinematicMaterial(config: CinematicMat"
+      },
+      {
+        "file": "src/anatomy/content-completeness-validator.ts",
+        "start_line": 52,
+        "lines": 135,
+        "signature": "export function validateContentCoverage(): ContentCoverageRe"
+      },
+      {
+        "file": "src/anatomy/CinematicCameraSystem.tsx",
+        "start_line": 76,
+        "lines": 212,
+        "signature": "function for transitions */\n  transitionEasing: 'linear' | '"
+      },
+      {
+        "file": "src/anatomy/PersonalizedBodyModel.tsx",
+        "start_line": 185,
+        "lines": 129,
+        "signature": "export function usePersonalizedBodyModelControls(\n  patientD"
+      },
+      {
+        "file": "src/anatomy/PersonalizedBodyModel.tsx",
+        "start_line": 322,
+        "lines": 87,
+        "signature": "function calculatePriorityAreas(\n  patientData: BiologicalSe"
+      },
+      {
+        "file": "src/anatomy/CompleteAnatomyFeatures.tsx",
+        "start_line": 313,
+        "lines": 65,
+        "signature": "export function useCompleteAnatomyFeatures() {"
+      },
+      {
+        "file": "src/anatomy/AnatomyLODSystem.tsx",
+        "start_line": 641,
+        "lines": 184,
+        "signature": "export function useLODManager(options: UseLODManagerOptions)"
+      },
+      {
+        "file": "src/anatomy/layers/useLayerSystem.ts",
+        "start_line": 206,
+        "lines": 154,
+        "signature": "function layerReducer(state: LayerSystemState, action: Layer"
+      },
+      {
+        "file": "src/anatomy/layers/useLayerSystem.ts",
+        "start_line": 420,
+        "lines": 230,
+        "signature": "export function useLayerSystem(): UseLayerSystemReturn {"
+      },
+      {
+        "file": "src/anatomy/layers/LayerAnnotations.tsx",
+        "start_line": 114,
+        "lines": 53,
+        "signature": "export function useAnnotationVisibility(\n  annotations: read"
+      },
+      {
+        "file": "src/anatomy/layers/data/index.ts",
+        "start_line": 105,
+        "lines": 70,
+        "signature": "export function searchAllStructures(\n  query: string,\n  lang"
+      },
+      {
+        "file": "src/education/regionContentMapping.ts",
+        "start_line": 2005,
+        "lines": 113,
+        "signature": "function including brainstem',\n    ],\n    clinicalNotesEs: ["
+      },
+      {
+        "file": "src/navigation/NavigationProvider.tsx",
+        "start_line": 85,
+        "lines": 217,
+        "signature": "function navigationReducer(\n  state: NavigationState,\n  acti"
+      },
+      {
+        "file": "src/utils/assetPathResolver.ts",
+        "start_line": 108,
+        "lines": 69,
+        "signature": "function for paths like 'assets/models/skeletal/model.glb'\n "
+      },
+      {
+        "file": "src/utils/anatomyContextBuilder.ts",
+        "start_line": 110,
+        "lines": 89,
+        "signature": "export function buildAnatomySystemPrompt(\n  structureId: str"
+      },
+      {
+        "file": "src/utils/bodyProportionCalculator.ts",
+        "start_line": 171,
+        "lines": 74,
+        "signature": "export function generateStructureTransforms(proportions: Bod"
+      },
+      {
+        "file": "src/utils/device-capability.ts",
+        "start_line": 290,
+        "lines": 119,
+        "signature": "export function detectDeviceCapabilities(): DeviceCapabiliti"
+      },
+      {
+        "file": "src/utils/device-capability.ts",
+        "start_line": 425,
+        "lines": 74,
+        "signature": "export function getQualitySettings(\n  preset: QualityPreset,"
+      },
+      {
+        "file": "src/search/SearchIndex.ts",
+        "start_line": 134,
+        "lines": 113,
+        "signature": "export function indexDocument(doc: SearchDocument): void {"
+      },
+      {
+        "file": "src/search/components/SearchProvider.tsx",
+        "start_line": 100,
+        "lines": 73,
+        "signature": "function searchReducer(state: SearchState, action: SearchAct"
+      },
+      {
+        "file": "src/components/iOS3DDebugOverlay.tsx",
+        "start_line": 180,
+        "lines": 51,
+        "signature": "function checkWebGLSupport(): WebGLStatus {"
+      },
+      {
+        "file": "src/components/AIMedicalEncyclopedia.tsx",
+        "start_line": 224,
+        "lines": 81,
+        "signature": "function getRegionHealthContext(\n  regionId: string,\n  regio"
+      },
+      {
+        "file": "src/components/AIMedicalEncyclopedia.tsx",
+        "start_line": 314,
+        "lines": 59,
+        "signature": "function generateSuggestedQuestions(\n  regionName: string,\n "
+      },
+      {
+        "file": "src/components/AIMedicalEncyclopedia.tsx",
+        "start_line": 382,
+        "lines": 54,
+        "signature": "function generateDidYouKnowFacts(\n  regionName: string,\n  he"
+      },
+      {
+        "file": "src/components/AIMedicalEncyclopedia.tsx",
+        "start_line": 445,
+        "lines": 62,
+        "signature": "function generateEducationalModules(\n  regionName: string,\n "
+      },
+      {
+        "file": "src/components/VoiceMedicalInput.tsx",
+        "start_line": 427,
+        "lines": 52,
+        "signature": "function detectMedicalTerms(\n  text: string,\n  patientTerms?"
+      },
+      {
+        "file": "src/components/DebugPanel.tsx",
+        "start_line": 86,
+        "lines": 63,
+        "signature": "export function setupGlobalErrorHandlers(): void {"
+      },
+      {
+        "file": "src/components/panels/SmartPanelManager.tsx",
+        "start_line": 207,
+        "lines": 341,
+        "signature": "function panelManagerReducer(\n  state: PanelManagerState,\n  "
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "start_line": 252,
+        "lines": 69,
+        "signature": "async function loadAllConditionContent(): Promise<Map<string"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "start_line": 534,
+        "lines": 106,
+        "signature": "export function usePathologyContent(\n  regionId: string,\n  c"
+      },
+      {
+        "file": "src/components/panels/usePathologyContent.ts",
+        "start_line": 547,
+        "lines": 53,
+        "signature": "async function fetchPathologyContent() {"
+      },
+      {
+        "file": "src/components/panels/PathologyPanel.tsx",
+        "start_line": 816,
+        "lines": 710,
+        "signature": "function PanelStyles() {"
+      },
+      {
+        "file": "src/components/navigation/UnifiedNavigation.tsx",
+        "start_line": 155,
+        "lines": 86,
+        "signature": "function navigationReducer(\n  state: UnifiedNavigationState,"
+      },
+      {
+        "file": "src/components/navigation/UnifiedNavigation.tsx",
+        "start_line": 355,
+        "lines": 55,
+        "signature": "const handleKeyDown = (event: KeyboardEvent) => {"
+      },
+      {
+        "file": "src/components/voice/voiceIntentClassifier.ts",
+        "start_line": 118,
+        "lines": 92,
+        "signature": "export function classifyIntent(transcript: string): Classifi"
+      },
+      {
+        "file": "src/ai/useAI.ts",
+        "start_line": 39,
+        "lines": 416,
+        "signature": "export function useAI() {"
+      },
+      {
+        "file": "src/ai/AnatomyIntentRecognizer.ts",
+        "start_line": 901,
+        "lines": 51,
+        "signature": "export function mergeRecognitionResults(\n  results: IntentRe"
+      },
+      {
+        "file": "src/ai/EducationalContextBuilder.ts",
+        "start_line": 2615,
+        "lines": 77,
+        "signature": "export function buildAnatomyChatSystemPrompt(\n  ctx: Anatomy"
+      },
+      {
+        "file": "src/ai/components/SmartAnatomyResponse.tsx",
+        "start_line": 207,
+        "lines": 56,
+        "signature": "function parseTextSegments(text: string): TextSegment[] {"
+      },
+      {
+        "file": "src/ai/components/AIQuiz.tsx",
+        "start_line": 98,
+        "lines": 69,
+        "signature": "const renderOptions = () => {"
+      },
+      {
+        "file": "src/ai/hooks/useSmartNavigation.ts",
+        "start_line": 332,
+        "lines": 203,
+        "signature": "export function useSmartNavigation(): UseSmartNavigationRetu"
+      },
+      {
+        "file": "src/ai/prompts/enhanced-prompts.ts",
+        "start_line": 138,
+        "lines": 73,
+        "signature": "export function buildSymptomAnalysisPrompt(\n  symptoms: Symp"
+      },
+      {
+        "file": "src/ai/prompts/enhanced-prompts.ts",
+        "start_line": 221,
+        "lines": 72,
+        "signature": "export function buildMedicationCheckPrompt(\n  medications: M"
+      },
+      {
+        "file": "src/ai/prompts/enhanced-prompts.ts",
+        "start_line": 303,
+        "lines": 65,
+        "signature": "export function buildLabInterpretationPrompt(\n  labs: LabInp"
+      },
+      {
+        "file": "src/ai/prompts/index.ts",
+        "start_line": 83,
+        "lines": 56,
+        "signature": "export function buildHealthContext(data: DashboardData | nul"
+      },
+      {
+        "file": "src/ai/prompts/index.ts",
+        "start_line": 199,
+        "lines": 51,
+        "signature": "export function buildHistologyPrompt(\n  context: HistologyCo"
+      },
+      {
+        "file": "src/ai/prompts/index.ts",
+        "start_line": 259,
+        "lines": 55,
+        "signature": "export function buildConditionPrompt(\n  context: ConditionCo"
+      },
+      {
+        "file": "src/hooks/useLearningProgress.ts",
+        "start_line": 31,
+        "lines": 127,
+        "signature": "export function useLearningProgress() {"
+      },
+      {
+        "file": "src/hooks/useVoiceFallback.ts",
+        "start_line": 196,
+        "lines": 222,
+        "signature": "export function useVoiceFallback(\n  language: string = 'en-U"
+      },
+      {
+        "file": "src/hooks/usePhysiologyContent.ts",
+        "start_line": 411,
+        "lines": 160,
+        "signature": "async function loadPhysiologyContent(\n  regionId: string,\n  "
+      },
+      {
+        "file": "src/hooks/usePhysiologyContent.ts",
+        "start_line": 591,
+        "lines": 66,
+        "signature": "export function usePhysiologyContent(\n  regionId: string,\n  "
+      },
+      {
+        "file": "src/hooks/useBilingualContent.ts",
+        "start_line": 79,
+        "lines": 64,
+        "signature": "export function useBilingualContent(\n  content?: Educational"
+      },
+      {
+        "file": "src/hooks/useKnowledgeGraph.ts",
+        "start_line": 84,
+        "lines": 56,
+        "signature": "export function useKnowledgeGraph(nodeId: string): Knowledge"
+      },
+      {
+        "file": "src/hooks/useJourneyContext.ts",
+        "start_line": 38,
+        "lines": 51,
+        "signature": "export function useJourneyContext(): JourneyContextResult {"
+      },
+      {
+        "file": "src/hooks/useAIEnhancement.ts",
+        "start_line": 76,
+        "lines": 229,
+        "signature": "export function useAIEnhancement(): UseAIEnhancementReturn {"
+      },
+      {
+        "file": "src/hooks/useAIContext.tsx",
+        "start_line": 168,
+        "lines": 144,
+        "signature": "export function useAIContext(): UseAIContextReturn {"
+      },
+      {
+        "file": "src/hooks/useBrainContentRAG.ts",
+        "start_line": 20,
+        "lines": 60,
+        "signature": "export function useBrainContentRAG() {"
+      },
+      {
+        "file": "src/hooks/useRegionSymptoms.ts",
+        "start_line": 133,
+        "lines": 87,
+        "signature": "export function useRegionSymptoms(\n  regionId: string | null"
+      },
+      {
+        "file": "src/hooks/useContent.ts",
+        "start_line": 278,
+        "lines": 53,
+        "signature": "export function useExplanation(\n  topicId: string,\n  level: "
+      },
+      {
+        "file": "src/hooks/useTheme.ts",
+        "start_line": 47,
+        "lines": 73,
+        "signature": "export function useTheme() {"
+      },
+      {
+        "file": "src/hooks/useFavorites.ts",
+        "start_line": 20,
+        "lines": 84,
+        "signature": "export function useFavorites() {"
+      },
+      {
+        "file": "src/hooks/useAnatomy3DTracking.ts",
+        "start_line": 21,
+        "lines": 104,
+        "signature": "export function useAnatomy3DTracking() {"
+      },
+      {
+        "file": "src/hooks/useHistologyContent.ts",
+        "start_line": 347,
+        "lines": 85,
+        "signature": "function generateFallbackContent(\n  regionId: string,\n  regi"
+      },
+      {
+        "file": "src/hooks/useNetworkStatus.ts",
+        "start_line": 75,
+        "lines": 159,
+        "signature": "export function useNetworkStatus(): UseNetworkStatusReturn {"
+      },
+      {
+        "file": "src/hooks/useUserDemographics.ts",
+        "start_line": 98,
+        "lines": 193,
+        "signature": "export function useUserDemographics(): UseUserDemographicsRe"
+      },
+      {
+        "file": "src/hooks/useActionTracker.ts",
+        "start_line": 139,
+        "lines": 116,
+        "signature": "export function useActionTracker<T extends ActionType = Acti"
+      },
+      {
+        "file": "src/hooks/useUniversalContentRAG.ts",
+        "start_line": 18,
+        "lines": 67,
+        "signature": "export function useUniversalContentRAG() {"
+      },
+      {
+        "file": "src/errors/types.ts",
+        "start_line": 130,
+        "lines": 265,
+        "signature": "function getErrorDefaults(code: ErrorCode): Pick<AppError, '"
+      },
+      {
+        "file": "src/export/pdfGenerator.ts",
+        "start_line": 37,
+        "lines": 53,
+        "signature": "export function generatePDFFromHTML(\n  htmlContent: string,\n"
+      },
+      {
+        "file": "src/export/pdfGenerator.ts",
+        "start_line": 99,
+        "lines": 281,
+        "signature": "function getPrintStyles(options: PDFGeneratorOptions): strin"
+      },
+      {
+        "file": "src/export/pdfGenerator.ts",
+        "start_line": 386,
+        "lines": 176,
+        "signature": "export function generateHealthSummaryPDF(report: HealthSumma"
+      },
+      {
+        "file": "src/export/pdfGenerator.ts",
+        "start_line": 568,
+        "lines": 119,
+        "signature": "export function generateMedicationReportPDF(report: Medicati"
+      },
+      {
+        "file": "src/export/pdfGenerator.ts",
+        "start_line": 693,
+        "lines": 115,
+        "signature": "export function generateLabTrendsPDF(report: LabTrendsReport"
+      },
+      {
+        "file": "src/export/pdfGenerator.ts",
+        "start_line": 814,
+        "lines": 170,
+        "signature": "export function generateDoctorVisitPDF(report: DoctorVisitRe"
+      },
+      {
+        "file": "src/export/pdfGenerator.ts",
+        "start_line": 1006,
+        "lines": 57,
+        "signature": "export function generateEncyclopediaEntryPDF(entry: Encyclop"
+      },
+      {
+        "file": "src/export/printManager.ts",
+        "start_line": 496,
+        "lines": 75,
+        "signature": "export function injectPrintStyles(): void {"
+      },
+      {
+        "file": "src/performance/PerformanceMonitor.ts",
+        "start_line": 453,
+        "lines": 142,
+        "signature": "export async function runGPUBenchmark(forceRun: boolean = fa"
+      },
+      {
+        "file": "src/performance/PerformanceMonitor.ts",
+        "start_line": 512,
+        "lines": 79,
+        "signature": "function benchmarkFrame() {"
+      },
+      {
+        "file": "src/i18n/utils.ts",
+        "start_line": 82,
+        "lines": 107,
+        "signature": "export function formatRelativeTime(\n  date: Date | number | "
+      },
+      {
+        "file": "src/i18n/test-i18n.tsx",
+        "start_line": 16,
+        "lines": 137,
+        "signature": "export function I18nTest(): React.ReactElement {"
+      },
+      {
+        "file": "src/accessibility/index.ts",
+        "start_line": 451,
+        "lines": 78,
+        "signature": "export function handle3DKeyboard(\n  e: KeyboardEvent,\n  hand"
+      },
+      {
+        "file": "src/data/loadEncyclopedia.ts",
+        "start_line": 125,
+        "lines": 198,
+        "signature": "function loadSampleEncyclopediaData(): EducationalContent[] "
+      },
+      {
+        "file": "src/data/loadEncyclopedia.ts",
+        "start_line": 359,
+        "lines": 73,
+        "signature": "export function searchEncyclopedia(query: ContentSearchQuery"
+      },
+      {
+        "file": "src/views/MedicalEncyclopediaView.tsx",
+        "start_line": 117,
+        "lines": 60,
+        "signature": "function getBrowseItemsForCategory(category: CategoryFilter)"
+      },
+      {
+        "file": "src/notifications/NotificationCenter.tsx",
+        "start_line": 199,
+        "lines": 145,
+        "signature": "export function NotificationCenter() {"
+      },
+      {
+        "file": "src/notifications/HealthAlerts.tsx",
+        "start_line": 18,
+        "lines": 91,
+        "signature": "export function useMedicationReminders() {"
+      },
+      {
+        "file": "src/notifications/HealthAlerts.tsx",
+        "start_line": 112,
+        "lines": 95,
+        "signature": "export function useAppointmentReminders() {"
+      },
+      {
+        "file": "src/notifications/HealthAlerts.tsx",
+        "start_line": 210,
+        "lines": 85,
+        "signature": "export function useVitalAlerts() {"
+      },
+      {
+        "file": "src/notifications/HealthAlerts.tsx",
+        "start_line": 298,
+        "lines": 84,
+        "signature": "export function useSymptomReminders() {"
+      },
+      {
+        "file": "src/notifications/SystemNotifications.tsx",
+        "start_line": 12,
+        "lines": 101,
+        "signature": "export function useSyncNotifications() {"
+      },
+      {
+        "file": "src/notifications/SystemNotifications.tsx",
+        "start_line": 116,
+        "lines": 52,
+        "signature": "export function useUpdateNotifications() {"
+      },
+      {
+        "file": "src/notifications/EducationalNotifications.tsx",
+        "start_line": 99,
+        "lines": 70,
+        "signature": "export function useHealthTips() {"
+      },
+      {
+        "file": "src/notifications/EducationalNotifications.tsx",
+        "start_line": 224,
+        "lines": 58,
+        "signature": "export function useContentAlerts() {"
+      },
+      {
+        "file": "src/notifications/NotificationContext.tsx",
+        "start_line": 37,
+        "lines": 81,
+        "signature": "function notificationReducer(\n  state: NotificationCenterSta"
+      },
+      {
+        "file": "src/services/RegionalConditionMapper.ts",
+        "start_line": 757,
+        "lines": 62,
+        "signature": "function tests', 'Lung biopsy', '6-minute walk test'],\n    s"
+      },
+      {
+        "file": "src/services/KnowledgeRAGService.ts",
+        "start_line": 97,
+        "lines": 165,
+        "signature": "export function buildRAGContext(\n  query: string,\n  userCont"
+      },
+      {
+        "file": "src/services/KnowledgeRAGService.ts",
+        "start_line": 276,
+        "lines": 86,
+        "signature": "export function getRelatedContent(\n  entityId: string,\n  ent"
+      },
+      {
+        "file": "src/onboarding/OnboardingProvider.tsx",
+        "start_line": 87,
+        "lines": 189,
+        "signature": "function onboardingReducer(\n  state: OnboardingState,\n  acti"
+      },
+      {
+        "file": "src/onboarding/hooks/useOnboarding.ts",
+        "start_line": 55,
+        "lines": 105,
+        "signature": "export function useOnboarding(): UseOnboardingReturn {"
+      },
+      {
+        "file": "src/onboarding/hooks/useOnboardingProgress.ts",
+        "start_line": 63,
+        "lines": 138,
+        "signature": "export function useOnboardingProgress(): UseOnboardingProgre"
+      }
+    ],
+    "empty_catch": [],
+    "hardcoded_strings": [],
+    "unused_imports_suspects": []
+  }
+}

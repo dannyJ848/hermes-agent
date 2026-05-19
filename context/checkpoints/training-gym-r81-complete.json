@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r81-complete",
+  "context": "Training Gym R81 completed! ALL 4 PASS ON FIRST TRY!\n\nR81 RESULTS (all 10/10):\n1. n-queens-001 (T9) - Backtracking with cols, pos_diag (r+c), neg_diag (r-c) sets. Place queen row by row.\n2. min-stack-001 (T8) - Two stacks. Push to min_stack only if val <= current min. Pop from both if matching.\n3. evaluate-reverse-polish-001 (T8) - Stack. Push numbers. Pop 2 for operators. int(a/b) for truncation toward zero.\n4. merge-intervals-001 (T8) - Sort by start. If current.start <= prev.end: merge (max end). Else: new interval.\n\nDB: 323 exercises, 563 attempts, avg 9.91, 95.4% perfect. 274 passed. Tier 9+ = 73, Tier 10 = 46.\n47+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R81 complete",
+    "R82 next"
+  ],
+  "decisions": [
+    "N-Queens: backtracking with 3 sets (cols, pos_diag=r+c, neg_diag=r-c). O(n!) worst case.",
+    "Min Stack: two stacks. min_stack only stores new minimums. Pop from min_stack if popped val matches top.",
+    "RPN: stack. Push numbers. Pop b then a for ops. Division: int(a/b) for truncation toward zero.",
+    "Merge intervals: sort by start. Linear scan. Merge if overlap (cur.start<=prev.end). Update prev end = max."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R82: Continue. Try:Serialize/Deserialize Binary Tree, LFU Cache, or Maximal Rectangle.",
+  "timestamp": "2026-04-08T21:39:58Z",
+  "unix_time": 1775684398.679326,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

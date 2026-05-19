@@ -1,0 +1,62 @@
+{
+  "version": "v3-engineering-audit",
+  "timestamp": "2026-04-06T17:39:41",
+  "experiences": {
+    "before": {
+      "signal": 219,
+      "noise": 3
+    },
+    "after": {
+      "signal": 219,
+      "noise": 1
+    },
+    "purged": 2
+  },
+  "tips_generated": 0,
+  "mastery_synced": 0,
+  "scorecard": {
+    "overall_score": 4.1,
+    "level": 4,
+    "level_name": "High Autonomy \u2014 self-directed",
+    "dimensions": {
+      "SELF_IMPROVEMENT": {
+        "score": 5,
+        "evidence": [
+          "57 distilled tips, 0 lessons (extensive learning)",
+          "11 meta-insights (deep reflection)"
+        ]
+      },
+      "ERROR_RECOVERY": {
+        "score": 3,
+        "evidence": [
+          "28 recovery tips",
+          "Overall success rate: 50.5% (12901 calls)"
+        ]
+      },
+      "TASK_SELECTION": {
+        "score": 5,
+        "evidence": [
+          "AGI cycle 217/1000",
+          "5 domains calibrated",
+          "9 exploration tasks pending"
+        ]
+      },
+      "CONTEXT_MANAGEMENT": {
+        "score": 3,
+        "evidence": [
+          "560 semantic facts stored",
+          "0 context pages in reservoir"
+        ]
+      },
+      "TOOL_MASTERY": {
+        "score": 4,
+        "evidence": [
+          "14/38 tools mastered (37%)",
+          "Average confidence: 0.68"
+        ]
+      }
+    },
+    "timestamp": "2026-04-06T17:39:41"
+  },
+  "gates_passed": 5
+}

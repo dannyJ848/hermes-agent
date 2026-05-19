@@ -1,0 +1,11 @@
+{
+  "label": "x-scanner-rig-complete",
+  "context": "COMPLETED: X AI news scanner rig fully working. /tmp/x_scanner.py scans HomeLatestTimeline, filters for AI keywords, ranks by engagement, returns structured results. Fixed X API user extraction (screen_name moved from result.legacy to result.core). Cron job 61c3a3adfd0e runs 3x daily. SOMA squad (3 agents) spun up in tmux, briefed on self-improvement mission, all knowledge/skills transferred. Delegation plugin simplified to GLM-5.1 only with 4000 default max_tokens. Squad board at /tmp/squad-board.json with shared lessons.",
+  "active_tasks": [
+    "SOMA squad self-improvement (autonomous)",
+    "X scanner cron running 3x daily",
+    "Self-improvement free exploration"
+  ],
+  "timestamp": "2026-04-01T03:30:38Z",
+  "task_id": "20260331_220745_fe055c"
+}

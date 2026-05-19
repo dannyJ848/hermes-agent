@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r42-complete",
+  "context": "Training Gym R42 completed. All 4 exercises 10/10 (2 needed bug fixes).\n\nR42 RESULTS (all 10/10):\n1. suffix-array-001 (T9) - Prefix doubling + Kasai's LCP. 5 tests. Test fix: LCP order is [1,2,3] not [3,2,1] for \"aaaa\".\n2. treap-001 (T7) - Treap with split/merge/kth/rank. 6 tests. Clean.\n3. rbtree-001 (T9) - Full Red-Black Tree with insert+delete fixup. 5 tests. Clean! No bugs!\n4. count-min-sketch-001 (T7) - CMS with MD5 hashing. 5 tests. Seed overflow bug fixed with % 2^32.\n\nKEY INSIGHT: RB Tree was clean on first try - the NIL sentinel pattern worked perfectly. Treap also clean.\n\nDB: 239 exercises, 407 attempts, avg 9.87\n5 consecutive clean rounds (R38-R42), but each round still has 1-2 exercises with bugs.",
+  "active_tasks": [
+    "R42 complete",
+    "R43 next"
+  ],
+  "decisions": [
+    "RB Tree: NIL sentinel simplifies all pointer operations - no null checks needed",
+    "Count-Min Sketch seeds: use modulo 2^32 for unsigned 32-bit packing",
+    "Suffix Array LCP: the LCP value depends on suffix lengths in SA order, not descending"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R43 exercises. Push boundaries: Concurrent DS, Distributed Hash, or Graph Algorithms.",
+  "timestamp": "2026-04-08T19:01:08Z",
+  "unix_time": 1775674868.435372,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

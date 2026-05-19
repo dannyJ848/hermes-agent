@@ -1,0 +1,26 @@
+{
+  "label": "r25-complete-vision-confirmed",
+  "context": "R25 COMPLETE — Episodic Memory module built, wired, and vision-verified.\n\nCOMPLETED:\n1. GLM-5V-Turbo vision pipeline WORKING — requires base64 encoding (not URLs). API: https://api.z.ai/api/paas/v4/ model=glm-5v-turbo. Key in ~/.hermes/config.yaml auxiliary.vision.api_key.\n2. Generated fresh cortex architecture diagram with live stats (24,164 nodes, 321 tips, 22 wired modules)\n3. GLM-5V visual analysis identified MEMORY domain as #1 gap (0% coverage, 17,707 nodes, 0 modules). Called architecture \"high-IQ goldfish with no persistence\"\n4. Researched GSW paper (arXiv:2511.07587, AAAI 2026 Oral) — Generative Semantic Workspace\n5. Built episodic_memory.py (~15KB) at ~/subconscious/episodic_memory.py — Operator/Reconciler/Retriever pattern\n6. Wired into BOTH post_tool_call (line ~862, captures tool outcomes) and pre_llm_call (line ~3253, injects retrieved context)\n7. Tested: capture() correctly classifies domains, retrieve() found 8 tips on first query from Cortex DB\n8. Distilled 6 tips to Cortex\n9. Regenerated diagram with R25 visible, GLM-5V verified: Memory domain ACTIVATED, balance 2/10→7/10\n10. Next gap identified by GLM-5V: novelty detection, world model\n\nCURRENT STATE:\n- Plugin: ~3,620 lines (was 3,597)\n- Modules: 22 wired + 4 standalone = 26 total (226 files)\n- R25 added episodic_memory in both hooks\n- Cortex: 24,164 nodes, 369,285 edges, 321 tips, Elo max 2273\n- 16 research papers (added GSW)\n- GLM-5V vision pipeline confirmed working via base64\n\nGLM-5V VISION PIPELINE (critical):\n  1. Generate diagram HTML → ~/Desktop/cortex_architecture.html\n  2. open -a \"Google Chrome\" ~/Desktop/cortex_architecture.html && sleep 3 && screencapture -x /tmp/cortex_r25.png\n  3. base64 encode PNG, send to https://api.z.ai/api/paas/v4/ chat/completions with model=glm-5v-turbo\n  4. Image must be data:image/png;base64,{b64} NOT a URL\n  5. Write script to /tmp/ and run — shell quoting breaks inline Python with psycopg2\n\nNEXT: R26 targeting novelty detection or world model (per GLM-5V analysis)",
+  "active_tasks": [
+    "R26: Build novelty detection or world model module (GLM-5V identified as next gap)"
+  ],
+  "decisions": [
+    "GLM-5V requires base64-encoded images not URLs for vision API",
+    "GSW (arXiv:2511.07587) chosen for episodic memory — AAAI 2026 Oral, Operator-Reconciler-Retriever pattern",
+    "Memory domain was #1 gap at 0% — now activated with R25",
+    "Next gaps: novelty detection and world model per GLM-5V analysis"
+  ],
+  "files_modified": [
+    "~/subconscious/episodic_memory.py (new, 15KB)",
+    "~/.hermes/plugins/distillation/__init__.py (R25 wired in both hooks)",
+    "~/Desktop/cortex_architecture.html (regenerated R25 state)",
+    "/tmp/gen_diagram_r25.py",
+    "/tmp/vision_r25_verify.py"
+  ],
+  "next_steps": "1. Research novelty detection papers (curiosity-driven exploration, surprise detection)\n2. Build R26 module targeting novelty/world model gap\n3. Wire into plugin, test, distill tips\n4. Regenerate diagram + vision verify R26\n5. Continue until ~100K tokens, then save checkpoint before compression",
+  "timestamp": "2026-04-15T00:03:05Z",
+  "unix_time": 1776211385.551509,
+  "task_id": "20260414_183956_d3ed13",
+  "source": "manual",
+  "version": 2
+}

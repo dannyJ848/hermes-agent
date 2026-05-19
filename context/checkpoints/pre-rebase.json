@@ -1,0 +1,18 @@
+{
+  "label": "pre-rebase",
+  "context": "Pulling 19 upstream commits from NousResearch/hermes-agent onto our local main branch. We have 1 local commit ahead (distillation plugin + hindsight context engine work). Rebasing to keep our work on top. After rebase, need to restart gateway to apply changes. Key concern: our local untracked files (cerebrum_memory.db, plugins/context_engine/hindsight/, generate_embeddings.py, populate_embeddings.py, wiki/) should be unaffected by rebase. Also need to clear __pycache__ after.",
+  "active_tasks": [
+    "Git rebase: pull 19 upstream commits"
+  ],
+  "decisions": [
+    "Rebase (not merge) to keep clean history",
+    "Will restart gateway after to apply all fixes"
+  ],
+  "files_modified": [],
+  "next_steps": "Run git rebase origin/main, resolve any conflicts, restart gateway",
+  "timestamp": "2026-04-14T00:04:09Z",
+  "unix_time": 1776125049.550703,
+  "task_id": "20260413_171007_ab89d0",
+  "source": "manual",
+  "version": 2
+}

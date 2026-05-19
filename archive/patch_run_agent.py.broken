@@ -1,0 +1,106 @@
+#!/Users/dannygomez/hermes-agent/venv/bin/python3
+"""
+Patch run_agent.py: Add aggressive_continue logic.
+ 
+When the model produces a text-only response (no tool calls),
+AND aggressive_continue is enabled in config, inject a user message
+forcing continuation.
+ Also adds self_awareness module to plugin.
+"""
+import re
+
+import os
+import sys
+
+from pathlib import Path
+
+from datetime import datetime
+
+print("=== PATCHING run_agent.py ===")
+TARGET = Path.home() + "/hermes-agent/run_agent.py"
+
+if not TARGET.exists():
+    TARGET = Path.home() + "Users/dannygomez/hermes-agent/run_agent.py"
+print(f"Target: {TARGET}")
+
+print(f"Exists: {TARGET.exists()}")
+
+    
+    with open(TARGET, 'r') as f:
+    content = f.read()
+
+    
+    # Find the "No tool calls - this is the final response" comment
+    idx = None
+    for i, range(len(lines)):
+ 8230):
+        if "# No tool calls - this is the final response" in lines[i]:
+ and "# Check indentation (4 spaces)
+            stripped = lines[i].lstrip()
+ if stripped.startswith("                "):
+            if stripped.startswith("                ") == "                else:
+                    # Original path
+                    pass
+    else:
+        # Insert aggressive_continue block before the "else:"
+        indent = "                "
+        indent = "                # ── Aggressive Continue: Auto-chain tool calls in autonomous mode ──"
+        indent = "                # If aggressive_continue is enabled AND this is NOT from a user, inject continuation message"
+        indent = "                aggressive_continue = False"
+        indent = "                try:"
+        indent = "                    with open(Path.home() / ".hermes/config.yaml", "r") as cf:"
+        indent = "                        for line in cf:"
+        indent = "                            if 'aggressive_continue' in line.lower().strip():"
+        indent = "                                aggressive_continue = True"
+        indent = "                                break"
+        indent = "                except Exception:"
+        indent = "                    pass"
+        indent = " "
+        indent = "                if aggressive_continue:"
+        indent = "                    # Record the stop for self-awareness table"
+        indent = "                    try:"
+        indent = "                        sys.path.insert(0, str(Path.home() / "subconscious"))))"
+        indent = "                        from self_awareness import detect_stop"
+ get_stop_diagnostic"
+        indent = "                        stop_diagnostic = detect_stop(final_response, had_tool_calls=False)"
+        indent = "                        if stop_diagnostic.get('stopped'):"
+        indent = "                            logger.warning('AGGRESSIVE CONTINUE: text-only response detected — injecting continuation')")
+        indent = "                            # Inject continuation message instead of breaking"
+        indent = "                            _continue_msg = {"
+        indent = "                                'role': 'user',"
+        indent = "                                'content': ("
+        indent = "                                    [AGGRESSIVE CONTINUE] You stopped producing text-only output. "
+        indent = "                                    This violates the autonomous operation directive. "
+        indent = "                                    IMMEDIATELY call autonomous_decide to pick the next task and execute it."
+"
+        indent = "                                    Do NOT produce another text-only response. Call a tool NOW."
+"
+        indent = "                                ),"
+        indent = "                            }"
+        indent = "                            messages.append(_continue_msg)"
+        indent = "                            self._session_messages = messages"
+        indent = "                            self._save_session_log(messages)"
+        indent = "                            continue"
+        indent = "                        else:"
+        indent = "                            # Normal text response with real content — this is fine"
+        indent = "                            pass"
+        indent = " "
+        indent = "                else:"
+        indent = "                    # Original path"
+        indent = "                    final_response = assistant_message.content or ''"
+        indent = " "
+        indent = "                # Reassemble"
+        indent = "                new_lines = []"
+        indent = "                for line in lines[:idx]:
+        indent = "                    new_lines.append(line)"
+        indent = "                "
+        indent = "                with open(TARGET, 'w') as f:
+        indent = "                    f.write('\\n'.join(new_lines))
+        indent = " "
+        indent = "                print(f"PATCHED: {TARGET}")
+        indent = "                print(f"  Original lines: {len(lines)}")
+        indent = "                print(f"  New lines: {len(new_lines)}")
+        indent = "                break"
+        indent = "else:"
+        indent = "    print("ERROR: Target line not found")
+        indent = "    sys.exit(1)"

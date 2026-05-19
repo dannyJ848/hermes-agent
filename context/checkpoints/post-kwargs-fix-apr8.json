@@ -1,0 +1,25 @@
+{
+  "label": "post-kwargs-fix-apr8",
+  "context": "STATE: 1154 distilled tips at 0.8528 avg confidence. 24 functional chains. 128 tools covered.\n\nCRITICAL FIX APPLIED THIS SESSION:\n- post_tool_call hook was silently failing with TypeError: \"_on_post_tool_call() got an unexpected keyword argument 'session_id'\"\n- Same gateway kwargs bug as the mesh plugin — invoke_hook passes ALL kwargs to callbacks\n- FIX: Added **kwargs to _on_post_tool_call signature in ~/.hermes/plugins/distillation/__init__.py L370\n- Also added logging to run_agent.py except blocks (was silent pass, now logs warnings at L6257 and L6573)\n- Verified via standalone test: callback fires without error, returns 0 results (side-effect writes to DB)\n\nALREADY WORKING:\n- pre_llm_call (tip injection) — confirmed injecting in live sessions\n- post_api_request (API tracking) — 8009 entries in api_analytics.db\n\nFILES MODIFIED THIS SESSION:\n- ~/.hermes/plugins/distillation/__init__.py — added **kwargs to _on_post_tool_call (L370)\n- ~/hermes-agent/run_agent.py — added logging to both post_tool_call except blocks (L6257, L6573)\n\nGATEWAY: needs restart for run_agent.py changes to take effect in new CLI sessions.\nCAFFEINATE PID: 82351\n\nBUILD-ACTIVATE-TEST-GROW: After restart, verify post_tool_call fires with real data by checking mythos DB and skill_rewards DB for entries with timestamps AFTER restart time.",
+  "active_tasks": [
+    "1154 tips, 0.8528 avg, 24 chains",
+    "post_tool_call **kwargs fix applied — needs restart to activate in live sessions",
+    "Verify hooks fire with real data after restart",
+    "Continue training gym with active feedback loop"
+  ],
+  "decisions": [
+    "Root cause: gateway kwargs (session_id, etc.) passed to plugin callbacks that don't accept them",
+    "Same bug pattern as mesh plugin — all plugin callbacks need **kwargs",
+    "Silent except:pass was hiding the TypeError for unknown time"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py (added **kwargs L370)",
+    "~/hermes-agent/run_agent.py (logging in except blocks L6257, L6573)"
+  ],
+  "next_steps": "1. Full restart (gateway + new CLI)\n2. Make 3-4 tool calls\n3. Check mythos_enhancements.db call_history and skill_rewards.db for entries with timestamps > restart time\n4. If confirmed, continue training gym with active feedback loop",
+  "timestamp": "2026-04-09T01:16:31Z",
+  "unix_time": 1775697391.877841,
+  "task_id": "20260408_143528_e93fb4",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,27 @@
+{
+  "label": "post-audit-reddit-scan-apr18",
+  "context": "Completed comprehensive audit of all 16 SuperQwen3.6 scripts in ~/dgx-spark-prep/ plus Reddit deep scan for Qwen3.6 developments.\n\nAUDIT: Found and fixed 13 bugs across the pipeline:\n- CRITICAL: spark-lora-train.sh silently ignored 10 orchestrator override args (--data-dir, --base-model, etc.)\n- CRITICAL: --lora-r/--lora-alpha arg name mismatch between orchestrator and training script\n- CRITICAL: batch/gradient-accum not injected into Python heredoc (mangled Python ternary)\n- CRITICAL: GRPO not receiving --base-model from orchestrator (would train on wrong base model)\n- CRITICAL: Merge phase 3x Python blocks missing UMA fix (would OOM on DGX Spark)\n- HIGH: GRPO target_modules missing gate, up_proj, down_proj\n- HIGH: GRPO missing liger-kernel\n- Earlier fixes: GRPO wrong Docker image, missing preserve_thinking, missing UMA import\n\nREDDIT SCAN: 4 integrations applied:\n1. UNSLOTH_MOE_BACKEND=grouped_mm added to spark-lora-train.sh (12x faster MoE training)\n2. PYTORCH_TUNABLEOP_TUNING=1 added to both vLLM Docker containers in spark-maxperf.sh\n3. MTP speculative decoding DISABLED — vLLM bugs #38182/#39680 show 62.5% perf degradation\n4. DavidAU \"Why Abliterated Models SUCK\" confirms our Restore SFT approach is correct\n\nFiles modified this session: spark-lora-train.sh, spark-grpo-train.sh, spark-maxperf.sh, superqwen3-super.sh",
+  "active_tasks": [
+    "Comprehensive audit: COMPLETED",
+    "Reddit deep scan: COMPLETED",
+    "Check tweet from 0xsero: IN PROGRESS"
+  ],
+  "decisions": [
+    "MTP speculative decoding disabled until vLLM fixes #38182",
+    "UNSLOTH_MOE_BACKEND=grouped_mm is the fastest option for GH200",
+    "Hot expert caching / --n-cpu-moe / ik_llama.cpp NOT applicable to DGX Spark UMA",
+    "DavidAU TOTAL RECALL validated our Restore SFT methodology"
+  ],
+  "files_modified": [
+    "~/dgx-spark-prep/spark-lora-train.sh",
+    "~/dgx-spark-prep/spark-grpo-train.sh",
+    "~/dgx-spark-prep/spark-maxperf.sh",
+    "~/dgx-spark-prep/superqwen3-super.sh"
+  ],
+  "next_steps": "Check the tweet from https://x.com/0xsero/status/2045255629791490456 — user asked to look at it before calling it a day",
+  "timestamp": "2026-04-18T18:35:49Z",
+  "unix_time": 1776537349.320838,
+  "task_id": "20260418_124117_725065",
+  "source": "manual",
+  "version": 2
+}

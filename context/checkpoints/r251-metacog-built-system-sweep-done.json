@@ -1,0 +1,21 @@
+{
+  "label": "r251-metacog-built-system-sweep-done",
+  "context": "METACOGNITION MODULE BUILT + WIRED. SYSTEM SWEEP COMPLETE.\n\nNEW MODULE: ~/subconscious/intrinsic_metacognition.py\n  - Self-questioning: analyzes cerebrum gaps, generates self-directed training tasks\n  - Self-navigating: retrieves relevant past experience to guide exploration\n  - Self-attributing: scores each training step (research/distill/insert/verify) 1-10\n  - Timely revision: checks mid-round health, detects degradation, triggers correction\n  - Plugin injection: 144 chars, added to pre_llm_call at line ~2785\n\nWIRED: Plugin line ~2785, imports intrinsic_metacognition, injects [METACOG] status every turn\n\nR251 TIPS: 12 metacognition tips from 3 papers:\n  - AgentEvolver (arxiv 2511.10395): 4 tips on self-questioning/navigating/attributing/context management\n  - Agent-R (arxiv 2501.11425): 4 tips on timely revision, revision trajectories, loop avoidance, iterative training\n  - Self-Improvement Overview (arxiv 2603.25681): 3 tips on closed-loop lifecycle, autonomous evaluation, self-generated signals\n  - Cross-synthesis: 1 tip on segment-wise reward rescaling\n\nSYSTEM SWEEP RESULTS:\n  - Deduplication: 65 duplicates removed (1611→1546 tips, avg conf 0.87→0.88)\n  - Hindsight: 9,945 nodes, 398K links, recall works (POST method confirmed)\n  - API analytics: 17,535 calls tracked\n  - All 4 inference servers UP\n  - Gateway: v0.8.1 running, no new errors\n\nNEXT: Resume training gym R251+ with metacognitive self-directed loop.\nPriority order from metacog module: \n  1. Thin tip_types (cross_domain_synthesis, error_recovery, coding, debugging)\n  2. Weak tools (browser_click)\n  3. Frontier research\n\n15 COMPRESSION LIMIT in effect. Stop and tell Danny at 15.",
+  "active_tasks": [
+    "R251+: Training gym with metacognitive loop",
+    "Monitor compression count — stop at 15"
+  ],
+  "decisions": [
+    "15 compression cutoff agreed with Danny",
+    "Priority: metacognition > system improvements > training",
+    "Self-directed training replaces fixed loop",
+    "IntrinsicMetacognition module drives focus areas"
+  ],
+  "files_modified": [],
+  "next_steps": "Run R251+ training with metacognitive self-directed loop. Use IntrinsicMetacognition.start_round() to identify gaps, then research/distill/insert with step scoring.",
+  "timestamp": "2026-04-12T16:19:55Z",
+  "unix_time": 1776010795.348107,
+  "task_id": "20260412_105213_9a3360",
+  "source": "manual",
+  "version": 2
+}

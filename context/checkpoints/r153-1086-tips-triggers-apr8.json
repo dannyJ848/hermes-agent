@@ -1,0 +1,22 @@
+{
+  "label": "r153-1086-tips-triggers-apr8",
+  "context": "R153. Excellent session. From session restore at 1000 → 1086 tips.\n\nKey milestones:\n- R139: Hit 1000 tips\n- R140: Quality cleanup (purged 59 noise)\n- R141: Clean 1000 at 0.848\n- R142-R144: Phase 2 functional chains (20 chains at 0.8957)\n- R145-R146: MIA + MemMachine + AT2QA papers\n- R147-R148: SQL-ASTRA + world models + cross-domain synthesis\n- R149-R150: AUTO-GEN NOISE SOLVED (DB triggers)\n- R151-R153: Operational + tool-specific + meta tips\n\nAUTO-GEN NOISE FIX: Two DB triggers enforce confidence >= 0.7 on INSERT and UPDATE. Permanently prevents auto-gen 0.5 tips.\n\nPapers integrated: 14+ (TRACE, MatClaw, AgentGL, SkillX, Deep Researcher, COSMO-Agent, YC-Bench, MemMachine, SoK, AT2QA, MIA, SQL-ASTRA, ToolFlood, World Models)\n\nTip DB: 1086 tips, 0.8514 avg, 0.7 floor (trigger-enforced), 0.95 ceiling\nKnowledge: 13 findings\nFunctional chains: 21\n\nSystem: gateway PID 28336, caffeinate PID 82351, disk 5%\nDanny at daylong test. Fully autonomous.",
+  "active_tasks": [
+    "R153 COMPLETE — 1086 tips, 0.8514 avg, DB triggers solving noise, auto-gen SOLVED"
+  ],
+  "decisions": [
+    "DB triggers are the permanent solution to auto-gen noise",
+    "execute_code + Python sqlite3 > terminal SQL for tip insertion",
+    "Quality-first approach: 0.8514 avg is rising, not degrading",
+    "Functional chains (0.8957) are 2x more valuable than atomic tips"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1086 tips, 0.8514, triggers)"
+  ],
+  "next_steps": "R154: Continue growth. More tool-specific tips, more research-driven insights. Target: 1100 tips while maintaining 0.85+ avg.",
+  "timestamp": "2026-04-08T17:33:00Z",
+  "unix_time": 1775669580.360815,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

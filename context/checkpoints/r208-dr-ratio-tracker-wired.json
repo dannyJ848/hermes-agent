@@ -1,0 +1,22 @@
+{
+  "label": "r208-dr-ratio-tracker-wired",
+  "context": "Training gym R208 complete. Researched Intervention Paradox (2602.03338) and SCoRe Reinforced Distillation (2509.14257). Distilled 10 tips (total 2036). Built dr_ratio_tracker.py — disruption-to-recovery ratio per tool, decides intervention vs selection-only policy. Wired into plugin post_tool_call (records failures for d/r tracking).\n\nPlugin: 2930 lines. Tips: 2036 active. Gateway running.\nNew DB: dr_ratio_tracker.db.\n\nKEY INSIGHT: Accurate failure prediction ≠ effective intervention. Must track d/r ratio to know if interventions actually help.",
+  "active_tasks": [
+    "R209: Continue autonomous training"
+  ],
+  "decisions": [
+    "d/r ratio < 1.0 = safe to intervene; d/r >= 1.0 = select only (don't intervene)",
+    "Only tracks tool failures currently; full would_have_succeeded tracking needs pre/post comparison",
+    "Early-step interventions are most dangerous — they cascade"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/dr_ratio_tracker.py"
+  ],
+  "next_steps": "R209: Continue autonomous loop. Research: compositional generalization, cross-agent memory, or causal reasoning.",
+  "timestamp": "2026-04-12T08:55:12Z",
+  "unix_time": 1775984112.655445,
+  "task_id": "20260411_124518_b6e893",
+  "source": "manual",
+  "version": 2
+}

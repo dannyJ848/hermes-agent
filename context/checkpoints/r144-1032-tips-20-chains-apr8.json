@@ -1,0 +1,22 @@
+{
+  "label": "r144-1032-tips-20-chains-apr8",
+  "context": "R144. Session restored from r15-r17-complete-apr7 checkpoint but actual DB state was at ~880 tips. Built from there through R139-R144:\n- R139: hit 1000 tips (0.834 avg, some noise)\n- R140: quality cleanup (941 at 0.846, purged 59 noise)\n- R141: clean 1000 (0.848 avg)\n- R142: SoK Agentic Skills paper, Phase 2 start (1018)\n- R143: AT2QA paper, 13 functional chains (1025)\n- R144: 20 functional chains target hit (1032 at 0.8491)\n\nPapers researched: TRACE, MatClaw, AgentGL, SkillX, Deep Researcher, COSMO-Agent, YC-Bench, MemMachine, SoK Agentic Skills, AT2QA\nKnowledge findings: 11 total\nFunctional chains: 20 at 0.8955 avg (highest quality tip type)\n\nSystem: gateway PID 28336, caffeinate PID 82351, disk 5%\nDanny at daylong test. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R144 COMPLETE — 1032 tips, 0.8491 avg, 20 functional chains at 0.8955"
+  ],
+  "decisions": [
+    "20 functional chains = Phase 2 depth target achieved",
+    "Next targets: adaptive retrieval, tip validation, cross-domain bridges",
+    "Quality maintained at 0.849 despite aggressive growth",
+    "Functional chains are 2x more valuable than atomic tips (0.8955 vs 0.848)"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1032 tips, 0.8491 avg, 20 chains)"
+  ],
+  "next_steps": "R145: Research adaptive retrieval techniques. Implement beyond-keyword matching for tip injection. Look at MemMachine's decomposed retrieval pattern.",
+  "timestamp": "2026-04-08T17:14:07Z",
+  "unix_time": 1775668447.259763,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

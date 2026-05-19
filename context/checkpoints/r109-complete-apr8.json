@@ -1,0 +1,19 @@
+{
+  "label": "r109-complete-apr8",
+  "context": "R109 complete. 406 tips, avg conf 0.830. Added GAAMA tip (concept-mediated hierarchical knowledge graph: 4 node types episode/fact/reflection/concept, 5 edge types, concept nodes enable cross-cutting traversal. Retrieval = cosine kNN + edge-type-aware Personalized PageRank. 78.9% on LoCoMo-10 vs HippoRAG 69.9%). Domain: memory-architecture. Round 109. ~04:48 AM. Danny sleeping. Cron a81e43404f79 safety net.",
+  "active_tasks": [
+    "R109 complete — 406 tips, 0.830 — ready for R110"
+  ],
+  "decisions": [
+    "Concept nodes in memory graphs enable traversal across episodic boundaries that pure similarity misses"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (1 new tip)"
+  ],
+  "next_steps": "R110: Continue. Training gym past 400 tips and accelerating.",
+  "timestamp": "2026-04-08T09:11:12Z",
+  "unix_time": 1775639472.866952,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

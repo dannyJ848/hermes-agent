@@ -1,0 +1,11 @@
+{
+  "label": "x-api-jxa-deployed",
+  "context": "X API via JXA is fully operational. Two modules:\n1. ~/subconscious/x_api_jxa.py - GraphQL API calls (user profiles, tweets by ID)\n2. ~/subconscious/chrome_x_bridge.py - DOM scraping (search, scan, trending)\n\nAPI pattern: Build JS as array of lines, join with \\n, pass via json.dumps() to JXA template. Avoids all escaping issues.\nChrome must have at least one window open. Can create via: osascript -e 'tell application \"Google Chrome\" to make new window'\n\nWorking: UserByScreenName (200, 2.3KB), UserTweets (200, 224KB, 20 tweets)\nBroken: SearchTimeline (404)\nFor search: DOM scraping via chrome_x_bridge.py scan\n\nIMPORTANT: Chrome needs a window. If no windows: error \"No Chrome windows\". Fix: open Chrome first.",
+  "active_tasks": [
+    "X API JXA module deployed and tested: ~/subconscious/x_api_jxa.py",
+    "chrome_x_bridge.py scan: DOM-based AI tweet scanning (25 tweets/run)",
+    "SearchTimeline: still broken (404), use DOM scraping for search"
+  ],
+  "timestamp": "2026-04-05T22:48:11Z",
+  "task_id": "20260405_152554_311967"
+}

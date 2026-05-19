@@ -1,0 +1,13 @@
+{
+  "label": "pre-restart-zai-key-swap",
+  "context": "Swapped Z.AI coding API key from old exhausted key to new one: 15e9252c363241a8b58ccf06575a58f1.zSCBZA5YQuJhfU56. All three layers updated: .env (GLM_API_KEY), auth.json (priority 0, base_url=coding endpoint), .env (GLM_BASE_URL=coding endpoint). Old key demoted to priority 1 in auth.json. Vision auxiliary in config.yaml left alone (uses general API for glm-5v-turbo). Key tested successfully — HTTP 200 from coding API.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Restart Hermes CLI session to pick up the new Z.AI API key.",
+  "timestamp": "2026-04-15T03:51:52Z",
+  "unix_time": 1776225112.010298,
+  "task_id": "20260414_224636_24436b",
+  "source": "manual",
+  "version": 2
+}

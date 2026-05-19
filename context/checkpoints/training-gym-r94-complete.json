@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r94-complete",
+  "context": "Training Gym R94 completed! ALL 4 PASS ON FIRST TRY!\n\nR94 RESULTS (all 10/10):\n1. merge-k-sorted-lists-001 (T10) - Min heap. Push (val, idx, node). Pop min, push next. O(N log K).\n2. n-queens-001 (T10) - Backtracking with cols/diag1/diag2 sets. 4=2 sol, 8=92 sol.\n3. minimum-window-subsequence-001 (T7) - Grid DP. dp[i][j]=grid[i][j]+min(up,left).\n4. letter-combinations-phone-001 (T7) - Iterative. result=[prefix+ch for prefix in result for ch in mapping[digit]].\n\nDB: 369 exercises, 615 attempts, avg 9.91, 95.8% perfect. 320 passed. Tier 9+ = 92, Tier 10 = 53.\n60+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R94 complete",
+    "R95 next"
+  ],
+  "decisions": [
+    "Merge K lists: min heap with (val, idx, node). Use idx to break ties when vals equal.",
+    "N-Queens: track cols, diag1(row+col), diag2(row-col). Backtrack row by row.",
+    "Min path sum: grid DP. Initialize first row/col. dp[i][j]=grid[i][j]+min(up,left).",
+    "Phone combos: iterative product. result = [p+c for p in result for c in mapping[d]]"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R95: Continue. Try: Course Schedule (topo sort), Climbing Stairs variants, or Subarray Sum Equals K.",
+  "timestamp": "2026-04-08T22:15:19Z",
+  "unix_time": 1775686519.261182,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

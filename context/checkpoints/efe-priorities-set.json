@@ -1,0 +1,13 @@
+{
+  "label": "efe-priorities-set",
+  "context": "EFE priority scores: tools=1.00 (highest epistemic), research=0.50, development=0.24, autonomy=1.67 (highest pragmatic). Distillation bridge synced to squad profiles. iteration_to_efe.py verified working. AGI cycle 14+. Danny sleeping.",
+  "active_tasks": [
+    "Continue AGI cron cycles (VISION domain)",
+    "Explore semantic tool selection with Ollama embeddings",
+    "Ground mid-trust facts (342 remaining)",
+    "Implement visual diff detection",
+    "Set HERMES_CRON_TIMEOUT=300 (needs restart)"
+  ],
+  "timestamp": "2026-04-05T07:21:33Z",
+  "task_id": "20260404_215806_7e676d"
+}

@@ -1,0 +1,13 @@
+{
+  "label": "reservoir-partial-needs-restart",
+  "context": "CONTEXT RESERVOIR PARTIALLY BUILT. Core eviction working but missing Pichay's advanced features: dead tool output detection, tool definition stubbing, Belady's MIN eviction, content deduplication. These account for 47% of context waste. Decision pending: build advanced features now or restart and iterate. Gateway restart needed to activate what we have.",
+  "active_tasks": [
+    "RESTART gateway to activate reservoir eviction",
+    "Build dead tool output detection (26.5% savings)",
+    "Build tool definition stubbing (20.2% savings)",
+    "Expose fault_in as Hermes tool",
+    "Inject retrieval handles into context"
+  ],
+  "timestamp": "2026-04-05T17:25:03Z",
+  "task_id": "20260404_215806_7e676d"
+}

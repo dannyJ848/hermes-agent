@@ -1,0 +1,27 @@
+TIP FEEDBACK LOOP ANALYSIS
+=========================
+Date: 2026-04-07
+
+FINDING: The _update_tip_confidence function at line 622 of the distillation
+plugin upvotes ALL tips for a tool on any successful call, and downvotes ALL
+tips on any failure. It does NOT check if the tip's condition matches the
+current call context.
+
+IMPACT:
+- Every execute_code call upvotes ALL 20+ execute_code tips (+0.005 each)
+- This means tips like "When using execute_code for creation" get upvoted
+  even when the agent is just running a simple print statement
+- The upvote/downvote counts are TOOL-LEVEL signals, not TIP-LEVEL signals
+- A tip's confidence reflects "how often this tool succeeds" not "how often
+  this tip's advice was actually relevant"
+
+FIX NEEDED:
+- _update_tip_confidence should check if the tip's condition matches the
+  current call context before voting
+- Without this, the feedback loop is noisy — it can't distinguish a tip
+  that helps from a tip that's irrelevant but happens to share a tool name
+
+This is the ROOT CAUSE of the dead tip problem: tips appear "alive" because
+they accumulate votes from unrelated calls to the same tool.
+
+FILES: ~/.hermes/plugins/distillation/__init__.py L622-646

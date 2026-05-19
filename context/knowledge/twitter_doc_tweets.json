@@ -1,0 +1,44 @@
+{
+  "adamghowiba": {
+    "text": "JP Morgan's investment research team just shared exactly how they built their multi-agent system \"Ask David\", and it's the same architecture pattern showing up everywhere:\n\n- supervisor agent orchestrates\n- specialized subagents handle retrieval, structured data, analytics\n- https://t.co/cpTehARnOR",
+    "user": "adamghowiba",
+    "created_at": "Sun May 03 10:32:36 +0000 2026",
+    "favs": 6935,
+    "rts": 674
+  },
+  "Mnilax": {
+    "text": "https://t.co/W4MxdOyUKD",
+    "user": "Mnilax",
+    "created_at": "Sat May 09 14:14:08 +0000 2026",
+    "favs": 3129,
+    "rts": 273
+  },
+  "milesdeutscher": {
+    "text": "This is pure gold.\n\nMarc Andreessen's custom system prompt that makes any LLM 10x smarter.\n\nYou'll want to save this: https://t.co/vCqNGnX3e9",
+    "user": "milesdeutscher",
+    "created_at": "Thu May 07 19:30:12 +0000 2026",
+    "favs": 5763,
+    "rts": 644
+  },
+  "kylejeong": {
+    "text": "https://t.co/ZRdHQha7y3",
+    "user": "kylejeong",
+    "created_at": "Wed May 06 19:11:28 +0000 2026",
+    "favs": 845,
+    "rts": 65
+  },
+  "techNmak": {
+    "text": "This is probably the most honest AI architecture breakdown on the internet right now.\n\n9-layer AI production architecture \n\nservices/ - RAG pipeline, semantic cache, memory, query rewriter, router. Not one file. Five.\n\nagents/ - document grader, decomposer, adaptive router. https://t.co/ggNiCJZVRn",
+    "user": "techNmak",
+    "created_at": "Fri May 08 05:29:05 +0000 2026",
+    "favs": 2718,
+    "rts": 367
+  },
+  "ianlapham": {
+    "text": "After 2 months of everyday use, I can say that setting up a personal research engine is one of the highest-ROI things you can do if you like to learn and stay on top of things at the edge \n\n- Use a cloud-hosted agent, probably hermes or openclaw\n- Learn about memory systems and",
+    "user": "ianlapham",
+    "created_at": "Fri May 08 01:55:03 +0000 2026",
+    "favs": 2126,
+    "rts": 98
+  }
+}

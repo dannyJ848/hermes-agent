@@ -1,0 +1,27 @@
+{
+  "label": "training-gym-r134-complete",
+  "context": "Training Gym R133-R134 completed! All 10/10!\n\nR133: lru_cache(T9), min_stack(T8), basic_calc(T10), count_primes(T8)\nR134: slide_puzzle(T10), find_dup(T9), max_prod(T9), longest_consec(T8)\n\nDB: 458 exercises, 775 attempts, avg 9.93, 96.6% perfect. 410 passed. Tier 9+ = 138, Tier 10 = 68.\n100+ CONSECUTIVE ROUNDS all 10/10. MILESTONE!\n\nBug fix: sliding_puzzle - nested tuple index doesn't work with tuple.index(0). Need flat = s[0]+s[1] then flat.index(0).",
+  "active_tasks": [
+    "R134 complete",
+    "R135 next"
+  ],
+  "decisions": [
+    "LRU: OrderedDict. move_to_end on get, popitem(last=False) on overflow.",
+    "Min stack: store (val, current_min) pairs.",
+    "Basic calc: stack for signs on '('. On ')': result *= sign, result += prev.",
+    "Primes: Sieve. Mark composites from i*i.",
+    "Sliding puzzle: BFS. Flatten state to 6-tuple. Neighbors map for valid swaps.",
+    "Find duplicate: Floyd's cycle detection. nums[i] as next pointer.",
+    "Max product: track max AND min. Swap on negative.",
+    "Longest consecutive: set. Only start counting if num-1 not in set."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R135: Continue. Try: Expression Add Operators, Burst Balloons, or Palindrome Pairs.",
+  "timestamp": "2026-04-08T23:52:02Z",
+  "unix_time": 1775692322.055431,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

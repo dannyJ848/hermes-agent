@@ -1,0 +1,22 @@
+{
+  "label": "dgx-training-pre-tokenization-running",
+  "context": "DGX Spark GB10 training session. Pre-tokenization is running (PID 572146) processing tier1-reasoning-chat.jsonl. ~280k/2.15M examples done, ETA ~3 hours. Direct training script built and verified at /data/SpecForge/custom_dflash/train_direct.py. Stack verified: Qwen 27B loads with low_cpu_mem_usage=False, LoRA r=256 applies, forward+backward+8-bit AdamW all work. Axolotl abandoned due to config errors. Telemetry server on port 8080. Session state saved to /data/SpecForge/custom_dflash/SESSION_STATE.md. Benchmarks completed earlier: MMLU 86.57%, GSM8K 66.19%, HumanEval 82.93%, ARC 60.24%, WinoGrande 77.19%.",
+  "active_tasks": [
+    "Wait for pre-tokenization to complete (~3 hours)",
+    "Launch direct training script",
+    "Monitor training via telemetry server"
+  ],
+  "decisions": [],
+  "files_modified": [
+    "/data/SpecForge/custom_dflash/train_direct.py",
+    "/data/SpecForge/custom_dflash/telemetry_server.py",
+    "/data/SpecForge/custom_dflash/training_monitor.py",
+    "/data/SpecForge/custom_dflash/SESSION_STATE.md"
+  ],
+  "next_steps": "1. Check pre-tokenization progress: ssh djg6228@10.0.0.171 'ps -p 572146 && ls -lh /data/SpecForge/custom_dflash/preprocessed/'\n2. When complete, launch training: cd /data/SpecForge/custom_dflash && ~/train-venv/bin/python train_direct.py\n3. Monitor: curl http://10.0.0.171:8080/status",
+  "timestamp": "2026-05-13T21:55:17Z",
+  "unix_time": 1778709317.211083,
+  "task_id": "20260513_004940_7419c5",
+  "source": "manual",
+  "version": 2
+}

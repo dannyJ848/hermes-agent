@@ -1,0 +1,17 @@
+{
+  "label": "r120-pre-restart",
+  "context": "R120 BUILD complete. Proposition Indexer module written at ~/subconscious/proposition_indexer.py (tested+working). Wired into distillation plugin: pre_llm_call injection (line ~1530, between R119 and MYTHOS) and post_tool_call extraction (line ~749, between Causal Chain Tracking and FEEDBACK LOOP). Plugin syntax OK, 1745 lines. 1260 tips. Need gateway restart to activate.",
+  "active_tasks": [
+    "r120-activate: restart gateway",
+    "r120-test: verify R120",
+    "continue training R121+"
+  ],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Restart gateway via `hermes gateway restart`, verify R120 loads, then complete TEST+INTEGRATE and continue training cycle R121+.",
+  "timestamp": "2026-04-10T05:12:04Z",
+  "unix_time": 1775797924.3409011,
+  "task_id": "20260409_133802_fc4fc7",
+  "source": "manual",
+  "version": 2
+}

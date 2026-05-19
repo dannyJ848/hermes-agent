@@ -1,0 +1,9 @@
+{
+  "label": "pre-stress-test-restart",
+  "context": "All Firecrawl Fusion code deployed. Need gateway restart to pick up web_interact tool. Then run 10 rigorous test cycles. Gateway was PID 51431.",
+  "active_tasks": [
+    "10-cycle stress test of Firecrawl Fusion"
+  ],
+  "timestamp": "2026-04-05T18:59:07Z",
+  "task_id": "20260404_215806_7e676d"
+}

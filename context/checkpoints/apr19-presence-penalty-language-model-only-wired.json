@@ -1,0 +1,29 @@
+{
+  "label": "apr19-presence-penalty-language-model-only-wired",
+  "context": "Patched 5 scripts based on Qwen3.6 Reddit/NVIDIA forum/X research scan on Apr 19. 9 patches applied across 5 scripts.\n\nCHANGES MADE:\n1. min_p=0.2, top_k=40 → presence_penalty=1.5, top_k=20 (official Qwen3.6 thinking mode settings, prevents infinite thinking loops)\n2. Added --language-model-only to ALL vLLM serve commands (skips vision encoder, frees ~2-3GB VRAM for KV cache)\n3. Added --override-generation-config to spark-day1.sh (was missing entirely)\n\nFILES PATCHED (9 patches, 5 scripts):\n- spark-maxperf.sh (BF16 L324 + FP8 L365)\n- superqwen3-super.sh (BF16 L922 + FP8 L956)\n- deploy-spark-day1.sh (BF16 L367 + FP8 L404)\n- spark-grpo-train.sh (GRPO L384)\n- spark-day1.sh (BF16 L920 + FP8 L963)\n\nVERIFICATION:\n- 0 stale min_p references in any .sh file\n- 10 presence_penalty occurrences across 5 scripts (correct)\n- 10 language-model-only occurrences across 5 scripts + 1 in asus-gx10 (correct)\n- reasoning-parser qwen3 already present in all scripts (was correct before)\n- --reasoning-parser qwen3 was ALREADY present in all scripts (confirmed by initial scan)\n\nKEY RESEARCH FINDINGS (not yet wired):\n- Qwen3.6-35B-A3B-FP8 official checkpoint on HF (should download, not runtime-quantize)\n- Qwen3.6 benchmarks WAY higher: MMLU-Pro 85.2%, GPQA 86.0%, SWE-bench 73.4%, AIME 92.7%\n- Allen Kuo benchmark: 208 tok/s FP8 decode on Blackwell (matches our estimate)\n- MTP still broken on GDN (confirmed, our disable is correct)\n- NVFP4 broken on DGX Spark ARM64 (confirmed, our fp8_e5m2 is correct)\n- Jackrong hasn't published Qwen3.6 distills yet (we'll be early)\n- HauhauCS already has Qwen3.6 Uncensored Aggressive on HF\n- LoRA→vLLM incompatibility reconfirmed (our merge strategy correct)",
+  "active_tasks": [
+    "All 5 scripts patched and verified",
+    "presence_penalty=1.5 + top_k=20 wired everywhere",
+    "--language-model-only wired everywhere",
+    "0 stale min_p references"
+  ],
+  "decisions": [
+    "presence_penalty=1.5 is the OFFICIAL fix for infinite thinking loops (not min_p=0.2)",
+    "top_k=20 is official (not 40) — matches Qwen model card",
+    "--language-model-only on both BF16 and FP8 ports (saves VRAM, we never use vision during serve)",
+    "BF16 for quality training, FP8 for speed inference — confirmed with Danny"
+  ],
+  "files_modified": [
+    "~/dgx-spark-prep/spark-maxperf.sh",
+    "~/dgx-spark-prep/superqwen3-super.sh",
+    "~/dgx-spark-prep/deploy-spark-day1.sh",
+    "~/dgx-spark-prep/spark-grpo-train.sh",
+    "~/dgx-spark-prep/spark-day1.sh"
+  ],
+  "next_steps": "Launch day tomorrow. Sequence: (1) macbook-transfer-helper.sh --enable-ssh, (2) spark-day1.sh --macbook <IP> --usb, (3) spark-maxperf.sh, (4) wire-spark-to-hermes.sh <SPARK_IP>, (5) spark-quality chat, (6) superqwen3-super.sh. Consider downloading Qwen3.6-35B-A3B-FP8 official checkpoint on launch day instead of runtime quantization.",
+  "timestamp": "2026-04-19T18:57:00Z",
+  "unix_time": 1776625020.6198862,
+  "task_id": "20260419_133215_4ffc00",
+  "source": "manual",
+  "version": 2
+}

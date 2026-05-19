@@ -1,0 +1,21 @@
+{
+  "label": "qwen27b-training-prep-in-progress",
+  "context": "Preparing Qwen 27B BF16 LoRA training on DGX Spark. Datasets transferred (393GB). Preprocessing running via axolotl - currently 68% through tier1-reasoning (2.15M examples). Training venv created at ~/train-venv with CUDA torch. Config updated with chat_template format and all 3 datasets (tier1, tier2, tier3). Launch script created at /data/SpecForge/custom_dflash/start_training.sh. Need to: 1) Wait for preprocessing to complete, 2) Launch training via background process, 3) Monitor progress.",
+  "active_tasks": [
+    "Wait for axolotl preprocessing to complete",
+    "Launch LoRA training (r=256, 2 epochs)",
+    "Monitor training progress"
+  ],
+  "decisions": [],
+  "files_modified": [
+    "/data/SpecForge/custom_dflash/axolotl_config.yaml",
+    "/data/SpecForge/custom_dflash/start_training.sh",
+    "~/train-venv/"
+  ],
+  "next_steps": "Wait for preprocessing to complete (~10-15 min), then launch training with terminal(background=true)",
+  "timestamp": "2026-05-13T16:49:05Z",
+  "unix_time": 1778690945.0179808,
+  "task_id": "20260513_004940_7419c5",
+  "source": "manual",
+  "version": 2
+}

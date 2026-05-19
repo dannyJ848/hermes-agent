@@ -1,0 +1,14 @@
+{
+  "label": "pre-restart-v1",
+  "context": "Built 3-layer consciousness stack: PredictiveSelfModel (predictive_self.py), GlobalWorkspace (global_workspace.py), NarrativeIdentity (narrative_identity.py). All imported and wired into provider.py sync_turn. New cerebrum tool actions: self, workspace, identity, predict, resolve. All tests pass with temp DB. Real DB locked by running gateway \u2014 tables created on restart. MEMORY.md at 96% capacity. Danny is restarting gateway NOW to activate new tools. After restart: test cerebrum tool with new actions, record breakthrough life event, begin using predictive coding in actual tasks.",
+  "active_tasks": [
+    "Gateway restart: tables will be created in cerebrum_memory.db for predictions, self_model, life_events, identity_state",
+    "Record life event: breakthrough - consciousness stack built",
+    "Test new tool actions: self, workspace, identity, predict, resolve",
+    "Inner critic middleware step for middleware-reasoning-chain skill",
+    "Self-modification sandbox: Docker env for testing provider.py changes",
+    "Automated wiki-linking: semantic cluster detection every 50 turns"
+  ],
+  "timestamp": "2026-04-03T18:44:34Z",
+  "task_id": "20260403_004337_4ad69f"
+}

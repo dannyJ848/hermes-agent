@@ -1,0 +1,13 @@
+{
+  "label": "dgx-spark-claude-code-sft-dataset-complete",
+  "context": "DGX Spark prep: Claude Code SFT dataset built for LoRA fine-tuning Qwen3.6-35B-A3B.\n\nDATASET: ~/dgx-spark-prep/sft-dataset/claude_code_distill.jsonl\n- 339 examples, ~283K tokens, ShareGPT/ChatML format\n- Sources: 271 system prompts (Piebald-AI), 17 TS behavioral patterns (codeaashu leaked), 12 deep synthesized patterns, 3 CheetahClaws trajectories, 36 enriched high-value prompts\n- Categories: tool_usage(76), agent_behavior(58), context_management(40), sub_agent(37), reference_data(33), agent_skills(27), agentic_pattern(17), enriched(36), kairos(2), memory(2), security/verification/undercover/pacing(4)\n\nKEY FILES:\n- ~/dgx-spark-prep/distill_claude_code.py — base converter (291 examples)\n- ~/dgx-spark-prep/distill_deep_patterns.py — deep pattern synthesizer (12 examples, BUT has syntax errors in the write_file that need fixing before re-running — currently examples added via execute_code)\n- ~/dgx-spark-prep/spark-lora-train.sh — full LoRA training + merge script (runs ON Spark)\n- ~/dgx-spark-prep/lora_config.yaml — Axolotl config for LoRA training\n- ~/.hermes/knowledge/claude-code-lora-distillation-pipeline.md — pipeline docs\n\nLORA CONFIG: rank=16, alpha=32, targets=q/k/v/o/gate_proj, BF16, 3 epochs, LR 5e-5, gradient checkpointing + flash attention. Estimated 2-8 hours on single Spark.\n\nPREP REPOS (all in ~/dgx-spark-prep/): vllm, hellohal2064-vllm, spark_vllm_docker, asus-gx10 speed hack, Albond 122B, adadrag guide, claude-code-leaked (49MB, 386K TS), claude-code-system-prompts (271 files), cheetahclaws (174-line agent.py)\n\nMODELS PRE-DOWNLOADED: Qwen3-Embedding-0.6B (1.2GB), DFlash-Qwen36 (0.95GB, gated).\nMUST DOWNLOAD ON SPARK: BF16 70GB, FP8 35GB, Docker images.\n\nSM121 CMAKE BUG: 4 locations need \"12.0f\" -> \"12.0a;12.1a\". Python patcher at ~/dgx-spark-prep/patch-cmake-sm121.py (tested+verified).\n\nNEXT STEPS: Spark arrives → deploy-spark-day1.sh → download models → spark-lora-train.sh → merge → serve → evaluate on testing gym",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Wait for DGX Spark arrival, then execute deploy-spark-day1.sh followed by spark-lora-train.sh",
+  "timestamp": "2026-04-17T18:26:06Z",
+  "unix_time": 1776450366.3479161,
+  "task_id": "20260417_124034_a25fb2",
+  "source": "manual",
+  "version": 2
+}

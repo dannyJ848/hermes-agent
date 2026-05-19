@@ -1,0 +1,11 @@
+{
+  "label": "research-night-2-knowledge-expansion",
+  "context": "Extended the knowledge base with 8 new research findings tonight:\n\nNEW FINDINGS (this session):\n1. attention-residuals-attnres: MoonshotAI's learned skip connections (replaces standard residuals with input-dependent attention over depth)\n2. kimi-linear-hybrid-attention: 3:1 KDA-to-MLA ratio, 6.3x faster at 1M tokens, 75% KV cache reduction\n3. checkpoint-engine-hot-weight-swap: 20s to update 1T params across thousands of GPUs (MoonshotAI)\n4. mooncake-kv-centric-serving: FAST 2025 Best Paper, powers Kimi, integrated into vLLM/SGLang/TensorRT-LLM\n5. google-amie-medical-conversations: Self-play RL for clinical dialogue, structured interview flow, PaLM 2 base\n6. multilingual-medical-knowledge-graphs: UMLS CUI as universal anchor, DeCS for Spanish, SapBERT-XLM for linking\n\nPREVIOUS SESSION FINDINGS:\n7. baichuan-m3-medical-ai: SOTA medical AI, Qwen3-235B, segmented pipeline RL\n8. deepseek-engram-conditional-memory: O(1) n-gram lookup for sparsifying memory\n9. kimi-k2-5-agent-swarm: Self-directed parallel sub-task execution\n10. moba-mixture-block-attention: MoE applied to attention blocks\n\nSQUAD STATUS: All 3 agents (soma-coder, soma-researcher, soma-tester) idle/timing out due to ZAI endpoint slowness. No autonomous work completed tonight.\n\nKEY SYNTHESIS for SOMA:\n- AMIE's self-play + Baichuan-M3's segmented RL = ideal training pipeline\n- CUI-based knowledge graph linking enables EN/ES medical concept mapping\n- Mooncake's PD disaggregation could serve real-time medical consultation at scale\n- Attention Residuals pattern could improve multi-agent communication aggregation",
+  "active_tasks": [
+    "Monitor ZAI endpoint stability",
+    "Sync new knowledge docs to soma-coder/soma-tester profiles",
+    "Explore DeepSeek-V3.2 DSA (DeepSeek Sparse Attention) when blog posts become available"
+  ],
+  "timestamp": "2026-04-01T04:08:02Z",
+  "task_id": "20260331_220745_fe055c"
+}

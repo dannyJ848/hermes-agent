@@ -1,0 +1,26 @@
+{
+  "label": "dgx-training-resolved",
+  "context": "DGX Spark Qwen 27B training deadlock is RESOLVED. Root cause was CPU-only PyTorch in train-venv.\n\n## What happened\n- Previous session spent hours debugging \"gradient checkpointing deadlock\"\n- Process entered D state (uninterruptible sleep) at first forward pass\n- Without GC: OOM at 117GB\n- Assumed GC was incompatible with Qwen3.5's linear attention\n\n## Root cause\n- train-venv at /home/djg6228/train-venv had `torch 2.10.0+cpu` (CPU-only)\n- System Python `/usr/bin/python3` has `torch 2.11.0+cu130` (CUDA enabled)\n- The \"deadlock\" was actually PyTorch failing when trying to move tensors to CUDA\n- D state was misleading — appeared during CPU-only torch's CUDA init attempt\n\n## Resolution\n1. Created minimal test script (`test_gc_minimal.py`) using system Python\n2. Verified gradient checkpointing works perfectly with Qwen 27B\n3. Created working training script: `/data/SpecForge/custom_dflash/train_qwen_gc_working.py`\n4. Updated systemd service to use `/usr/bin/python3` instead of train-venv\n5. Training is now live and running\n\n## Current training state\n- Script: `/data/SpecForge/custom_dflash/train_qwen_gc_working.py`\n- Service: `qwen-training.service` (active, PID 822039)\n- Model: Qwen3.6-27B-Uncensored\n- LoRA: r=128, alpha=256 (637M trainable params, 2.3%)\n- Gradient checkpointing: ENABLED, use_reentrant=False\n- GPU memory: 53.8GB (model) → 56.4GB (LoRA) → ~58GB (training)\n- Config: seq_len=1024, batch_size=1, grad_accum=4, 8-bit AdamW\n- Data: 327k pre-tokenized examples from tier1_preprocessed.jsonl\n- Max steps: 10,000, checkpoint every 500 steps\n- Log file: `/data/SpecForge/custom_dflash/logs/training.log`\n\n## Key files\n- `/data/SpecForge/custom_dflash/train_qwen_gc_working.py` — working training script\n- `/data/SpecForge/custom_dflash/test_gc_minimal.py` — minimal GC verification test\n- `/data/SpecForge/custom_dflash/train_lora_sae_teacher_v1.py` — May 8 script (paths fixed)\n- `/etc/systemd/system/qwen-training.service` — systemd service\n\n## Critical lesson\nAlways verify `torch.cuda.is_available()` BEFORE debugging training issues. The environment matters more than the code.",
+  "active_tasks": [
+    "Monitor training run — first checkpoint at step 500",
+    "Verify loss convergence",
+    "Consider hyperparameter tuning (seq_len, rank)"
+  ],
+  "decisions": [
+    "Use system Python (/usr/bin/python3) for all training on DGX",
+    "Gradient checkpointing with use_reentrant=False works with Qwen 27B",
+    "train-venv is broken (CPU-only torch) and should not be used"
+  ],
+  "files_modified": [
+    "/data/SpecForge/custom_dflash/train_qwen_gc_working.py",
+    "/data/SpecForge/custom_dflash/test_gc_minimal.py",
+    "/etc/systemd/system/qwen-training.service",
+    "/data/SpecForge/custom_dflash/train_lora_sae_teacher_v1.py (fixed paths)"
+  ],
+  "next_steps": "1. Monitor training for first checkpoint at step 500 (~2-3 hours)\n2. Check loss convergence and step timing\n3. Consider increasing seq_len to 2048 or 4096 if memory allows\n4. Consider increasing LoRA rank to 256 for more expressiveness\n5. Fix train-venv by installing CUDA torch, or delete it to prevent future confusion",
+  "timestamp": "2026-05-14T03:31:15Z",
+  "unix_time": 1778729475.844759,
+  "task_id": "20260513_220517_f80727",
+  "source": "manual",
+  "version": 2
+}

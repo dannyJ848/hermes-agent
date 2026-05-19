@@ -1,0 +1,12 @@
+{
+  "label": "pre-full-restart-firecrawl-patch",
+  "context": "PATCHED ~/.hermes/plugins/evey-research/__init__.py to use Firecrawl as primary search backend (falls back to SearXNG). Added _firecrawl_search() function that calls Firecrawl cloud API. FIRECRAWL_API_KEY in ~/.hermes/.env. Cleared __pycache__. BUT current process can't reload -- needs full restart killing gateway (PID 29903), main agent (PID 3628), and squad profiles (PIDs 5743/5745/5746). Gateway process survives pkill of run_agent.py, which is why env vars don't reload. Kill command: pkill -f hermes_cli.main; pkill -f 'hermes -p'; pkill -f run_agent.py. Then: cd ~/hermes-agent && source venv/bin/activate && python run_agent.py. Squad profiles need relaunch in tmux after.",
+  "active_tasks": [
+    "Full restart to activate Firecrawl",
+    "Relaunch SOMA Squad profiles after restart",
+    "Test web_research with Firecrawl",
+    "GLM-5V-Turbo migration decision"
+  ],
+  "timestamp": "2026-04-02T02:11:40Z",
+  "task_id": "20260331_220745_fe055c"
+}

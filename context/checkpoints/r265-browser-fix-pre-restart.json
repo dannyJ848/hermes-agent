@@ -1,0 +1,23 @@
+{
+  "label": "r265-browser-fix-pre-restart",
+  "context": "R265 session - fixing browser tools. Root cause: gateway cached old CAMOFOX_URL env var from before it was commented out. Gateway PID 29702 started at 8:03PM before the .env change. .env line 24 has #CAMOFOX_URL=http://localhost:9377 (commented). config.yaml has cloud_provider: browserbase. After restart, browser_navigate should use Browserbase cloud provider instead of trying Camofox. Todo: 5 items - fix browser (in_progress), local screen capture, Gemini 3 Flash switch, MiMo V2 Pro integration, Qwen 3.5 local deploy.",
+  "active_tasks": [
+    "1. Fix Hermes browser tools - restart gateway to pick up commented CAMOFOX_URL",
+    "2. Add local screen capture capability",
+    "3. Switch subagent delegation to Gemini 3 Flash",
+    "4. MiMo V2 Pro integration",
+    "5. Qwen 3.5 local deployment"
+  ],
+  "decisions": [
+    "CAMOFOX_URL commented out in .env, gateway just needs restart to pick up change",
+    "Browserbase cloud provider configured in config.yaml",
+    "GLM-5V-turbo is the vision model for all image analysis"
+  ],
+  "files_modified": [],
+  "next_steps": "Restart gateway via `hermes gateway restart`, then test browser_navigate to example.com to confirm Browserbase cloud provider works. Then build local screen capture using screencapture + GLM-5V-turbo.",
+  "timestamp": "2026-04-13T02:43:30Z",
+  "unix_time": 1776048210.889903,
+  "task_id": "20260412_191932_edf6e1",
+  "source": "manual",
+  "version": 2
+}

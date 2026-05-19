@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r116-complete",
+  "context": "Training Gym R116 completed! ALL 4 PASS including 2 T9 and 1 T10!\n\nR116 RESULTS (all 10/10):\n1. merge-intervals-001 (T7) - Sort by start. Extend last if overlap.\n2. n-queens-001 (T9) - Backtrack with cols, diag1 (r-c), diag2 (r+c) sets. Count solutions.\n3. word-ladder-001 (T9) - BFS. Try all 26 chars at each position. Remove from word_set when enqueued.\n4. word-search-ii-001 (T10) - Trie + DFS. Build trie from words. DFS board following trie. Prune empty trie nodes.\n\nDB: 422 exercises, 703 attempts, avg 9.92, 96.3% perfect. 373 passed. Tier 9+ = 107, Tier 10 = 58.\n82+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R116 complete",
+    "R117 next"
+  ],
+  "decisions": [
+    "Merge intervals: sort by start. If start <= last_end, extend. Else append.",
+    "N-queens: 3 sets (cols, diag1=r-c, diag2=r+c). Backtrack row by row.",
+    "Word ladder: BFS. Change each position to a-z. Remove from set to avoid revisit.",
+    "Word search II: Trie of words + DFS from each cell. Mark found word=None to dedup. Prune empty children."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R117: Continue. Try: Trapping Rain Water, First Missing Positive, Minimum Window Substring, or Serialize/Deserialize Binary Tree.",
+  "timestamp": "2026-04-08T23:11:16Z",
+  "unix_time": 1775689876.501222,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

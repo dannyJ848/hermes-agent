@@ -1,0 +1,11 @@
+{
+  "label": "zai-400-debug",
+  "context": "Debugging Z.AI HTTP 400 (code 1210) errors that block ALL API calls. Added debug logging to run_agent.py that dumps api_kwargs to ~/tmp_api_debug.json before each create() call. User needs to restart Hermes, send a message, then check that file. The ONLY confirmed cause of code 1210 is content=None in user messages. All other parameters (tools, reasoning, streaming, large prompts) pass fine. Debug logging added at line ~3924 in run_agent.py. Also have backup at run_agent.py.bak.",
+  "active_tasks": [
+    "Fix Z.AI 400 error by capturing exact failing payload via debug logging",
+    "Verify plugin discovery after restart",
+    "Run 24h brain performance baseline"
+  ],
+  "timestamp": "2026-04-04T03:49:40Z",
+  "task_id": "20260403_134459_9fb996"
+}

@@ -1,0 +1,12 @@
+{
+  "label": "pre-unified-restart-manual",
+  "context": "Built and tested unified restart system. hermes gateway restart --all saves checkpoint, kills all processes, clears caches, restarts gateway, auto-restores on next session. Files patched: gateway.py, main.py, gateway/run.py. Plugin v2 at evey-session-guard. Echo facts cleaned (8 entries). Danny wants to fix the disconnected-systems problem systemwide \u2014 too many pieces colliding. After restart, resume the 12-task distillation audit.",
+  "active_tasks": [
+    "Execute unified restart",
+    "Resume bottom-up/top-down audit",
+    "BLACK HAT analysis",
+    "AGI"
+  ],
+  "timestamp": "2026-04-06T07:53:10Z",
+  "task_id": "20260405_193236_c8c810"
+}

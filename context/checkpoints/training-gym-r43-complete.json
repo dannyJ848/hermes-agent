@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r43-complete",
+  "context": "Training Gym R43 completed. All 4 exercises 10/10.\n\nR43 RESULTS (all 10/10):\n1. aho-corasick-001 (T8) - Multi-pattern matching automaton with trie + failure links. 5 tests. Test fix: 'his' starts at index 1 in 'ahishers', not 3.\n2. union-find-rollback-001 (T8) - Union-Find with snapshot/rollback via change stack. 5 tests. Clean!\n3. splay-tree-001 (T8) - Bottom-up splay with path recording. 5 tests. Bug: top-down splay had null pointer issues; rewrote to bottom-up path-based.\n4. hyperloglog-001 (T8) - HLL with SHA256 hashing, bias correction. 5 tests. Clean!\n\nDB: 243 exercises, 411 attempts, avg 9.87\n6 consecutive rounds all 10/10. Consistent strong performance.",
+  "active_tasks": [
+    "R43 complete",
+    "R44 next"
+  ],
+  "decisions": [
+    "Splay tree: bottom-up path-based splay is simpler than top-down - record path during BST traversal then splay using path",
+    "Union-Find rollback: store (child, parent, old_size, old_count) tuples in stack, pop to undo",
+    "Aho-Corasick: failure links built via BFS, outputs merged from fail node",
+    "HLL: small-range bias correction uses empty register count V, estimate = m*ln(m/V)"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R44 exercises. Try graph algorithms: Tarjan SCC, Dinic's max flow, Kruskal MST with edge list.",
+  "timestamp": "2026-04-08T19:05:32Z",
+  "unix_time": 1775675132.484351,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

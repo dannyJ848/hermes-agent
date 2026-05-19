@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r115-complete",
+  "context": "Training Gym R115 completed! ALL 4 PASS ON FIRST TRY including T10!\n\nR115 RESULTS (all 10/10):\n1. graph-valid-tree-001 (T8) - Check edges==n-1. DFS cycle detection + connectivity.\n2. cheapest-flights-k-stops-001 (T9) - Dijkstra with stops_remaining. State: (cost, city, stops).\n3. longest-increasing-path-matrix-001 (T10) - DFS+memo. Cache per cell. Explore 4 dirs if neighbor > cell.\n4. alien-dictionary-001 (T9) - Build rank map. Compare adjacent words char by char. Shorter prefix = valid.\n\nDB: 420 exercises, 699 attempts, avg 9.92, 96.3% perfect. 371 passed. Tier 9+ = 105, Tier 10 = 58.\n81+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R115 complete",
+    "R116 next"
+  ],
+  "decisions": [
+    "Valid tree: len(edges)==n-1 AND connected. DFS with parent to detect cycle.",
+    "Cheapest flights: Dijkstra with (cost, city, stops_remaining). Track visited (city, stops).",
+    "LIP: DFS+memo. For each cell, 1 + max(dfs(neighbor)) for all higher neighbors. Cache prevents O(4^(mn)).",
+    "Alien dict: rank map. Compare adjacent pairs. Break on first diff. Check prefix length."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R116: Continue. Try: Median of Two Sorted Arrays, Regular Expression Matching, N-Queens, or Merge Intervals variant.",
+  "timestamp": "2026-04-08T23:09:00Z",
+  "unix_time": 1775689740.580826,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,29 @@
+{
+  "label": "qwen27b-benchmarks-in-progress-may10",
+  "context": "Qwen 27B Expert Logician benchmark evaluation is IN PROGRESS on DGX Spark. MMLU completed at 86.57% (excellent result). GSM8K is currently running via PID 3233497. Remaining benchmarks queued: HumanEval, BBH, ARC Challenge, WinoGrande. The process is running in a background SSH session that survives disconnects. Full distillation has been saved to /data/SpecForge/custom_dflash/BENCHMARK_DISTILLATION.md. Direct reasoning tests completed earlier show 79.2% average (Wason 100%, Barbara 100%, math 75%, counterfactual 67%, ambiguous 33% keyword-matched, edge case 100%). Model is 51GB BF16 at /data/SpecForge/custom_dflash/checkpoints/final_model_merged/. All evaluation artifacts are in /data/SpecForge/custom_dflash/evaluation_results/. The benchmark suite was launched with lm-eval-harness via a background SSH process that runs all benchmarks sequentially. MMLU took ~4h43m. Current time is May 10, 23:57 CDT. User wants CLI to pick up where we left off when transferring sessions.",
+  "active_tasks": [
+    "MMLU benchmark - COMPLETE (86.57%)",
+    "GSM8K benchmark - IN PROGRESS (PID 3233497)",
+    "HumanEval benchmark - QUEUED",
+    "BBH benchmark - QUEUED",
+    "ARC Challenge benchmark - QUEUED",
+    "WinoGrande benchmark - QUEUED"
+  ],
+  "decisions": [
+    "MMLU completed successfully at 86.57% - excellent performance",
+    "GSM8K started at 23:56 CDT, running generate_until requests",
+    "Background SSH process (not nohup) is working - survives disconnects",
+    "Full distillation saved to BENCHMARK_DISTILLATION.md on DGX"
+  ],
+  "files_modified": [
+    "/data/SpecForge/custom_dflash/BENCHMARK_DISTILLATION.md",
+    "/data/SpecForge/custom_dflash/evaluation_results/mmlu_full/",
+    "/data/SpecForge/custom_dflash/evaluation_results/benchmark_suite.log"
+  ],
+  "next_steps": "Check benchmark progress with: ssh djg6228@10.0.0.171 \"ps aux | grep lm_eval; tail -20 /data/SpecForge/custom_dflash/evaluation_results/benchmark_suite.log\". When GSM8K completes, check for results in /data/SpecForge/custom_dflash/evaluation_results/gsm8k/. Continue monitoring until all benchmarks complete, then compile final report with all scores.",
+  "timestamp": "2026-05-11T05:04:21Z",
+  "unix_time": 1778475861.218328,
+  "task_id": "20260510_152943_e9ea4a",
+  "source": "manual",
+  "version": 2
+}

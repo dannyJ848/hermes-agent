@@ -1,0 +1,13 @@
+{
+  "label": "testing-gym-validation-complete",
+  "context": "## Testing Gym Validation Run — COMPLETE\n\n### Objective\nValidate whether R34-R113 modules improved agent performance vs pre-module baseline (9.5/10).\n\n### Critical Finding: Injection Pipeline is the Bottleneck\n- 92.1% of active tips (466/506) NEVER reach agent context\n- Only 40 tips ever accessed; popularity bias locks out new tips\n- P2 self-improvement path was completely dead (domain mismatch + all tips inactive)\n- Only 11/237 modules produce active injection content\n- LLM evaluation has 0% success rate\n\n### Fixes Applied This Session\n1. **P2 domain**: `self-improvement` → `training` + `meta` (3 tips now returned, was 0)\n2. **P1.5 exploration**: ε-greedy injection of 2 random under-accessed tips per turn (437 eligible)\n3. **Metacog insertion domain**: `self_improvement` → `training` (consistent)\n4. **9 high-quality self_improvement tips**: reactivated as training domain\n5. **_MAX_INJECT**: 8 → 12 (more room for exploration)\n6. **_INJECTION_MAX_CHARS**: 2400 → 3600\n7. **_INJECTION_MAX_LINES**: 15 → 18\n\n### R34-R113 Module Assessment\n- 80 modules produce tips via distillation — tips go into Cortex but never reach agent\n- 220/235 module variables are live (referenced), 15 dead (config/flags)\n- Modules are NOT the problem — the injection pipeline is\n- The modules produce tips that sit dormant in the database\n\n### Files Modified\n- ~/.hermes/plugins/distillation/__init__.py (6 patches: P2 domain, P1.5 exploration, metacog domain, injection caps)\n\n### Gym Baseline Scores (synthetic, not live)\n- coding: 4.3-6.3/10 | planning: 3.3-3.7 | reasoning: 3.0-4.0 | search: 3.7-5.6 | tool_use: 5.2-9.4\n\n### Next Steps\n1. Verify P1.5 + P2 fixes increase injection diversity in live usage\n2. Fix LLM evaluation pipeline (0% success is degrading tip quality)\n3. Consider Thompson Sampling for tip selection\n4. Run live agent tasks to measure real performance delta with fixed pipeline",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Verify injection fixes work in live agent usage by monitoring tip access_count distribution over next few turns. Then fix LLM evaluation pipeline.",
+  "timestamp": "2026-04-16T01:44:24Z",
+  "unix_time": 1776303864.1350882,
+  "task_id": "20260415_203434_bde8ff",
+  "source": "manual",
+  "version": 2
+}

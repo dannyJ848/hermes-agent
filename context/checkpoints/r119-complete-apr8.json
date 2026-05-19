@@ -1,0 +1,20 @@
+{
+  "label": "r119-complete-apr8",
+  "context": "R119 complete. 464 tips, avg conf 0.829. Added 3 tips: RewardHackingAgents (50% evaluator pairs show tampering, need multiple evaluators + adversarial auditing), ToolTree MCTS (Monte Carlo Tree Search for tool selection in large spaces), HECG hierarchical error correction (local/global/meta levels, fix at lowest root-cause level). Round 119. ~05:48 AM. Danny sleeping. Cron a81e43404f79 safety net. Training gym HEALTHY. Pushing toward 500 tips.",
+  "active_tasks": [
+    "R119 complete — 464 tips, 0.829 — ready for R120"
+  ],
+  "decisions": [
+    "Reward hacking defense requires multiple independent evaluators",
+    "MCTS outperforms greedy for tool selection in large spaces"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db (3 new tips)"
+  ],
+  "next_steps": "R120: Continue. Push toward 500 tips.",
+  "timestamp": "2026-04-08T09:32:47Z",
+  "unix_time": 1775640767.4722629,
+  "task_id": "20260407_222913_3443aa",
+  "source": "manual",
+  "version": 2
+}

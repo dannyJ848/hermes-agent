@@ -1,0 +1,22 @@
+{
+  "label": "r11-training-gym-complete",
+  "context": "R11 COMPLETE. Built heuristic_matcher.py (Selective retrieval, arXiv 2603.24639 ERL). Keyword-based relevance scoring, 5-min Cortex cache, top-3 retrieval. Wired as R177 in pre_llm_call. 4 tips distilled.\n\n12-MODULE STACK (10 wired + 2 stored):\n  WIRED: R168-R177 (self_critic, reasoning_discover, task_frontier, uncertainty_reward, tool_adaptor, meta_reasoner, reflection_synth, curriculum, tool_router, heuristic_matcher)\n  STORED: context_governor\n  Plugin: 3,441 lines. 82 total tips. Compressions: 1 of 16.",
+  "active_tasks": [
+    "R12: Continue training gym"
+  ],
+  "decisions": [
+    "Selective retrieval > recency-based injection — ERL proves this",
+    "5-min cache TTL balances freshness vs query cost",
+    "Keyword overlap scoring with confidence tiebreaker"
+  ],
+  "files_modified": [
+    "~/subconscious/heuristic_matcher.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "R12: Continue. Find next paper.",
+  "timestamp": "2026-04-14T21:22:19Z",
+  "unix_time": 1776201739.542361,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

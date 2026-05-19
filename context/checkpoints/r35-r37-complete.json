@@ -1,0 +1,13 @@
+{
+  "label": "r35-r37-complete",
+  "context": "R35-R37 COMPLETE. Three rounds done.\n\nR35: Constraint Verifier (ACS arXiv 2409.14371) + scoring bug fixes\n- Fixed efficiency_score: 0 steps = OPTIMAL for pure reasoning tasks (expected_tools=[])\n- Fixed invariant scorer: generic invariant checking instead of hardcoded scheduling patterns\n- Built constraint_verifier.py: mechanical verification to counteract LLM \"satisfied\" bias\n- Wired as R35 in plugin (post: record errors, pre: injection)\n\nR36: Code Verifier (DRV arXiv 2603.00897)\n- Detect-Repair-Verify loop for code generation\n- Pattern-based defect detection (syntax, import, logic, error_handling, resource, security)\n- Fixed false-positive patterns (colon_no_block too broad, import_exists too broad)\n- Wired as R36 in plugin\n\nR37: Adaptive Calibrator + Full Re-benchmark\n- Only injects for weak domains (coding 4.8, reasoning 6.0), skips strong (search 8.3)\n- Full re-benchmark with fixed scorer: 6.7 → 7.8 (+1.1 from scorer fixes alone)\n- Modules themselves need real-world validation (simulated answers don't prove module value)\n\nBENCHMARK SCORES (post scorer fix):\n- search: 8.3 (stable), planning: 8.7 (+1.2), reasoning: 10.0 (+4.0, scorer fix)\n- tool_use: 7.1 (stable), coding: 4.8 (unchanged)\n- OVERALL: 7.8/10 (up from 6.7)\n\n10 tips distilled across R35-R37.\n\nPLUGIN: 3,945 lines. All compiles. Gateway restarted.\n\nKEY FILES:\n- ~/subconscious/constraint_verifier.py (R35)\n- ~/subconscious/code_verifier.py (R36)  \n- ~/subconscious/adaptive_calibrator.py (R37)\n- ~/subconscious/testing_gym.py (scorer fixes)\n- ~/.hermes/plugins/distillation/__init__.py (R33-R37 all wired)",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "R38: Continue training gym evolution. Focus on coding domain (4.8, still weakest). Could research code generation self-repair techniques or build a module that forces test-driven development workflow for coding tasks.",
+  "timestamp": "2026-04-15T16:34:30Z",
+  "unix_time": 1776270870.922863,
+  "task_id": "20260415_105546_b5199b",
+  "source": "manual",
+  "version": 2
+}

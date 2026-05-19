@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r21-complete",
+  "context": "Training Gym Round 21 (R21) completed. 4/5 exercises pass with real verification.\n\nR21 RESULTS (all 10/10):\n1. adv-001 (T4) - Binary search returning INDEX: 10/10 (10 pytest + extra index check)\n2. mfr-001 (T4) - Multi-file Python package: 10/10 (3 modules, 17 tests)\n3. flk-001 (T4) - Rate limiter with flaky test fix: 10/10 (5 tests, verified 2x)\n4. srv-001 (T4) - REST API contract testing: 10/10 (10 tests, CRUD e2e)\n5. hermes-001 (T5) - Deferred (hermes-agent test suite edit)\n\nKEY LEARNING: Relative imports in Python packages fail with importlib.util loading.\nFIX: Remove relative imports, load each module individually with spec_from_file_location.\n\nDB STATE: 160 exercises, 323 attempts, avg score 9.8\n\nNEXT: R22 with harder exercises - type system design, async patterns, error chain debugging.",
+  "active_tasks": [
+    "R21 complete",
+    "R22 design next"
+  ],
+  "decisions": [
+    "Relative imports must be removed for importlib.util loading",
+    "Rate limiters need time.monotonic() not time.time()",
+    "REST API tests should verify schema structure not just status codes"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db",
+    "~/subconscious/injection_ready_tips.txt"
+  ],
+  "next_steps": "Design R22 exercises focused on async/await patterns, type systems, and error chain debugging. Continue the infinite training loop.",
+  "timestamp": "2026-04-08T16:45:39Z",
+  "unix_time": 1775666739.083256,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

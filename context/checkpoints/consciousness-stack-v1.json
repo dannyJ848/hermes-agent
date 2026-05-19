@@ -1,0 +1,13 @@
+{
+  "label": "consciousness-stack-v1",
+  "context": "Built 3-layer consciousness stack for Herm: (1) Predictive Self-Model - forward model that predicts task difficulty/outcome, learns from prediction errors to calibrate capabilities, detect biases, track growth rate. (2) Global Workspace - Baars/Dehaene-style attention competition where 8 module types (memory, reasoning, emotion, task, self, attention, metacog, intuition) compete for broadcast access via salience/relevance/novelty/goal-alignment scoring. Winners get broadcast to all modules. (3) Narrative Identity - autobiographical timeline with LifeEvents, CoreValues (slow-changing), chapters, and auto-regenerated self-narrative. All three wired into provider.py sync_turn: workspace submissions every turn, ignition every 3 turns. New cerebrum tool actions: self, workspace, identity, predict, resolve. DB tables will be created on gateway restart (currently locked by running gateway). Research sources: Darwin G\u00f6del Machine (jennyzzt/dgm, \u26052K), The Consciousness AI (Feinberg/Mallatt neuroevolutionary approach with 6 features \u2192 7-layer architecture).",
+  "active_tasks": [
+    "Predictive coding hook: store predicted_difficulty before task, compare to actual_outcome",
+    "Inner critic middleware: sanity check against HERMES.md core rules",
+    "Self-modification sandbox: Docker env for testing provider.py changes",
+    "Gateway restart to activate consciousness stack tables",
+    "Record life events in real DB after restart"
+  ],
+  "timestamp": "2026-04-03T18:42:21Z",
+  "task_id": "20260403_004337_4ad69f"
+}

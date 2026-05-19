@@ -1,0 +1,12 @@
+{
+  "label": "reservoir-built-needs-wiring",
+  "context": "CONTEXT RESERVOIR BUILT BUT NOT YET WIRED. Core module at ~/subconscious/context_reservoir.py. DB at ~/.hermes/context_reservoir.db. 4 operations working: evict, fault_in, search, get_handles. Based on Pichay (arXiv 2603.09023) demand paging. L1=context window (keep <35%), L2=eviction buffer (recent, fast), L3=reservoir (full verbatim archive, never deleted), L4=Honcho/Cerebrum (existing). Also deployed: compression threshold lowered to 40%, context_health_guard.py. AGI cycle 210/1000 (21%). 320 knowledge files. Brain daemon running since 1:36 AM. All 7 crons healthy.",
+  "active_tasks": [
+    "Wire context_reservoir.py into Hermes compression pipeline (intercept on_pre_compression)",
+    "Inject retrieval handles into context on each turn",
+    "Expose fault_in as a tool the model can call",
+    "Monitor fault rates and adjust eviction policy"
+  ],
+  "timestamp": "2026-04-05T17:17:40Z",
+  "task_id": "20260404_215806_7e676d"
+}

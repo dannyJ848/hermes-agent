@@ -1,0 +1,36 @@
+{
+  "label": "cortex-rebuild-complete",
+  "context": "CORTEX REBUILD COMPLETE — Full PostgreSQL consolidation of training gym + Hindsight KG + cerebrum.\n\nDONE:\n- cortex database on localhost:5432 with pgvector, pg_trgm, uuid-ossp\n- 15,715+ cortex_nodes (tips: 3739, facts: 1080, predictions: 5251, experiences: 8157, etc.)\n- cortex_compat_shim.py — connection-level SQLite→Cortex proxy with column remapping\n- Monkey-patched into 4 files: brain.py, meta_loop.py, distillation plugin, evey-tool-intelligence\n- E2E verified: INSERT→Cortex, SELECT→Cortex, WHERE column remapping working\n- cortex_daemon.py running under launchd (KeepAlive=true, PID 37049)\n  - Flywheel: Elo eval (LLM judge via gemini-2.5-flash), embedding dedup, consolidation, tip normalization\n- 22 indexes, md5 hash dedup, K=40 Elo, 384-dim embeddings\n- Backup script at ~/subconscious/cortex_backup.sh (30.7MB backup exists)\n- Log rotation in daemon\n\nCURRENT STATE:\n- Daemon PID: 37049 (under launchd)\n- Daemon log: ~/subconscious/cortex_daemon.jsonl + /tmp/cortex_daemon.log\n- PID file: ~/subconscious/cortex_daemon.pid\n- Heartbeat: ~/subconscious/cortex_daemon.heartbeat\n- launchd plist: ~/subconscious/com.hermes.cortex-daemon.plist (LOADED)\n- Backup: ~/subconscious/backups/cortex_20260413.sql.gz\n\nKEY FILES:\n- ~/subconscious/cortex_access.py — unified access (psycopg2, zero sqlite3)\n- ~/subconscious/cortex_flywheel.py — autonomous flywheel\n- ~/subconscious/cortex_daemon.py — 24/7 daemon (uses cortex_access directly, no shim needed)\n- ~/subconscious/cortex_compat_shim.py — SQLite→Cortex proxy (28K+ bytes)\n- ~/subconscious/llm_judge.py — LLM Elo judge\n- ~/subconscious/tip_normalizer.py — IF/THEN formatter\n- ~/subconscious/research_to_tips.py — research→tips pipeline\n\nCONNECTION: psycopg2.connect('postgresql://hindsight:hindsight@localhost:5432/cortex')\nOPENROUTER: key at config.auxiliary.approval.api_key, model google/gemini-2.5-flash\n\nREMAINING (nice-to-have, not critical):\n- Re-embed backfilled tips (1,869 new tips need embeddings beyond the 1,576 already done)\n- Test remaining 151 ~/subconscious/ modules against shim\n- Populate self_model/episodic_memory data if those SQLite tables have content\n- Consider cron job for periodic backups",
+  "active_tasks": [],
+  "decisions": [
+    "Connection-level shim over per-table mapping",
+    "_ORIGINAL_CONNECT at module level prevents infinite recursion",
+    "INSERT via cortex_access.insert_node() not raw SQL",
+    "SELECT with node_type injection + column remap to metadata->>'col'",
+    "launchd KeepAlive=true for daemon auto-restart",
+    "Python psycopg2 backup (no pg_dump binary)",
+    "LLM judge uses gemini-2.5-flash via OpenRouter"
+  ],
+  "files_modified": [
+    "~/subconscious/cortex_compat_shim.py",
+    "~/subconscious/cortex_daemon.py",
+    "~/subconscious/cortex_access.py",
+    "~/subconscious/cortex_flywheel.py",
+    "~/subconscious/llm_judge.py",
+    "~/subconscious/tip_normalizer.py",
+    "~/subconscious/research_to_tips.py",
+    "~/subconscious/cortex_backup.sh",
+    "~/subconscious/run_cortex_daemon.sh",
+    "~/subconscious/com.hermes.cortex-daemon.plist",
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/.hermes/plugins/evey-tool-intelligence/__init__.py",
+    "~/subconscious/brain.py",
+    "~/subconscious/meta_loop.py"
+  ],
+  "next_steps": "Check if re-embedding the backfilled tips is needed, or move on to next autonomous task",
+  "timestamp": "2026-04-13T22:05:49Z",
+  "unix_time": 1776117949.48479,
+  "task_id": "20260413_135506_962792",
+  "source": "manual",
+  "version": 2
+}

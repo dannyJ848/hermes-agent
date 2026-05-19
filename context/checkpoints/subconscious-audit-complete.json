@@ -1,0 +1,11 @@
+{
+  "label": "subconscious-audit-complete",
+  "context": "FULL AUDIT + FIX of subconscious system. Found and fixed 6 critical issues:\n\nFIX 1: Crons updated from brain.py to parallel_brain.py (3 jobs)\nFIX 2: Resolved 84 stale predictions (108->24)\nFIX 3: Iteration engine hooks wired into DirectModel._call (quick_before/quick_after)\nFIX 4: Epistemic guard validation added to all fact storage in synthesize()\nFIX 5: Capped 10 model-sourced facts from 0.7 to 0.3 trust\nFIX 6: Removed 6 near-duplicates + 1 self-flattering fact\n\nAlso fixed:\n- Thread safety: BrainRegion uses threading.local for per-thread SQLite connections\n- Thread safety: iteration_engine uses threading.local for get_engine()\n- Removed unused imports (subprocess, Future, VerificationPipeline)\n- Deleted orphan files (brain_recovered.py, main_agent_loop.py)\n- Fixed speedup variable UnboundLocalError\n- Fixed quick_before/quick_after argument types (string not int)\n\nFinal run: 71.3s, Level 4/5, 3.3x speedup, all 5 brain regions working.",
+  "active_tasks": [
+    "Audit complete, all 6 critical fixes applied",
+    "Parallel brain running at 3.3x speedup",
+    "Crons updated to parallel_brain.py"
+  ],
+  "timestamp": "2026-04-04T02:07:40Z",
+  "task_id": "20260403_134459_9fb996"
+}

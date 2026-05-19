@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r73-complete",
+  "context": "Training Gym R73 completed! ALL 4 PASS ON FIRST TRY!\n\nR73 RESULTS (all 10/10):\n1. priority-queue-001 (T8) - MinHeap from scratch: sift_up (append→swap with parent), sift_down (swap with smallest child). heapify: sift down from last parent to root O(n).\n2. dp-knapsack-001 (T8) - 1D DP: iterate w from capacity down to weight. Backtrack with 2D table for items.\n3. max-subarray-001 (T7) - Kadane's: curr=max(x, curr+x). Max product: track both max_prod and min_prod, swap on negative.\n4. graph-bipartite-001 (T7) - BFS coloring: assign 0/1, neighbors opposite. Conflict = not bipartite.\n\nDB: 305 exercises, 531 attempts, avg 9.9, 95.1% perfect. 256 passed. Tier 9+ = 63.\n39+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R73 complete",
+    "R74 next"
+  ],
+  "decisions": [
+    "MinHeap: push=append+sift_up, pop=swap root/last+sift_down. heapify: sift_down from n//2-1 to 0.",
+    "0/1 Knapsack 1D: for each item, w from cap down to weight. dp[w]=max(dp[w], dp[w-weight]+val).",
+    "Kadane's: curr=max(x,curr+x), track max. Max product: swap max/min on negative, track both.",
+    "Bipartite: BFS coloring 0/1. Adj list. If neighbor same color → not bipartite."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R74: Continue with more exercises. Try: Union-Find with path compression, Topological Sort, Dijkstra, or DFS/BFS variations.",
+  "timestamp": "2026-04-08T21:17:36Z",
+  "unix_time": 1775683056.831192,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

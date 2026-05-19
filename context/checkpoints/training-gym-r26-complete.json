@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r26-complete",
+  "context": "Training Gym R22-R26 completed. 20/20 exercises pass with real pytest verification.\n\nR26 RESULTS (all 10/10):\n1. command-001 (T5) - Command pattern with undo/redo + macro. Fixed position-at-execute bug. 12 tests.\n2. observer-001 (T4) - Observer with weak refs + priority + auto-cleanup. 7 tests.\n3. strategy-001 (T4) - Strategy with pipeline chaining. 12 tests.\n4. template-001 (T4) - Template Method with CSV/JSON, metrics, hooks. 9 tests.\n\nKEY BUG FIXED: AddTextCommand computed position at init time instead of execute time. In macros, all commands see empty document at init. Fix: compute position lazily in execute().\n\nDB: 180 exercises, 343 attempts, avg 9.8",
+  "active_tasks": [
+    "R22-R26 complete",
+    "R27 next"
+  ],
+  "decisions": [
+    "AddTextCommand: compute position at execute() time, not __init__() - critical for macro commands",
+    "Observer weak refs: auto-cleanup dead refs during notify()",
+    "Template Method: use _run_step wrapper for metrics + hooks"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R27 exercises. Consider: data structures (Trie, B-tree, skip list), or systems (connection pool, object pool).",
+  "timestamp": "2026-04-08T17:18:32Z",
+  "unix_time": 1775668712.5560992,
+  "task_id": "ff19461e-c812-47be-8f09-22cad0313296",
+  "source": "manual",
+  "version": 2
+}

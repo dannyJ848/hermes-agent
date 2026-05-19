@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r97-complete",
+  "context": "Training Gym R97 completed! ALL 4 PASS ON FIRST TRY!\n\nR97 RESULTS (all 10/10):\n1. longest-palindromic-substring-001 (T9) - Expand around center. Odd(i,i) and even(i,i+1). Track best.\n2. permutations-001 (T8) - Backtracking with swap. Swap start<->i, recurse start+1, swap back.\n3. unique-paths-dp-001 (T7) - Combinatorics: C(m+n-2, min(m-1,n-1)). Avoid overflow.\n4. decode-ways-001 (T8) - DP rolling. prev2/prev1. Single: if s[i]!='0'. Double: 10<=two<=26.\n\nDB: 379 exercises, 627 attempts, avg 9.92, 95.9% perfect. 330 passed. Tier 9+ = 95, Tier 10 = 53.\n63+ consecutive rounds all 10/10.",
+  "active_tasks": [
+    "R97 complete",
+    "R98 next"
+  ],
+  "decisions": [
+    "Longest palindrome: expand around center. For each i: expand(i,i) odd, expand(i,i+1) even.",
+    "Permutations: swap-based backtracking. Swap start with each i, recurse start+1, swap back.",
+    "Unique paths: combinatorics C(m+n-2,k). Use min(m-1,n-1) for efficiency.",
+    "Decode ways: rolling DP. Two cases: single digit valid, two-digit (10-26) valid."
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "R98: Continue. Try: Minimum Window Substring, Word Search, or Max Subarray.",
+  "timestamp": "2026-04-08T22:22:38Z",
+  "unix_time": 1775686958.946698,
+  "task_id": "df297ec7-656b-467e-aaea-3e7816f20445",
+  "source": "manual",
+  "version": 2
+}

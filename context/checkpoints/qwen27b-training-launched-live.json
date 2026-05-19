@@ -1,0 +1,19 @@
+{
+  "label": "qwen27b-training-launched-live",
+  "context": "Qwen 27B LoRA training has been launched on DGX Spark (djg6228@10.0.0.171). The training is running in background via axolotl with the tiered datasets (tier1-reasoning 2.15M, tier2-reasoning 130K, tier3-health 194 examples). Currently in preprocessing phase — tokenizing tier1 dataset at ~39% complete. Training config: LoRA r=256, alpha=512, 2 epochs, bf16, sequence_len=4096, sample_packing=true. Output dir: /data/SpecForge/custom_dflash/adapters/qwen27b-tiered-r256/. Log file: /data/SpecForge/custom_dflash/adapters/qwen27b-tiered-r256/logs/training_live.log. Cron database is corrupted (jobs.json has unescaped quotes) — needs manual repair if cron jobs needed. Dataset transfer from MacBook to DGX is still running (~15% done, ETA 3-4 hours) but training datasets are already on DGX. Benchmarks completed earlier: MMLU 86.57%, GSM8K 66.19%, HumanEval 82.93%, ARC 60.24%, WinoGrande 77.19%.",
+  "active_tasks": [
+    "Qwen 27B LoRA training (in progress)",
+    "Dataset transfer from MacBook (15% complete)"
+  ],
+  "decisions": [],
+  "files_modified": [
+    "/data/SpecForge/custom_dflash/axolotl_config.yaml",
+    "/data/SpecForge/custom_dflash/adapters/qwen27b-tiered-r256/logs/training_live.log"
+  ],
+  "next_steps": "1. Monitor training progress via log file. 2. Once training completes (2-3 days), merge LoRA adapters and quantize to GGUF for Hermes integration. 3. Fix cron database if needed for future automation. 4. Complete dataset transfer from MacBook.",
+  "timestamp": "2026-05-13T17:10:09Z",
+  "unix_time": 1778692209.785989,
+  "task_id": "20260513_004940_7419c5",
+  "source": "manual",
+  "version": 2
+}

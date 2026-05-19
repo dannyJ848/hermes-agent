@@ -1,0 +1,24 @@
+{
+  "label": "dgx-hermes-infrastructure-locked",
+  "context": "DGX Hermes fully operational after fixing SSH access confusion. Critical infrastructure knowledge now persisted across all layers:\n\n1. MEMORY: Hardware topology entry (System A = DGX spark-85e8.local, System B = MacBook MacBook-Air-9.local)\n2. SKILL: dgx-infrastructure-topology with full access methods, hostnames, auth keys, and failure recovery\n3. KNOWLEDGE: DGX-MacBook Infrastructure Access Pattern finding\n4. SOUL.md: Already has self-optimization rules\n\nKey facts locked in:\n- DGX hostname: spark-85e8.local (NOT an IP address)\n- MacBook → DGX uses NVIDIA Sync nvsync.key\n- DGX → MacBook uses standard id_ed25519\n- After DGX restart: ssh-keygen -R spark-85e8.local then reconnect with accept-new\n- Never guess IPs — use hostnames\n\nDGX Hermes status:\n- 5 goals seeded\n- Terminal: OK\n- Web search: OK\n- Cognitive orchestrator: 20/20 subsystems\n- Service: active\n- vLLM: process running",
+  "active_tasks": [
+    "DGX Hermes operational verification complete"
+  ],
+  "decisions": [
+    "Use hostnames not IPs for DGX access",
+    "Use NVIDIA Sync key for MacBook→DGX",
+    "Use standard id_ed25519 for DGX→MacBook",
+    "Persist infrastructure topology to all layers"
+  ],
+  "files_modified": [
+    "/Users/dannygomez/.hermes/memories/MEMORY.md",
+    "/Users/dannygomez/.hermes/skills/devops/dgx-infrastructure-topology/SKILL.md",
+    "/Users/dannygomez/.hermes/knowledge/dgx-macbook-infrastructure-access-pattern.md"
+  ],
+  "next_steps": "1. Verify DGX Hermes continues running overnight\n2. Check vLLM health in morning\n3. Monitor for any module shadowing errors in logs",
+  "timestamp": "2026-05-16T16:17:26Z",
+  "unix_time": 1778948246.946822,
+  "task_id": "20260515_234937_7065dc",
+  "source": "manual",
+  "version": 2
+}

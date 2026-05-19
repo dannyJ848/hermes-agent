@@ -1,0 +1,21 @@
+{
+  "label": "pre-restart-distillation-fixes",
+  "context": "Distillation audit complete. 6 bugs fixed across ~/subconscious/ and ~/hermes-agent/gateway/run.py. Gateway needs restart to activate the distillation recall injection (top 5 tips + 3 meta-insights now injected into every session). Key fix: top_down_recall was dead code — 903 tips in DB were invisible to agent. After restart, next step is 100-cycle validation to measure improvement in engineering success rate (was 7.2%).",
+  "active_tasks": [
+    "Restart gateway to activate distillation injection",
+    "100-cycle validation (next priority)",
+    "Black hat extraction (after validation)"
+  ],
+  "decisions": [
+    "Used direct DB injection in run.py instead of wiring top_down_recall function",
+    "Controller cron confirmed working — was misdiagnosed",
+    "bottom_up_store wiring deferred — only 1hr delay via controller cron"
+  ],
+  "files_modified": [],
+  "next_steps": "Run safe-restart.sh to restart gateway with patched code. Then begin 100-cycle validation.",
+  "timestamp": "2026-04-06T20:04:57Z",
+  "unix_time": 1775505897.3137448,
+  "task_id": "20260406_150326_55934a",
+  "source": "manual",
+  "version": 2
+}

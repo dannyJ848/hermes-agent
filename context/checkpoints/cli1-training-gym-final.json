@@ -1,0 +1,19 @@
+{
+  "label": "cli1-training-gym-final",
+  "context": "TRAINING GYM SESSION COMPLETE at R24 (CLI session 1):\n  24 rounds, 25 modules (21 wired + 4 standalone), 136 tips distilled\n  Plugin: ~3,630 lines. ALL 22 modules passed health check.\n  \n  COMPLETE MODULE ROSTER (R168-R190):\n  R168 self_critic, R169 reasoning_discover, R170 task_frontier, R171 uncertainty_reward, R172 tool_adaptor, R173 meta_reasoner, R174 reflection_synth, R175 curriculum, R176 tool_router, R177 heuristic_matcher, R178 recovery_selector, R179 confidence_estimator, R180 task_decomposer, R181 interaction_logger, R182 exec_tracer, R183 skill_gap_detector, R184 prompt_optimizer, R185 reward_evolver, R186 context_budget, R187 adaptation_speed, R188 tool_diversity, R189 output_quality, R190 meta_controller, + context_governor (stored)\n  \n  RESEARCH PAPERS (15): SelfDiscover(2402.03620), Tool-R0(2602.21320), SELAUR(2602.21158), DRAFT(2410.08197), ARES(2603.07915), Externalization(2604.08224), GVU(2512.02731), E2H(2506.06632), Select-then-Solve(2604.06753), ERL(2603.24639), PALADIN(2509.25238), Confidence-First(2603.05881), AgentTrace(2602.10133), Co-Evolution(2604.03098), Synapse(2601.02744)\n  \n  WIRING PATTERN: try/except blocks in distillation plugin, from module import get_instance, os.environ.get(\"HERMES_SESSION_ID\", \"default\")\n  MODULE PATH: ~/subconscious/\n  PLUGIN: ~/.hermes/plugins/distillation/__init__.py\n  \n  Checkpoints saved: r1 through r24, pre-compression-2-state\n  \n  Session ended at ~194K tokens, 1 LCM compression. Danny noted quality degrading.",
+  "active_tasks": [
+    "R25: Resume training gym in new CLI"
+  ],
+  "decisions": [
+    "Context window degradation threshold: ~130-140K prompt tokens is the safe ceiling",
+    "4-compression hard limit replaced by token-count trigger",
+    "LCM threshold should be lowered from 75% to ~65%"
+  ],
+  "files_modified": [],
+  "next_steps": "Restore in new CLI: hermes --resume cli1-training-gym-final. Continue R25+.",
+  "timestamp": "2026-04-14T22:51:22Z",
+  "unix_time": 1776207082.21765,
+  "task_id": "20260414_154305_93cbe7",
+  "source": "manual",
+  "version": 2
+}

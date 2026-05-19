@@ -1,0 +1,13 @@
+{
+  "label": "pre-llm-eval-fix",
+  "context": "## Pre-LLM Eval Fix Checkpoint\n\n### Context\nJust completed testing gym validation run. Found injection pipeline broken (92% tips unused). Applied 7 fixes (P2 domain, P1.5 exploration, injection caps). Now moving to fix LLM evaluation pipeline which has 0% success rate — this means tips lose elo over time, get deactivated, and never surface.\n\n### Fixes Already Applied This Session\n1. P2 domain: self-improvention → training + meta\n2. P1.5 exploration: ε-greedy 2 random under-accessed tips\n3. Metacog insertion domain: self_improvement → training\n4. _MAX_INJECT: 8 → 12\n5. _INJECTION_MAX_CHARS: 2400 → 3600\n6. _INJECTION_MAX_LINES: 15 → 18\n7. 9 self_improvement tips reactivated as training\n\n### LLM Eval Pipeline — What We Know\n- cortex_eval_history has 192,345 entries\n- Recent flywheel cycle: \"eval\" with in=250, out=0 (0% success)\n- \"full_audit\" with model_results showing gpt-4.1-mini: 90 calls / 0 successes, gemini-2.5-flash: 90 calls / 0 successes\n- avg_judges_per_pair: 0.0\n- Judges: minimax-paid (MiniMax-M2.7 direct), google/gemini-2.5-flash + openai/gpt-4.1-mini via OpenRouter\n- 0% success = tips never win Elo matches = elo decays = tips get deactivated = self-reinforcing death spiral\n\n### Files Modified This Session\n- ~/.hermes/plugins/distillation/__init__.py (7 patches)\n- Cortex DB: 9 tips reactivated, domain remapped\n\n### Next Steps\n1. Diagnose WHY LLM eval returns 0 successes (API issue? prompt format? judge config?)\n2. Fix the eval pipeline\n3. Run eval cycle to prove tips can gain elo\n4. Verify injection diversity increases over time",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Diagnose LLM eval pipeline failure: check cortex_daemon eval code, check API keys, check judge prompt format, identify why 0% success rate.",
+  "timestamp": "2026-04-16T01:46:05Z",
+  "unix_time": 1776303965.235481,
+  "task_id": "20260415_203434_bde8ff",
+  "source": "manual",
+  "version": 2
+}

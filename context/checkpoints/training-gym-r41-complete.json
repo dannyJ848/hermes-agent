@@ -1,0 +1,23 @@
+{
+  "label": "training-gym-r41-complete",
+  "context": "Training Gym R41 completed. All 4 exercises 10/10 (2 needed bug fixes).\n\nR41 RESULTS (all 10/10):\n1. rope-001 (T8) - Rope with split/concat/insert/delete, weight-based indexing. 5 tests. Clean.\n2. veb-tree-001 (T9) - Van Emde Boas Tree with summary/cluster recursion. 5 tests. Clean.\n3. wavelet-tree-001 (T8) - Wavelet Tree with bitvector binary partition. 5 tests. Bug: split on mid value caused infinite recursion — fixed by splitting alphabet at mid_idx.\n4. minmax-heap-001 (T7) - Min-Max Heap with min/max level bubble-up. 5 tests. Bug: _parent(None) — fixed by checking parent before computing grandparent.\n\nKEY PATTERNS:\n- Rope: weight = left subtree total length, split returns (left_node, right_node)\n- VEB: min stored separately, high/low split by sqrt(U), base case U<=2\n- Wavelet Tree: split alphabet at mid_idx (not by value), left_alpha = set(alphabet[:mid_idx])\n- Min-Max Heap: even depths are min levels, compare with grandparent on bubble-up, check parent != None first\n\nDB: 238 exercises, 403 attempts, avg 9.87\n4 clean rounds in last 5 (R38-R41). Coding accuracy strong.",
+  "active_tasks": [
+    "R41 complete",
+    "R42 next"
+  ],
+  "decisions": [
+    "Wavelet tree: split alphabet by INDEX not by VALUE to avoid infinite recursion when single element keeps going left",
+    "Min-Max heap: always check parent is not None before computing grandparent in bubble_up",
+    "VEB tree: min stored separately from clusters, cluster[high] created lazily",
+    "Rope: split at position i returns (left_node, right_node), handle edge cases where split creates empty side"
+  ],
+  "files_modified": [
+    "~/subconscious/training_gym.db"
+  ],
+  "next_steps": "Design R42 exercises. Push to T9: Suffix Array + LCP, Treap, or Left-Leaning Red-Black Tree.",
+  "timestamp": "2026-04-08T18:56:12Z",
+  "unix_time": 1775674572.63922,
+  "task_id": "0ed1fda5-d638-4734-8094-076158ba8bba",
+  "source": "manual",
+  "version": 2
+}

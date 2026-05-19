@@ -1,0 +1,22 @@
+{
+  "label": "training-gym-r100-complete",
+  "context": "Training Gym R100 MILESTONE completed. Full cycle: Research → Distill → Build → Activate → Test.\n\nRESEARCH: Tool-learning frontier (2025-2026). Key findings: PRM for tool calls (+14%), self-correction (73.6% in 1 retry), argument optimization (+18%), semantic caching (46% hit rate), cross-tool transfer (+24%).\n\nDISTILL: 10 new tips inserted (1166→1176) across domains: process-reward, error-recovery, tool_precision, efficiency, tool-learning, self-improvement, metacognition.\n\nBUILD: Added Argument Feedback Cache to distillation plugin. 4 new functions:\n- _args_hash(): stable MD5 hash of tool+args\n- _record_arg_feedback(): stores failed args in arg_feedback.db on error\n- _retrieve_arg_feedback(): retrieves past corrections for pre_llm_call injection\n- _ensure_arg_feedback_db(): creates table with tool_name, args_hash, error_msg, correction, was_fixed\n\nWIRED INTO: \n- post_tool_call error path: _record_arg_feedback called on every error\n- pre_llm_call injection: retrieves past fixes when user mentions tools by name\n\nACTIVATE: Plugin syntax-checked, gateway restarted (PID 3907), caffeinate running.\n\nTEST: All systems pass — 1356-line plugin, 1176 tips all >=0.7 confidence, 26 tools in predictor, 57 in capability, 291 skill rewards, arg_feedback.db with correct schema.\n\nGateway PID: 3907. Caffeinate active.",
+  "active_tasks": [
+    "R100 complete, starting R101"
+  ],
+  "decisions": [
+    "R100 milestone: implemented Tool-REFINE arg feedback cache",
+    "Keep using /tmp scripts for Python to avoid bash escaping",
+    "Caffeinate + gateway restart pattern for all-night runs"
+  ],
+  "files_modified": [
+    "~/.hermes/plugins/distillation/__init__.py",
+    "~/subconscious/arg_feedback.db"
+  ],
+  "next_steps": "Start R101 training gym round. Research a new frontier topic (agent memory or robustness — the two topics that timed out in R100), distill, build the next impactful feature, activate, test, integrate. Continue the all-night loop.",
+  "timestamp": "2026-04-09T05:55:44Z",
+  "unix_time": 1775714144.473887,
+  "task_id": "20260408_220858_c2e2e3",
+  "source": "manual",
+  "version": 2
+}

@@ -1,0 +1,27 @@
+{
+  "label": "training-gym-r25-vision-loop",
+  "context": "TRAINING GYM R25 — Vision-Guided Loop Setup Complete\n\nSession was setting up the vision-guided training gym loop. Everything is wired and ready to execute R25.\n\nCOMPLETED THIS SESSION:\n1. Restored from cli1-training-gym-final checkpoint (R24 state)\n2. Found and wired GLM-5V-Turbo vision model for diagram self-review\n   - Config: provider=custom, model=glm-5v-turbo, base_url=https://api.z.ai/api/paas/v4/\n   - Key insight: Z.AI has TWO APIs — /api/coding/paas/v4/ (coding) vs /api/paas/v4/ (model). GLM-5V uses model API.\n   - Pipeline: screencapture -x /tmp/shot.png → vision_analyze(image_url=\"/tmp/shot.png\")\n   - Danny has $13.85 in credits (~1,150 vision calls available)\n3. Built Cortex Architecture Diagram skill (cortex-architecture-diagram)\n   - Saved at ~/.hermes/skills/meta/cortex-architecture-diagram/\n   - SKILL.md + references/cortex_diagram_template.html\n4. Updated Hermes to v2026.4.13-108 (108 commits past v0.9.0, fully current)\n   - Clean rebase, TCP keepalive patches intact\n   - GLM-5V support already merged upstream (commit 6448e1da)\n5. Generated first cortex_architecture.html diagram at ~/Desktop/\n6. Successfully tested GLM-5V vision — it CAN see and analyze the diagram\n7. Gathered fresh Cortex stats for R25 diagram generation\n\nFRESH CORTEX STATS (gathered but NOT yet used for new diagram):\n- 27,726 nodes (up from 26,434), 369,285 edges\n- 316 tips (up from 310), Elo: min=1048, max=2263, avg=1443\n- 315 rated tips, 27,091 eval history, 3,868 flywheel\n- 226 subconscious module files, 3,597 line plugin\n- 41 get_instance wiring calls\n\nCURRENT STATE:\n- Training gym at R24 complete, 25 modules (21 wired + 4 standalone)\n- R168-R190 + context_governor\n- Plugin: ~3,597 lines\n- Danny directive: run vision analysis after EVERY round to decide focus\n\nDANNY'S INSTRUCTIONS FOR NEXT SESSION:\n- Use GLM-5V after every round to see diagram and decide where to focus\n- Generate diagram → analyze with vision → research gap → build module → repeat\n- Credits: $13.85 available (~$0.012/call)\n\nTODO LIST STATE:\n1. Generate fresh architecture diagram from live Cortex data — IN PROGRESS\n2. Analyze diagram with GLM-5V-Turbo to identify structural gaps — PENDING\n3. Research frontier paper for the biggest gap — PENDING\n4. Build R25 module and wire into plugin — PENDING\n5. Distill tips to Cortex — PENDING\n6. Regenerate diagram + vision analyze to confirm improvement — PENDING\n\nFILES MODIFIED:\n- ~/.hermes/config.yaml (vision: GLM-5V-Turbo config)\n- ~/hermes-agent/agent/auxiliary_client.py (GLM-5V in _PROVIDER_VISION_MODELS — but upstream already has this now)\n- ~/hermes-agent/run_agent.py (TCP keepalive patches — stashed, reapplied)\n- ~/.hermes/skills/meta/cortex-architecture-diagram/ (new skill)\n- ~/Desktop/cortex_architecture.html (diagram)\n- /tmp/cortex_architecture.html (diagram copy)\n\nGLM-5V-TURBO VISION CONFIG (critical for next session):\n  provider: custom\n  model: glm-5v-turbo\n  base_url: https://api.z.ai/api/paas/v4/\n  api_key: (GLM_API_KEY from ~/.hermes/.env)\n  timeout: 60\n  Vision pipeline: open -a \"Google Chrome\" ~/Desktop/cortex_architecture.html && sleep 3 && screencapture -x /tmp/cortex_screenshot.png && vision_analyze(image_url=\"/tmp/cortex_screenshot.png\")\n",
+  "active_tasks": [
+    "R25: Vision-guided training gym round — generate diagram → analyze → research → build → verify"
+  ],
+  "decisions": [
+    "Vision-guided loop: GLM-5V-Turbo after every round, not every 5 rounds",
+    "Use Cocoon AI diagram template for Cortex visualization",
+    "Z.AI Model API (/api/paas/v4/) is separate from Coding API (/api/coding/paas/v4/)",
+    "Danny wants vision analysis to drive WHERE to focus next — expand or deepen"
+  ],
+  "files_modified": [
+    "~/.hermes/config.yaml",
+    "~/hermes-agent/agent/auxiliary_client.py",
+    "~/hermes-agent/run_agent.py",
+    "~/.hermes/skills/meta/cortex-architecture-diagram/SKILL.md",
+    "~/.hermes/skills/meta/cortex-architecture-diagram/references/cortex_diagram_template.html",
+    "~/Desktop/cortex_architecture.html"
+  ],
+  "next_steps": "1. Load cortex-architecture-diagram skill\n2. Generate fresh diagram with updated Cortex stats (27,726 nodes, 316 tips, Elo max 2263)\n3. Open in Chrome + screenshot + analyze with GLM-5V-Turbo\n4. Based on visual gap analysis, research frontier paper\n5. Build R25 module, wire into plugin, distill tips\n6. Regenerate diagram, vision-analyze to confirm\n7. Continue R26+ with same vision-guided loop",
+  "timestamp": "2026-04-14T23:37:14Z",
+  "unix_time": 1776209834.5367942,
+  "task_id": "20260414_175506_ef124f",
+  "source": "manual",
+  "version": 2
+}

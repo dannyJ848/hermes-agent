@@ -1,0 +1,27 @@
+{
+  "label": "apr20-dgx-launch-ready",
+  "context": "DGX Spark launch day prep COMPLETE. All audit fixes applied and 3 enhancement scripts added.\n\nAUDIT FIXES APPLIED (4 files patched):\n- spark-day1.sh: HF token env fallback + prompt, disk check 1000GB, PyTorch cu130 removed, CUDA 12.8 Docker image, USB arg fix, conditional DeepGEMM mounts/envs, safe marker check\n- spark-maxperf.sh: eval nohup for BF16/FP8 commands, removed fatal # comments inside quoted strings, removed 100W power limit bug, DFLASH single-quote JSON, DeepGEMM guard, gradient checkpointing enabled, Spark-only guard, P5-P8 labels corrected\n- wire-spark-to-hermes.sh: tunnel regex fixed (http://[^\\s:]+:\\d+/v1), removed unused yaml import\n- superqwen3-super.sh: SPANK → SPARK typo fixed\n\nNEW SCRIPTS CREATED:\n- kimi-distill-bridge.sh (197 lines): Kimi K2.6 → Qwen3.6 distillation bridge. Calls Kimi API via KIMI_API_KEY from ~/.hermes/.env, formats as Qwen3 chat JSONL, auto-transfers to Spark via rsync.\n- spark-health-daemon.sh (107 lines): vLLM crash-recovery watchdog. Polls :8000/:8001 every 30s, auto-restarts dead Docker containers. Supports --daemon, --stop, --status.\n- spark-preflight.sh (186 lines): Launch-day go/no-go validator. Checks network, GPU, disk, Docker, HF token, scripts, Hermes wiring. Exit code 0 = ready to launch.\n\nMODEL PROVIDER: Kimi K2.6 wired as main model (kimi-for-coding / kimi-coding provider). GLM-5.1 available as fallback.\n\nNEXT STEPS FOR DANNY:\n1. bash ~/dgx-spark-prep/spark-preflight.sh <SPARK_IP>\n2. ssh spark@<SPARK_IP>, run spark-day1.sh\n3. wire-spark-to-hermes.sh <SPARK_IP> on MacBook\n4. Optional: spark-health-daemon.sh --daemon on Spark\n5. Optional: kimi-distill-bridge.sh --spark-ip <SPARK_IP> on MacBook\n\nAll backups saved as *.pre-audit-fix in ~/dgx-spark-prep/.",
+  "active_tasks": [
+    "DGX Spark launch day prep complete - awaiting Danny's go-ahead"
+  ],
+  "decisions": [
+    "All audit bugs fixed before launch",
+    "3 enhancement scripts added (distillation bridge, health daemon, preflight validator)",
+    "Kimi K2.6 distillation bridge leverages newly wired main model"
+  ],
+  "files_modified": [
+    "~/dgx-spark-prep/spark-day1.sh",
+    "~/dgx-spark-prep/spark-maxperf.sh",
+    "~/dgx-spark-prep/wire-spark-to-hermes.sh",
+    "~/dgx-spark-prep/superqwen3-super.sh",
+    "~/dgx-spark-prep/kimi-distill-bridge.sh",
+    "~/dgx-spark-prep/spark-health-daemon.sh",
+    "~/dgx-spark-prep/spark-preflight.sh"
+  ],
+  "next_steps": "Restart Hermes gateway to complete session. After restart, verify checkpoint restored and confirm launch readiness with Danny.",
+  "timestamp": "2026-04-20T18:27:35Z",
+  "unix_time": 1776709655.1373582,
+  "task_id": "20260420_115033_278c2e",
+  "source": "manual",
+  "version": 2
+}

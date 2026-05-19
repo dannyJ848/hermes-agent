@@ -1,0 +1,18 @@
+{
+  "label": "r116-complete-training-gym",
+  "context": "TRAINING GYM R100-R116 completed across multiple sessions tonight. Built 17 subconscious modules wired into the distillation plugin (~1674 lines). All modules loaded and firing on every LLM call via pre_llm_call and post_tool_call hooks.\n\nMODULES BUILT (R100-R116):\nR100: arg_feedback.db — stores (tool, args_hash, error, correction) for retry learning\nR101: cascade_recovery.py — 4-level failure taxonomy (Planning/Execution/Reasoning/SelfMonitor) with 12 recovery strategies\nR102: plan_monitor.py — goal progress tracking, dead-end detection, replan signals\nR103: confidence_tracker.py — per-tool sliding-window success rates, metacognitive escalation\nR104: experience_replay.py — cross-session pattern mining, DO/AVOID rule extraction\nR105: reward_shaping.py — per-tool reward tracking, tool retirement, combo rewards\nR106: think_budget.py — adaptive reasoning allocation (quick/standard/deep/unlimited tiers)\nR107: knowledge_retrieval.py — corrective RAG with multi-index routing (hot/warm/cold)\nR108: knowledge_compiler.py — research→structured rules pipeline with dedup+conflict detection\nR109: memory_selector.py — auto-selects retrieval strategy (vector/graph/hybrid) based on query\nR110: think_budget.py v2 — rewritten with complexity estimation and adaptive tier escalation\nR111: tip_inserter.py — queue-based daemon for safe DB writes without killing gateway\nR112-R115: more research rounds with tips and module enhancements\nR116: self_eval_loop.py — 4-axis self-evaluation (correctness/completeness/reasoning/efficiency)\n\nSTATE: ~1260 tips in cerebrum, ~30+ DBs, plugin at ~1674 lines. Gateway running.\nRECURRING ISSUE: DB lock from gateway — use nohup bash retry loop or tip_inserter.py queue daemon. NEVER kill gateway PID directly (kills Hermes itself).",
+  "active_tasks": [],
+  "decisions": [
+    "Queue-based tip insertion (nohup bash retry) is the ONLY safe way to write to cerebrum when gateway is running",
+    "Never kill gateway PID — it IS the Hermes process",
+    "All modules use subconscious/ path which is in sys.path via distillation plugin",
+    "score_step returns dict with key 'composite' NOT 'score'"
+  ],
+  "files_modified": [],
+  "next_steps": "Continue training gym R117+. Research new frontier topic, distill tips, build new module, test, integrate, restart gateway, repeat. Focus on high-impact modules that fill capability gaps.",
+  "timestamp": "2026-04-09T22:35:48Z",
+  "unix_time": 1775774148.27264,
+  "task_id": "20260409_133802_fc4fc7",
+  "source": "manual",
+  "version": 2
+}

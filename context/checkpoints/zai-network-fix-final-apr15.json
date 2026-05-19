@@ -1,0 +1,31 @@
+{
+  "label": "zai-network-fix-final-apr15",
+  "context": "Session started Apr 14 ~10:54PM. Primary work: diagnosing and fixing Z.AI connection drops.\n\nISSUES FOUND & FIXED:\n1. EXPIRED API KEY — Main key in ~/.hermes/.env expired (401). Updated to new key: 15e9252c363241a8b58ccf06575a58f1.zSCBZA5YQuJhfU56. Verified working on both coding API and model API.\n2. VISION KEY EXPIRED — Old key 3239ea7b...PvNTiCdtHfHcw9mq returned 401. Updated config.yaml vision block with new key on api/paas/v4/ endpoint. NOTE: coding API (api/coding/paas/v4) does NOT have glm-5v-turbo — vision must stay on Model API.\n3. AGGRESSIVE KEEPALIVE TUNING REVERTED — run_agent.py reverted from backup (run_agent.py.bak.pre-zero-downtime, Apr 14 22:04). Was: 15s keepalive, 5s interval, 45s timeouts. Now: 30s keepalive, 10s interval, 90s timeouts (UWorld project era settings). The aggressive v3 tuning was causing more drops than it prevented.\n4. KILLED RESOURCE HOGS — Docker (460MB), Ollama (175MB), 3 llama servers, schema echo proxy. Freed ~700MB RAM.\n5. RAISED FD LIMIT — ulimit -n was 256 (hermes processes at 89-100 FDs each). Raised to 65536 via ~/.zshrc.\n6. CLEANED DEAD SOCKETS — Killed stale processes (PIDs 50070, 30907, 4992). Restarted gateway. CLOSE_WAIT: 34→23.\n7. RESTARTED GATEWAY — PID changed from 86135 to 25677.\n\nDIAGNOSTIC RESULTS:\n- Z.AI API responding normally: 4s small requests, 8s streaming, 0% packet loss\n- IPv6 latency: 72-85ms stable to 2607:a400:4:58::2c\n- IPv4 latency: 61-128ms variable to 128.14.14.141\n- No VPN, proxy, firewall, or competing gateway interference\n- DNS resolves fine (Comcast → ZenSafeDNS)\n- No env var overrides on timeouts\n\nSTATE:\n- New CLI (PID 25846) is running successfully on the other terminal\n- This CLI (PID 2131) is running fine\n- Gateway (PID 25677) is healthy\n- Training gym was at R181 before this session",
+  "active_tasks": [
+    "Z.AI network diagnostic — COMPLETE",
+    "API key rotation — COMPLETE",
+    "Vision config fix — COMPLETE",
+    "Resource cleanup (Docker/Ollama/llama) — COMPLETE",
+    "FD limit raised — COMPLETE",
+    "Training gym — PAUSED at R181"
+  ],
+  "decisions": [
+    "Reverted to UWorld-era network settings (30s keepalive, 90s timeouts)",
+    "Vision stays on Model API endpoint (api/paas/v4/) — coding API doesn't have glm-5v-turbo",
+    "Same new API key works for both coding and model API endpoints",
+    "Killed Docker/Ollama/llama — not needed right now, frees 700MB RAM",
+    "Raised FD limit to 65536 — was at 256, dangerously close to hermes usage"
+  ],
+  "files_modified": [
+    "~/.hermes/.env (GLM_API_KEY updated to new key)",
+    "~/.hermes/config.yaml (vision api_key + base_url updated)",
+    "~/hermes-agent/run_agent.py (reverted to backup from Apr 14 22:04)",
+    "~/.zshrc (added ulimit -n 65536)"
+  ],
+  "next_steps": "Training gym R182+ can resume. New CLI session is running and healthy. If connection issues recur, the remaining 23 CLOSE_WAIT sockets should self-clean via OS reclamation.",
+  "timestamp": "2026-04-15T04:24:53Z",
+  "unix_time": 1776227093.928648,
+  "task_id": "20260414_225432_0b5f43",
+  "source": "manual",
+  "version": 2
+}

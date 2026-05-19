@@ -1,0 +1,23 @@
+{
+  "label": "cortex-audit-optimization-complete",
+  "context": "COMPREHENSIVE CORTEX AUDIT & OPTIMIZATION COMPLETE\n\nAUDITS RUN:\n1. Tip Quality — 1873 tips, avg conf=0.885, 1857 high-conf. 10 noise markers found, 2 duplicates removed, 2 dead tips purged\n2. Orphan Detection — 436 subconscious modules, 208 not wired in plugin (203 without build_injection = utility/infrastructure modules, not injection modules)\n3. Injection Redundancy — 683 unique keywords, 83 shared by 2+ modules (code→7 modules), governor caps at 1500 chars/12 lines\n4. Injection Overhead — ~$0.02/day, negligible. 233 modules checked per turn, ~1-2ms overhead\n5. DB Bloat — perspective_diversity purged 19,278 low-value rows; 19 dead tables dropped; VACUUM saved 1.5MB\n6. 3-DB Sync — MASSIVE: tool_stats had phantom 31,500 terminal calls vs 302 in call_log. Resynced from ground truth.\n7. API Analytics — 29K API calls tracked, GLM-5.1 is 97% of traffic\n\nFIXES APPLIED:\n1. tool_stats resynced from call_log (ground truth) — terminal 31,500→303\n2. mastery_scores resynced from tool_stats — 38 entries now accurate\n3. perspective_diversity purged (23,154→3,876 rows)\n4. Duplicate tips removed (2)\n5. Dead tips purged (2)\n6. tip_elo orphans removed (4)\n7. 5 new indexes added (speed_trends, token_tracking, perspective_diversity×2, call_log)\n8. 19 dead empty tables DROPPED (no write paths, zero rows)\n9. VACUUM executed (13.9→12.3MB)\n10. tip_elo reseeded from confidence (avg 1200→1667, above1400: 0→1858)\n11. Generic recovery tip downgraded (conf 0.5→0.3, below injection threshold)\n12. Elo-aware injection priority added to plugin governor\n13. Added 3 new tips: patch path-required bug, 3-DB drift warning, injection overlap\n\nPOST-OPTIMIZATION STATE:\n- Tips: 1,873, avg conf=0.885, high-conf=1,857\n- Elo: avg=1667, above 1400=1,858, max=2000\n- Tables: 69 active, 3 empty\n- DB: 12.3MB cerebrum, 1.5MB tool_cap\n- Mastery: 38 entries, synced\n- Critical tools: 1 (patch at 38.1%)\n- Gateway: restarted with all changes active\n\nREMAINING RECOMMENDATIONS:\n- Add tip creation for patch tool (critical, 38% success, tips exist but not preventing failures)\n- Create write paths for 3 remaining empty tables OR drop them\n- Consider Elo tournament system for tip evolution (would require daemon modification)",
+  "active_tasks": [],
+  "decisions": [
+    "3-DB sync is critical maintenance — run monthly to prevent drift",
+    "tool_stats was wildly inflated by old classifier bug (31K phantom terminal calls)",
+    "tip_elo was defaulted at 1200 — now seeded from confidence for meaningful ranking",
+    "19 dead tables dropped — zero cost to remove inactive infrastructure",
+    "Elo-aware injection priority ensures high-quality tips inject first when governor must triage"
+  ],
+  "files_modified": [
+    "~/.hermes/cerebrum_memory.db",
+    "~/subconscious/tool_capability.db",
+    "~/.hermes/plugins/distillation/__init__.py (elo-aware injection patch)"
+  ],
+  "next_steps": "Continue training gym work with optimized cortex. The 3-DB sync should be added to the controller.py cron to run automatically.",
+  "timestamp": "2026-04-15T18:27:32Z",
+  "unix_time": 1776277652.248489,
+  "task_id": "20260415_124324_50ea50",
+  "source": "manual",
+  "version": 2
+}

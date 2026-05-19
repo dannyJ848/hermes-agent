@@ -1,0 +1,9 @@
+{
+  "label": "pre-shutdown-cycle-216",
+  "context": "Cycle 216/1000. Built uncertainty_explorer.py, step_reward.py, semantic_tool_selector.py, agent_scorecard.py. Scorecard L4 (3.90/5.00). All systems alive. Danny wants the other Hermes session (PID 49354) killed.",
+  "active_tasks": [
+    "Kill other Hermes session PID 49354"
+  ],
+  "timestamp": "2026-04-06T04:19:16Z",
+  "task_id": "20260405_193236_c8c810"
+}

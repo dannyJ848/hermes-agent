@@ -1,0 +1,13 @@
+{
+  "label": "firecrawl-updated-apr15",
+  "context": "All Z.AI freeze fixes complete and verified. Docker restarted with 4GB memory cap. Firecrawl updated from 4.21.0 → 4.22.1 (PDF Parser v2 with Rust-based extraction, 3x faster, auto OCR fallback).\n\nCURRENT STATE:\n- Hermes agent v0.9.0 running GLM-5.1 via Z.AI\n- Docker VM: 4096 MiB (was 8092)\n- TCP keepidle: 30s (was 2hr), persistent via launch daemon\n- Firecrawl: 4.22.1 (latest)\n- Cortex daemon running\n- UWorld pipeline COMPLETE: 1,822 cloze Anki cards\n- ~5,899 total study cards for Step 1 (~May 7)\n\nTRAINING GYM:\n- 13,805 active nodes\n- R167 skill_verifier.py in progress (pre_llm_call hook, distill tips, restart gateway still needed)\n\nHuggingFace Kernel Hub: checked it out — useful for future GPU/local inference phase, not needed now.\n\nTWO HERMES SESSIONS ACTIVE.",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Continue training gym R167 (skill_verifier.py pre_llm_call hook), or support Danny with study prep.",
+  "timestamp": "2026-04-14T17:03:12Z",
+  "unix_time": 1776186192.01936,
+  "task_id": "20260414_113106_74aada",
+  "source": "manual",
+  "version": 2
+}

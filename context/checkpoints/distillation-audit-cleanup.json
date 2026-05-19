@@ -1,0 +1,13 @@
+{
+  "label": "distillation-audit-cleanup",
+  "context": "Completed distillation pipeline cleanup:\n1. Fixed _classify_result() in evey-tool-intelligence plugin — JSON-first classification avoids false positives from injected context mentioning errors. execute_code success rate corrected from ~28% to 79%.\n2. Purged 96 stale \"Add delay\" lessons, 20 inflated tips from cerebrum_memory.db.\n3. Killed META-INSIGHTS and CEREBRUM FACTS injection in distillation_bridge.py — zero additional signal, caused echo bug.\n4. Deleted 20 raw-output \"lessons\" that were just tool output dumps.\n5. Cleaned fake tool names (cerebrum, tool_intelligence, honcho_*) from tool_stats.\n6. Injection reduced from ~2500 chars (~625 tokens) to ~1000 chars (~250 tokens) per turn.\n7. Gateway restarted with clean pycache.\n\nFiles modified:\n- ~/.hermes/plugins/evey-tool-intelligence/__init__.py (_classify_result rewrite)\n- ~/subconscious/distillation_bridge.py (disabled META-INSIGHTS + CEREBRUM FACTS sections)\n\nDB changes:\n- cerebrum_memory.db: purged experiences + distilled_tips\n- tool_capability.db: cleaned tool_stats, recalculated confidence from call_log",
+  "active_tasks": [],
+  "decisions": [],
+  "files_modified": [],
+  "next_steps": "Run next session to verify the injection is clean in a live session, and potentially run the 100-cycle audit to confirm 31/31 still passes.",
+  "timestamp": "2026-04-07T01:37:41Z",
+  "unix_time": 1775525861.762957,
+  "task_id": "20260406_193318_f8f2c8",
+  "source": "manual",
+  "version": 2
+}

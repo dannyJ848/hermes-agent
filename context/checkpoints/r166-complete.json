@@ -1,0 +1,24 @@
+{
+  "label": "r166-complete",
+  "context": "R166 TRAJECTORY INTELLIGENCE EXTRACTOR — FULLY COMPLETE\n\nAll 4 phases done:\n1. RESEARCH: 3 papers (2603.10600, 2506.04287, 2603.14011) extracted\n2. BUILD: ~/subconscious/trajectory_intel.py (~697 lines, 27KB)\n   - TrajectoryIntel, TrajectoryBuffer, DecisionAttributionAnalyzer, ContextualLearningGenerator\n   - 3 tip types: strategy_tip, recovery_tip, optimization_tip\n   - Cortex-backed storage, embedding-based retrieval\n   - Self-test 4/4 pass\n3. DISTILL: 14 tips total in Cortex (8 regular tip + 3 strategy_tip + 2 recovery_tip + 1 optimization_tip)\n4. ACTIVATE: Wired into distillation plugin post_tool_call + pre_llm_call hooks\n5. VERIFY: Module imports OK, record_call works, get_relevant_hints works, plugin compiles OK\n\nAPI SIGNATURES:\n- TrajectoryIntel.record_call(tool_name, args, result_summary, success, step_num, duration_ms=0, error_type=None, error_msg=None)\n- TrajectoryIntel.get_relevant_hints(current_context, max_hints=3)\n- TrajectoryBuffer.calls (not ._calls)\n- TrajectoryBuffer.max_size, .append(), .get_recent(), .clear()\n\nCORTEX STATE:\n- 13,939 active nodes, 13,903 embeddings (99.0%)\n- 1,836 active tips + 6 TrajectoryIntel tips + 20 failure exemplars + 1 failure record\n- Dead tuples: 2,489 (minor, next VACUUM will clean)\n\nPREVIOUS WORK ALSO COMPLETE:\n- All 10 Cortex audits + all fixes (FIX 1-7) + 12 unused indexes dropped\n- R165 Failure Exemplar Bank — fully wired and active\n- Distillation plugin: 161,809 bytes, compiles clean",
+  "active_tasks": [
+    "R166 Trajectory Intelligence Extractor — COMPLETE"
+  ],
+  "decisions": [
+    "R166 uses 3-type tip taxonomy from 2603.10600 (strategy/recovery/optimization)",
+    "tips stored as separate node types (strategy_tip, recovery_tip, optimization_tip) not generic tip",
+    "TrajectoryBuffer.calls is public attribute, not ._calls",
+    "record_call signature: tool_name, args, result_summary, success, step_num, duration_ms, error_type, error_msg"
+  ],
+  "files_modified": [
+    "~/subconscious/trajectory_intel.py",
+    "~/subconscious/failure_exemplar_bank.py",
+    "~/.hermes/plugins/distillation/__init__.py"
+  ],
+  "next_steps": "Autonomous training gym continues. R167 next round — check autonomous_decide for next priority. System is idle and ready.",
+  "timestamp": "2026-04-13T23:15:49Z",
+  "unix_time": 1776122149.015496,
+  "task_id": "20260413_171007_ab89d0",
+  "source": "manual",
+  "version": 2
+}

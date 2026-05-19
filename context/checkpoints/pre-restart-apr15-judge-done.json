@@ -1,0 +1,19 @@
+{
+  "label": "pre-restart-apr15-judge-done",
+  "context": "LLM judge session complete. 3-judge ensemble live and running (MiniMax M2.7 + Gemini Flash + GPT-4.1-mini). Daemon PID 40536 running with Phase 1.5 full audit every 5th cycle. All judge work done. The OTHER CLI is handling the audit fix gauntlet (shim fixes, vacuum, embeddings, 10-audit gauntlet) — those items in the todo list are NOT for this session. Danny wants a fresh CLI restart.",
+  "active_tasks": [
+    "llm-judge-verify: COMPLETE. Daemon confirmed running, 3-judge ensemble operational."
+  ],
+  "decisions": [
+    "3-judge ensemble finalized: minimax-paid, google/gemini-2.5-flash, openai/gpt-4.1-mini",
+    "All 3 free models removed (0-22% availability)",
+    "Other CLI owns the audit fix gauntlet"
+  ],
+  "files_modified": [],
+  "next_steps": "Fresh restart. No carryover tasks — Danny will direct next steps.",
+  "timestamp": "2026-04-14T20:00:23Z",
+  "unix_time": 1776196823.029849,
+  "task_id": "20260414_134505_6cd910",
+  "source": "manual",
+  "version": 2
+}

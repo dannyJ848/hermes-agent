@@ -1,0 +1,12 @@
+{
+  "label": "research-grenzwert-webgpu-cycle",
+  "context": "Researched Grenzwert (Mikhail Gorobets) \u2014 WebGPU path-traced volumetric CT renderer with C++/WASM, progressive mip pyramid streaming, interactive transfer functions. Open-source. Key SOMA takeaways: progressive mip loading pattern (same concept as DECODE-3DViz but for volumes), transfer function editor for tissue layering, C++/WASM approach for mobile perf. Finding saved. Next: verify Grenzwert GitHub repo structure for LOD algorithm details, or research OHIF Viewer's WebGL approach as comparison.",
+  "active_tasks": [
+    "Verify Grenzwert GitHub repo for shader/streaming code structure",
+    "Compare Grenzwert vs OHIF Viewer approaches for SOMA architecture decision",
+    "Research OHIF Cornerstone3D WebGL context sharing pattern",
+    "Evaluate WebGPU browser support for iOS Safari 2026"
+  ],
+  "timestamp": "2026-04-05T18:10:30Z",
+  "task_id": "1533d733-bd7a-4d2d-9307-cfe7d8c00afb"
+}

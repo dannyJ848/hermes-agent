@@ -1,0 +1,14 @@
+{
+  "label": "auto-handoff-1778994953",
+  "timestamp": 1778994953.7439308,
+  "context": {
+    "timestamp": 1778994953.743853,
+    "session_id": "20260516_150530_58a475",
+    "compression_count": 6,
+    "message_count": 171,
+    "model": "kimi-for-coding",
+    "system_prompt_preview": "You are Hermes Agent, an intelligent AI assistant created by Nous Research. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and in",
+    "todo_snapshot": "[Your active task list was preserved across context compression]\n- [ ] yantrik-migrate. Complete cerebrum\u2192YantrikDB memory copy (partially done, queue blocked) (pending)\n- [ ] cron-stale. Cron jobs stale \u2014 last run 2026-04-22, none in May. Need investigation/restart. (pending)\n- [ ] orphan-aliases. 3 orphan profile aliases (soma-coder, soma-tester, soma-researcher) \u2014 cleanup (pending)\n- [ ] plugins-disabled. 3 plugins not enabled (disk-cleanup, google_meet, spotify) \u2014 optional (pending)\n- [ ] tools-disabled. 6 toolsets disabled (video, moa, rl, homeassistant, spotify, yuanbao) \u2014 need API keys or deps (pending)"
+  },
+  "session_id": "20260516_150530_58a475"
+}

@@ -1,0 +1,39 @@
+
+UPSTREAM AUDIT SUMMARY
+======================
+Date: 2026-05-18
+Source: NousResearch/hermes-agent main (457fa913b)
+Commits ahead: 8,722
+
+HIGH-VALUE FINDINGS FOR COGNITIVE APPARATUS:
+
+TIER S (Game Changer):
+1. background_review.py — Isolated fork for post-turn memory/skill evaluation
+2. agent_runtime_helpers.py — Trajectory format + think-block stripping
+
+TIER A (High Value):
+3. conversation_compression.py — Feasibility-checked compression
+4. iteration_budget.py — Thread-safe iteration budget tracking
+5. Memory provider isolation pattern — Prevent plugin interference
+
+TIER B (Useful):
+6. Skill load hardening — None-on-failure instead of truthy stub
+7. async_utils.py — Safe coroutine scheduling
+8. conversation_loop.py — Reference for hook injection points
+
+INTEGRATION STRATEGY:
+- Adapt patterns, not code (architecturally incompatible)
+- Enhance existing subsystems rather than replace
+- Add background_review as subsystem #22
+- Use trajectory format for training_gym data export
+
+FILES IN upstream_cherrypick/:
+- background_review.py (570 lines)
+- agent_runtime_helpers.py (2,138 lines)
+- conversation_compression.py (556 lines)
+- iteration_budget.py (62 lines)
+- async_utils.py (68 lines)
+- conversation_loop.py (4,084 lines)
+- ANALYSIS.md (integration plan)
+- memory_isolation_patch.stat
+- skill_load_hardening.stat
