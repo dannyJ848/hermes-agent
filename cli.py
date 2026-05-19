@@ -651,6 +651,8 @@ import fire
 
 # Import the agent and tool systems
 from run_agent import AIAgent
+from agent.mega_wiring import wire_all
+wire_all(AIAgent)
 from model_tools import get_tool_definitions, get_toolset_for_tool
 
 # Extracted CLI modules (Phase 3)
