@@ -271,6 +271,9 @@ class IterationEngine:
             "SELECT id, frequency, result, iterations, lesson FROM experiences WHERE action_hash = ?",
             (action_hash,)
         ).fetchone()
+        # sqlite3.Row supports dict-like access, but be defensive
+        if existing is not None and not hasattr(existing, '__getitem__'):
+            existing = dict(existing) if hasattr(existing, 'keys') else None
 
         if existing:
             # UPDATE: we've been here before
@@ -408,6 +411,12 @@ class IterationEngine:
         """Extract the reusable pattern from an error, stripping specifics."""
         if not error:
             return ""
+        
+        # Ensure error is a string (may be passed as dict from mega_wiring)
+        if isinstance(error, dict):
+            error = json.dumps(error, default=str)
+        elif not isinstance(error, str):
+            error = str(error)
 
         # Common error patterns to detect
         patterns = [

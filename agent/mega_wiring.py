@@ -347,7 +347,8 @@ def _patch_tool_execution(agent_class):
                 if orch:
                     try:
                         result_str = str(result)[:500] if result else ""
-                        orch.after_action(function_name, str(function_args)[:500], result_str, int(duration))
+                        error_str = "" if success else str(result)[:500]
+                        orch.after_action(function_name, str(function_args)[:500], result_str, int(duration), error=error_str)
                     except Exception:
                         pass
             except Exception:

@@ -592,12 +592,18 @@ class CognitiveOrchestrator:
         
         return "\n".join(lessons) if lessons else None
     
-    def after_action(self, action_type: str, detail: str, result: str, 
-                     duration_ms: int, error: str = "") -> None:
+    def after_action(self, action_type: str, detail: str, result: str = "", 
+                     duration_ms: int = 0, error: str = "") -> None:
         """
         Called after EVERY tool execution.
         Records results, learns from outcomes, updates all subsystems.
         """
+        # Ensure result is a string
+        if isinstance(result, dict):
+            result = json.dumps(result, default=str)
+        elif not isinstance(result, str):
+            result = str(result)
+        
         result_status = "failure" if error or "error" in result.lower()[:100] else "success"
         
         # Pop from action stack
