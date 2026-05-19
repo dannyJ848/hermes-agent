@@ -23,14 +23,193 @@ Public API (signatures preserved from the original 2,400-line version):
 import json
 import asyncio
 import logging
+import random
 import threading
 import time
+from functools import wraps
 from typing import Dict, Any, List, Optional, Tuple
 
 from tools.registry import discover_builtin_tools, registry
 from toolsets import resolve_toolset, validate_toolset
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# Circuit Breaker + Retry resilience layer
+# =============================================================================
+
+class CircuitBreaker:
+    """Per-tool circuit breaker tracking failures over a sliding window.
+
+    States:
+        CLOSED   – normal operation, failures are tracked.
+        OPEN     – after 5 failures within 60 s; calls fail fast.
+        HALF_OPEN – after 30 s in OPEN; next call is a trial.
+
+    On a trial success → CLOSED.
+    On a trial failure → OPEN (resets the half-open timer).
+    """
+
+    FAILURE_THRESHOLD = 5
+    FAILURE_WINDOW_SECONDS = 60.0
+    HALF_OPEN_TIMEOUT_SECONDS = 30.0
+
+    def __init__(self):
+        # tool_name -> list of monotonic timestamps of recent failures
+        self._failures: Dict[str, List[float]] = {}
+        # tool_name -> state ("closed", "open", "half_open")
+        self._states: Dict[str, str] = {}
+        # tool_name -> timestamp when the breaker transitioned to OPEN
+        self._open_since: Dict[str, float] = {}
+        self._lock = threading.Lock()
+
+    def _prune(self, tool_name: str, now: float) -> None:
+        """Drop failure timestamps older than the sliding window."""
+        cutoff = now - self.FAILURE_WINDOW_SECONDS
+        self._failures[tool_name] = [
+            ts for ts in self._failures.get(tool_name, [])
+            if ts > cutoff
+        ]
+
+    def record_success(self, tool_name: str) -> None:
+        with self._lock:
+            state = self._states.get(tool_name, "closed")
+            if state == "half_open":
+                self._states[tool_name] = "closed"
+                self._failures.pop(tool_name, None)
+                self._open_since.pop(tool_name, None)
+                logger.info("Circuit breaker for %s: HALF_OPEN -> CLOSED", tool_name)
+            elif state == "closed":
+                # Clear any stale failures so a single success resets the window.
+                self._failures.pop(tool_name, None)
+
+    def record_failure(self, tool_name: str) -> None:
+        now = time.monotonic()
+        with self._lock:
+            self._prune(tool_name, now)
+            self._failures.setdefault(tool_name, []).append(now)
+            state = self._states.get(tool_name, "closed")
+            if state == "half_open":
+                self._states[tool_name] = "open"
+                self._open_since[tool_name] = now
+                logger.warning(
+                    "Circuit breaker for %s: HALF_OPEN -> OPEN (%d recent failures)",
+                    tool_name, len(self._failures[tool_name]),
+                )
+            elif state == "closed" and len(self._failures[tool_name]) >= self.FAILURE_THRESHOLD:
+                self._states[tool_name] = "open"
+                self._open_since[tool_name] = now
+                logger.warning(
+                    "Circuit breaker for %s: CLOSED -> OPEN (%d failures in %.0f s)",
+                    tool_name, self.FAILURE_THRESHOLD, self.FAILURE_WINDOW_SECONDS,
+                )
+
+    def can_execute(self, tool_name: str) -> bool:
+        now = time.monotonic()
+        with self._lock:
+            state = self._states.get(tool_name, "closed")
+            if state == "closed":
+                return True
+            if state == "open":
+                opened = self._open_since.get(tool_name, now)
+                if now - opened >= self.HALF_OPEN_TIMEOUT_SECONDS:
+                    self._states[tool_name] = "half_open"
+                    logger.info("Circuit breaker for %s: OPEN -> HALF_OPEN", tool_name)
+                    return True
+                return False
+            # half_open – allow exactly one trial call
+            return True
+
+    def state(self, tool_name: str) -> str:
+        with self._lock:
+            return self._states.get(tool_name, "closed")
+
+
+# Global circuit breaker instance shared across all tool calls.
+_circuit_breaker = CircuitBreaker()
+
+
+def _exponential_backoff_delay(base: float, max_delay: float, attempt: int) -> float:
+    """Compute jittered exponential backoff delay.
+
+    attempt is 0-indexed (0 = first retry).
+    """
+    delay = base * (2 ** attempt)
+    delay = min(delay, max_delay)
+    # Add up to 20% jitter to avoid thundering herd.
+    jitter = delay * 0.2 * random.random()
+    return delay + jitter
+
+
+def resilient_call(max_retries: int = 3, base_delay: float = 1.0, max_delay: float = 10.0):
+    """Decorator that adds retry with exponential backoff and circuit breaker.
+
+    Retries only on Exception (not BaseException) so KeyboardInterrupt and
+    SystemExit propagate immediately.
+
+    Args:
+        max_retries: Maximum number of retry attempts (default 3).
+        base_delay: Initial backoff delay in seconds (default 1.0).
+        max_delay: Cap on backoff delay in seconds (default 10.0).
+    """
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            # Heuristic: first positional arg or keyword arg "function_name"
+            # is the tool name for circuit-breaker tracking.
+            tool_name = None
+            if args:
+                tool_name = args[0]
+            if tool_name is None:
+                tool_name = kwargs.get("function_name") or kwargs.get("name")
+            if tool_name is None:
+                tool_name = "<unknown>"
+
+            if not _circuit_breaker.can_execute(tool_name):
+                return json.dumps({
+                    "error": (
+                        f"Circuit breaker OPEN for tool '{tool_name}'. "
+                        "Too many recent failures; try again later."
+                    )
+                }, ensure_ascii=False)
+
+            last_exception = None
+            for attempt in range(max_retries + 1):
+                try:
+                    result = fn(*args, **kwargs)
+                    _circuit_breaker.record_success(tool_name)
+                    return result
+                except Exception as exc:
+                    last_exception = exc
+                    _circuit_breaker.record_failure(tool_name)
+                    # Don't retry on the last attempt.
+                    if attempt >= max_retries:
+                        break
+                    # Don't retry if the circuit breaker is now open.
+                    if not _circuit_breaker.can_execute(tool_name):
+                        break
+                    delay = _exponential_backoff_delay(base_delay, max_delay, attempt)
+                    logger.warning(
+                        "Tool %s attempt %d/%d failed (%s: %s); retrying in %.2f s",
+                        tool_name, attempt + 1, max_retries + 1,
+                        type(exc).__name__, exc, delay,
+                    )
+                    time.sleep(delay)
+
+            # All retries exhausted or breaker opened.
+            logger.exception(
+                "Tool %s failed after %d attempts: %s",
+                tool_name, max_retries + 1, last_exception,
+            )
+            return json.dumps({
+                "error": (
+                    f"Error executing {tool_name}: {type(last_exception).__name__}: "
+                    f"{last_exception}"
+                )
+            }, ensure_ascii=False)
+        return wrapper
+    return decorator
 
 
 # =============================================================================
@@ -641,6 +820,7 @@ def _coerce_boolean(value: str):
     return value
 
 
+@resilient_call(max_retries=3, base_delay=1.0, max_delay=10.0)
 def handle_function_call(
     function_name: str,
     function_args: Dict[str, Any],

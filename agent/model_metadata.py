@@ -1432,7 +1432,7 @@ def get_model_context_length(
 
 
 def estimate_tokens_rough(text: str) -> int:
-    """Rough token estimate (~4 chars/token) for pre-flight checks.
+    """Accurate token estimate using tiktoken (cl100k_base), with heuristic fallback.
 
     Uses ceiling division so short texts (1-3 chars) never estimate as
     0 tokens, which would cause the compressor and pre-flight checks to
@@ -1440,7 +1440,12 @@ def estimate_tokens_rough(text: str) -> int:
     """
     if not text:
         return 0
-    return (len(text) + 3) // 4
+    try:
+        import tiktoken
+        enc = tiktoken.get_encoding("cl100k_base")
+        return len(enc.encode(text, disallowed_special=()))
+    except Exception:
+        return (len(text) + 3) // 4
 
 
 def estimate_messages_tokens_rough(messages: List[Dict[str, Any]]) -> int:
