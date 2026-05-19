@@ -999,8 +999,9 @@ class CognitiveOrchestrator:
             )
             conn.commit()
             conn.close()
-        except Exception:
-            pass
+            logger.debug("[COG] Recorded subsystem %s = %s", name, status)
+        except Exception as e:
+            logger.warning("[COG] Failed to record subsystem %s: %s", name, e)
     
     # ── Public API ───────────────────────────────────────────────────────────
     

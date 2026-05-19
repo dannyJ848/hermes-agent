@@ -850,12 +850,14 @@ def init_agent(
         orch = get_orchestrator()
         if hasattr(orch, 'initialize'):
             orch.initialize(agent)
-        stats = orch.get_stats() if hasattr(orch, 'get_stats') else {}
-        active = stats.get('active', 0)
-        total = stats.get('total', 0)
+        # Use get_status() for in-memory state (faster, always current)
+        # get_stats() queries SQLite which may lag behind
+        status = orch.get_status() if hasattr(orch, 'get_status') else {}
+        active = status.get('active_count', 0)
+        total = active + status.get('failed_count', 0)
         print(f"🧠 Cognitive orchestrator ready: {active}/{total} subsystems active")
-        for name, info in stats.get('subsystems', {}).items():
-            if info.get('active'):
+        for name, st in status.get('subsystems', {}).items():
+            if st == 'active':
                 print(f"   ✓ {name}")
     except Exception as _co_err:
         logger.debug("Cognitive orchestrator init failed: %s", _co_err)
