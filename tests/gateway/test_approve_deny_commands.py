@@ -650,4 +650,4 @@ class TestFallbackNoCallback:
             os.environ.pop("HERMES_SESSION_KEY", None)
 
         assert result["approved"] is False
-        assert result.get("status") == "approval_required"
+        assert result.get("status") == "pending_approval"
