@@ -844,6 +844,23 @@ def init_agent(
         if missing_reqs:
             print(f"⚠️  Some tools may not work due to missing requirements: {missing_reqs}")
     
+    # ── Cognitive Orchestrator: initialize all subsystems ────────────
+    try:
+        from agent.cognitive_orchestrator import get_orchestrator
+        orch = get_orchestrator()
+        if hasattr(orch, 'initialize'):
+            orch.initialize(agent)
+        if not agent.quiet_mode:
+            stats = orch.get_stats() if hasattr(orch, 'get_stats') else {}
+            active = stats.get('active', 0)
+            total = stats.get('total', 0)
+            print(f"🧠 Cognitive orchestrator ready: {active}/{total} subsystems active")
+            for name, info in stats.get('subsystems', {}).items():
+                if info.get('active'):
+                    print(f"   ✓ {name}")
+    except Exception as _co_err:
+        logger.debug("Cognitive orchestrator init failed: %s", _co_err)
+
     # ── Iteration Engine: experiential learning loop ──────────────────
     try:
         from agent.iteration_engine import get_engine as _get_iteration_engine
@@ -853,6 +870,15 @@ def init_agent(
     except Exception as _ie_err:
         logger.warning("Iteration engine init failed: %s", _ie_err)
         agent.iteration_engine = None
+
+    # ── Subconscious Plugins ─────────────────────────────────────────
+    try:
+        from agent.subconscious_plugin_loader import init_subconscious_plugins
+        init_subconscious_plugins()
+        if not agent.quiet_mode:
+            print("🌊 Subconscious plugins initialized")
+    except Exception as _sp_err:
+        logger.debug("Subconscious plugins init failed: %s", _sp_err)
 
     # Show trajectory saving status
     if agent.save_trajectories and not agent.quiet_mode:

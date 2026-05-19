@@ -504,6 +504,12 @@ def wire_all(agent_class=None):
             logger.error("[MEGA] Could not auto-import AIAgent: %s", e)
             return
 
+    # ── Patch __init__ FIRST (before other patches that depend on it) ──
+    try:
+        _wire_learning_system(agent_class)
+    except Exception as e:
+        logger.warning("[MEGA] Learning system wiring failed: %s", e)
+
     try:
         _patch_api_call(agent_class)
     except Exception as e:
@@ -527,20 +533,14 @@ def wire_all(agent_class=None):
     except Exception as e:
         logger.warning("[MEGA] Smart iteration pipeline failed: %s", e)
 
-    # Wire learning apparatus (cerebrum + cortex + distillation)
-    try:
-        _wire_learning_system(agent_class)
-    except Exception as e:
-        logger.warning("[MEGA] Learning system wiring failed: %s", e)
-
     logger.info("[MEGA] All enhancements wired into AIAgent")
 
 
 def _wire_learning_system(agent_class):
-    """Wire cerebrum, cortex, and distillation into the agent lifecycle.
+    """Wire cerebrum, cortex, distillation, cognitive orchestrator, iteration engine, and subconscious plugins into the agent lifecycle.
     
     Hooks:
-    - session_start: initialize learning context
+    - session_start: initialize learning context + cognitive subsystems + iteration engine
     - tool_success/error: capture experiences
     - session_end: run reflection + distillation
     """
@@ -564,6 +564,43 @@ def _wire_learning_system(agent_class):
                 )
         except Exception as e:
             logger.debug("[MEGA] Learning init hook failed: %s", e)
+        
+        # ── Initialize cognitive orchestrator ──────────────────────────
+        try:
+            from agent.cognitive_orchestrator import get_orchestrator
+            orch = get_orchestrator()
+            if hasattr(orch, 'initialize'):
+                orch.initialize(self)
+            if hasattr(self, '_print_fn') and self._print_fn:
+                stats = orch.get_stats() if hasattr(orch, 'get_stats') else {}
+                active = stats.get('active', 0)
+                total = stats.get('total', 0)
+                self._print_fn(f"🧠 Cognitive orchestrator ready: {active}/{total} subsystems active")
+                for name, info in stats.get('subsystems', {}).items():
+                    if info.get('active'):
+                        self._print_fn(f"   ✓ {name}")
+        except Exception as e:
+            logger.debug("[MEGA] Cognitive orchestrator init failed: %s", e)
+        
+        # ── Initialize iteration engine ──────────────────────────────────
+        try:
+            from agent.iteration_engine import get_engine as _get_iteration_engine
+            self.iteration_engine = _get_iteration_engine()
+            if hasattr(self, '_print_fn') and self._print_fn:
+                self._print_fn("🔄 Iteration engine ready: experiential learning loop active")
+        except Exception as e:
+            logger.debug("[MEGA] Iteration engine init failed: %s", e)
+            self.iteration_engine = None
+        
+        # ── Initialize subconscious plugins ──────────────────────────────
+        try:
+            from agent.subconscious_plugin_loader import init_subconscious_plugins
+            init_subconscious_plugins()
+            if hasattr(self, '_print_fn') and self._print_fn:
+                self._print_fn("🌊 Subconscious plugins initialized")
+        except Exception as e:
+            logger.debug("[MEGA] Subconscious plugins init failed: %s", e)
+        
         return result
     agent_class.__init__ = wrapped_init
     
