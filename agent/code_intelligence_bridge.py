@@ -20,50 +20,57 @@ class CodeIntelligenceBridge:
         Returns:
             Top 5 matching results with file_path, chunk_text, node_name.
         """
-        conn = sqlite3.connect(self.db_path)
+        import os
+        if not os.path.exists(self.db_path):
+            return []
+
+        try:
+            conn = sqlite3.connect(self.db_path)
+        except sqlite3.Error:
+            return []
+
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-
         like_pattern = f"%{query}%"
+        results = []
 
-        # Search flow_nodes (name, description)
-        cursor.execute(
-            """
-            SELECT name AS node_name, description AS chunk_text, NULL AS file_path
-            FROM flow_nodes
-            WHERE name LIKE ? OR description LIKE ?
-            """,
-            (like_pattern, like_pattern),
-        )
-        flow_results = cursor.fetchall()
+        # Search flow_nodes (name, description) — table may not exist
+        try:
+            cursor.execute(
+                """
+                SELECT name AS node_name, description AS chunk_text, 'flow_node' AS file_path
+                FROM flow_nodes
+                WHERE name LIKE ? OR description LIKE ?
+                """,
+                (like_pattern, like_pattern),
+            )
+            for row in cursor.fetchall():
+                results.append({
+                    "file_path": row["file_path"],
+                    "chunk_text": row["chunk_text"],
+                    "node_name": row["node_name"],
+                })
+        except sqlite3.OperationalError:
+            pass  # flow_nodes table doesn't exist
 
-        # Search code_chunks (file_path, chunk_text)
-        cursor.execute(
-            """
-            SELECT file_path, chunk_text, NULL AS node_name
-            FROM code_chunks
-            WHERE file_path LIKE ? OR chunk_text LIKE ?
-            """,
-            (like_pattern, like_pattern),
-        )
-        chunk_results = cursor.fetchall()
+        # Search code_chunks (file_path, chunk_text) — table may not exist
+        try:
+            cursor.execute(
+                """
+                SELECT file_path, chunk_text, NULL AS node_name
+                FROM code_chunks
+                WHERE file_path LIKE ? OR chunk_text LIKE ?
+                """,
+                (like_pattern, like_pattern),
+            )
+            for row in cursor.fetchall():
+                results.append({
+                    "file_path": row["file_path"],
+                    "chunk_text": row["chunk_text"],
+                    "node_name": row["node_name"],
+                })
+        except sqlite3.OperationalError:
+            pass  # code_chunks table doesn't exist
 
         conn.close()
-
-        # Combine and format results
-        results = []
-        for row in flow_results:
-            results.append({
-                "file_path": row["file_path"],
-                "chunk_text": row["chunk_text"],
-                "node_name": row["node_name"],
-            })
-        for row in chunk_results:
-            results.append({
-                "file_path": row["file_path"],
-                "chunk_text": row["chunk_text"],
-                "node_name": row["node_name"],
-            })
-
-        # Return top 5
         return results[:5]

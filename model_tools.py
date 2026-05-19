@@ -55,7 +55,7 @@ class CircuitBreaker:
     FAILURE_WINDOW_SECONDS = 60.0
     HALF_OPEN_TIMEOUT_SECONDS = 30.0
 
-    def __init__(self):
+    def __init__(self, tool_name: str = None):
         # tool_name -> list of monotonic timestamps of recent failures
         self._failures: Dict[str, List[float]] = {}
         # tool_name -> state ("closed", "open", "half_open")
@@ -63,6 +63,8 @@ class CircuitBreaker:
         # tool_name -> timestamp when the breaker transitioned to OPEN
         self._open_since: Dict[str, float] = {}
         self._lock = threading.Lock()
+        # Optional default tool name for single-tool breaker instances
+        self._tool_name = tool_name
 
     def _prune(self, tool_name: str, now: float) -> None:
         """Drop failure timestamps older than the sliding window."""

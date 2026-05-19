@@ -658,7 +658,31 @@ class CognitiveOrchestrator:
             except Exception:
                 pass
     
-    def session_end(self, telemetry: Optional[SessionTelemetry] = None) -> Dict[str, Any]:
+    def session_start(self, session_id: str = None) -> None:
+        """Initialize a new session."""
+        self._current_session_id = session_id
+        # Initialize subsystems if needed
+        try:
+            self._init_cortex_flywheel()
+        except Exception:
+            pass
+        try:
+            self._init_agent_scorecard()
+        except Exception:
+            pass
+
+    def session_end(self, telemetry: Optional[Any] = None) -> Dict[str, Any]:
+        """Finalize a session and return summary."""
+        results = {}
+        try:
+            results["flywheel"] = self._run_flywheel_update()
+        except Exception:
+            pass
+        try:
+            results["scorecard"] = self._run_agent_scorecard()
+        except Exception:
+            pass
+        return results
         """
         Called at session end. Runs all post-session cognitive processes.
         Returns audit report.

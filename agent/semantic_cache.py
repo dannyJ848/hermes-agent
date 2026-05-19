@@ -24,7 +24,7 @@ class SemanticCache:
     CREATE INDEX IF NOT EXISTS idx_timestamp ON cache_entries(timestamp);
     """
 
-    def __init__(self, db_path: str = ":memory:", similarity_threshold: float = 0.90):
+    def __init__(self, db_path: str = ":memory:", similarity_threshold: float = 0.60):
         self.db_path = db_path
         self.similarity_threshold = similarity_threshold
         self._conn = sqlite3.connect(db_path, check_same_thread=False)
