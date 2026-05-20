@@ -241,6 +241,8 @@ class CognitiveOrchestrator:
             ("attention_prioritizer", self._init_attention_prioritizer),
             ("evaluation_gate", self._init_evaluation_gate),
             ("agent_scorecard", self._init_agent_scorecard),
+            ("auto_memory", self._init_auto_memory),
+            ("memory_learning", self._init_memory_learning),
         ]
         
         for name, init_fn in init_order:
@@ -403,7 +405,17 @@ class CognitiveOrchestrator:
             def run(self):
                 return self.compute()
         return ScorecardWrapper(compute_scorecard)
-    
+
+    def _init_auto_memory(self):
+        """Initialize automatic memory extraction."""
+        from agent.auto_memory import AutoMemoryExtractor
+        return AutoMemoryExtractor()
+
+    def _init_memory_learning(self):
+        """Initialize memory learning system."""
+        from agent.memory_learning import MemoryLearningEngine
+        return MemoryLearningEngine()
+
     def get_enhanced_context(self, query: str, limit: int = 5) -> List[str]:
         """Get context-enhanced memories and tips for a query."""
         context_items: List[str] = []
@@ -768,7 +780,15 @@ class CognitiveOrchestrator:
         # 7. Agent Scorecard — compute autonomy evaluation
         if "agent_scorecard" in self._subsystems:
             futures.append(self._executor.submit(self._run_agent_scorecard, report))
-        
+
+        # 8. Auto Memory — extract tips from session
+        if "auto_memory" in self._subsystems:
+            futures.append(self._executor.submit(self._run_auto_memory_extraction))
+
+        # 9. Memory Learning — update relevance weights
+        if "memory_learning" in self._subsystems:
+            futures.append(self._executor.submit(self._run_memory_learning_update))
+
         # Wait for all with timeout
         for future in futures:
             try:
@@ -878,7 +898,39 @@ class CognitiveOrchestrator:
             logger.info("Intelligence briefing generated: %d insights", len(briefing))
         except Exception as e:
             logger.warning("Intelligence briefing failed: %s", e)
-    
+
+    def _run_auto_memory_extraction(self) -> None:
+        """Extract learnable tips from session and store in cerebrum."""
+        try:
+            am = self._subsystems.get("auto_memory")
+            if am and self._session_telemetry:
+                # Build session messages from telemetry
+                session_data = {
+                    "session_id": self._session_telemetry.session_id,
+                    "tool_calls": self._session_telemetry.tool_calls,
+                    "errors": self._session_telemetry.errors,
+                    "skills_used": list(self._session_telemetry.skills_used),
+                }
+                tips = am.extract_from_session(session_data)
+                if tips:
+                    am.store_tips(tips)
+                    logger.info("Auto-memory: extracted %d tips", len(tips))
+        except Exception as e:
+            logger.warning("Auto-memory extraction failed: %s", e)
+
+    def _run_memory_learning_update(self) -> None:
+        """Update memory relevance weights based on session usage."""
+        try:
+            ml = self._subsystems.get("memory_learning")
+            if ml and self._session_telemetry:
+                ml.update_weights_from_session(
+                    session_id=self._session_telemetry.session_id,
+                    tool_calls=self._session_telemetry.tool_calls,
+                )
+                logger.info("Memory learning: weights updated")
+        except Exception as e:
+            logger.warning("Memory learning update failed: %s", e)
+
     # ── Self-Evaluation Gate ─────────────────────────────────────────────────
     
     def evaluate_output(self, output: str, task: str, tools_used: List[str] = None,

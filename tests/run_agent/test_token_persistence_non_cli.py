@@ -66,6 +66,10 @@ def test_run_conversation_persists_tokens_for_cron_sessions():
 
 
 def test_session_search_lazily_opens_db_when_entrypoint_did_not_pass_one(monkeypatch):
+    # Clear any cached hermes_state imports to ensure our fake is used
+    monkeypatch.delitem(sys.modules, "hermes_state", raising=False)
+    monkeypatch.delitem(sys.modules, "tools.session_search_tool", raising=False)
+    
     sentinel_db = object()
     captured = {}
 

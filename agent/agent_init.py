@@ -847,15 +847,15 @@ def init_agent(
     # ── Cognitive Orchestrator: initialize all subsystems ────────────
     try:
         from agent.cognitive_orchestrator import get_orchestrator
-        orch = get_orchestrator()
-        if hasattr(orch, 'initialize'):
-            orch.initialize(agent)
+        agent.cognitive_orchestrator = get_orchestrator()
+        if hasattr(agent.cognitive_orchestrator, 'initialize'):
+            agent.cognitive_orchestrator.initialize(agent)
         # Use get_status() for in-memory state (faster, always current)
         # get_stats() queries SQLite which may lag behind
-        status = orch.get_status() if hasattr(orch, 'get_status') else {}
+        status = agent.cognitive_orchestrator.get_status() if hasattr(agent.cognitive_orchestrator, 'get_status') else {}
         active = status.get('active_count', 0)
         total = active + status.get('failed_count', 0)
-        # Skip banner during tests to avoid polluting captured output
+        # Skip banner during tests to avoid polluting test output
         if not ('pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST')):
             print(f"🧠 Cognitive orchestrator ready: {active}/{total} subsystems active")
         for name, st in status.get('subsystems', {}).items():
@@ -863,6 +863,18 @@ def init_agent(
                 print(f"   ✓ {name}")
     except Exception as _co_err:
         logger.debug("Cognitive orchestrator init failed: %s", _co_err)
+        agent.cognitive_orchestrator = None
+
+    # ── Mega Wiring: auto-wire all enhancements ────────────────────────
+    # Skip during tests to avoid xdist state pollution
+    _in_test = 'pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST')
+    if not _in_test:
+        try:
+            from agent.mega_wiring import wire_all
+            wire_all()
+            print("⚡ Mega wiring: all enhancements auto-wired")
+        except Exception as _mw_err:
+            logger.debug("Mega wiring init failed: %s", _mw_err)
 
     # ── Iteration Engine: experiential learning loop ──────────────────
     try:

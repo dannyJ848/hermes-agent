@@ -232,6 +232,17 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
                 _set_sudo_password_callback(_parent_sudo_cb)
             except Exception:
                 pass
+        # ── Cognitive before_action hook ──
+        _co_lessons = None
+        try:
+            if hasattr(agent, "cognitive_orchestrator") and agent.cognitive_orchestrator:
+                _co_lessons = agent.cognitive_orchestrator.before_action(
+                    action_type=function_name,
+                    detail=json.dumps(function_args, ensure_ascii=False)[:500],
+                )
+        except Exception:
+            pass
+
         start = time.time()
         try:
             result = agent._invoke_tool(
@@ -245,6 +256,21 @@ def execute_tool_calls_concurrent(agent, assistant_message, messages: list, effe
         except Exception as tool_error:
             result = f"Error executing tool '{function_name}': {tool_error}"
             logger.error("_invoke_tool raised for %s: %s", function_name, tool_error, exc_info=True)
+
+        # ── Cognitive after_action hook ──
+        duration_ms = int((time.time() - start) * 1000)
+        try:
+            if hasattr(agent, "cognitive_orchestrator") and agent.cognitive_orchestrator:
+                agent.cognitive_orchestrator.after_action(
+                    action_type=function_name,
+                    detail=json.dumps(function_args, ensure_ascii=False)[:500],
+                    result=result,
+                    duration_ms=duration_ms,
+                    error="" if not isinstance(result, str) or not result.startswith("Error") else result,
+                )
+        except Exception:
+            pass
+
         duration = time.time() - start
         is_error, _ = _detect_tool_failure(function_name, result)
         if is_error:
@@ -539,6 +565,18 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
                 args_preview = args_str[:agent.log_prefix_chars] + "..." if len(args_str) > agent.log_prefix_chars else args_str
                 print(f"  📞 Tool {i}: {function_name}({list(function_args.keys())}) - {args_preview}")
 
+        # ── Cognitive before_action hook (sequential path) ──
+        _co_lessons_seq = None
+        if not _execution_blocked:
+            try:
+                if hasattr(agent, "cognitive_orchestrator") and agent.cognitive_orchestrator:
+                    _co_lessons_seq = agent.cognitive_orchestrator.before_action(
+                        action_type=function_name,
+                        detail=json.dumps(function_args, ensure_ascii=False)[:500],
+                    )
+            except Exception:
+                pass
+
         if not _execution_blocked:
             agent._current_tool = function_name
             agent._touch_activity(f"executing tool: {function_name}")
@@ -782,6 +820,21 @@ def execute_tool_calls_sequential(agent, assistant_message, messages: list, effe
                 function_result = f"Error executing tool '{function_name}': {tool_error}"
                 logger.error("handle_function_call raised for %s: %s", function_name, tool_error, exc_info=True)
             tool_duration = time.time() - tool_start_time
+
+        # ── Cognitive after_action hook (sequential path) ──
+        if not _execution_blocked:
+            _seq_duration_ms = int(tool_duration * 1000)
+            try:
+                if hasattr(agent, "cognitive_orchestrator") and agent.cognitive_orchestrator:
+                    agent.cognitive_orchestrator.after_action(
+                        action_type=function_name,
+                        detail=json.dumps(function_args, ensure_ascii=False)[:500],
+                        result=function_result,
+                        duration_ms=_seq_duration_ms,
+                        error="" if not isinstance(function_result, str) or not function_result.startswith("Error") else function_result,
+                    )
+            except Exception:
+                pass
 
         if isinstance(function_result, str):
             result_preview = function_result if agent.verbose_logging else (
