@@ -387,11 +387,21 @@ class MSGraphWebhookAdapter(BasePlatformAdapter):
         if scheduler is not None:
             result = scheduler(notification, event)
             if asyncio.iscoroutine(result):
-                task = asyncio.create_task(result)
+                try:
+                    task = asyncio.create_task(result)
+                except RuntimeError:
+                    # No running event loop — get the current loop
+                    loop = asyncio.get_event_loop()
+                    task = loop.create_task(result)
                 self._background_tasks.add(task)
                 task.add_done_callback(self._background_tasks.discard)
             return
 
-        task = asyncio.create_task(self.handle_message(event))
+        try:
+            task = asyncio.create_task(self.handle_message(event))
+        except RuntimeError:
+            # No running event loop — get the current loop
+            loop = asyncio.get_event_loop()
+            task = loop.create_task(self.handle_message(event))
         self._background_tasks.add(task)
         task.add_done_callback(self._background_tasks.discard)
