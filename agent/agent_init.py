@@ -845,25 +845,28 @@ def init_agent(
             print(f"⚠️  Some tools may not work due to missing requirements: {missing_reqs}")
     
     # ── Cognitive Orchestrator: initialize all subsystems ────────────
-    try:
-        from agent.cognitive_orchestrator import get_orchestrator
-        agent.cognitive_orchestrator = get_orchestrator()
-        if hasattr(agent.cognitive_orchestrator, 'initialize'):
-            agent.cognitive_orchestrator.initialize(agent)
-        # Use get_status() for in-memory state (faster, always current)
-        # get_stats() queries SQLite which may lag behind
-        status = agent.cognitive_orchestrator.get_status() if hasattr(agent.cognitive_orchestrator, 'get_status') else {}
-        active = status.get('active_count', 0)
-        total = active + status.get('failed_count', 0)
-        # Skip banner during tests to avoid polluting test output
-        if not ('pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST')):
-            print(f"🧠 Cognitive orchestrator ready: {active}/{total} subsystems active")
-        for name, st in status.get('subsystems', {}).items():
-            if st == 'active':
-                print(f"   ✓ {name}")
-    except Exception as _co_err:
-        logger.debug("Cognitive orchestrator init failed: %s", _co_err)
-        agent.cognitive_orchestrator = None
+    # Skip during tests to avoid xdist state pollution
+    _in_test = 'pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST')
+    if not _in_test:
+        try:
+            from agent.cognitive_orchestrator import get_orchestrator
+            agent.cognitive_orchestrator = get_orchestrator()
+            if hasattr(agent.cognitive_orchestrator, 'initialize'):
+                agent.cognitive_orchestrator.initialize(agent)
+            # Use get_status() for in-memory state (faster, always current)
+            # get_stats() queries SQLite which may lag behind
+            status = agent.cognitive_orchestrator.get_status() if hasattr(agent.cognitive_orchestrator, 'get_status') else {}
+            active = status.get('active_count', 0)
+            total = active + status.get('failed_count', 0)
+            # Skip banner during tests to avoid polluting test output
+            if not ('pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST')):
+                print(f"🧠 Cognitive orchestrator ready: {active}/{total} subsystems active")
+            for name, st in status.get('subsystems', {}).items():
+                if st == 'active':
+                    print(f"   ✓ {name}")
+        except Exception as _co_err:
+            logger.debug("Cognitive orchestrator init failed: %s", _co_err)
+            agent.cognitive_orchestrator = None
 
     # ── Mega Wiring: auto-wire all enhancements ────────────────────────
     # Skip during tests to avoid xdist state pollution
@@ -879,6 +882,15 @@ def init_agent(
         except Exception:
             pass
     if not _in_test:
+        # Also check if pytest is in the process command line (catches xdist workers)
+        try:
+            import psutil
+            cmdline = ' '.join(psutil.Process().cmdline())
+            if 'pytest' in cmdline or 'py.test' in cmdline:
+                _in_test = True
+        except Exception:
+            pass
+    if not _in_test:
         try:
             from agent.mega_wiring import wire_all
             wire_all()
@@ -887,21 +899,24 @@ def init_agent(
             logger.debug("Mega wiring init failed: %s", _mw_err)
 
     # ── Iteration Engine: experiential learning loop ──────────────────
-    try:
-        from agent.iteration_engine import get_engine as _get_iteration_engine
-        agent.iteration_engine = _get_iteration_engine()
-        print("🔄 Iteration engine ready: experiential learning loop active")
-    except Exception as _ie_err:
-        logger.warning("Iteration engine init failed: %s", _ie_err)
-        agent.iteration_engine = None
+    _in_test = 'pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST')
+    if not _in_test:
+        try:
+            from agent.iteration_engine import get_engine as _get_iteration_engine
+            agent.iteration_engine = _get_iteration_engine()
+            print("🔄 Iteration engine ready: experiential learning loop active")
+        except Exception as _ie_err:
+            logger.warning("Iteration engine init failed: %s", _ie_err)
+            agent.iteration_engine = None
 
     # ── Subconscious Plugins ─────────────────────────────────────────
-    try:
-        from agent.subconscious_plugin_loader import init_subconscious_plugins
-        init_subconscious_plugins()
-        print("🌊 Subconscious plugins initialized")
-    except Exception as _sp_err:
-        logger.debug("Subconscious plugins init failed: %s", _sp_err)
+    if not _in_test:
+        try:
+            from agent.subconscious_plugin_loader import init_subconscious_plugins
+            init_subconscious_plugins()
+            print("🌊 Subconscious plugins initialized")
+        except Exception as _sp_err:
+            logger.debug("Subconscious plugins init failed: %s", _sp_err)
 
     # Show trajectory saving status
     if agent.save_trajectories and not agent.quiet_mode:

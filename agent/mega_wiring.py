@@ -695,6 +695,9 @@ def _wire_learning_system(agent_class):
 # Auto-wire on import if AIAgent is already loaded
 # Skip during tests to avoid xdist state pollution — check multiple signals
 def _is_test_environment():
+    """Check if we're running in a test environment.
+    
+    Checks multiple signals to catch pytest in various import scenarios."""
     import sys
     if 'pytest' in sys.modules:
         return True
