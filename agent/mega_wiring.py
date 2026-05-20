@@ -502,6 +502,10 @@ def wire_all(agent_class=None):
 
     ZERO-FAILURE: If anything fails, the agent still works normally.
     """
+    # Skip during tests to avoid xdist state pollution
+    if _is_test_environment():
+        return
+    
     if agent_class is None:
         try:
             from run_agent import AIAgent as _AIAgent

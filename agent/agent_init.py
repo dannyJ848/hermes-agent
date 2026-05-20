@@ -869,6 +869,16 @@ def init_agent(
     # Skip during tests to avoid xdist state pollution
     _in_test = 'pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST')
     if not _in_test:
+        # Also check call stack for pytest (catches late imports in xdist workers)
+        try:
+            import inspect
+            for frame in inspect.stack():
+                if 'pytest' in frame.filename or '_pytest' in frame.filename:
+                    _in_test = True
+                    break
+        except Exception:
+            pass
+    if not _in_test:
         try:
             from agent.mega_wiring import wire_all
             wire_all()
