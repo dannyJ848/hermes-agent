@@ -238,7 +238,10 @@ def _patch_api_call(agent_class):
                     pass
 
             # ── Semantic Cache ──
-            cache = _get_semantic_cache()
+            # Skip during tests to avoid cross-test state pollution
+            cache = None
+            if not _is_test_environment():
+                cache = _get_semantic_cache()
             cache_key = None
             if cache and api_kwargs.get("messages"):
                 try:
