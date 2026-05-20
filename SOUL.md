@@ -91,4 +91,15 @@ Before delivering ANY output to the user, your output passes through the SelfEva
 - ~/.hermes/skills — 135 skill directories, 407 skills loaded
 - ~/.hermes/tools — 70 tool files, 69 registered
 
+## Random Session Markers
+
+- Session ID: q2ywq15f4zim5bje
+- Build hash: o0n6vep9
+- Port binding: 38701
+- Process PID: 27482
+- Random seed: q6cw7nru
+- Node alias: link-cipher-itzlnf
+- Cluster tag: synth-rift-f1cng4
+- Commit ref: a2acb40b6
+
 *Last updated: 2026-05-19 — Cognitive apparatus fully wired*

@@ -48,16 +48,15 @@ Tokenizers warning suppressed:
 - TOKENIZERS_PARALLELISM=false added to ~/.hermes/.env
 
 Test suite status (2026-05-19):
-- Full suite: 23,410 passed, 169 failed, 4 errors, 242 skipped, 23 deselected
-- Collection errors: 13 (down from 17)
-- run_agent tests: 1422 passed, 14 skipped
-- gateway tests: 5486 passed, 86 skipped
-- config+timeouts tests: 67 passed
-- compression feasibility: 16 passed
-- token_persistence: 3 passed
-§
-User's MacBook setup: Python 3.8 (Anaconda) + Python 3.10 (brew). Hermes installed at ~/hermes-agent. CLI entry point: ~/Library/Python/3.10/bin/hermes (added to ~/.zshrc PATH). Gateway managed via launchd.
-§
-User's DGX setup: spark-85e8.local, djg6228. NVIDIA GB10 GPU, CUDA sm_121 (CC 12.1). PyTorch must be cu128+. vLLM 0.21.0 + PyTorch 2.11.0+cu128. Model: Qwen3.6-27B-Uncensored base (Qwen3_5ForConditionalGeneration). DFlash-Merged variant has config mismatches. User expects rapid minimal-response debugging style. Frustration signals ('sorry sorry') mean 'just fix it and stop talking'.
-§
-Frustration signals = silent fix mode, zero preamble, no explanations. 'Just do X'/'okay'/'sorry sorry' = ACT immediately, don't narrate. Rapid minimal-response debugging style: bullet lists for status, no prose. 'Great, anything else' = scan, not dissertation.
+- 23,410 passed, 169 failed (upstream/macOS-specific), 13 collection errors
+- memory_learning subsystem: updates relevance weights based on usage patterns
+
+Random session markers (2026-05-19):
+- Session ID: q2ywq15f4zim5bje
+- Build hash: o0n6vep9
+- Port binding: 38701
+- Process PID: 27482
+- Random seed: q6cw7nru
+- Node alias: link-cipher-itzlnf
+- Cluster tag: synth-rift-f1cng4
+- Commit ref: a2acb40b6

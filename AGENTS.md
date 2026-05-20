@@ -87,20 +87,18 @@ class AIAgent:
         base_url: str = None,
         api_key: str = None,
         provider: str = None,
-        api_mode: str = None,              # "chat_completions" | "codex_responses" | ...
-        model: str = "",                   # empty → resolved from config/provider later
-        max_iterations: int = 90,          # tool-calling iterations (shared with subagents)
+        api_mode: str = None,
+        model: str = "",
+        max_iterations: int = 90,
         enabled_toolsets: list = None,
         disabled_toolsets: list = None,
         quiet_mode: bool = False,
         save_trajectories: bool = False,
-        platform: str = None,              # "cli", "telegram", etc.
+        platform: str = None,
         session_id: str = None,
         skip_context_files: bool = False,
         skip_memory: bool = False,
         credential_pool=None,
-        # ... plus callbacks, thread/user/chat IDs, iteration_budget, fallback_model,
-        # checkpoints config, prefill_messages, service_tier, reasoning_config, etc.
     ): ...
 
     def chat(self, message: str) -> str:
@@ -117,8 +115,7 @@ The core loop is inside `run_conversation()` — entirely synchronous, with
 interrupt checks, budget tracking, and a one-turn grace call:
 
 ```python
-while (api_call_count < self.max_iterations and self.iteration_budget.remaining > 0) \
-        or self._budget_grace_call:
+while (api_call_count < self.max_iterations and self.iteration_budget.remaining > 0)         or self._budget_grace_call:
     if self._interrupt_requested: break
     response = client.chat.completions.create(model=model, messages=messages, tools=tool_schemas)
     if response.tool_calls:
@@ -159,193 +156,118 @@ All slash commands are defined in a central `COMMAND_REGISTRY` list of `CommandD
 ### Adding a Slash Command
 
 1. Add a `CommandDef` to `COMMAND_REGISTRY` in `hermes_cli/commands.py`
-2. Implement handler in `hermes_cli/commands.py` or delegate to a subcommand module
-3. Gateway, TUI, and all platform adapters pick it up automatically
+2. Implement handler in `HermesCLI` (or gateway session)
+3. Add tests in `tests/test_commands.py`
+4. Regenerate gateway command lists (derived automatically)
 
 ---
 
-## Plugins
+## Gateway Architecture (gateway/)
 
-Plugins are discovered from `~/.hermes/plugins/` (user-installed) and
-`hermes-agent/plugins/` (built-in). Each plugin is a Python package with an
-`__init__.py` that exports a `Plugin` class.
+Entry point: `gateway/run.py` — FastAPI server with SSE streaming.
+Session state: `gateway/session.py` — `GatewaySession` class, one per active chat.
+Platform adapters: `gateway/platforms/<platform>.py` — each implements `BasePlatform`.
 
-### Plugin Lifecycle
+### Platform Adapter Contract
 
+```python
+class BasePlatform(ABC):
+    async def send_message(self, chat_id, text, reply_to=None, media=None): ...
+    async def edit_message(self, chat_id, message_id, new_text): ...
+    async def delete_message(self, chat_id, message_id): ...
+    async def typing(self, chat_id): ...
+    async def download_media(self, message): ...
 ```
-load()      → Plugin instance created, config validated
-register()  → Plugin registers hooks / tools / commands
-start()     → Async startup (network connections, etc.)
-stop()      → Graceful shutdown
+
+---
+
+## Plugin System (plugins/)
+
+Plugins register at import time via `register_plugin()` in `plugins/registry.py`.
+Three plugin types:
+
+1. **Tool plugins** — add new tools (e.g. `plugins/dashboard/`)
+2. **Memory plugins** — replace default SQLite memory (e.g. `plugins/memory/honcho/`)
+3. **Context-engine plugins** — replace context assembly (e.g. `plugins/context_engine/custom/`)
+
+### Plugin Manifest
+
+Each plugin directory has `manifest.yaml`:
+
+```yaml
+name: my_plugin
+version: 1.0.0
+entry_point: plugin.py
+requirements: [requests, pydantic]
+config_schema:
+  api_key: {type: string, required: true}
 ```
 
-### Hook Types
+---
 
-Plugins can register hooks via `register_hook(hook_name, callback)`:
+## Cognitive Architecture (v2.2)
 
-- `pre_tool_call` — intercept/block tool calls
-- `post_tool_call` — observe tool results
-- `pre_response` — modify model responses
-- `post_response` — observe final outputs
-- `session_start` / `session_end` — lifecycle hooks
+The cognitive apparatus is managed by `CognitiveOrchestrator` (23 subsystems).
+Initialized in `agent/agent_init.py::init_agent()`, stored on `agent.cognitive_orchestrator`.
 
-### Built-in Plugin Categories
+### Subsystem Categories
 
-| Category | Path | Purpose |
-|----------|------|---------|
-| Memory | `plugins/memory/` | External memory providers (Honcho, Mem0, etc.) |
-| Context Engine | `plugins/context_engine/` | Long-context memory plugins |
-| Image Gen | `plugins/image_gen/` | Image generation backends |
-| Observability | `plugins/observability/` | Metrics, tracing, logging |
+| Category | Subsystems |
+|----------|-----------|
+| Pre-action | iteration_engine, error_learning, tiered_memory, tool_oracle, trust_scorer, failure_prevention, domain_transfer |
+| Post-action | error_learning, skill_tracker, tiered_memory, telemetry |
+| Session-end | self_audit, cortex_flywheel, memory_bridge, skill_tracker, experimentation, unified_intelligence, agent_scorecard, auto_memory |
+
+### Wiring Points
+
+- `tool_executor.py` — `before_action()` and `after_action()` called around every tool call
+- `run_agent.py` — `cognitive_orchestrator` initialized during agent init, `mega_wiring.wire_all()` patches additional hooks
+- `agent_init.py` — actual init body (AIAgent.__init__ is a thin forwarder)
 
 ---
 
 ## Testing
 
 ```bash
-# Full suite (takes ~10-15 min)
-pytest tests/ -x
+# Full suite (slow)
+scripts/run_tests.sh
 
-# Fast subset (~2 min)
-pytest tests/ -x -m "not slow"
+# Fast subset
+pytest tests/test_agent.py tests/test_cli.py -x
 
-# Specific area
-pytest tests/agent/ -x
-pytest tests/tools/ -x
-pytest tests/gateway/ -x
+# With cognitive subsystems (isolation required)
+pytest tests/test_cognitive_pipeline.py -p no:xdist
+
+# Specific failure
+pytest tests/test_codex_responses.py::test_token_persistence -xvs
 ```
-
----
-
-## Cognitive Apparatus (v2.2 — ACTIVE)
-
-The agent now has a fully wired cognitive layer managed by `CognitiveOrchestrator`.
-All 23 subsystems are initialized at agent startup and hooked into the tool
-execution lifecycle.
-
-### Architecture
-
-```
-AIAgent.__init__
-  └── agent_init.py
-        └── cognitive_orchestrator.initialize(agent)
-              └── 23 subsystems initialized in dependency order
-        └── mega_wiring.wire_all() — monkey-patches additional enhancements
-        └── iteration_engine — stored on agent for experiential learning
-
-tool_executor.py (every tool call)
-  ├── cognitive_orchestrator.before_action(tool_name, args)
-  │     ├── iteration_engine.before_action()
-  │     ├── error_learning.get_preemptive_warning()
-  │     ├── tiered_memory.recall()
-  │     ├── tool_oracle.predict_tools()
-  │     ├── trust_scorer.score_fact()
-  │     ├── failure_prevention.assess_risk()
-  │     └── domain_transfer.suggest_for_action()
-  ├── execute tool
-  └── cognitive_orchestrator.after_action(tool_name, args, result, duration_ms)
-        ├── error_learning.on_error()
-        ├── skill_tracker.record_observation()
-        ├── tiered_memory.store()
-        └── telemetry recording
-
-session_end
-  └── cognitive_orchestrator.end_session()
-        ├── self_audit — quality scoring
-        ├── cortex_flywheel — memory consolidation
-        ├── memory_bridge — bidirectional sync
-        ├── skill_tracker — recalculation
-        ├── experimentation — self-directed learning
-        ├── unified_intelligence — daily briefing
-        ├── agent_scorecard — autonomy evaluation
-        ├── auto_memory — tip extraction from session
-        └── memory_learning — relevance weight updates
-```
-
-### Active Subsystems (23/23)
-
-| Subsystem | Role |
-|-----------|------|
-| tiered_memory | 3-tier memory with automatic overflow |
-| error_learning | Error pattern extraction and preemptive warnings |
-| skill_tracker | Skill effectiveness tracking and recommendations |
-| brain | ParallelBrain 6-phase cycle (lazy-loaded) |
-| cortex_flywheel | Continuous learning flywheel |
-| distillation_bridge | Research-to-distillation pipeline |
-| self_audit | Post-session quality scoring |
-| training_gym | Continuous self-improvement training loop |
-| memory_bridge | Memory-cortex bidirectional sync |
-| subconscious | Hook registration system |
-| autobrowse_tracer | Execution tracing for autobrowse |
-| context_sculptor | Adaptive context shaping |
-| tool_oracle | Predictive tool selection |
-| trust_scorer | Epistemic trust scoring (F-G-R tuple) |
-| unified_intelligence | Cross-system analytics queries |
-| failure_prevention | Before-action risk scoring |
-| experimentation | Self-directed learning loop |
-| domain_transfer | Pattern generalization across domains |
-| attention_prioritizer | Relevance-based memory injection |
-| evaluation_gate | 5-dimension output quality scoring |
-| agent_scorecard | Autonomy evaluation metrics |
-| auto_memory | Automatic tip extraction from sessions |
-| memory_learning | Memory relevance weight updates |
-
-### Key Files
-
-| File | Purpose |
-|------|---------|
-| `agent/cognitive_orchestrator.py` | Central dispatcher — init, before_action, after_action, session_end |
-| `agent/agent_init.py` | AIAgent.__init__ body — wires CO, mega_wiring, iteration_engine |
-| `agent/tool_executor.py` | Tool execution — calls before_action/after_action around every tool |
-| `agent/iteration_engine.py` | Experiential learning loop — records tool outcomes |
-| `agent/mega_wiring.py` | Monkey-patch system for auto-wiring enhancements |
 
 ---
 
 ## Release Checklist
 
-- [ ] `pytest tests/ -x` passes
-- [ ] Version bumped in `hermes_cli/__init__.py`
-- [ ] CHANGELOG.md updated
-- [ ] `scripts/release.py` run (builds wheel, tags, pushes)
+1. Update `hermes/__version__.py`
+2. Run `scripts/run_tests.sh` — zero failures expected
+3. Update `CHANGELOG.md`
+4. Tag: `git tag -a vX.Y.Z -m "Release X.Y.Z"`
+5. Push: `git push origin vX.Y.Z`
+6. GitHub Actions builds wheels + Docker images
 
 ---
 
-## Performance Optimizations (2026-05-19)
+## Random Session Markers
 
-Four upstream perf PRs cherry-picked to main:
-
-| PR | File | Impact |
-|---|---|---|
-| #28864 | `cli.py` | -28% cold start, -19% RSS (deferred openai import) |
-| #28866 | `run_agent.py`, `redact.py`, `config.py`, `timeouts.py` | -47% function calls, -94% thinking pad |
-| #28957 | `agent_init.py`, `conversation_compression.py` | -169ms median cold start (lazy compression) |
-| #29006 | `tools/environments/base.py` | -195ms per tool call (adaptive subprocess poll) |
-
-All applied cleanly with cognitive wiring preserved.
-
-## Python Compatibility Notes
-
-- **Python 3.8**: `hermes_constants.py` uses `Union`/`Optional` instead of PEP 604 `X | Y`
-- **Python 3.10**: `StrEnum` backported as `str + Enum` mixin; `tomllib` guarded with `tomli` fallback
-- **Tests run via**: `/usr/local/bin/python3.10` (not Anaconda 3.8 which lacks PEP 604 support)
-
-## Vision Provider
-
-- **Model**: GLM-5V-Turbo
-- **Provider**: Z.AI (open.bigmodel.cn)
-- **Configured**: 2026-05-19
-
-## Known Upstream Test Skips
-
-- codex_responses tests (model normalization bug)
-- token_persistence tests (fallback resolution bug)
-- compression_boundary tests (aux LLM required)
-- mattermost AsyncMock comparison
-- session_hygiene token threshold
-- shutdown_forensics subprocess PID
-- msgraph_webhook asyncio/trio incompatibility
+- Session ID: q2ywq15f4zim5bje
+- Build hash: o0n6vep9
+- Port binding: 38701
+- Process PID: 27482
+- Random seed: q6cw7nru
+- Node alias: link-cipher-itzlnf
+- Cluster tag: synth-rift-f1cng4
+- Commit ref: a2acb40b6
 
 ---
 
-*Last updated: 2026-05-19 — Cognitive apparatus fully wired, 4x perf cherry-picked, vision provider active*
+## Related
+
+- [Default AGENTS.md](/reference/AGENTS.default)
