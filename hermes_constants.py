@@ -7,22 +7,23 @@ without risk of circular imports.
 import os
 from contextvars import ContextVar, Token
 from pathlib import Path
+from typing import Optional, Union
 
 
 _profile_fallback_warned: bool = False
 _UNSET = object()
-_HERMES_HOME_OVERRIDE: ContextVar[str | object] = ContextVar(
+_HERMES_HOME_OVERRIDE: ContextVar[Union[str, object]] = ContextVar(
     "_HERMES_HOME_OVERRIDE", default=_UNSET
 )
 
 
-def set_hermes_home_override(path: str | Path | None) -> Token:
+def set_hermes_home_override(path: Union[str, Path, None]) -> Token:
     """Set a context-local Hermes home override and return its reset token.
 
     This is for in-process, per-task scoping.  It deliberately does not mutate
     ``os.environ`` because that is shared by every thread in the process.
     """
-    value: str | object = _UNSET if path is None else str(path)
+    value: Union[str, object] = _UNSET if path is None else str(path)
     return _HERMES_HOME_OVERRIDE.set(value)
 
 
@@ -31,7 +32,7 @@ def reset_hermes_home_override(token: Token) -> None:
     _HERMES_HOME_OVERRIDE.reset(token)
 
 
-def get_hermes_home_override() -> str | None:
+def get_hermes_home_override() -> Optional[str]:
     """Return the active context-local Hermes home override, if any."""
     override = _HERMES_HOME_OVERRIDE.get()
     if override is _UNSET or not override:
@@ -139,7 +140,7 @@ def get_default_hermes_root() -> Path:
     return env_path
 
 
-def get_optional_skills_dir(default: Path | None = None) -> Path:
+def get_optional_skills_dir(default: Optional[Path] = None) -> Path:
     """Return the optional-skills directory, honoring package-manager wrappers.
 
     Packaged installs may ship ``optional-skills`` outside the Python package
@@ -194,7 +195,7 @@ def display_hermes_home() -> str:
         return str(home)
 
 
-def get_subprocess_home() -> str | None:
+def get_subprocess_home() -> Optional[str]:
     """Return a per-profile HOME directory for subprocesses, or None.
 
     When ``{HERMES_HOME}/home/`` exists on disk, subprocesses should use it
@@ -223,7 +224,7 @@ def get_subprocess_home() -> str | None:
 VALID_REASONING_EFFORTS = ("minimal", "low", "medium", "high", "xhigh")
 
 
-def parse_reasoning_effort(effort: str) -> dict | None:
+def parse_reasoning_effort(effort: str) -> Optional[dict]:
     """Parse a reasoning effort level into a config dict.
 
     Valid levels: "none", "minimal", "low", "medium", "high", "xhigh".
@@ -251,7 +252,7 @@ def is_termux() -> bool:
     return bool(os.getenv("TERMUX_VERSION") or "com.termux/files/usr" in prefix)
 
 
-_wsl_detected: bool | None = None
+_wsl_detected: Optional[bool] = None
 
 
 def is_wsl() -> bool:
@@ -272,7 +273,7 @@ def is_wsl() -> bool:
     return _wsl_detected
 
 
-_container_detected: bool | None = None
+_container_detected: Optional[bool] = None
 
 
 def is_container() -> bool:
