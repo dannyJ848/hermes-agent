@@ -1,7 +1,10 @@
 """Regression tests for packaging metadata in pyproject.toml."""
 
 from pathlib import Path
-import tomllib
+try:
+    import tomllib  # Python 3.11+
+except ImportError:
+    import tomli as tomllib  # type: ignore
 
 
 def _load_optional_dependencies():

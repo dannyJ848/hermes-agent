@@ -1,5 +1,8 @@
 from pathlib import Path
-import tomllib
+try:
+    import tomllib  # Python 3.11+
+except ImportError:
+    import tomli as tomllib  # type: ignore
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]

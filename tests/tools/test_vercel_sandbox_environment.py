@@ -10,7 +10,13 @@ import tarfile
 import threading
 import types
 from dataclasses import dataclass
-from enum import StrEnum
+from enum import Enum
+
+
+class StrEnum(str, Enum):
+    """Backport of enum.StrEnum for Python < 3.11."""
+    pass
+
 from pathlib import Path
 from types import SimpleNamespace
 
