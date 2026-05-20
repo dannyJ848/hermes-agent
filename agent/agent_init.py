@@ -855,7 +855,9 @@ def init_agent(
         status = orch.get_status() if hasattr(orch, 'get_status') else {}
         active = status.get('active_count', 0)
         total = active + status.get('failed_count', 0)
-        print(f"🧠 Cognitive orchestrator ready: {active}/{total} subsystems active")
+        # Skip banner during tests to avoid polluting captured output
+        if not ('pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST')):
+            print(f"🧠 Cognitive orchestrator ready: {active}/{total} subsystems active")
         for name, st in status.get('subsystems', {}).items():
             if st == 'active':
                 print(f"   ✓ {name}")

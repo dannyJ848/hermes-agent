@@ -42,7 +42,9 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import os
 import sqlite3
+import sys
 import threading
 import time
 import traceback
@@ -250,7 +252,9 @@ class CognitiveOrchestrator:
                     self._subsystem_status[name] = "active"
                     init_ms = int((time.time() - start) * 1000)
                     self._record_subsystem_status(name, "active", init_ms=init_ms)
-                    logger.info("✓ %s initialized (%dms)", name, init_ms)
+                    # Skip verbose boot messages during tests to avoid polluting test output
+                    if not ('pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST')):
+                        logger.info("✓ %s initialized (%dms)", name, init_ms)
                 else:
                     self._subsystem_status[name] = "skipped"
             except Exception as e:
