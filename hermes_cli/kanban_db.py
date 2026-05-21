@@ -638,6 +638,9 @@ class Task:
     # to the worker, overriding the profile's default model. NULL = use
     # the profile default.
     model_override: Optional[str] = None
+    # Git branch for worktree workspaces. The dispatcher checks out this
+    # branch in the worktree before spawning the worker.
+    branch_name: Optional[str] = None
     # Force-loaded skills for the worker on this task (appended to the
     # dispatcher's built-in `kanban-worker` via --skills). Stored as a
     # JSON array of skill names. None = use only the defaults; empty
@@ -717,6 +720,9 @@ class Task:
             ),
             model_override=(
                 row["model_override"] if "model_override" in keys else None
+            ),
+            branch_name=(
+                row["branch_name"] if "branch_name" in keys else None
             ),
         )
 
@@ -848,7 +854,10 @@ CREATE TABLE IF NOT EXISTS tasks (
     -- Per-task model override. When set, the dispatcher passes -m <model>
     -- to the worker, overriding the profile's default model. NULL = use
     -- the profile default.
-    model_override       TEXT
+    model_override       TEXT,
+    -- Git branch for worktree workspaces. The dispatcher checks out this
+    -- branch in the worktree before spawning the worker.
+    branch_name          TEXT
 );
 
 CREATE TABLE IF NOT EXISTS task_links (
@@ -1203,6 +1212,9 @@ def _migrate_add_optional_columns(conn: sqlite3.Connection) -> None:
     if "model_override" not in cols:
         _add_column_if_missing(conn, "tasks", "model_override", "model_override TEXT")
 
+    if "branch_name" not in cols:
+        _add_column_if_missing(conn, "tasks", "branch_name", "branch_name TEXT")
+
     # task_events gained a run_id column; back-fill it as NULL for
     # historical events (they predate runs and can't be attributed).
     ev_cols = {row["name"] for row in conn.execute("PRAGMA table_info(task_events)")}
@@ -1373,6 +1385,7 @@ def create_task(
     max_retries: Optional[int] = None,
     model_override: Optional[str] = None,
     board: Optional[str] = None,
+    branch_name: Optional[str] = None,
 ) -> str:
     """Create a new task and optionally link it under parent tasks.
 
@@ -1407,6 +1420,11 @@ def create_task(
             f"got {workspace_kind!r}"
         )
     parents = tuple(p for p in parents if p)
+
+    if branch_name is not None:
+        branch_name = str(branch_name).strip() or None
+    if branch_name and workspace_kind != "worktree":
+        raise ValueError("branch_name is only valid for worktree workspaces")
 
     # Resolve workspace_path from board-level default_workdir when the
     # caller did not specify one explicitly.
@@ -1514,9 +1532,9 @@ def create_task(
                     INSERT INTO tasks (
                         id, title, body, assignee, status, priority,
                         created_by, created_at, workspace_kind, workspace_path,
-                        tenant, idempotency_key, max_runtime_seconds, skills,
-                        max_retries, model_override
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        branch_name, tenant, idempotency_key, max_runtime_seconds,
+                        skills, max_retries, model_override
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         task_id,
@@ -1529,6 +1547,7 @@ def create_task(
                         now,
                         workspace_kind,
                         workspace_path,
+                        branch_name,
                         tenant,
                         idempotency_key,
                         int(max_runtime_seconds) if max_runtime_seconds is not None else None,
@@ -4870,6 +4889,8 @@ def _default_spawn(
         env["HERMES_KANBAN_RUN_ID"] = str(task.current_run_id)
     if task.claim_lock:
         env["HERMES_KANBAN_CLAIM_LOCK"] = task.claim_lock
+    if task.branch_name:
+        env["HERMES_KANBAN_BRANCH"] = task.branch_name
     terminal_timeout = _worker_terminal_timeout_env(
         task.max_runtime_seconds,
         env.get("TERMINAL_TIMEOUT"),
