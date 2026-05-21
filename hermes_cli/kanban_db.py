@@ -930,8 +930,6 @@ CREATE TABLE IF NOT EXISTS kanban_notify_subs (
 
 CREATE INDEX IF NOT EXISTS idx_tasks_assignee_status ON tasks(assignee, status);
 CREATE INDEX IF NOT EXISTS idx_tasks_status          ON tasks(status);
-CREATE INDEX IF NOT EXISTS idx_tasks_tenant          ON tasks(tenant);
-CREATE INDEX IF NOT EXISTS idx_tasks_idempotency     ON tasks(idempotency_key);
 CREATE INDEX IF NOT EXISTS idx_links_child           ON task_links(child_id);
 CREATE INDEX IF NOT EXISTS idx_links_parent          ON task_links(parent_id);
 CREATE INDEX IF NOT EXISTS idx_comments_task         ON task_comments(task_id, created_at);
@@ -1125,10 +1123,6 @@ def _migrate_add_optional_columns(conn: sqlite3.Connection) -> None:
         _add_column_if_missing(
             conn, "tasks", "idempotency_key", "idempotency_key TEXT"
         )
-        conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_tasks_idempotency "
-            "ON tasks(idempotency_key)"
-        )
 
     # Refresh after early additive migrations above. Some existing DBs were
     # partially migrated in older releases and can already contain the later
@@ -1214,6 +1208,18 @@ def _migrate_add_optional_columns(conn: sqlite3.Connection) -> None:
 
     if "branch_name" not in cols:
         _add_column_if_missing(conn, "tasks", "branch_name", "branch_name TEXT")
+
+    # Indexes over additive task columns must be created after the columns
+    # exist. Keeping them in SCHEMA_SQL breaks legacy boards because
+    # CREATE TABLE IF NOT EXISTS does not add new columns to existing tables.
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_tasks_tenant ON tasks(tenant)")
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_tasks_idempotency ON tasks(idempotency_key)"
+    )
+    if "session_id" in cols:
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_tasks_session_id ON tasks(session_id)"
+        )
 
     # task_events gained a run_id column; back-fill it as NULL for
     # historical events (they predate runs and can't be attributed).
