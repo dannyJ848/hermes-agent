@@ -1226,10 +1226,14 @@ def _migrate_add_optional_columns(conn: sqlite3.Connection) -> None:
     ev_cols = {row["name"] for row in conn.execute("PRAGMA table_info(task_events)")}
     if "run_id" not in ev_cols:
         _add_column_if_missing(conn, "task_events", "run_id", "run_id INTEGER")
-        conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_events_run "
-            "ON task_events(run_id, id)"
-        )
+
+    # Same ordering rule as the additive ``tasks`` indexes above: create the
+    # index after the additive column migration so legacy ``task_events``
+    # tables don't fail during SCHEMA_SQL execution before ``run_id`` exists.
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_events_run "
+        "ON task_events(run_id, id)"
+    )
 
     notify_table_exists = conn.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='kanban_notify_subs'"
