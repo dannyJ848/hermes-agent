@@ -921,21 +921,25 @@ def connect(
     resolved = str(path.resolve())
     needs_init = resolved not in _INITIALIZED_PATHS
     conn = sqlite3.connect(str(path), isolation_level=None, timeout=30)
-    conn.row_factory = sqlite3.Row
-    # WAL doesn't work on network filesystems (NFS/SMB/FUSE).  Shared helper
-    # falls back to DELETE with one WARNING so kanban stays usable there.
-    # See hermes_state._WAL_INCOMPAT_MARKERS for detection logic.
-    from hermes_state import apply_wal_with_fallback
-    apply_wal_with_fallback(conn, db_label=f"kanban.db ({path.name})")
-    conn.execute("PRAGMA synchronous=NORMAL")
-    conn.execute("PRAGMA foreign_keys=ON")
-    if needs_init:
-        # Idempotent: runs CREATE TABLE IF NOT EXISTS + the additive
-        # migrations. Cached so subsequent connect() calls in the same
-        # process are cheap.
-        conn.executescript(SCHEMA_SQL)
-        _migrate_add_optional_columns(conn)
-        _INITIALIZED_PATHS.add(resolved)
+    try:
+        conn.row_factory = sqlite3.Row
+        # WAL doesn't work on network filesystems (NFS/SMB/FUSE).  Shared helper
+        # falls back to DELETE with one WARNING so kanban stays usable there.
+        # See hermes_state._WAL_INCOMPAT_MARKERS for detection logic.
+        from hermes_state import apply_wal_with_fallback
+        apply_wal_with_fallback(conn, db_label=f"kanban.db ({path.name})")
+        conn.execute("PRAGMA synchronous=NORMAL")
+        conn.execute("PRAGMA foreign_keys=ON")
+        if needs_init:
+            # Idempotent: runs CREATE TABLE IF NOT EXISTS + the additive
+            # migrations. Cached so subsequent connect() calls in the same
+            # process are cheap.
+            conn.executescript(SCHEMA_SQL)
+            _migrate_add_optional_columns(conn)
+            _INITIALIZED_PATHS.add(resolved)
+    except Exception:
+        conn.close()
+        raise
     return conn
 
 
@@ -3202,6 +3206,29 @@ def _record_worker_exit(pid: int, raw_status: int) -> None:
             _recent_worker_exits.pop(_pid, None)
 
 
+def _error_fingerprint(error_text: str) -> str:
+    """Normalize an error string so systemic failures share a fingerprint.
+
+    Strips host-specific noise (PIDs, timestamps, hex addresses, temp paths)
+    so that 3+ workers crashing with the same root cause (provider outage,
+    auth expiry, OOM) are detected as a single systemic failure.
+    """
+    import hashlib as _hashlib
+    import re as _re
+
+    if not error_text:
+        return ""
+    # Strip PIDs, timestamps, hex addresses, UUIDs, temp paths
+    text = error_text.lower()
+    text = _re.sub(r"\b\d{4,}\b", "", text)          # large numbers (PIDs, timestamps)
+    text = _re.sub(r"0x[0-9a-f]+", "", text)         # hex addresses
+    text = _re.sub(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", "", text)  # UUIDs
+    text = _re.sub(r"/tmp/[^\s]+", "", text)         # temp paths
+    text = _re.sub(r"/var/folders/[^\s]+", "", text)  # macOS temp paths
+    text = _re.sub(r"\s+", "", text)                 # collapse whitespace
+    return _hashlib.md5(text.encode("utf-8", "replace")).hexdigest()[:16]
+
+
 def _classify_worker_exit(pid: int) -> "tuple[str, Optional[int]]":
     """Classify a recently-reaped worker by pid.
 
@@ -3643,18 +3670,29 @@ def detect_crashed_workers(conn: sqlite3.Connection) -> list[str]:
     # human with a clear reason than to loop ``DEFAULT_FAILURE_LIMIT``
     # times first.
     auto_blocked: list[str] = []
-    for tid, pid, claimer, protocol_violation, error_text in crash_details:
-        tripped = _record_task_failure(
-            conn, tid,
-            error=error_text,
-            outcome="crashed",
-            failure_limit=(1 if protocol_violation else None),
-            release_claim=False,
-            end_run=False,
-            event_payload_extra={"pid": pid, "claimer": claimer},
-        )
-        if tripped:
-            auto_blocked.append(tid)
+    if crash_details:
+        # Fingerprint errors to detect systemic failures.
+        _fp_counts: dict[str, int] = {}
+        for _, _, _, _, err_text in crash_details:
+            fp = _error_fingerprint(err_text)
+            _fp_counts[fp] = _fp_counts.get(fp, 0) + 1
+        for tid, pid, claimer, protocol_violation, error_text in crash_details:
+            fp = _error_fingerprint(error_text)
+            is_systemic = (
+                not protocol_violation
+                and _fp_counts.get(fp, 0) >= 3
+            )
+            tripped = _record_task_failure(
+                conn, tid,
+                error=error_text,
+                outcome="crashed",
+                failure_limit=1 if (protocol_violation or is_systemic) else None,
+                release_claim=False,
+                end_run=False,
+                event_payload_extra={"pid": pid, "claimer": claimer},
+            )
+            if tripped:
+                auto_blocked.append(tid)
     # Stash auto-blocked ids on the function for the dispatch loop to pick up.
     # Keeps the public return type (``list[str]``) stable for direct callers
     # and tests that destructure the result; ``dispatch_once`` reads this
@@ -4208,6 +4246,41 @@ def _resolve_hermes_argv() -> list[str]:
     return [sys.executable, "-m", "hermes_cli.main"]
 
 
+def _kanban_worker_skill_available(hermes_home: Optional[str]) -> bool:
+    """True if the bundled ``kanban-worker`` skill resolves for the home the
+    spawned worker will run under.
+
+    The dispatcher injects ``--skills kanban-worker`` into every worker. When
+    the worker activates a profile (``hermes -p <name>``), its ``SKILLS_DIR``
+    becomes ``<profile_home>/skills`` — which on many profiles does NOT contain
+    the bundled skill (it ships in the *default* root home, not every
+    profile-scoped skills dir). Preloading a missing skill is fatal at CLI
+    startup (``ValueError: Unknown skill(s): kanban-worker``), aborting the
+    worker before the agent loop runs. Gate the flag on actual resolvability;
+    the kanban lifecycle contract is still injected via ``KANBAN_GUIDANCE``, so
+    omitting the flag only drops the supplementary pattern library.
+    """
+    from pathlib import Path as _Path
+
+    # An unset HERMES_HOME means the worker falls back to the default root
+    # home (``~/.hermes``), which ships the bundled skill.
+    base = _Path(hermes_home) if hermes_home else (_Path.home() / ".hermes")
+    skills_root = base / "skills"
+    if not skills_root.is_dir():
+        return False
+    # Canonical bundled location first (cheap), then a bounded scan for
+    # profiles that have it nested elsewhere.
+    if (skills_root / "devops" / "kanban-worker" / "SKILL.md").is_file():
+        return True
+    try:
+        for skill_md in skills_root.rglob("kanban-worker/SKILL.md"):
+            if skill_md.is_file():
+                return True
+    except OSError:
+        pass
+    return False
+
+
 def _worker_terminal_timeout_env(
     max_runtime_seconds: Optional[int],
     current_timeout: Optional[str],
@@ -4327,16 +4400,23 @@ def _default_spawn(
     cmd = [
         *_resolve_hermes_argv(),
         "-p", profile_arg,
-        # Auto-load the kanban-worker skill so every dispatched worker
-        # has the pattern library (good summary/metadata shapes, retry
-        # diagnostics, block-reason examples) in its context, even if
-        # the profile hasn't wired it into skills config. The MANDATORY
-        # lifecycle is already in the system prompt via KANBAN_GUIDANCE;
-        # this skill is the deeper reference. Users can point a profile
-        # at a different/additional skill via config if they want —
-        # --skills is additive to the profile's default skill set.
-        "--skills", "kanban-worker",
     ]
+    # Auto-load the kanban-worker skill so every dispatched worker
+    # has the pattern library (good summary/metadata shapes, retry
+    # diagnostics, block-reason examples) in its context, even if
+    # the profile hasn't wired it into skills config. The MANDATORY
+    # lifecycle is already in the system prompt via KANBAN_GUIDANCE;
+    # this skill is the deeper reference. Users can point a profile
+    # at a different/additional skill via config if they want —
+    # --skills is additive to the profile's default skill set.
+    #
+    # Only add the flag when the skill actually resolves for the home
+    # the worker runs under: the bundled skill is absent from many
+    # profile-scoped skills dirs, and preloading a missing skill is
+    # fatal at CLI startup. Omitting it is safe — the lifecycle
+    # contract still ships via KANBAN_GUIDANCE.
+    if _kanban_worker_skill_available(env.get("HERMES_HOME")):
+        cmd.extend(["--skills", "kanban-worker"])
     # Per-task force-loaded skills. Each name goes in its own
     # `--skills X` pair rather than a single comma-joined arg: the CLI
     # accepts both forms (action='append' + comma-split), but
