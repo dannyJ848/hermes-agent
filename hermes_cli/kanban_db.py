@@ -99,11 +99,36 @@ VALID_WORKSPACE_KINDS = {"scratch", "worktree", "dir"}
 KNOWN_TOOLSET_NAMES = frozenset(name.casefold() for name in get_toolset_names())
 _IS_WINDOWS = sys.platform == "win32"
 
-# A running task's claim is valid for 15 minutes; after that the next
-# dispatcher tick reclaims it.  Workers that outlive this window should call
-# ``heartbeat_claim(task_id)`` periodically.  In practice most kanban
-# workloads either finish within 15m or set a longer claim explicitly.
-DEFAULT_CLAIM_TTL_SECONDS = 15 * 60
+# A running task's claim is valid for 15 minutes by default; after that the
+# next dispatcher tick reclaims it. Workers that outlive this window should
+# call ``heartbeat_claim(task_id)`` periodically. In practice most kanban
+# workloads either finish within 15m, set a longer claim explicitly, or use
+# ``HERMES_KANBAN_CLAIM_TTL_SECONDS`` to raise the default claim window for
+# long single-call MCP workflows.
+DEFAULT_CLAIM_TTL_SECONDS = 900
+
+
+def _resolve_claim_ttl_seconds(ttl_seconds: Optional[int] = None) -> int:
+    """Return the effective claim TTL, honoring the kanban env override.
+
+    Explicit call-site values win. Otherwise a positive integer from
+    ``HERMES_KANBAN_CLAIM_TTL_SECONDS`` overrides the built-in default.
+    Invalid or non-positive env values fall back silently so existing
+    installs keep working.
+    """
+    if ttl_seconds is not None:
+        return max(1, int(ttl_seconds))
+
+    raw = os.environ.get("HERMES_KANBAN_CLAIM_TTL_SECONDS", "").strip()
+    if raw:
+        try:
+            parsed = int(raw)
+        except ValueError:
+            parsed = 0
+        if parsed > 0:
+            return parsed
+
+    return DEFAULT_CLAIM_TTL_SECONDS
 
 
 # Worker-context caps so build_worker_context() stays bounded on
@@ -2054,7 +2079,7 @@ def claim_task(
     conn: sqlite3.Connection,
     task_id: str,
     *,
-    ttl_seconds: int = DEFAULT_CLAIM_TTL_SECONDS,
+    ttl_seconds: Optional[int] = None,
     claimer: Optional[str] = None,
 ) -> Optional[Task]:
     """Atomically transition ``ready -> running``.
@@ -2064,7 +2089,7 @@ def claim_task(
     """
     now = int(time.time())
     lock = claimer or _claimer_id()
-    expires = now + int(ttl_seconds)
+    expires = now + _resolve_claim_ttl_seconds(ttl_seconds)
     with write_txn(conn):
         # Structural invariant: never transition ready -> running while any
         # parent is not yet 'done'. This is the single enforcement point
@@ -2168,7 +2193,7 @@ def heartbeat_claim(
     conn: sqlite3.Connection,
     task_id: str,
     *,
-    ttl_seconds: int = DEFAULT_CLAIM_TTL_SECONDS,
+    ttl_seconds: Optional[int] = None,
     claimer: Optional[str] = None,
 ) -> bool:
     """Extend a running claim.  Returns True if we still own it.
@@ -2176,7 +2201,7 @@ def heartbeat_claim(
     Workers that know they'll exceed 15 minutes should call this every
     few minutes to keep ownership.
     """
-    expires = int(time.time()) + int(ttl_seconds)
+    expires = int(time.time()) + _resolve_claim_ttl_seconds(ttl_seconds)
     lock = claimer or _claimer_id()
     with write_txn(conn):
         cur = conn.execute(
@@ -4357,7 +4382,7 @@ def dispatch_once(
     conn: sqlite3.Connection,
     *,
     spawn_fn=None,
-    ttl_seconds: int = DEFAULT_CLAIM_TTL_SECONDS,
+    ttl_seconds: Optional[int] = None,
     dry_run: bool = False,
     max_spawn: Optional[int] = None,
     failure_limit: int = DEFAULT_SPAWN_FAILURE_LIMIT,
