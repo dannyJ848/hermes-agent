@@ -79,12 +79,15 @@ import sqlite3
 import subprocess
 import sys
 import threading
+import logging
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Optional
 
 from toolsets import get_toolset_names
+
+_log = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -1976,6 +1979,58 @@ def recompute_ready(conn: sqlite3.Connection) -> int:
 
 
 # ---------------------------------------------------------------------------
+# Workspace / tmux cleanup
+# ---------------------------------------------------------------------------
+
+def _cleanup_workspace(conn: sqlite3.Connection, task_id: str) -> None:
+    """Best-effort cleanup of scratch workspace and stale tmux session.
+
+    Scratch workspaces (used by swarm agents) accumulate on disk — hundreds
+    of MB per task, never released. Stale tmux sessions from completed agents
+    also persist indefinitely.
+
+    Both gates are safe:
+    - workspace_kind == 'scratch' gate preserves user worktree/dir workspaces
+    - tmux #{pane_dead} == 1 gate only kills sessions where the worker has
+      already exited
+    - best-effort: cleanup failures never block task completion
+    """
+    try:
+        row = conn.execute(
+            "SELECT workspace_path, workspace_kind FROM tasks WHERE id = ?",
+            (task_id,),
+        ).fetchone()
+        if not row:
+            return
+        path = row["workspace_path"]
+        kind = row["workspace_kind"]
+        if path and kind == "scratch":
+            p = Path(path)
+            if p.exists():
+                import shutil
+                shutil.rmtree(p, ignore_errors=True)
+                _log.debug("Cleaned scratch workspace for %s: %s", task_id, path)
+    except Exception:
+        pass
+
+    try:
+        # Kill tmux session if the pane is dead (worker already exited)
+        import subprocess as _sp
+        result = _sp.run(
+            ["tmux", "list-panes", "-t", f"hermes_worker_{task_id}", "-F", "#{pane_dead}"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if result.returncode == 0 and result.stdout.strip() == "1":
+            _sp.run(
+                ["tmux", "kill-session", "-t", f"hermes_worker_{task_id}"],
+                capture_output=True, timeout=5,
+            )
+            _log.debug("Killed dead tmux session for %s", task_id)
+    except Exception:
+        pass
+
+
+# ---------------------------------------------------------------------------
 # Claim / complete / block
 # ---------------------------------------------------------------------------
 
@@ -2646,6 +2701,8 @@ def complete_task(
     _clear_failure_counter(conn, task_id)
     # Recompute ready status for dependents (separate txn so children see done).
     recompute_ready(conn)
+    # Clean up the scratch workspace and any stale tmux session for the worker.
+    _cleanup_workspace(conn, task_id)
     return True
 
 
