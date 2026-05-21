@@ -29,9 +29,26 @@ Your cognitive apparatus is managed by the CognitiveOrchestrator and consists of
 - **agent_scorecard**: Compute autonomy evaluation metrics
 - **auto_memory**: Extract learnable tips from session content
 
-## Recent Updates (2026-05-19)
+## Recent Updates (2026-05-20)
 
-### Performance Optimizations
+### Surgical Upstream Integration (15 commits + 3 manual patches)
+- **perf**: termux tui cold start speedup
+- **fix(deps)**: pydantic 2.13.4 segfault fix
+- **fix(x_search)**: degraded results + date validation
+- **fix(clipboard)**: nix xclip/wl-copy, linux/wayland tui copy
+- **fix(skills-hub)**: deduplicate by identifier (not name) — GitHubSource + browse_skills
+- **fix(lint)**: skip shell linter when LSP handles file
+- **fix(runtime)**: ollama/vllm/llamacpp aliases as custom provider
+- **fix(security)**: yaml.safe_load guards, flock unlock, TOCTOU races, atomic writes
+- **fix(gateway)**: pre-mark resume_pending before drain (data loss prevention)
+- **fix(gateway)**: quiet corrupt kanban dispatcher boards
+- **fix(kanban)**: sqlite fd leak on init failure
+- **fix(kanban)**: gate --skills kanban-worker on skill availability (prevents worker crash)
+- **fix(kanban)**: error fingerprinting + circuit breaker for systemic crashes (3+ same fingerprint)
+- **Tests**: 531 core tests passed, no regressions
+- **Backups**: backup-pre-risky-20260520-230255 tag, 562MB bundle, 55MB tar.gz, 16GB ~/.hermes copy
+
+### Performance Optimizations (2026-05-19)
 Upstream cherry-picks integrated:
 - **PR #28864**: Deferred openai._base_client import (-28% cold start, -19% RSS)
 - **PR #28866**: Agent-loop hot-path optimizations (-47% function calls, -94% thinking pad)

@@ -27,6 +27,16 @@ Cognitive apparatus wiring (2026-05-19):
 - AGENTS.md updated with cognitive architecture section
 - SOUL.md updated with cognitive capabilities and operational parameters
 
+Surgical upstream integration session (2026-05-20, commit 1557fae06):
+- 12 commits cherry-picked cleanly: perf(termux tui cold start), pydantic 2.13.4 segfault fix, x_search degraded results, clipboard fixes (nix/linux/wayland), skills-hub dedup by identifier, lint skip shell when LSP handles, ollama/vllm/llamacpp aliases as custom, yaml.safe_load/flock/TOCTOU/atomic writes hardening, gateway resume_pending before drain (data loss prevention), quiet corrupt kanban boards
+- 3 kanban fixes manually applied: sqlite fd leak (try/except connect), kanban-worker crash (gate --skills on availability), systemic crash detection (error fingerprinting + circuit breaker at 3+ same-fingerprint crashes)
+- Skipped: JSON snapshot writer (6-file conflict), kanban/provider cleanup races (agent_runtime_helpers refactor), cache kanban guidance at session init (touches agent_init.py)
+- Tests: 531 core tests passed, no regressions
+- Backup tag: backup-pre-risky-20260520-230255
+- Full bundle backup: ~/hermes-full-backup-20260520-230303.bundle (562MB)
+- Source tar.gz: ~/hermes-source-backup-20260520-230337.tar.gz (55MB)
+- ~/.hermes backup: ~/hermes-dot-hermes-backup-20260520-230341/ (16GB)
+
 Upstream perf cherry-picks (2026-05-19, commit bccf762e8):
 - PR #28864: defer openai._base_client import via sys.meta_path finder (-28% cold start, -19% RSS)
 - PR #28866: agent-loop 3-way hot-path optimizations (-47% function calls, -94% thinking pad, -89% host matches)
