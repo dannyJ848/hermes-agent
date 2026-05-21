@@ -207,7 +207,7 @@ def get_current_board() -> str:
     if env:
         try:
             normed = _normalize_board_slug(env)
-            if normed:
+            if normed and board_exists(normed):
                 return normed
         except ValueError:
             pass
@@ -267,17 +267,17 @@ def board_dir(board: Optional[str] = None) -> Path:
 
 
 def board_exists(board: Optional[str] = None) -> bool:
-    """Return True if the board has a DB or a metadata dir on disk.
+    """Return True if the board has persisted metadata or a DB on disk.
 
     ``default`` is considered to always exist — its DB is created
     on first :func:`connect` and there's no way for it to be missing
-    in a configuration where the kanban feature is usable at all.
+    short of deliberate filesystem vandalism.
     """
-    slug = _normalize_board_slug(board) or DEFAULT_BOARD
+    slug = _normalize_board_slug(board or "")
     if slug == DEFAULT_BOARD:
         return True
     d = board_dir(slug)
-    return d.is_dir() or (d / "kanban.db").exists()
+    return (d / "board.json").exists() or (d / "kanban.db").exists()
 
 
 def kanban_db_path(board: Optional[str] = None) -> Path:
@@ -534,6 +534,11 @@ def remove_board(slug: str, *, archive: bool = True) -> dict:
     # If the user removed the currently-active board, revert to default.
     if get_current_board() == normed:
         clear_current_board()
+
+    # A concurrent connect(board=normed) after the rename/delete recreates
+    # an empty sqlite file via mkdir(exist_ok=True); the cache entry must be
+    # dropped first so the schema init pass re-runs on that fresh file.
+    _INITIALIZED_PATHS.discard(str((d / "kanban.db").resolve()))
 
     if archive:
         archive_root = boards_root() / "_archived"
@@ -1063,6 +1068,14 @@ def _migrate_add_optional_columns(conn: sqlite3.Connection) -> None:
             "CREATE INDEX IF NOT EXISTS idx_tasks_idempotency "
             "ON tasks(idempotency_key)"
         )
+
+    # Refresh after early additive migrations above. Some existing DBs were
+    # partially migrated in older releases and can already contain the later
+    # columns (for example ``consecutive_failures``) even when this function's
+    # initial snapshot did not. Re-snapshot here so the legacy-column migration
+    # below is truly idempotent and never re-adds columns that already exist.
+    cols = {row["name"] for row in conn.execute("PRAGMA table_info(tasks)")}
+
     # Legacy column migration: ``spawn_failures`` → ``consecutive_failures``
     # and ``last_spawn_error`` → ``last_failure_error``.
     #
@@ -1452,7 +1465,7 @@ def create_task(
                         workspace_path,
                         tenant,
                         idempotency_key,
-                        int(max_runtime_seconds) if max_runtime_seconds else None,
+                        int(max_runtime_seconds) if max_runtime_seconds is not None else None,
                         json.dumps(skills_list) if skills_list is not None else None,
                         int(max_retries) if max_retries is not None else None,
                     ),
@@ -2751,7 +2764,8 @@ def unblock_task(conn: sqlite3.Connection, task_id: str) -> bool:
         ).fetchone()
         new_status = "todo" if undone_parents else "ready"
         cur = conn.execute(
-            "UPDATE tasks SET status = ?, current_run_id = NULL "
+            "UPDATE tasks SET status = ?, current_run_id = NULL, "
+            "consecutive_failures = 0, last_failure_error = NULL "
             "WHERE id = ? AND status = 'blocked'",
             (new_status, task_id),
         )
@@ -4826,22 +4840,40 @@ def board_stats(conn: sqlite3.Connection) -> dict:
     }
 
 
-def _safe_int(val: Optional[str]) -> Optional[int]:
-    """Parse a timestamp field to int, returning None on garbage like '%s'."""
+def _to_epoch(val) -> Optional[int]:
+    """Normalise a timestamp to unix epoch seconds.
+
+    Accepts ints (pass-through), numeric strings, and ISO-8601 strings.
+    Returns ``None`` for ``None`` / empty values.
+    """
     if val is None:
         return None
-    try:
+    if isinstance(val, int):
+        return val
+    if isinstance(val, float):
         return int(val)
-    except (ValueError, TypeError):
+    s = str(val).strip()
+    if not s:
+        return None
+    try:
+        return int(s)
+    except ValueError:
+        pass
+    # ISO-8601 fallback (e.g. '2026-05-10T15:00:00Z')
+    try:
+        from datetime import datetime, timezone
+        dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        return int(dt.timestamp())
+    except (ValueError, OSError):
         return None
 
 
 def task_age(task: Task) -> dict:
     """Return age metrics for a single task. All values are seconds or None."""
     now = int(time.time())
-    created = _safe_int(task.created_at)
-    started = _safe_int(task.started_at)
-    completed = _safe_int(task.completed_at)
+    created = _to_epoch(task.created_at)
+    started = _to_epoch(task.started_at)
+    completed = _to_epoch(task.completed_at)
     age_since_created = now - created if created else None
     age_since_started = now - started if started else None
     time_to_complete = (
