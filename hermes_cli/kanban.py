@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from hermes_cli import kanban_db as kb
+from hermes_cli.profiles import get_active_profile_name, get_profile_dir, seed_profile_skills
 
 
 # ---------------------------------------------------------------------------
@@ -295,6 +296,9 @@ def build_parser(parent_subparsers: argparse._SubParsersAction) -> argparse.Argu
                                "kanban.failure_limit config "
                                f"(default {kb.DEFAULT_FAILURE_LIMIT}).")
     p_create.add_argument("--json", action="store_true", help="Emit JSON output")
+    p_create.add_argument("--initial-status", default="ready",
+                          choices=sorted(kb.VALID_INITIAL_STATUSES),
+                          help="Initial task status (default: ready)")
 
     # --- list ---
     p_list = sub.add_parser("list", aliases=["ls"], help="List tasks")
@@ -307,6 +311,11 @@ def build_parser(parent_subparsers: argparse._SubParsersAction) -> argparse.Argu
     p_list.add_argument("--archived", action="store_true",
                         help="Include archived tasks")
     p_list.add_argument("--json", action="store_true")
+    p_list.add_argument("--sort", default=None,
+                        choices=sorted(kb.VALID_SORT_ORDERS.keys()),
+                        help="Sort order (default: priority)")
+    p_list.add_argument("--board", default=None,
+                        help="Board slug to query (default: current board)")
 
     # --- show ---
     p_show = sub.add_parser("show", help="Show a task with comments + events")
@@ -457,6 +466,8 @@ def build_parser(parent_subparsers: argparse._SubParsersAction) -> argparse.Argu
     )
     p_disp.add_argument("--dry-run", action="store_true",
                         help="Don't actually spawn processes; just print what would happen")
+    p_disp.add_argument("--once", action="store_true",
+                        help="Run a single dispatch tick and exit (default)")
     p_disp.add_argument("--max", type=int, default=None,
                         help="Cap number of spawns this pass")
     p_disp.add_argument("--failure-limit", type=int,
@@ -1045,6 +1056,21 @@ def _cmd_init(args: argparse.Namespace) -> int:
         print("No profiles found under ~/.hermes/profiles/.")
         print("Create one with `hermes -p <name> setup` before assigning tasks.")
     print()
+    # Seed bundled skills (e.g. kanban-worker) into the active profile so
+    # the kanban dispatcher can use them without a separate `hermes profile
+    # create` step.  This is best-effort — a missing or broken profile is
+    # not fatal to `kanban init`.
+    try:
+        profile_name = get_active_profile_name() or "default"
+        profile_dir = get_profile_dir(profile_name)
+        result = seed_profile_skills(profile_dir, quiet=True)
+        if result:
+            copied = result.get("copied", [])
+            if copied:
+                print(f"Seeded skill(s) into profile {profile_name}: {', '.join(copied)}")
+    except Exception:
+        pass  # best-effort
+    print()
     print("Next step: start the gateway so ready tasks actually get picked up.")
     print("  hermes gateway start")
     print()
@@ -1122,6 +1148,7 @@ def _cmd_create(args: argparse.Namespace) -> int:
             max_runtime_seconds=max_runtime,
             skills=getattr(args, "skills", None) or None,
             max_retries=max_retries,
+            initial_status=getattr(args, "initial_status", "ready"),
         )
         task = kb.get_task(conn, task_id)
     if getattr(args, "json", False):
@@ -1157,6 +1184,7 @@ def _cmd_list(args: argparse.Namespace) -> int:
             status=args.status,
             tenant=args.tenant,
             include_archived=args.archived,
+            order_by=getattr(args, "sort", None),
         )
     if getattr(args, "json", False):
         print(json.dumps([_task_to_dict(t) for t in tasks], indent=2, ensure_ascii=False))
@@ -1752,7 +1780,7 @@ def _cmd_dispatch(args: argparse.Namespace) -> int:
             failure_limit=getattr(args, "failure_limit", kb.DEFAULT_SPAWN_FAILURE_LIMIT),
         )
     if getattr(args, "json", False):
-        print(json.dumps({
+        payload = {
             "reclaimed": res.reclaimed,
             "crashed": res.crashed,
             "timed_out": res.timed_out,
@@ -1764,9 +1792,20 @@ def _cmd_dispatch(args: argparse.Namespace) -> int:
             ],
             "skipped_unassigned": res.skipped_unassigned,
             "skipped_nonspawnable": res.skipped_nonspawnable,
-        }, indent=2))
+        }
+        if hasattr(res, "stale"):
+            payload["stale"] = res.stale
+        if hasattr(res, "respawn_guarded"):
+            payload["respawn_guarded"] = [
+                {"task_id": tid, "reason": reason}
+                for tid, reason in res.respawn_guarded
+            ]
+        print(json.dumps(payload, indent=2))
         return 0
     print(f"Reclaimed:    {res.reclaimed}")
+    print(f"Stale:        {len(res.stale)}")
+    if res.stale:
+        print(f"  {', '.join(res.stale)}")
     print(f"Crashed:      {len(res.crashed)}")
     if res.crashed:
         print(f"  {', '.join(res.crashed)}")
@@ -1781,6 +1820,10 @@ def _cmd_dispatch(args: argparse.Namespace) -> int:
     for tid, who, ws in res.spawned:
         tag = " (dry)" if args.dry_run else ""
         print(f"  - {tid}  ->  {who}  @ {ws or '-'}{tag}")
+    if res.respawn_guarded:
+        print(f"Respawn guarded: {len(res.respawn_guarded)}")
+        for tid, reason in res.respawn_guarded:
+            print(f"  - {tid}: {reason}")
     if res.skipped_unassigned:
         print(f"Skipped (unassigned): {', '.join(res.skipped_unassigned)}")
     if res.skipped_nonspawnable:
