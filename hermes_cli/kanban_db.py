@@ -1386,6 +1386,7 @@ def create_task(
     model_override: Optional[str] = None,
     board: Optional[str] = None,
     branch_name: Optional[str] = None,
+    initial_status: str = "ready",
 ) -> str:
     """Create a new task and optionally link it under parent tasks.
 
@@ -1425,6 +1426,11 @@ def create_task(
         branch_name = str(branch_name).strip() or None
     if branch_name and workspace_kind != "worktree":
         raise ValueError("branch_name is only valid for worktree workspaces")
+
+    if initial_status not in VALID_INITIAL_STATUSES:
+        raise ValueError(
+            f"initial_status must be one of {sorted(VALID_INITIAL_STATUSES)}"
+        )
 
     # Resolve workspace_path from board-level default_workdir when the
     # caller did not specify one explicitly.
@@ -1502,12 +1508,19 @@ def create_task(
         task_id = _new_task_id()
         try:
             with write_txn(conn):
-                # Determine initial status from parent status, unless the
-                # caller is parking this task in triage for a specifier.
-                if triage:
-                    initial_status = "triage"
+                # Determine task status from parent status, unless the caller
+                # parks it directly in blocked for human-ops review or in
+                # triage for a specifier.
+                if initial_status == "blocked":
+                    task_status = "blocked"
+                    if parents:
+                        missing = _find_missing_parents(conn, parents)
+                        if missing:
+                            raise ValueError(f"unknown parent task(s): {', '.join(missing)}")
+                elif triage:
+                    task_status = "triage"
                 else:
-                    initial_status = "ready"
+                    task_status = "ready"
                     if parents:
                         missing = _find_missing_parents(conn, parents)
                         if missing:
@@ -1519,7 +1532,7 @@ def create_task(
                             parents,
                         ).fetchall()
                         if any(r["status"] != "done" for r in rows):
-                            initial_status = "todo"
+                            task_status = "todo"
                 # Even in triage mode we still need to validate parent ids
                 # so the eventual link rows don't dangle.
                 if triage and parents:
@@ -1541,7 +1554,7 @@ def create_task(
                         title.strip(),
                         body,
                         assignee,
-                        initial_status,
+                        task_status,
                         priority,
                         created_by,
                         now,
@@ -1567,18 +1580,20 @@ def create_task(
                     "created",
                     {
                         "assignee": assignee,
-                        "status": initial_status,
+                        "status": task_status,
                         "parents": list(parents),
                         "tenant": tenant,
                         "skills": list(skills_list) if skills_list else None,
+                        "model_override": model_override,
+                        "branch_name": branch_name,
                     },
+                    run_id=None,
                 )
-            return task_id
+                return task_id
         except sqlite3.IntegrityError:
-            if attempt == 1:
-                raise
-            # Retry with a fresh id.
-            continue
+            if attempt == 0:
+                continue
+            raise
     raise RuntimeError("unreachable")
 
 
@@ -3464,7 +3479,10 @@ VALID_SORT_ORDERS = {
     "status": "status ASC, priority DESC",
 }
 
+# Valid initial statuses for ``create_task`` / ``kanban create``.
+VALID_INITIAL_STATUSES = {"ready", "blocked", "triage"}
 
+# Patterns in last_failure_error that indicate a quota / auth blocker.
 # Patterns in last_failure_error that indicate a quota / auth blocker.
 # These errors won't resolve by retrying immediately — auto-block instead.
 _RESPAWN_BLOCKER_RE = re.compile(
