@@ -134,3 +134,15 @@ class CortexFlywheel:
         )
         conn.commit()
         conn.close()
+
+
+# Global singleton instance
+_cortex_instance: Optional["CortexFlywheel"] = None
+
+
+def get_cortex() -> "CortexFlywheel":
+    """Return the global CortexFlywheel singleton."""
+    global _cortex_instance
+    if _cortex_instance is None:
+        _cortex_instance = CortexFlywheel()
+    return _cortex_instance

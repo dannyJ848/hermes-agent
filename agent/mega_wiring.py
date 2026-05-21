@@ -620,8 +620,8 @@ def _wire_learning_system(agent_class):
     original_invoke = agent_class._invoke_tool
     
     @wraps(original_invoke)
-    def wrapped_invoke(self, tool_name, tool_input):
-        result = original_invoke(self, tool_name, tool_input)
+    def wrapped_invoke(self, tool_name, tool_input, *args, **kwargs):
+        result = original_invoke(self, tool_name, tool_input, *args, **kwargs)
         try:
             cerebrum = _get_cerebrum()
             cortex = _get_cortex()
