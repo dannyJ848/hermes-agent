@@ -1916,52 +1916,10 @@ def select_provider_and_model(args=None):
         config_provider or os.getenv("HERMES_INFERENCE_PROVIDER") or "auto"
     )
     compatible_custom_providers = get_compatible_custom_providers(config)
-    active = None
-    if effective_provider != "auto":
-        active_def = resolve_provider_full(
-            effective_provider,
-            config.get("providers"),
-            compatible_custom_providers,
-        )
-        if active_def is not None:
-            active = active_def.id
-        else:
-            warning = (
-                f"Unknown provider '{effective_provider}'. Check 'hermes model' for "
-                "available providers, or run 'hermes doctor' to diagnose config "
-                "issues."
-            )
-            print(f"Warning: {warning} Falling back to auto provider detection.")
-    if active is None:
-        try:
-            active = resolve_provider("auto")
-        except AuthError as exc:
-            if effective_provider == "auto":
-                warning = format_auth_error(exc)
-                print(f"Warning: {warning} Falling back to auto provider detection.")
-            active = None  # no provider yet; default to first in list
-
-    # Detect custom endpoint
-    if active == "openrouter" and get_env_value("OPENAI_BASE_URL"):
-        active = "custom"
-
-    from hermes_cli.models import CANONICAL_PROVIDERS, _PROVIDER_LABELS
-
-    provider_labels = dict(_PROVIDER_LABELS)  # derive from canonical list
-    active_label = provider_labels.get(active, active) if active else "none"
-
-    print()
-    print(f"  Current model:    {current_model}")
-    print(f"  Active provider:  {active_label}")
-    print()
-
-    # Step 1: Provider selection — flat list from CANONICAL_PROVIDERS
-    all_providers = [(p.slug, p.tui_desc) for p in CANONICAL_PROVIDERS]
-
     def _named_custom_provider_map(cfg) -> dict[str, dict[str, str]]:
         from hermes_cli.config import read_raw_config
 
-        # Build a lookup of raw (un-expanded) api_key templates keyed by a
+        # Build lookups of raw (un-expanded) templates keyed by a
         # stable identity. We intentionally bypass
         # ``get_compatible_custom_providers(read_raw_config())`` here because
         # its ``_normalize_custom_provider_entry`` step calls ``urlparse()``
@@ -1970,6 +1928,7 @@ def select_provider_and_model(args=None):
         # entries is exactly how env-ref preservation fails for the user
         # config that motivated this fix.
         raw_api_key_refs: dict[tuple, str] = {}
+        raw_base_url_refs: dict[tuple, str] = {}
         raw_cfg = read_raw_config()
 
         def _record_raw(
@@ -1977,10 +1936,10 @@ def select_provider_and_model(args=None):
             provider_key: str,
             model: str,
             api_key: str,
+            base_url: str,
         ) -> None:
             template = str(api_key or "").strip()
-            if "${" not in template:
-                return
+            base_template = str(base_url or "").strip()
             name = str(name or "").strip()
             provider_key = str(provider_key or "").strip()
             model = str(model or "").strip()
@@ -1988,12 +1947,19 @@ def select_provider_and_model(args=None):
             # might present: (name), (name, model), (provider_key), and
             # (provider_key, model). Case-insensitive on name/provider_key so
             # the loaded entry matches regardless of display casing.
+            identities = []
             if name:
-                raw_api_key_refs.setdefault((name.lower(),), template)
-                raw_api_key_refs.setdefault((name.lower(), model), template)
+                identities.extend(((name.lower(),), (name.lower(), model)))
             if provider_key:
-                raw_api_key_refs.setdefault((provider_key.lower(),), template)
-                raw_api_key_refs.setdefault((provider_key.lower(), model), template)
+                identities.extend(
+                    ((provider_key.lower(),), (provider_key.lower(), model))
+                )
+            if "${" in template:
+                for identity in identities:
+                    raw_api_key_refs.setdefault(identity, template)
+            if "${" in base_template:
+                for identity in identities:
+                    raw_base_url_refs.setdefault(identity, base_template)
 
         raw_list = raw_cfg.get("custom_providers")
         if isinstance(raw_list, list):
@@ -2005,6 +1971,9 @@ def select_provider_and_model(args=None):
                     "",
                     raw_entry.get("model", "") or raw_entry.get("default_model", ""),
                     raw_entry.get("api_key", ""),
+                    raw_entry.get("base_url", "")
+                    or raw_entry.get("url", "")
+                    or raw_entry.get("api", ""),
                 )
         raw_providers = raw_cfg.get("providers")
         if isinstance(raw_providers, dict):
@@ -2016,9 +1985,17 @@ def select_provider_and_model(args=None):
                     raw_key,
                     raw_entry.get("model", "") or raw_entry.get("default_model", ""),
                     raw_entry.get("api_key", ""),
+                    raw_entry.get("base_url", "")
+                    or raw_entry.get("url", "")
+                    or raw_entry.get("api", ""),
                 )
 
-        def _lookup_ref(name: str, provider_key: str, model: str) -> str:
+        def _lookup_ref(
+            refs: dict[tuple, str],
+            name: str,
+            provider_key: str,
+            model: str,
+        ) -> str:
             name_lc = str(name or "").strip().lower()
             pkey_lc = str(provider_key or "").strip().lower()
             model = str(model or "").strip()
@@ -2028,8 +2005,8 @@ def select_provider_and_model(args=None):
                 (name_lc, model),
                 (name_lc,),
             ):
-                if identity[0] and identity in raw_api_key_refs:
-                    return raw_api_key_refs[identity]
+                if identity[0] and identity in refs:
+                    return refs[identity]
             return ""
 
         custom_provider_map = {}
@@ -2055,14 +2032,81 @@ def select_provider_and_model(args=None):
                 "model": entry.get("model", ""),
                 "api_mode": entry.get("api_mode", ""),
                 "provider_key": provider_key,
-                "api_key_ref": _lookup_ref(name, provider_key, entry.get("model", "")),
+                "api_key_ref": _lookup_ref(
+                    raw_api_key_refs, name, provider_key, entry.get("model", "")
+                ),
+                "base_url_ref": _lookup_ref(
+                    raw_base_url_refs, name, provider_key, entry.get("model", "")
+                ),
             }
         return custom_provider_map
+
+    def _norm_base_url(url: str) -> str:
+        return str(url or "").strip().rstrip("/").lower()
 
     # Add user-defined custom providers from config.yaml
     _custom_provider_map = _named_custom_provider_map(
         config
     )  # key → {name, base_url, api_key}
+
+    def _active_custom_key_from_base_url() -> str:
+        if effective_provider != "custom" or not isinstance(model_cfg, dict):
+            return ""
+        current_base = _norm_base_url(model_cfg.get("base_url", ""))
+        if not current_base:
+            return ""
+        for key, provider_info in _custom_provider_map.items():
+            if _norm_base_url(provider_info.get("base_url", "")) == current_base:
+                return key
+        return ""
+
+    active = _active_custom_key_from_base_url()
+    if active is None:
+        active = ""
+    if not active and effective_provider != "auto":
+        active_def = resolve_provider_full(
+            effective_provider,
+            config.get("providers"),
+            compatible_custom_providers,
+        )
+        if active_def is not None:
+            active = active_def.id
+        else:
+            warning = (
+                f"Unknown provider '{effective_provider}'. Check 'hermes model' for "
+                "available providers, or run 'hermes doctor' to diagnose config "
+                "issues."
+            )
+            print(f"Warning: {warning} Falling back to auto provider detection.")
+    if not active:
+        try:
+            active = resolve_provider("auto")
+        except AuthError as exc:
+            if effective_provider == "auto":
+                warning = format_auth_error(exc)
+                print(f"Warning: {warning} Falling back to auto provider detection.")
+            active = None  # no provider yet; default to first in list
+
+    # Detect custom endpoint
+    if active == "openrouter" and get_env_value("OPENAI_BASE_URL"):
+        active = "custom"
+
+    from hermes_cli.models import CANONICAL_PROVIDERS, _PROVIDER_LABELS
+
+    provider_labels = dict(_PROVIDER_LABELS)  # derive from canonical list
+    if active and active in _custom_provider_map:
+        active_label = _custom_provider_map[active]["name"]
+    else:
+        active_label = provider_labels.get(active, active) if active else "none"
+
+    print()
+    print(f"  Current model:    {current_model}")
+    print(f"  Active provider:  {active_label}")
+    print()
+
+    # Step 1: Provider selection — flat list from CANONICAL_PROVIDERS
+    all_providers = [(p.slug, p.tui_desc) for p in CANONICAL_PROVIDERS]
+
     for key, provider_info in _custom_provider_map.items():
         name = provider_info["name"]
         base_url = provider_info["base_url"]
@@ -2114,7 +2158,7 @@ def select_provider_and_model(args=None):
     elif selected_provider == "openai-codex":
         _model_flow_openai_codex(config, current_model)
     elif selected_provider == "xai-oauth":
-        _model_flow_xai_oauth(config, current_model)
+        _model_flow_xai_oauth(config, current_model, args=args)
     elif selected_provider == "qwen-oauth":
         _model_flow_qwen_oauth(config, current_model)
     elif selected_provider == "minimax-oauth":
@@ -2997,7 +3041,7 @@ def _model_flow_openai_codex(config, current_model=""):
         print("No change.")
 
 
-def _model_flow_xai_oauth(_config, current_model=""):
+def _model_flow_xai_oauth(_config, current_model="", *, args=None):
     """xAI Grok OAuth (SuperGrok Subscription) provider: ensure logged in, then pick model."""
     from hermes_cli.auth import (
         get_xai_oauth_auth_status,
@@ -3028,7 +3072,15 @@ def _model_flow_xai_oauth(_config, current_model=""):
             print("Starting a fresh xAI OAuth login...")
             print()
             try:
-                mock_args = argparse.Namespace()
+                # Forward CLI flags from ``hermes model --manual-paste``
+                # / ``--no-browser`` / ``--timeout`` into the loopback
+                # login. Without this, browser-only remotes (#26923)
+                # can't reach the manual-paste path via ``hermes model``.
+                mock_args = argparse.Namespace(
+                    manual_paste=bool(getattr(args, "manual_paste", False)),
+                    no_browser=bool(getattr(args, "no_browser", False)),
+                    timeout=getattr(args, "timeout", None),
+                )
                 _login_xai_oauth(
                     mock_args,
                     PROVIDER_REGISTRY["xai-oauth"],
@@ -3046,7 +3098,11 @@ def _model_flow_xai_oauth(_config, current_model=""):
         print("Not logged into xAI Grok OAuth (SuperGrok Subscription). Starting login...")
         print()
         try:
-            mock_args = argparse.Namespace()
+            mock_args = argparse.Namespace(
+                manual_paste=bool(getattr(args, "manual_paste", False)),
+                no_browser=bool(getattr(args, "no_browser", False)),
+                timeout=getattr(args, "timeout", None),
+            )
             _login_xai_oauth(mock_args, PROVIDER_REGISTRY["xai-oauth"])
         except SystemExit:
             print("Login cancelled or failed.")
@@ -3573,6 +3629,14 @@ def _custom_provider_api_key_config_value(provider_info, resolved_api_key=""):
         return f"${{{key_env}}}"
 
     return str(resolved_api_key or "").strip()
+
+
+def _custom_provider_base_url_config_value(provider_info, resolved_base_url=""):
+    """Return the value that should be persisted for a custom provider URL."""
+    base_url_ref = str(provider_info.get("base_url_ref", "") or "").strip()
+    if base_url_ref:
+        return base_url_ref
+    return str(resolved_base_url or "").strip()
 
 
 def _save_custom_provider(
@@ -4188,7 +4252,9 @@ def _model_flow_named_custom(config, provider_info):
         model.pop("api_key", None)
     else:
         model["provider"] = "custom"
-        model["base_url"] = base_url
+        model["base_url"] = _custom_provider_base_url_config_value(
+            provider_info, base_url
+        )
         if config_api_key:
             model["api_key"] = config_api_key
     # Apply api_mode from custom_providers entry, or clear stale value
@@ -10185,6 +10251,16 @@ def main():
         help="Do not attempt to open the browser automatically during Nous login",
     )
     model_parser.add_argument(
+        "--manual-paste",
+        action="store_true",
+        help=(
+            "For loopback OAuth providers (xai-oauth, ...): skip the local "
+            "callback listener and paste the failed callback URL from your "
+            "browser instead. Use on browser-only remotes (Cloud Shell, "
+            "Codespaces, EC2 Instance Connect, ...). See #26923."
+        ),
+    )
+    model_parser.add_argument(
         "--timeout",
         type=float,
         default=15.0,
@@ -10645,6 +10721,17 @@ def main():
         "--no-browser",
         action="store_true",
         help="Do not auto-open a browser for OAuth login",
+    )
+    auth_add.add_argument(
+        "--manual-paste",
+        action="store_true",
+        help=(
+            "Skip the loopback callback listener and paste the failed "
+            "callback URL from your browser instead. Use this on "
+            "browser-only remotes (GCP Cloud Shell, GitHub Codespaces, "
+            "EC2 Instance Connect, ...) where 127.0.0.1 on the remote "
+            "isn't reachable from your laptop. See #26923."
+        ),
     )
     auth_add.add_argument(
         "--timeout", type=float, help="OAuth/network timeout in seconds"
