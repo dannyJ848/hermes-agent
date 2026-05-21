@@ -113,26 +113,29 @@ class IterationEngine:
         # Extract structural patterns from detail
         if action_type in ("patch", "write_file"):
             # For code: hash the file extension + the type of change, not the content
-            ext = Path(detail).suffix if "." in detail else "unknown"
+            detail_str = str(detail)
+            ext = Path(detail_str).suffix if "." in detail_str else "unknown"
             normalized += f":{ext}"
         elif action_type == "terminal":
             # For commands: hash the base command, not the arguments
-            cmd = detail.split()[0] if detail.split() else "unknown"
+            detail_str = str(detail)
+            cmd = detail_str.split()[0] if detail_str.split() else "unknown"
             normalized += f":{cmd}"
         elif action_type == "delegate":
-            normalized += f":{detail[:50]}"
+            normalized += f":{str(detail)[:50]}"
         elif action_type == "search":
-            normalized += f":{detail[:30]}"
+            normalized += f":{str(detail)[:30]}"
 
         if extra:
             normalized += f":{extra[:50]}"
 
         return hashlib.sha256(normalized.encode()).hexdigest()[:16]
 
-    def _hash_error(self, error: str) -> str:
+    def _hash_error(self, error) -> str:
         """Hash an error pattern for matching similar errors."""
         if not error:
             return ""
+        error = str(error)
         # Strip specific values (file paths, line numbers, variable names)
         cleaned = re.sub(r'/[^\s]+', '<PATH>', error)
         cleaned = re.sub(r'\d+', 'N', cleaned)
@@ -407,7 +410,7 @@ class IterationEngine:
 
     # ── PATTERN EXTRACTION ──
 
-    def _extract_error_pattern(self, error: str) -> str:
+    def _extract_error_pattern(self, error) -> str:
         """Extract the reusable pattern from an error, stripping specifics."""
         if not error:
             return ""

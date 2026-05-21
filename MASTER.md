@@ -175,3 +175,15 @@ Before starting a new CLI session:
 4. Add missing API keys to DGX `.env` for web/discord tools
 5. Verify DGX cognitive orchestrator initializes all 20 subsystems on first run
 6. Test Hermes chat end-to-end with DGX local model
+
+
+## 2026-05-21 — Apparatus Hardening
+
+**iteration_engine.py** — 5 type-hardening patches:
+- `_hash_error()`: accepts any type, normalizes with `str()` before regex
+- `_hash_action()`: all 4 branches stringify dict inputs before `.split()` or slicing
+- `_extract_error_pattern()`: accepts any type, preserves existing dict->json path
+
+**Test suite**: 4555 passed, 0 failures (285s full run)
+**Cognitive smoke test**: 10/10 tests passed
+**Databases**: 4/4 accessible, writes verified

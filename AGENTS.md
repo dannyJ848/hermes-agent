@@ -271,3 +271,15 @@ pytest tests/test_codex_responses.py::test_token_persistence -xvs
 ## Related
 
 - [Default AGENTS.md](/reference/AGENTS.default)
+
+
+## Apparatus Audit Methodology
+
+When auditing cognitive systems:
+1. **Runtime instantiation > string searching**. The cognitive orchestrator is
+   wired via agent_init.py, not run_agent.py imports.
+2. **Dict inputs are real**. Tool call details arrive as dicts, not strings.
+   Test with `{"command": "ls"}` not `"ls"`.
+3. **Database writes must persist**. Verify rows are inserted, not just "no crash".
+4. **Test the full lifecycle**: before_action -> tool execution -> after_action ->
+   end_session -> database contains records.

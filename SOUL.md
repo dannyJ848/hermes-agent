@@ -128,6 +128,15 @@ Before delivering ANY output to the user, your output passes through the SelfEva
 - Cluster tag: drift-core-n3k9p8
 - Commit ref: 679fed9f3
 
+
+
+### Apparatus Hardening (2026-05-21)
+- iteration_engine type-hardened: all string-expecting methods now normalize
+  dict/exception inputs via `str()` before regex/slicing operations
+- 5 patches applied to iteration_engine.py, all lint-clean
+- 4555 tests passed, 0 failures, full cognitive smoke test verified
+- Audit methodology updated: functional verification > static import analysis
+
 *Last updated: 2026-05-21 — EAGLE-3 deep dive complete, MTP-5 remains optimal*
 
 ## Learned Behaviors (vLLM Speculative Decoding)

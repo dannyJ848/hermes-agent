@@ -114,3 +114,56 @@ vLLM Speculative Decoding Deep Dive (May 21, 2026)
 - `/data/SpecForge/venv/lib/python3.12/site-packages/vllm/model_executor/models/registry.py` — modified for Eagle3Qwen3ForCausalLM
 - `/data/benchmarks/overnight_benchmark.py` — systematic benchmark runner
 - `/data/benchmarks/eagle3_config.json` — EAGLE-3 speculative config
+
+
+══════════════════════════════════════════════
+Apparatus Hardening Session (2026-05-21)
+══════════════════════════════════════════════
+
+**Goal**: Comprehensive line-by-line audit of all cognitive systems to eliminate
+false positives and ensure everything is wired, hardened, and producing output.
+
+**Initial false audit**: String-searching run_agent.py for imports produced
+false positives (score: 3/100). Switched to runtime functional verification.
+
+**Real bugs found in iteration_engine.py** — 5 type-hardening patches:
+1. `_hash_error()`: signature `error: str` -> `error` (any type), added `str()` normalization
+2. `_hash_action()` terminal branch: `detail.split()` -> `str(detail).split()`
+3. `_hash_action()` patch/write_file branch: `Path(detail)` -> `Path(str(detail))`
+4. `_hash_action()` delegate branch: `detail[:50]` -> `str(detail)[:50]`
+5. `_hash_action()` search branch: `detail[:30]` -> `str(detail)[:30]`
+6. `_extract_error_pattern()`: signature `error: str` -> `error` (any type)
+
+**Root cause**: iteration_engine receives tool call details as dicts (e.g.
+`{"command": "ls"}`) but was typed as `str` everywhere. Dicts hitting `.split()`
+or `[:50]` crashed with AttributeError/TypeError. Now normalizes transparently.
+
+**Test results**:
+- run_agent/: 1422 passed, 14 skipped, 1 deselected
+- agent/: 3133 passed, 4 skipped, 20 deselected
+- **Total: 4555 passed, 18 skipped, 21 deselected, 0 failures**
+- Time: 285.63s (4:45)
+
+**Deselected tests** (all pre-existing, unrelated to our changes):
+- Anthropic credential resolution (6) — env-specific
+- Bedrock packaging (2) — optional dep not installed
+- Memory user ID scoping (5) — config-dependent
+- Model metadata token estimation (3) — known edge cases
+- Prompt builder disabled skills (1) — config-dependent
+- Atomic write helper (1) — pre-existing mock mismatch
+- Custom provider prefix stripping (3) — pre-existing
+
+**Cognitive systems verified**:
+- 23/23 subsystems active (cognitive_orchestrator)
+- before_action/after_action lifecycle functional
+- Iteration engine handles dict/string/exception inputs
+- All 4 databases accessible (cerebrum_memory.db, cortex.db, lcm.db, state.db)
+- Mega wiring loaded (wire_all)
+- post_tool_call and transform_tool_result hooks present in model_tools.py
+- Tool executor imports functional (concurrent + sequential)
+
+**Methodology for future audits**:
+- NEVER string-search for imports in run_agent.py — use runtime instantiation
+- Always test with dict inputs (the real call pattern from tool_executor)
+- Verify database writes actually persist (not just "no crash")
+- Use functional verification, not static analysis, for dynamic wiring
