@@ -476,6 +476,17 @@ def build_parser(parent_subparsers: argparse._SubParsersAction) -> argparse.Argu
                              f"(spawn_failed, timed_out, or crashed; default: {kb.DEFAULT_SPAWN_FAILURE_LIMIT})")
     p_disp.add_argument("--json", action="store_true")
 
+    # --- swarm ---
+    p_swarm = sub.add_parser(
+        "swarm",
+        help="Create a Kanban Swarm v1 graph: root + parallel workers + verifier + synthesizer",
+    )
+    p_swarm.add_argument("--title", default="Swarm Task", help="Root card title")
+    p_swarm.add_argument("--workers", type=int, default=3,
+                         help="Number of parallel worker cards (default: 3)")
+    p_swarm.add_argument("--board", default=None, help="Target board name")
+    p_swarm.add_argument("--json", action="store_true", help="Emit JSON output")
+
     # --- daemon (deprecated) ---
     p_daemon = sub.add_parser(
         "daemon",
@@ -797,6 +808,7 @@ def kanban_command(args: argparse.Namespace) -> int:
         "specify":  _cmd_specify,
         "decompose":  _cmd_decompose,
         "gc":       _cmd_gc,
+        "swarm":    _cmd_swarm,
     }
     handler = handlers.get(action)
     if not handler:
@@ -2343,6 +2355,27 @@ def _cmd_gc(args: argparse.Namespace) -> int:
     )
     print(f"GC complete: {removed_ws} workspace(s), "
           f"{removed_events} event row(s), {removed_logs} log file(s) removed")
+    return 0
+
+
+def _cmd_swarm(args: argparse.Namespace) -> int:
+    """Create a Kanban Swarm v1 graph."""
+    from hermes_cli.kanban_swarm import create_swarm
+
+    board = getattr(args, "board", None)
+    result = create_swarm(
+        title=args.title,
+        num_workers=args.workers,
+        board=board,
+    )
+    if getattr(args, "json", False):
+        import json as _json
+        print(_json.dumps(result, indent=2, default=str))
+    else:
+        print(f"Swarm created: {result['root_id']}")
+        print(f"  Workers: {', '.join(result['worker_ids'])}")
+        print(f"  Verifier: {result['verifier_id']}")
+        print(f"  Synthesizer: {result['synthesizer_id']}")
     return 0
 
 
