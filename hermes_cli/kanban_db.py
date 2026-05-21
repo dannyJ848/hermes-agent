@@ -1589,6 +1589,7 @@ def list_tasks(
     tenant: Optional[str] = None,
     include_archived: bool = False,
     limit: Optional[int] = None,
+    order_by: Optional[str] = None,
 ) -> list[Task]:
     query = "SELECT * FROM tasks WHERE 1=1"
     params: list[Any] = []
@@ -1605,7 +1606,15 @@ def list_tasks(
         params.append(tenant)
     if not include_archived and status != "archived":
         query += " AND status != 'archived'"
-    query += " ORDER BY priority DESC, created_at ASC"
+    if order_by is not None:
+        order_by = order_by.strip().lower()
+        if order_by not in VALID_SORT_ORDERS:
+            raise ValueError(
+                f"order_by must be one of {sorted(VALID_SORT_ORDERS.keys())}"
+            )
+        query += f" ORDER BY {VALID_SORT_ORDERS[order_by]}"
+    else:
+        query += " ORDER BY priority DESC, created_at ASC"
     if limit:
         query += f" LIMIT {int(limit)}"
     rows = conn.execute(query, params).fetchall()
@@ -3373,6 +3382,15 @@ DEFAULT_LOG_BACKUP_COUNT = 1
 # Keep a little wall-clock budget for the worker to observe a terminal timeout
 # and call kanban_block/kanban_complete before max_runtime_seconds kills it.
 KANBAN_TERMINAL_TIMEOUT_GRACE_SECONDS = 30
+
+# Valid sort orders for ``list_tasks`` / ``kanban list``.
+VALID_SORT_ORDERS = {
+    "priority": "priority DESC, created_at ASC",
+    "created": "created_at ASC",
+    "updated": "updated_at DESC",
+    "title": "title ASC",
+    "status": "status ASC, priority DESC",
+}
 
 
 # Patterns in last_failure_error that indicate a quota / auth blocker.
