@@ -4946,6 +4946,12 @@ def board_stats(conn: sqlite3.Connection) -> dict:
     }
 
 
+# Backward-compat alias used by tests
+def _safe_int(val) -> Optional[int]:
+    """Deprecated — use :func:`_to_epoch`."""
+    return _to_epoch(val)
+
+
 def _to_epoch(val) -> Optional[int]:
     """Normalise a timestamp to unix epoch seconds.
 
