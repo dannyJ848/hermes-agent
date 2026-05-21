@@ -936,7 +936,18 @@ def init_agent(
         else:
             source = "Claude via OpenRouter"
         print(f"💾 Prompt caching: ENABLED ({source}, {agent._cache_ttl} TTL)")
-    
+
+    # Kanban worker/orchestrator lifecycle guidance is session-static:
+    # the dispatcher decides at spawn time whether this process is a kanban
+    # worker (kanban_show tool is present iff HERMES_KANBAN_TASK is set).
+    # Resolving the ~835-token block once here avoids re-running the
+    # membership test + reference on every system-prompt rebuild
+    # (init + each context compression).
+    from agent.prompt_builder import KANBAN_GUIDANCE
+    agent._kanban_worker_guidance = (
+        KANBAN_GUIDANCE if "kanban_show" in agent.valid_tool_names else ""
+    )
+
     # Session logging setup - auto-save conversation trajectories for debugging
     agent.session_start = datetime.now()
     if session_id:

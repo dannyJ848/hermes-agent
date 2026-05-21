@@ -111,8 +111,13 @@ def build_system_prompt_parts(agent: Any, system_message: Optional[str] = None) 
     # Kanban worker/orchestrator lifecycle — only present when the
     # dispatcher spawned this process (kanban_show check_fn gates on
     # HERMES_KANBAN_TASK env var). Normal chat sessions never see
-    # this block.
-    if "kanban_show" in agent.valid_tool_names:
+    # this block.  Cached on agent_init to avoid re-resolving on every
+    # system-prompt rebuild (init + each context compression).
+    _kwg = getattr(agent, "_kanban_worker_guidance", None)
+    if _kwg is not None:
+        if _kwg:
+            tool_guidance.append(_kwg)
+    elif "kanban_show" in agent.valid_tool_names:
         tool_guidance.append(KANBAN_GUIDANCE)
     if tool_guidance:
         stable_parts.append(" ".join(tool_guidance))
