@@ -982,20 +982,27 @@ def connect(
     conn = sqlite3.connect(str(path), isolation_level=None, timeout=30)
     try:
         conn.row_factory = sqlite3.Row
-        # WAL doesn't work on network filesystems (NFS/SMB/FUSE).  Shared helper
-        # falls back to DELETE with one WARNING so kanban stays usable there.
-        # See hermes_state._WAL_INCOMPAT_MARKERS for detection logic.
-        from hermes_state import apply_wal_with_fallback
-        apply_wal_with_fallback(conn, db_label=f"kanban.db ({path.name})")
-        conn.execute("PRAGMA synchronous=NORMAL")
-        conn.execute("PRAGMA foreign_keys=ON")
-        if needs_init:
-            # Idempotent: runs CREATE TABLE IF NOT EXISTS + the additive
-            # migrations. Cached so subsequent connect() calls in the same
-            # process are cheap.
-            conn.executescript(SCHEMA_SQL)
-            _migrate_add_optional_columns(conn)
-            _INITIALIZED_PATHS.add(resolved)
+        with _INIT_LOCK:
+            # WAL activation can take an exclusive lock while SQLite creates the
+            # sidecar files for a fresh database. Keep it in the same process-local
+            # critical section as schema initialization so concurrent gateway
+            # startup threads do not race before _INITIALIZED_PATHS is populated.
+            # WAL doesn't work on network filesystems (NFS/SMB/FUSE). Shared helper
+            # falls back to DELETE with one WARNING so kanban stays usable there.
+            # See hermes_state._WAL_INCOMPAT_MARKERS for detection logic.
+            from hermes_state import apply_wal_with_fallback
+            apply_wal_with_fallback(conn, db_label=f"kanban.db ({path.name})")
+            conn.execute("PRAGMA synchronous=NORMAL")
+            conn.execute("PRAGMA foreign_keys=ON")
+            if needs_init:
+                # Idempotent: runs CREATE TABLE IF NOT EXISTS + the additive
+                # migrations. Cached so subsequent connect() calls in the same
+                # process are cheap. The lock prevents same-process dispatcher
+                # threads from racing through the additive ALTER TABLE pass with
+                # stale PRAGMA snapshots during gateway startup.
+                conn.executescript(SCHEMA_SQL)
+                _migrate_add_optional_columns(conn)
+                _INITIALIZED_PATHS.add(resolved)
     except Exception:
         conn.close()
         raise
@@ -1897,8 +1904,32 @@ def _synthesize_ended_run(
 # Dependency resolution (todo -> ready)
 # ---------------------------------------------------------------------------
 
+def _has_sticky_block(conn: sqlite3.Connection, task_id: str) -> bool:
+    """True if the most recent block event on ``task_id`` is a worker/operator
+    ``kanban_block`` (not a circuit-breaker auto-block).
+
+    Distinguishes the two block sources using the cheapest available signal:
+    the most recent ``"blocked"`` / ``"unblocked"`` event in ``task_events``.
+
+    * Worker / operator ``kanban_block`` emits ``"blocked"`` → sticky.
+    * Circuit-breaker ``_record_task_failure`` emits ``"gave_up"`` (not
+      ``"blocked"``) → not sticky.
+    * Direct DB manipulation also recovers, since no ``"blocked"`` event row.
+    """
+    row = conn.execute(
+        "SELECT event_type FROM task_events "
+        "WHERE task_id = ? AND event_type IN ('blocked', 'unblocked') "
+        "ORDER BY created_at DESC LIMIT 1",
+        (task_id,),
+    ).fetchone()
+    return row is not None and row["event_type"] == "blocked"
+
+
 def recompute_ready(conn: sqlite3.Connection) -> int:
     """Promote ``todo`` tasks to ``ready`` when all parents are ``done`` or ``archived``.
+
+    Also promotes ``blocked`` tasks whose parents are done, unless the block
+    was worker-initiated (sticky block for human review).
 
     Returns the number of tasks promoted.  Safe to call inside or outside
     an existing transaction; it opens its own IMMEDIATE txn.
@@ -1906,21 +1937,39 @@ def recompute_ready(conn: sqlite3.Connection) -> int:
     promoted = 0
     with write_txn(conn):
         todo_rows = conn.execute(
-            "SELECT id FROM tasks WHERE status = 'todo'"
+            "SELECT id, status FROM tasks WHERE status IN ('todo', 'blocked')"
         ).fetchall()
         for row in todo_rows:
             task_id = row["id"]
+            cur_status = row["status"]
+            if cur_status == "blocked" and _has_sticky_block(conn, task_id):
+                # Worker / operator asked for human review — do not
+                # silently auto-recover.  ``unblock_task`` is the only
+                # legitimate exit (it emits ``"unblocked"`` which flips
+                # this predicate back).
+                continue
             parents = conn.execute(
                 "SELECT t.status FROM tasks t "
                 "JOIN task_links l ON l.parent_id = t.id "
                 "WHERE l.child_id = ?",
                 (task_id,),
             ).fetchall()
-            if all(p["status"] in {"done", "archived"} for p in parents):
-                conn.execute(
-                    "UPDATE tasks SET status = 'ready' WHERE id = ? AND status = 'todo'",
-                    (task_id,),
-                )
+            if all(p["status"] in ("done", "archived") for p in parents):
+                # Blocked tasks also get their failure counters reset —
+                # this is effectively an auto-unblock (circuit-breaker
+                # recovery; worker-initiated blocks are skipped above).
+                if cur_status == "blocked":
+                    conn.execute(
+                        "UPDATE tasks SET status = 'ready', "
+                        "consecutive_failures = 0, last_failure_error = NULL "
+                        "WHERE id = ? AND status = 'blocked'",
+                        (task_id,),
+                    )
+                else:
+                    conn.execute(
+                        "UPDATE tasks SET status = 'ready' WHERE id = ? AND status = 'todo'",
+                        (task_id,),
+                    )
                 _append_event(conn, task_id, "promoted", None)
                 promoted += 1
     return promoted
