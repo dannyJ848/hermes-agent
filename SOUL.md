@@ -29,9 +29,25 @@ Your cognitive apparatus is managed by the CognitiveOrchestrator and consists of
 - **agent_scorecard**: Compute autonomy evaluation metrics
 - **auto_memory**: Extract learnable tips from session content
 
-## Recent Updates (2026-05-20)
+## Recent Updates (2026-05-21)
 
-### Surgical Upstream Integration (15 commits + 3 manual patches)
+### Learning Systems Comprehensive Audit
+- **fix(mega-wiring)**: `_invoke_tool` wrapper in `_wire_learning_system` was
+  `(self, tool_name, tool_input)` — only 2 args. tool_executor.py passes 4
+  positional + `messages=` + `pre_tool_block_checked=` kwargs. All tool calls
+  with messages kwarg failed silently. Fixed to `*args, **kwargs`.
+- **fix(cortex-flywheel)**: Added missing `get_cortex()` singleton factory.
+  mega_wiring.py imported it but class had no factory — cortex never initialized.
+- **Verification**: All 7 cognitive subsystems import and initialize correctly.
+- **Tests**: 15 core tests pass, 3133 agent tests pass.
+- **Commit**: 1da15ad02 on origin/main
+
+### Apparatus Hardening (2026-05-21)
+- **perf**: type-safe iteration_engine (5 patches, 4555 tests pass)
+- **fix**: dict inputs normalized with str() before regex/slicing
+- **methodology**: Runtime functional verification > static string searching
+
+### Surgical Upstream Integration (2026-05-20, 15 commits + 3 manual patches)
 - **perf**: termux tui cold start speedup
 - **fix(deps)**: pydantic 2.13.4 segfault fix
 - **fix(x_search)**: degraded results + date validation

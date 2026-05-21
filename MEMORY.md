@@ -167,3 +167,34 @@ or `[:50]` crashed with AttributeError/TypeError. Now normalizes transparently.
 - Always test with dict inputs (the real call pattern from tool_executor)
 - Verify database writes actually persist (not just "no crash")
 - Use functional verification, not static analysis, for dynamic wiring
+
+══════════════════════════════════════════════
+Learning Systems Audit (2026-05-21, commit 1da15ad02)
+══════════════════════════════════════════════
+
+**Critical bug found in mega_wiring.py** during user-requested pre-project audit:
+- `_wire_learning_system` at line 630: `wrapped_invoke(self, tool_name, tool_input)`
+  only accepted 2 args but tool_executor.py passes 4 positional + `messages=` +
+  `pre_tool_block_checked=` kwargs. Result: `TypeError: unexpected keyword
+  argument 'messages'` — ALL tool calls with messages kwarg FAILED silently.
+- **Fix**: `wrapped_invoke(self, tool_name, tool_input, *args, **kwargs)` with
+  pass-through to `original_invoke(self, tool_name, tool_input, *args, **kwargs)`.
+
+**Missing factory found in cortex_flywheel.py**:
+- `mega_wiring.py` imports `get_cortex` but module only had `CortexFlywheel` class.
+- Result: Cortex flywheel never initialized, reflection/distillation hooks
+  silently failed on every session end.
+- **Fix**: Added `get_cortex()` singleton factory matching cerebrum/distillation.
+
+**Cognitive subsystem status (all verified working)**:
+- cerebrum: get_cerebrum() ✅
+- cortex: get_cortex() ✅ (FIXED)
+- iteration_engine: get_engine() ✅
+- cognitive_orchestrator: get_orchestrator() ✅
+- distillation: get_pipeline() ✅
+- vector_memory: VectorMemory ✅
+- metrics: MetricsCollector ✅
+
+**Database health**: All 6 learning databases accessible with expected tables.
+**Tests**: 15 core tests pass, 3133 agent tests pass (20 pre-existing failures).
+**Tool dispatch**: messages= kwarg now accepted correctly through full wrapper chain.

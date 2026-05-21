@@ -283,3 +283,9 @@ When auditing cognitive systems:
 3. **Database writes must persist**. Verify rows are inserted, not just "no crash".
 4. **Test the full lifecycle**: before_action -> tool execution -> after_action ->
    end_session -> database contains records.
+5. **Wrapper signatures must match**. Monkey-patched methods (mega_wiring.py) must
+   accept `*args, **kwargs` if the original does. Signature mismatches cause
+   silent failures on keyword arguments like `messages=` and `pre_tool_block_checked=`.
+6. **Factory functions must exist**. If `mega_wiring.py` imports `get_cortex()`,
+   the module MUST expose that function — not just the class. Missing factories
+   cause silent initialization failures.
