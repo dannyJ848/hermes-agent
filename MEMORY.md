@@ -27,15 +27,22 @@ Cognitive apparatus wiring (2026-05-19):
 - AGENTS.md updated with cognitive architecture section
 - SOUL.md updated with cognitive capabilities and operational parameters
 
-Surgical upstream integration session (2026-05-20, commit 1557fae06):
-- 12 commits cherry-picked cleanly: perf(termux tui cold start), pydantic 2.13.4 segfault fix, x_search degraded results, clipboard fixes (nix/linux/wayland), skills-hub dedup by identifier, lint skip shell when LSP handles, ollama/vllm/llamacpp aliases as custom, yaml.safe_load/flock/TOCTOU/atomic writes hardening, gateway resume_pending before drain (data loss prevention), quiet corrupt kanban boards
-- 3 kanban fixes manually applied: sqlite fd leak (try/except connect), kanban-worker crash (gate --skills on availability), systemic crash detection (error fingerprinting + circuit breaker at 3+ same-fingerprint crashes)
-- Skipped: JSON snapshot writer (6-file conflict), kanban/provider cleanup races (agent_runtime_helpers refactor), cache kanban guidance at session init (touches agent_init.py)
-- Tests: 531 core tests passed, no regressions
-- Backup tag: backup-pre-risky-20260520-230255
-- Full bundle backup: ~/hermes-full-backup-20260520-230303.bundle (562MB)
-- Source tar.gz: ~/hermes-source-backup-20260520-230337.tar.gz (55MB)
-- ~/.hermes backup: ~/hermes-dot-hermes-backup-20260520-230341/ (16GB)
+|Surgical upstream integration session (2026-05-20, commit 1557fae06):
+|- 12 commits cherry-picked cleanly: perf(termux tui cold start), pydantic 2.13.4 segfault fix, x_search degraded results, clipboard fixes (nix/linux/wayland), skills-hub dedup by identifier, lint skip shell when LSP handles, ollama/vllm/llamacpp aliases as custom, yaml.safe_load/flock/TOCTOU/atomic writes hardening, gateway resume_pending before drain (data loss prevention), quiet corrupt kanban boards
+|- 3 kanban fixes manually applied: sqlite fd leak (try/except connect), kanban-worker crash (gate --skills on availability), systemic crash detection (error fingerprinting + circuit breaker at 3+ same-fingerprint crashes)
+|- Skipped: JSON snapshot writer (6-file conflict), kanban/provider cleanup races (agent_runtime_helpers refactor), cache kanban guidance at session init (touches agent_init.py)
+|- Tests: 531 core tests passed, no regressions
+|- Backup tag: backup-pre-risky-20260520-230255
+
+|FULL Kanban system integration (2026-05-20 to 2026-05-21, 32 commits, HEAD 09053642f):
+|- Foundation: stale detection (detect_stale_running), respawn guard (check_respawn_guard), per-task model override (model_override column + -m flag), claim TTL config (HERMES_KANBAN_CLAIM_TTL_SECONDS env), board workdir (default_workdir metadata)
+|- Task lifecycle: max_in_progress cap, --sort option (created/priority/status/title/updated), workflow filter (workflow_template_id + current_step_key), worktree paths (branch_name column + HERMES_KANBAN_BRANCH env), scheduled status (schedule_task + unblock_task handles scheduled), initial-status (blocked/triage/ready at create time)
+|- CLI: swarm topology (kanban_swarm.py module + hermes kanban swarm command), comment --max-len trimming, specify max_tokens env config (HERMES_KANBAN_SPECIFY_MAX_TOKENS), seed bundled skills on init, --board override, --once dispatch, --dry-run
+|- DB fixes: SQLite header validation (_validate_sqlite_header), workspace cleanup (_cleanup_workspace), index migration ordering (idx_tasks_tenant/idempotency/session_id after column migration), release_stale_claims recompute_ready, _default_spawn --accept-hooks, specify_triage_task assignee support
+|- Agent: kanban guidance cache (_kanban_worker_guidance in agent_init, cached consumption in system_prompt)
+|- Tests: 84 kanban tests pass, 216 core tests pass, end-to-end CLI verified
+|- Zero deletions in Kanban session (2 upstream deletions from batch 2a/2b pre-session)
+|- Pushed to origin/main, clean working tree, backup tag valid
 
 Upstream perf cherry-picks (2026-05-19, commit bccf762e8):
 - PR #28864: defer openai._base_client import via sys.meta_path finder (-28% cold start, -19% RSS)
@@ -72,3 +79,38 @@ Random session markers (2026-05-19):
 - Commit ref: 679fed9f3
 
 DGX note: Managed by separate CLI instance. Do not modify DGX state.
+
+══════════════════════════════════════════════
+vLLM Speculative Decoding Deep Dive (May 21, 2026)
+══════════════════════════════════════════════
+
+**Hardware**: DGX Spark GB10 (unified memory, memory-bandwidth bound)
+**Model**: Qwen3.6-27B-Uncensored (BF16, no quantization)
+**vLLM**: 0.21.0 + PyTorch 2.11.0+cu128
+
+**Results:**
+- Baseline (no speculative): 3.1 tps, 319ms/token
+- MTP-5: 5.4 tps, 185ms/token (~14% draft acceptance)
+- EAGLE-3 (specdrift drafter): 1.5 tps, 667ms/token (~5-8% acceptance — misaligned drafter)
+
+**Key Findings:**
+1. EAGLE-3 requires custom-trained drafter aligned with target model. Off-the-shelf drafters are severely misaligned.
+2. MTP (using model's own layers) beats EAGLE-3 when external drafter is misaligned.
+3. vLLM 0.21.0 uses `--speculative-config '{"method":"mtp|eagle3|ngram|suffix",...}'` JSON format.
+4. GB10 unified memory is memory-bandwidth bound; CUDA graph compilation is essential (~300s startup).
+5. `--enforce-eager` makes inference 3x slower on GB10 despite faster startup.
+6. Optimal config: `--max-num-batched-tokens 65536 --max-num-seqs 64 --gpu-memory-utilization 0.85 --enable-prefix-caching --max-model-len 65536`
+
+**EAGLE-3 Patching:**
+- vLLM `llama_eagle3.py` needs `fcs.X.weight` skip for specdrift models (per-layer FC weights not used by single FC architecture)
+- Custom `qwen3_eagle3.py` approach abandoned — saved weights had wrong architecture
+- `specdrift-qwen3.6-27b-eagle3` is the real EAGLE-3 drafter (LlamaForCausalLMEagle3, 1 layer, hidden_size=5120)
+
+**Overnight Benchmark:** `/data/benchmarks/overnight_benchmark.py` tests baseline + MTP-3/5/7/10 + ngram + suffix decoding. Results in `/data/benchmarks/overnight_results.json`.
+
+**Files Modified on DGX:**
+- `/data/SpecForge/venv/lib/python3.12/site-packages/vllm/model_executor/models/llama_eagle3.py` — patched to skip `fcs.` weights
+- `/data/SpecForge/venv/lib/python3.12/site-packages/vllm/model_executor/models/qwen3_eagle3.py` — custom model (disabled, obsolete)
+- `/data/SpecForge/venv/lib/python3.12/site-packages/vllm/model_executor/models/registry.py` — modified for Eagle3Qwen3ForCausalLM
+- `/data/benchmarks/overnight_benchmark.py` — systematic benchmark runner
+- `/data/benchmarks/eagle3_config.json` — EAGLE-3 speculative config

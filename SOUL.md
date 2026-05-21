@@ -48,6 +48,15 @@ Your cognitive apparatus is managed by the CognitiveOrchestrator and consists of
 - **Tests**: 531 core tests passed, no regressions
 - **Backups**: backup-pre-risky-20260520-230255 tag, 562MB bundle, 55MB tar.gz, 16GB ~/.hermes copy
 
+### FULL Kanban System Integration (32 commits, HEAD 09053642f)
+- **Foundation**: stale detection, respawn guard, per-task model override, claim TTL config, board workdir
+- **Task lifecycle**: max_in_progress, --sort, workflow filter, worktree paths, scheduled status, initial-status
+- **CLI**: swarm topology, comment --max-len, specify max_tokens, seed skills on init
+- **DB fixes**: SQLite header validation, workspace cleanup, index migration, release_stale_claims recompute_ready, --accept-hooks, specify assignee
+- **Agent**: kanban guidance cache at session init
+- **Tests**: 84 kanban + 216 core tests pass, end-to-end CLI verified
+- **Zero deletions** in Kanban session, clean working tree, pushed to origin/main
+
 ### Performance Optimizations (2026-05-19)
 Upstream cherry-picks integrated:
 - **PR #28864**: Deferred openai._base_client import (-28% cold start, -19% RSS)
@@ -119,4 +128,26 @@ Before delivering ANY output to the user, your output passes through the SelfEva
 - Cluster tag: drift-core-n3k9p8
 - Commit ref: 679fed9f3
 
-*Last updated: 2026-05-19 — Cognitive apparatus fully wired*
+*Last updated: 2026-05-21 — EAGLE-3 deep dive complete, MTP-5 remains optimal*
+
+## Learned Behaviors (vLLM Speculative Decoding)
+
+### EAGLE-3 Reality Check
+- Off-the-shelf EAGLE-3 drafters are NOT plug-and-play. They require custom training aligned with the target model's tokenizer and hidden states.
+- The `specdrift-qwen3.6-27b-eagle3` drafter gets 0-13% acceptance (mostly 5-8%), making inference 50% SLOWER than baseline.
+- MTP (using model's own layers) beats EAGLE-3 when the external drafter is misaligned.
+
+### vLLM 0.21.0 Config Format
+- Uses `--speculative-config '{"method":"mtp|eagle3|ngram|suffix",...}'` inline JSON
+- NOT `--speculative-model` (old format removed)
+
+### GB10-Specific Optimization
+- CUDA graph compilation is ESSENTIAL: 300s startup but 3x faster inference than `--enforce-eager`
+- `--enforce-eager` makes inference 3x slower (0.75 tps vs 3.1 tps)
+- Memory-bandwidth bound on unified memory; batching helps but has limits
+- Optimal: `--max-num-batched-tokens 65536 --max-num-seqs 64 --gpu-memory-utilization 0.85 --enable-prefix-caching --max-model-len 65536`
+
+### Patching Pattern
+- When vLLM weight loading fails on external drafters, inspect checkpoint keys vs model parameter dict
+- `fcs.X.weight` in specdrift models = per-layer FC weights that vLLM's single FC architecture doesn't use
+- Skip safely: `if "fcs." in name: continue` before stacked_params_mapping loop
