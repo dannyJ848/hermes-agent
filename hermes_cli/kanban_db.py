@@ -2397,6 +2397,10 @@ def release_stale_claims(
                 run_id=run_id,
             )
             reclaimed += 1
+    # ``archived`` parents no longer block children, same as ``done``.
+    # Promote newly-unblocked dependents immediately instead of waiting
+    # for a later dispatcher tick.
+    recompute_ready(conn)
     return reclaimed
 
 
@@ -4986,8 +4990,13 @@ def _default_spawn(
     env["HERMES_PROFILE"] = profile_arg
 
     cmd = [
-        *_resolve_hermes_argv(),
+        sys.executable, "-m", "hermes_cli",
         "-p", profile_arg,
+        # Worker subprocesses switch to a profile-scoped HERMES_HOME above,
+        # so they see that profile's shell-hook allowlist instead of the
+        # dispatcher's root allowlist. Pass --accept-hooks explicitly so
+        # profile-local worker sessions still register configured hooks.
+        "--accept-hooks",
     ]
     # Auto-load the kanban-worker skill so every dispatched worker
     # has the pattern library (good summary/metadata shapes, retry
