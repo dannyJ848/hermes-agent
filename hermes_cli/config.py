@@ -1560,6 +1560,12 @@ DEFAULT_CONFIG = {
         # worker process (if still running host-locally) is terminated
         # before the reclaim.  0 disables stale detection entirely.
         "dispatch_stale_timeout_seconds": 14400,
+        # Max number of tasks that may be ``running`` at once across the
+        # whole board. When the cap is hit the dispatcher skips spawning
+        # until some workers finish. Useful on resource-constrained hosts
+        # (local LLMs, small GPUs) where piling on tasks causes timeouts.
+        # ``None`` (default) means no cap.
+        "max_in_progress": None,
     },
 
     # execute_code settings — controls the tool used for programmatic tool calls.
