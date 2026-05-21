@@ -185,7 +185,7 @@ def specify_task(
                 {"role": "user", "content": user_msg},
             ],
             temperature=0.3,
-            max_tokens=1500,
+            max_tokens=int(os.environ.get("HERMES_KANBAN_SPECIFY_MAX_TOKENS", "1500")),
             timeout=timeout or 120,
             extra_body=get_auxiliary_extra_body() or None,
         )
