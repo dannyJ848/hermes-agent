@@ -251,6 +251,13 @@ def is_moonshot_model(model: str | None) -> bool:
     """
     if not model:
         return False
+    # Exclude Z.AI coding API models — these are served via a different
+    # transport and must NOT have their tool schemas sanitized by the
+    # Moonshot path.  The kimi-coding provider uses the OpenAI-compatible
+    # completions endpoint, so its tool schemas must stay in standard
+    # OpenAI format.
+    if "kimi-for-coding" in model or "kimi-coding" in model:
+        return False
     bare = model.strip().lower()
     # Last path segment (covers aggregator-prefixed slugs)
     tail = bare.rsplit("/", 1)[-1]
