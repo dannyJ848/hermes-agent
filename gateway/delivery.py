@@ -136,36 +136,55 @@ class DeliveryRouter:
     ) -> Dict[str, Any]:
         """
         Deliver content to all specified targets.
-        
+
         Args:
             content: The message/output to deliver
             targets: List of delivery targets
             job_id: Optional job ID (for cron jobs)
             job_name: Optional job name
             metadata: Additional metadata to include
-        
+
         Returns:
             Dict with delivery results per target
         """
         results = {}
-        
+        audit_entries = []
+
         for target in targets:
+            target_key = target.to_string()
             try:
                 if target.platform == Platform.LOCAL:
                     result = self._deliver_local(content, job_id, job_name, metadata)
                 else:
                     result = await self._deliver_to_platform(target, content, metadata)
-                
-                results[target.to_string()] = {
+
+                results[target_key] = {
                     "success": True,
                     "result": result
                 }
+                audit_entries.append({
+                    "target": target_key,
+                    "success": True,
+                    "timestamp": datetime.now().isoformat(),
+                    "job_id": job_id,
+                })
             except Exception as e:
-                results[target.to_string()] = {
+                results[target_key] = {
                     "success": False,
                     "error": str(e)
                 }
-        
+                audit_entries.append({
+                    "target": target_key,
+                    "success": False,
+                    "error": str(e),
+                    "timestamp": datetime.now().isoformat(),
+                    "job_id": job_id,
+                })
+
+        # Audit trail: log delivery outcomes for provenance tracking.
+        if audit_entries:
+            logger.info("[delivery_audit] job=%s entries=%s", job_id, audit_entries)
+
         return results
     
     def _deliver_local(

@@ -4669,15 +4669,26 @@ class YuanbaoAdapter(BasePlatformAdapter):
         return await self._outbound.send_text(chat_id, content, reply_to, group_code=group_code)
 
     async def get_chat_info(self, chat_id: str) -> Dict[str, Any]:
-        """Return basic chat metadata derived from the chat_id prefix.
+        """Return chat metadata, fetching from Yuanbao API when possible.
 
         chat_id conventions:
           "group:<group_code>"  → group chat
           "direct:<account>"   → C2C / direct message (default)
-
-        TODO (T06): fetch real chat name/member-count from Yuanbao API.
         """
         if chat_id.startswith("group:"):
+            group_code = chat_id[len("group:"):]
+            # Attempt live query via GroupQueryService; fall back to chat_id-derived name on failure.
+            try:
+                result = await self._group_query.query_group_info_raw(group_code)
+                if result:
+                    return {
+                        "name": result.get("group_name") or chat_id,
+                        "type": "group",
+                        "member_count": result.get("member_count"),
+                        "owner": result.get("owner"),
+                    }
+            except Exception:
+                pass
             return {"name": chat_id, "type": "group"}
         return {"name": chat_id, "type": "dm"}
 
