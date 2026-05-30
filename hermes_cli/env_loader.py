@@ -21,6 +21,46 @@ _CREDENTIAL_SUFFIXES = ("_API_KEY", "_TOKEN", "_SECRET", "_KEY")
 # tests) don't spam the same warning multiple times.
 _WARNED_KEYS: set[str] = set()
 
+# Map of env-var name → source label ("bitwarden", etc.) for credentials
+# that were injected by an external secret source during load_hermes_dotenv().
+# Used by setup / `hermes model` flows to label detected credentials so
+# users understand WHERE a key came from when their .env doesn't contain it
+# directly (otherwise the "credentials detected ✓" line looks identical to
+# the .env case and they don't know Bitwarden is wired up).
+_SECRET_SOURCES: dict[str, str] = {}
+
+
+def get_secret_source(env_var: str) -> str | None:
+    """Return the label of the secret source that supplied ``env_var``, if any.
+
+    Returns ``"bitwarden"`` for keys pulled from Bitwarden Secrets Manager
+    during the current process's ``load_hermes_dotenv()`` call.  Returns
+    ``None`` for keys that came from ``.env``, the shell environment, or
+    aren't tracked.  The returned label is metadata only: credential-pool
+    persistence may store it to explain the origin of a borrowed secret, but
+    must never treat it as authorization to persist the raw value.
+    """
+    return _SECRET_SOURCES.get(env_var)
+
+
+def format_secret_source_suffix(env_var: str) -> str:
+    """Return a human-readable suffix like ``" (from Bitwarden)"`` or ``""``.
+
+    Use this when printing a detected credential so the user can see where
+    it came from.  Empty string when the credential came from ``.env`` or
+    the shell — those are the implicit / "default" cases users already
+    understand.
+    """
+    source = get_secret_source(env_var)
+    if not source:
+        return ""
+    if source == "bitwarden":
+        return " (from Bitwarden)"
+    # Generic fallback — future-proofing for additional secret sources
+    # (e.g. 1Password, HashiCorp Vault) without having to update every
+    # call site.
+    return f" (from {source})"
+
 
 def _format_offending_chars(value: str, limit: int = 3) -> str:
     """Return a compact 'U+XXXX ('c'), ...' summary of non-ASCII codepoints."""
@@ -117,7 +157,11 @@ def _sanitize_env_file_if_needed(path: Path) -> None:
     try:
         with open(path, **read_kw) as f:
             original = f.readlines()
-        sanitized = _sanitize_env_lines(original)
+        # Strip null bytes before _sanitize_env_lines so they never
+        # reach python-dotenv (which passes them to os.environ and
+        # crashes with ValueError).
+        stripped = [line.replace("\x00", "") for line in original]
+        sanitized = _sanitize_env_lines(stripped)
         if sanitized != original:
             import tempfile
             fd, tmp = tempfile.mkstemp(
@@ -172,4 +216,74 @@ def load_hermes_dotenv(
         _load_dotenv_with_fallback(project_env_path, override=not loaded)
         loaded.append(project_env_path)
 
+    _apply_external_secret_sources(home_path)
+
     return loaded
+
+
+def _apply_external_secret_sources(home_path: Path) -> None:
+    """Pull secrets from external sources (currently Bitwarden) into env.
+
+    Runs AFTER dotenv loads so .env values are visible (we use them to
+    locate the access token) but BEFORE the rest of Hermes reads
+    ``os.environ`` for credentials.  Any failure here is logged and
+    swallowed — external secret sources must never block startup.
+    """
+    try:
+        cfg = _load_secrets_config(home_path)
+    except Exception:  # noqa: BLE001 — config errors must not block startup
+        return
+
+    bw_cfg = (cfg or {}).get("bitwarden") or {}
+    if not bw_cfg.get("enabled"):
+        return
+
+    # Bitwarden integration — fetch secrets from BWS and inject into os.environ
+    try:
+        _fetch_bitwarden_secrets(bw_cfg, home_path)
+    except Exception:  # noqa: BLE001
+        return
+
+
+def _load_secrets_config(home_path: Path) -> dict:
+    """Load secrets configuration from ~/.hermes/secrets.yaml if present."""
+    secrets_path = home_path / "secrets.yaml"
+    if not secrets_path.exists():
+        return {}
+    try:
+        import yaml
+        with open(secrets_path, "r", encoding="utf-8") as f:
+            return yaml.safe_load(f) or {}
+    except Exception:
+        return {}
+
+
+def _fetch_bitwarden_secrets(bw_cfg: dict, home_path: Path) -> None:
+    """Fetch secrets from Bitwarden Secrets Manager and inject into os.environ."""
+    import subprocess
+    import json
+
+    access_token = bw_cfg.get("access_token") or os.environ.get("BWS_ACCESS_TOKEN")
+    if not access_token:
+        return
+
+    # Build bws command
+    bws_cmd = bw_cfg.get("bws_path", "bws")
+    try:
+        result = subprocess.run(
+            [bws_cmd, "secret", "list", "--output", "json", "--access-token", access_token],
+            capture_output=True, text=True, timeout=30
+        )
+        if result.returncode != 0:
+            return
+        secrets = json.loads(result.stdout)
+    except Exception:
+        return
+
+    # Inject secrets into os.environ and track their source
+    for secret in secrets:
+        key = secret.get("key", "")
+        value = secret.get("value", "")
+        if key and value:
+            os.environ[key] = value
+            _SECRET_SOURCES[key] = "bitwarden"
