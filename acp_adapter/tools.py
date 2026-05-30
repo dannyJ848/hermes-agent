@@ -6,13 +6,20 @@ import json
 import uuid
 from typing import Any, Dict, List, Optional
 
-import acp
-from acp.schema import (
-    ToolCallLocation,
-    ToolCallStart,
-    ToolCallProgress,
-    ToolKind,
-)
+try:
+    import acp
+except ImportError:
+    acp = None
+
+try:
+    from acp.schema import (
+        ToolCallLocation,
+        ToolCallStart,
+        ToolCallProgress,
+        ToolKind,
+    )
+except ImportError:
+    ToolCallLocation = ToolCallStart = ToolCallProgress = ToolKind = object
 
 # ---------------------------------------------------------------------------
 # Map hermes tool names -> ACP ToolKind

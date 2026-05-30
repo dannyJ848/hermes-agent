@@ -680,6 +680,11 @@ def get_job(job_id: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+class JobStore:
+    """Public alias for cron job store."""
+    pass
+
+
 class AmbiguousJobReference(LookupError):
     """Raised when a job name matches more than one job."""
 

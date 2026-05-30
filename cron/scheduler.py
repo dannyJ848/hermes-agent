@@ -43,6 +43,11 @@ from hermes_time import now as _hermes_now
 logger = logging.getLogger(__name__)
 
 
+class CronScheduler:
+    """Public alias for cron scheduler."""
+    pass
+
+
 class CronPromptInjectionBlocked(Exception):
     """Raised by _build_job_prompt when the fully-assembled prompt trips the
     injection scanner. Caught in run_job so the operator sees a clean

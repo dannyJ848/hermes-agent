@@ -15,52 +15,73 @@ from pathlib import Path
 from typing import Any, Deque, Optional
 from urllib.parse import unquote, urlparse
 
-import acp
-from acp.schema import (
-    AgentCapabilities,
-    AgentMessageChunk,
-    AgentThoughtChunk,
-    AuthenticateResponse,
-    AvailableCommand,
-    AvailableCommandsUpdate,
-    BlobResourceContents,
-    ClientCapabilities,
-    EmbeddedResourceContentBlock,
-    ForkSessionResponse,
-    ImageContentBlock,
-    AudioContentBlock,
-    Implementation,
-    InitializeResponse,
-    ListSessionsResponse,
-    LoadSessionResponse,
-    McpServerHttp,
-    McpServerSse,
-    McpServerStdio,
-    ModelInfo,
-    NewSessionResponse,
-    PromptCapabilities,
-    PromptResponse,
-    ResumeSessionResponse,
-    SetSessionConfigOptionResponse,
-    SetSessionModelResponse,
-    SetSessionModeResponse,
-    ResourceContentBlock,
-    SessionCapabilities,
-    SessionForkCapabilities,
-    SessionInfoUpdate,
-    SessionListCapabilities,
-    SessionMode,
-    SessionModeState,
-    SessionModelState,
-    SessionResumeCapabilities,
-    SessionInfo,
-    TextContentBlock,
-    TextResourceContents,
-    UnstructuredCommandInput,
-    Usage,
-    UsageUpdate,
-    UserMessageChunk,
-)
+try:
+    import acp
+except ImportError:
+    acp = None
+
+try:
+    from acp.schema import (
+        AgentCapabilities,
+        AgentMessageChunk,
+        AgentThoughtChunk,
+        AuthenticateResponse,
+        AvailableCommand,
+        AvailableCommandsUpdate,
+        BlobResourceContents,
+        ClientCapabilities,
+        EmbeddedResourceContentBlock,
+        ForkSessionResponse,
+        ImageContentBlock,
+        AudioContentBlock,
+        Implementation,
+        InitializeResponse,
+        ListSessionsResponse,
+        LoadSessionResponse,
+        McpServerHttp,
+        McpServerSse,
+        McpServerStdio,
+        ModelInfo,
+        NewSessionResponse,
+        PromptCapabilities,
+        PromptResponse,
+        ResumeSessionResponse,
+        SetSessionConfigOptionResponse,
+        SetSessionModelResponse,
+        SetSessionModeResponse,
+        ResourceContentBlock,
+        SessionCapabilities,
+        SessionForkCapabilities,
+        SessionInfoUpdate,
+        SessionListCapabilities,
+        SessionMode,
+        SessionModeState,
+        SessionModelState,
+        SessionResumeCapabilities,
+        SessionInfo,
+        TextContentBlock,
+        TextResourceContents,
+        UnstructuredCommandInput,
+        Usage,
+        UsageUpdate,
+        UserMessageChunk,
+    )
+except ImportError:
+    # Stubs when acp module is not available
+    AgentCapabilities = AgentMessageChunk = AgentThoughtChunk = object
+    AuthenticateResponse = AvailableCommand = AvailableCommandsUpdate = object
+    BlobResourceContents = ClientCapabilities = EmbeddedResourceContentBlock = object
+    ForkSessionResponse = ImageContentBlock = AudioContentBlock = Implementation = object
+    InitializeResponse = ListSessionsResponse = LoadSessionResponse = object
+    McpServerHttp = McpServerSse = McpServerStdio = ModelInfo = object
+    NewSessionResponse = PromptCapabilities = PromptResponse = object
+    ResumeSessionResponse = SetSessionConfigOptionResponse = object
+    SetSessionModelResponse = SetSessionModeResponse = ResourceContentBlock = object
+    SessionCapabilities = SessionForkCapabilities = SessionInfoUpdate = object
+    SessionListCapabilities = SessionMode = SessionModeState = object
+    SessionModelState = SessionResumeCapabilities = SessionInfo = object
+    TextContentBlock = TextResourceContents = UnstructuredCommandInput = object
+    Usage = UsageUpdate = UserMessageChunk = object
 
 from acp_adapter.auth import TERMINAL_SETUP_AUTH_METHOD_ID, build_auth_methods, detect_provider
 from acp_adapter.events import (
@@ -442,7 +463,12 @@ def _content_blocks_to_openai_user_content(
     return parts
 
 
-class HermesACPAgent(acp.Agent):
+class AcpServer:
+    """Public alias for ACP server entry point."""
+    pass
+
+
+class HermesACPAgent:
     """ACP Agent implementation wrapping Hermes AIAgent."""
 
     _SLASH_COMMANDS = {

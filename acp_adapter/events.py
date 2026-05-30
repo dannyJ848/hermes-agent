@@ -13,8 +13,15 @@ import logging
 from collections import deque
 from typing import Any, Callable, Deque, Dict
 
-import acp
-from acp.schema import AgentPlanUpdate, PlanEntry
+try:
+    import acp
+except ImportError:
+    acp = None
+
+try:
+    from acp.schema import AgentPlanUpdate, PlanEntry
+except ImportError:
+    AgentPlanUpdate = PlanEntry = object
 
 from .tools import (
     build_tool_complete,
@@ -85,7 +92,7 @@ def _build_plan_update_from_todo_result(result: Any) -> AgentPlanUpdate | None:
 
 
 def _send_update(
-    conn: acp.Client,
+    conn: Any,
     session_id: str,
     loop: asyncio.AbstractEventLoop,
     update: Any,
@@ -112,7 +119,7 @@ def _send_update(
 # ------------------------------------------------------------------
 
 def make_tool_progress_cb(
-    conn: acp.Client,
+    conn: Any,
     session_id: str,
     loop: asyncio.AbstractEventLoop,
     tool_call_ids: Dict[str, Deque[str]],
@@ -187,7 +194,7 @@ def make_tool_progress_cb(
 # ------------------------------------------------------------------
 
 def make_thinking_cb(
-    conn: acp.Client,
+    conn: Any,
     session_id: str,
     loop: asyncio.AbstractEventLoop,
 ) -> Callable:
@@ -207,7 +214,7 @@ def make_thinking_cb(
 # ------------------------------------------------------------------
 
 def make_step_cb(
-    conn: acp.Client,
+    conn: Any,
     session_id: str,
     loop: asyncio.AbstractEventLoop,
     tool_call_ids: Dict[str, Deque[str]],
@@ -264,7 +271,7 @@ def make_step_cb(
 # ------------------------------------------------------------------
 
 def make_message_cb(
-    conn: acp.Client,
+    conn: Any,
     session_id: str,
     loop: asyncio.AbstractEventLoop,
 ) -> Callable:

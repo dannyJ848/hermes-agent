@@ -180,6 +180,11 @@ sys.stdout = sys.stderr
 _stdio_transport = StdioTransport(lambda: _real_stdout, _stdout_lock)
 
 
+class TuiGatewayServer:
+    """Public alias for TUI gateway server entry point."""
+    pass
+
+
 class _SlashWorker:
     """Persistent HermesCLI subprocess for slash commands."""
 
