@@ -89,19 +89,12 @@ _INVISIBLE_CHARS = {
 }
 
 
+from tools.threat_patterns import first_threat_message as _first_threat_message
+
+
 def _scan_memory_content(content: str) -> Optional[str]:
     """Scan memory content for injection/exfil patterns. Returns error string if blocked."""
-    # Check invisible unicode
-    for char in _INVISIBLE_CHARS:
-        if char in content:
-            return f"Blocked: content contains invisible unicode character U+{ord(char):04X} (possible injection)."
-
-    # Check threat patterns
-    for pattern, pid in _MEMORY_THREAT_PATTERNS:
-        if re.search(pattern, content, re.IGNORECASE):
-            return f"Blocked: content matches threat pattern '{pid}'. Memory entries are injected into the system prompt and must not contain injection or exfiltration payloads."
-
-    return None
+    return _first_threat_message(content, scope="strict")
 
 
 class MemoryStore:
@@ -144,11 +137,53 @@ class MemoryStore:
         self.memory_entries = self._truncate_to_limit(self.memory_entries, self.memory_char_limit)
         self.user_entries = self._truncate_to_limit(self.user_entries, self.user_char_limit)
 
+        # Sanitize entries for the system-prompt snapshot only.  Live state
+        # (memory_entries / user_entries) keeps the raw text so the user
+        # can see + remove poisoned entries via the memory tool.
+        sanitized_memory = self._sanitize_entries_for_snapshot(self.memory_entries, "MEMORY.md")
+        sanitized_user = self._sanitize_entries_for_snapshot(self.user_entries, "USER.md")
+
         # Capture frozen snapshot for system prompt injection
         self._system_prompt_snapshot = {
-            "memory": self._render_block("memory", self.memory_entries),
-            "user": self._render_block("user", self.user_entries),
+            "memory": self._render_block("memory", sanitized_memory),
+            "user": self._render_block("user", sanitized_user),
         }
+
+    @staticmethod
+    def _sanitize_entries_for_snapshot(entries: List[str], filename: str) -> List[str]:
+        """Return ``entries`` with any threat-matching entry replaced by a placeholder.
+
+        Each entry is scanned with the shared threat-pattern library at the
+        ``"strict"`` scope (same as memory writes).  On match, the entry is
+        replaced in the returned list with ``"[BLOCKED: <filename> entry
+        contained threat pattern: <ids>. Removed from system prompt.]"`` —
+        the placeholder enters the snapshot, the original entry stays in
+        live state for the user to inspect and delete.
+
+        Empty or already-block-marker entries pass through unchanged.
+        """
+        from tools.threat_patterns import scan_for_threats
+
+        sanitized: List[str] = []
+        for entry in entries:
+            if not entry or entry.startswith("[BLOCKED:"):
+                sanitized.append(entry)
+                continue
+            findings = scan_for_threats(entry, scope="strict")
+            if findings:
+                logger.warning(
+                    "Memory entry from %s blocked at load time: %s",
+                    filename, ", ".join(findings),
+                )
+                sanitized.append(
+                    f"[BLOCKED: {filename} entry contained threat pattern(s): "
+                    f"{', '.join(findings)}. Removed from system prompt; "
+                    f"use memory(action=read) to inspect and memory(action=remove) "
+                    f"to delete the original.]"
+                )
+            else:
+                sanitized.append(entry)
+        return sanitized
 
     @staticmethod
     @contextmanager
