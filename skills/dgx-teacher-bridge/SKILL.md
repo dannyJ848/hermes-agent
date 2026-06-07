@@ -23,6 +23,44 @@ DGX Hermes (Qwopus3.6-27B)
   ↓ incorporates into context via skill_view or memory
 ```
 
+## When DGX Should Request a Lesson
+
+**Use the `request_lesson` tool when:**
+- Web scraping fails due to IP blocks (Reddit, etc.)
+- Browser automation is blocked by bot detection
+- A tool consistently fails after 3+ attempts
+- You need knowledge MacBook has (API keys, proxies, etc.)
+- You see patterns like "connection refused", "403 Forbidden", "blocked"
+
+**Do NOT request a lesson for:**
+- Syntax errors in your own code (fix those yourself)
+- Logic bugs (debug those yourself)
+- Tasks DGX can complete successfully
+
+## How to Request a Lesson (DGX)
+
+```
+request_lesson(
+    task="reddit-browser-debug",
+    what_went_wrong="Reddit blocks DGX IP at network level. All approaches failed: curl, browser, old.reddit.com",
+    attempted_approaches="curl with headers, browser tool, old.reddit.com, kimi webbridge"
+)
+```
+
+This writes a request file to ~/teacher-lessons/. MacBook detects it and creates a lesson.
+
+## How to Check for Lessons (DGX)
+
+```
+check_lessons()
+```
+
+Returns count and list of available lessons. If lessons exist, read them:
+
+```
+read_lesson(lesson_name="lesson-20260606-200359-reddit-browser-debug.md")
+```
+
 ## Lesson File Format
 
 ```markdown
@@ -62,8 +100,8 @@ echo "lesson content" | dgx-teach "lesson-title"
 # Check DGX lesson inbox
 ssh djg6228@10.0.0.171 'ls -la ~/teacher-lessons/'
 
-# Mark lesson as read (on DGX)
-mv ~/teacher-lessons/lesson-*.md ~/teacher-lessons/read/
+# Check for DGX requests
+macbook-check-requests
 ```
 
 ## DGX Commands
@@ -90,18 +128,23 @@ DGX checks every 5 minutes via crontab:
 
 When DGX encounters a task it struggles with (e.g., Reddit blocked, browser failing):
 
-1. **Check lessons first**: `ls ~/teacher-lessons/*.md 2>/dev/null`
-2. **Read relevant lesson**: `cat ~/teacher-lessons/lesson-*-<task>.md`
-3. **Apply the insight**: Use the MacBook-taught approach
-4. **If no lesson exists**: Attempt task, then if MacBook succeeds, request a lesson
+1. **Try 2-3 times yourself first** — don't immediately give up
+2. **If still failing**: Use `request_lesson` tool to ask MacBook
+3. **Wait for lesson**: MacBook creates and sends it (usually within minutes)
+4. **Check for lessons**: Use `check_lessons` to see if new lessons arrived
+5. **Read and apply**: Use `read_lesson` to get the content, then apply the approach
+6. **Mark as read**: Move lesson to read/ subdirectory
 
 ## Requesting a Lesson from MacBook
 
-DGX can signal MacBook to create a lesson by writing a request file:
+DGX can signal MacBook to create a lesson by using the `request_lesson` tool:
 
-```bash
-# On DGX:
-echo "Need help with: OAuth Reddit API setup" > ~/teacher-lessons/.request
+```
+request_lesson(
+    task="reddit-oauth-setup",
+    what_went_wrong="Reddit blocks DGX IP. Need OAuth API approach from MacBook.",
+    attempted_approaches="curl, browser, old.reddit.com"
+)
 ```
 
 MacBook checks for requests during heartbeats and creates lessons.
@@ -115,6 +158,8 @@ MacBook checks for requests during heartbeats and creates lessons.
 ## Files
 
 - MacBook: `/Users/dannygomez/bin/dgx-teach`
+- MacBook: `/Users/dannygomez/bin/macbook-check-requests`
 - DGX: `~/bin/dgx-check-lessons`
+- DGX: `~/bin/dgx-request-lesson`
 - DGX: `~/teacher-lessons/` (inbox)
 - DGX: `~/teacher-lessons/read/` (archive)
