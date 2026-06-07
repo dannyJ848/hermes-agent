@@ -35,7 +35,7 @@ def _is_registry_register_call(node: ast.AST) -> bool:
         isinstance(func, ast.Attribute)
         and func.attr == "register"
         and isinstance(func.value, ast.Name)
-        and func.value.id == "registry"
+        and func.value.id in {"registry", "register"}
     )
 
 
