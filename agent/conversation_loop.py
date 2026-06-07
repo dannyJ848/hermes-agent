@@ -529,6 +529,12 @@ def run_conversation(
     try:
         from agent.cognitive_orchestrator import get_orchestrator
         _orch = get_orchestrator()
+        # Auto-initialize if agent available but not yet initialized
+        if _orch and not getattr(_orch, '_initialized', False):
+            try:
+                _orch.initialize(agent)
+            except Exception:
+                pass
         if _orch and hasattr(_orch, '_subsystems'):
             _eg = _orch._subsystems.get("evaluation_gate")
             if _eg and hasattr(_eg, 'should_proceed'):
@@ -632,7 +638,7 @@ def run_conversation(
         from agent.cognitive_orchestrator import get_orchestrator
         _orch = get_orchestrator()
         if _orch and hasattr(_orch, 'session_start'):
-            _orch.session_start(agent.session_id)
+            _orch.session_start(agent.session_id, agent=agent)
     except Exception:
         pass
 
@@ -851,6 +857,12 @@ def run_conversation(
         try:
             from agent.cognitive_orchestrator import get_orchestrator
             _orch = get_orchestrator()
+            # Auto-initialize if needed
+            if _orch and not getattr(_orch, '_initialized', False):
+                try:
+                    _orch.initialize(agent)
+                except Exception:
+                    pass
             if _orch and hasattr(_orch, 'get_enhanced_context'):
                 _ctx_items = _orch.get_enhanced_context(
                     query=original_user_message if isinstance(original_user_message, str) else "",
@@ -4008,6 +4020,12 @@ def run_conversation(
         from agent.cognitive_orchestrator import get_orchestrator
         _orch = get_orchestrator()
         if _orch and hasattr(_orch, '_subsystems') and final_response and not interrupted:
+            # Auto-initialize if needed (defensive: ensures subsystems exist before use)
+            if _orch and not getattr(_orch, '_initialized', False) and hasattr(_orch, 'initialize'):
+                try:
+                    _orch.initialize(agent)
+                except Exception:
+                    pass
             # 1. Evaluate response quality
             _eg = _orch._subsystems.get("evaluation_gate")
             if _eg and hasattr(_eg, 'evaluate'):
@@ -4176,6 +4194,13 @@ def run_conversation(
         _orch = get_orchestrator()
         if _orch and hasattr(_orch, 'session_end'):
             _orch.session_end(agent.session_id)
+        
+        # Ensure orchestrator is initialized with agent for next session
+        if _orch and not getattr(_orch, '_initialized', False):
+            try:
+                _orch.initialize(agent)
+            except Exception:
+                pass
         
         # Update cortex flywheel with session summary
         if _orch and hasattr(_orch, '_subsystems'):

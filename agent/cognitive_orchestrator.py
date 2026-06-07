@@ -126,17 +126,18 @@ class CognitiveOrchestrator:
             with cls._lock:
                 if cls._instance is None:
                     cls._instance = super().__new__(cls)
-                    cls._instance._initialized = False
+                    cls._instance._instance_initialized = False
         return cls._instance
     
     def __init__(self):
-        if self._initialized:
+        if getattr(self, '_instance_initialized', False):
             return
-        self._initialized = True
+        self._instance_initialized = True
         
         self._agent: Any = None
         self._subsystems: Dict[str, Any] = {}
         self._subsystem_status: Dict[str, str] = {}
+        self._initialized: bool = False
         self._executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="cognitive_")
         self._session_telemetry: Optional[SessionTelemetry] = None
         self._action_stack: List[Dict[str, Any]] = []
@@ -208,6 +209,10 @@ class CognitiveOrchestrator:
         Initialize all cognitive subsystems. Called once per agent instance.
         Returns status map: {subsystem_name: "active"|"failed"|"skipped"}
         """
+        if self._initialized:
+            return dict(self._subsystem_status)
+        self._initialized = True
+        
         self._agent = agent
         self._session_telemetry = SessionTelemetry(
             session_id=getattr(agent, "session_id", "unknown"),
@@ -715,9 +720,15 @@ class CognitiveOrchestrator:
             except Exception:
                 pass
     
-    def session_start(self, session_id: str = None) -> None:
-        """Initialize a new session."""
+    def session_start(self, session_id: Optional[str] = None, agent: Any = None) -> None:
+        """Initialize a new session. Auto-initializes subsystems if agent provided."""
         self._current_session_id = session_id
+        # Auto-initialize if agent provided and not yet initialized
+        if agent is not None and not self._initialized:
+            try:
+                self.initialize(agent)
+            except Exception:
+                pass
         # Initialize subsystems if needed
         try:
             self._init_cortex_flywheel()
@@ -985,7 +996,13 @@ class CognitiveOrchestrator:
     def get_evaluation_stats(self) -> Dict[str, Any]:
         """Get evaluation gate statistics."""
         if "evaluation_gate" in self._subsystems:
-            return self._subsystems["evaluation_gate"].get_stats()
+            gate = self._subsystems["evaluation_gate"]
+            if hasattr(gate, 'get_stats'):
+                return gate.get_stats()
+            elif hasattr(gate, 'get_session_summary'):
+                return gate.get_session_summary()
+            elif hasattr(gate, 'get_quality_trend'):
+                return {"quality_trend": gate.get_quality_trend()}
         return {"error": "Gate not initialized"}
     
     # ── Database Recording ───────────────────────────────────────────────────
