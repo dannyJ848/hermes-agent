@@ -412,7 +412,7 @@ class _CortexLearningStore:
         self._cerebrum_path = Path.home() / ".hermes" / "cerebrum_memory.db"
     
     def get_usage_stats(self, memory_ids: List[str]) -> Dict[str, Dict]:
-        """Return usage stats for given memory IDs from cortex.
+        """Return usage stats for given memory IDs from local SQLite.
         
         Called by adaptive_injection.py every turn — keep it fast.
         """
@@ -421,21 +421,25 @@ class _CortexLearningStore:
         
         stats = {}
         try:
-            with _cortex_cursor() as cur:
-                # Batch query all at once
-                placeholders = ','.join(['%s'] * len(memory_ids))
-                cur.execute(f"""
-                    SELECT id, usefulness_score, success_count, failure_count, access_count
-                    FROM memory_units
-                    WHERE id IN ({placeholders})
-                """, tuple(memory_ids))
-                for row in cur.fetchall():
-                    stats[str(row[0])] = {
-                        "usefulness_score": row[1] or 0.5,
-                        "success_count": row[2] or 0,
-                        "failure_count": row[3] or 0,
-                        "access_count": row[4] or 0,
-                    }
+            import sqlite3
+            conn = sqlite3.connect(str(self._cerebrum_path))
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            # Batch query all at once using ? placeholders
+            placeholders = ','.join(['?'] * len(memory_ids))
+            cur.execute(f"""
+                SELECT id, trust, salience, access_count
+                FROM memory_units
+                WHERE id IN ({placeholders})
+            """, tuple(memory_ids))
+            for row in cur.fetchall():
+                stats[str(row["id"])] = {
+                    "usefulness_score": row["trust"] or 0.5,
+                    "success_count": row["salience"] or 0,
+                    "failure_count": 0,
+                    "access_count": row["access_count"] or 0,
+                }
+            conn.close()
         except Exception as e:
             logger.debug("get_usage_stats failed: %s", e)
         
@@ -457,29 +461,25 @@ class _CortexLearningStore:
             conn = sqlite3.connect(str(self._cerebrum_path))
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
+            # Query actual schema: id, tip_hash, topic, tip_text, priority, source_sessions, verification_status, created_at, confidence, category
             cur.execute("""
-                SELECT tip_type, condition, recommendation, rationale, tool_name, domain, confidence, frequency, upvotes, downvotes
+                SELECT id, tip_hash, topic, tip_text, priority, confidence, category, source_sessions, verification_status
                 FROM distilled_tips
                 WHERE confidence >= 0.6
-                ORDER BY frequency DESC, confidence DESC, upvotes DESC
+                ORDER BY priority DESC, confidence DESC, created_at DESC
                 LIMIT ?
             """, (limit,))
             for row in cur.fetchall():
-                # Build content from condition + recommendation + rationale
-                parts = []
-                if row["condition"]:
-                    parts.append(f"Condition: {row['condition']}")
-                if row["recommendation"]:
-                    parts.append(f"Action: {row['recommendation']}")
-                if row["rationale"]:
-                    parts.append(f"Why: {row['rationale']}")
-                content = " | ".join(parts) if parts else ""
+                content = row["tip_text"] or row["topic"] or ""
                 tips.append({
                     "content": content,
-                    "category": row["domain"] or row["tip_type"] or "general",
-                    "confidence": row["confidence"],
-                    "usage_count": row["frequency"] or 0,
-                    "tool_name": row["tool_name"] or "",
+                    "category": row["category"] or "general",
+                    "confidence": row["confidence"] or 0.5,
+                    "usage_count": 0,
+                    "tool_name": "",
+                    "tip_hash": row["tip_hash"] or "",
+                    "priority": row["priority"] or 5,
+                    "verification_status": row["verification_status"] or "unverified",
                 })
             conn.close()
         except Exception as e:

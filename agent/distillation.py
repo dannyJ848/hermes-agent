@@ -78,21 +78,55 @@ class DistillationPipeline:
     def _collect_experiences(self, hours: int = 24) -> List[Dict]:
         """Gather experiences from all sources."""
         all_exps = []
-        # From cortex
-        if self.cortex:
-            all_exps.extend(self.cortex.get_recent_experiences(hours=hours))
+        # From cortex (if available and has method)
+        if self.cortex and hasattr(self.cortex, 'get_recent_experiences'):
+            try:
+                all_exps.extend(self.cortex.get_recent_experiences(hours=hours))
+            except Exception:
+                pass
         # From cerebrum episodic
-        if self.cerebrum:
-            eps = self.cerebrum.get_episodes(min_importance=0.4, limit=200)
-            for ep in eps:
-                all_exps.append({
-                    "session_id": ep.get("session_id", "unknown"),
-                    "capture_type": ep.get("event_type", "unknown"),
-                    "description": ep.get("content", ""),
-                    "outcome": None,
-                    "lessons": None,
-                    "importance": ep.get("importance_score", 0.5)
-                })
+        if self.cerebrum and hasattr(self.cerebrum, 'get_episodes'):
+            try:
+                eps = self.cerebrum.get_episodes(min_importance=0.4, limit=200)
+                for ep in eps:
+                    all_exps.append({
+                        "session_id": ep.get("session_id", "unknown"),
+                        "capture_type": ep.get("event_type", "unknown"),
+                        "description": ep.get("content", ""),
+                        "outcome": None,
+                        "lessons": None,
+                        "importance": ep.get("importance_score", 0.5)
+                    })
+            except Exception:
+                pass
+        # Fallback: read from SQLite experiences table directly
+        if not all_exps:
+            try:
+                conn = sqlite3.connect(str(HERMES_HOME / "cerebrum_memory.db"))
+                conn.row_factory = sqlite3.Row
+                cur = conn.cursor()
+                cur.execute("""
+                    SELECT id, action_type, action_detail, result, lesson, error_pattern, 
+                           context_tags, last_seen, created_at
+                    FROM experiences
+                    WHERE lesson != '' AND lesson IS NOT NULL
+                      AND last_seen > datetime('now', '-{} hours')
+                    ORDER BY frequency DESC, last_seen DESC
+                    LIMIT 200
+                """.format(hours))
+                for row in cur.fetchall():
+                    all_exps.append({
+                        "session_id": str(row["id"]),
+                        "capture_type": row["action_type"] or "unknown",
+                        "description": row["action_detail"] or "",
+                        "outcome": row["result"] or "unknown",
+                        "lessons": row["lesson"] or "",
+                        "error_pattern": row["error_pattern"] or "",
+                        "importance": 0.6 if row["result"] == "regression" else 0.4
+                    })
+                conn.close()
+            except Exception:
+                pass
         return all_exps
 
     @_safe
@@ -179,10 +213,28 @@ class DistillationPipeline:
     @_safe
     def _deduplicate_tip(self, tip: Dict) -> Optional[Dict]:
         """Check semantic similarity against existing tips."""
-        if not self.cerebrum:
-            return tip
-        existing = self.cerebrum.get_all_tips(limit=200)
         tip_hash = hashlib.sha256(tip["text"].encode()).hexdigest()[:16]
+        
+        # Try cerebrum first
+        existing = []
+        if self.cerebrum and hasattr(self.cerebrum, 'get_all_tips'):
+            try:
+                existing = self.cerebrum.get_all_tips(limit=200)
+            except Exception:
+                pass
+        
+        # Fallback: read from SQLite
+        if not existing:
+            try:
+                conn = sqlite3.connect(str(HERMES_HOME / "cerebrum_memory.db"))
+                conn.row_factory = sqlite3.Row
+                cur = conn.cursor()
+                cur.execute("SELECT tip_hash, tip_text FROM distilled_tips LIMIT 200")
+                existing = [dict(row) for row in cur.fetchall()]
+                conn.close()
+            except Exception:
+                pass
+        
         # Exact hash check
         for ex in existing:
             if ex.get("tip_hash") == tip_hash:
@@ -190,11 +242,10 @@ class DistillationPipeline:
         # Simple text similarity: shared word ratio
         tip_words = set(re.findall(r"\b[a-z]{4,}\b", tip["text"].lower()))
         for ex in existing:
-            ex_words = set(re.findall(r"\b[a-z]{4,}\b", ex.get("tip_text", "").lower()))
+            ex_words = set(re.findall(r"\b[a-z]{4,}\b", ex.get("tip_text", ex.get("text", "")).lower()))
             if tip_words and ex_words:
                 overlap = len(tip_words & ex_words) / len(tip_words | ex_words)
                 if overlap > 0.85:
-                    # Merge: keep higher priority
                     return None
         return tip
 
