@@ -1930,6 +1930,14 @@ class AIAgent:
         NOT called per-turn — only at CLI exit, /reset, gateway
         session expiry, etc.
         """
+        # Notify cognitive orchestrator of session end
+        try:
+            _orch = getattr(self, 'cognitive_orchestrator', None)
+            if _orch and hasattr(_orch, 'end_session'):
+                _orch.end_session({"session_id": self.session_id, "messages": messages or []})
+        except Exception:
+            pass
+        
         if self._memory_manager:
             try:
                 self._memory_manager.on_session_end(messages or [])
@@ -1954,6 +1962,14 @@ class AIAgent:
         Called when session_id rotates (e.g. /new, context compression);
         providers keep their state and continue running under the old
         session_id — they just flush pending extraction now."""
+        # Notify cognitive orchestrator of session rotation
+        try:
+            _orch = getattr(self, 'cognitive_orchestrator', None)
+            if _orch and hasattr(_orch, 'end_session'):
+                _orch.end_session({"session_id": self.session_id, "messages": messages or [], "rotation": True})
+        except Exception:
+            pass
+        
         if self._memory_manager:
             try:
                 self._memory_manager.on_session_end(messages or [])
@@ -1962,9 +1978,7 @@ class AIAgent:
         # Notify context engine of session end too — same lifecycle moment as
         # the memory manager's on_session_end. Without this, engines that
         # accumulate per-session state (DAGs, summaries) leak that state from
-        # the rotated-out session into whatever comes next under the same
-        # compressor instance. Mirrors the call in shutdown_memory_provider().
-        # See issue #22394.
+        # the old session into the new one.
         if hasattr(self, "context_compressor") and self.context_compressor:
             try:
                 self.context_compressor.on_session_end(

@@ -1567,13 +1567,35 @@ def invoke_tool(agent, function_name: str, function_args: dict, effective_task_i
     elif function_name == "delegate_task":
         return agent._dispatch_delegate_task(function_args)
     else:
-        return _ra().handle_function_call(
-            function_name, function_args, effective_task_id,
-            tool_call_id=tool_call_id,
-            session_id=agent.session_id or "",
-            enabled_tools=list(agent.valid_tool_names) if agent.valid_tool_names else None,
-            skip_pre_tool_call_hook=True,
-        )
+        # ── Cognitive orchestrator hooks ──────────────────────────────
+        _co_result = None
+        _co_start = None
+        try:
+            _orch = getattr(agent, 'cognitive_orchestrator', None)
+            if _orch and hasattr(_orch, 'before_action'):
+                _co_result = _orch.before_action(function_name, function_args)
+        except Exception:
+            pass
+        
+        _co_start = __import__('time').time()
+        _tool_result = None
+        try:
+            _tool_result = _ra().handle_function_call(
+                function_name, function_args, effective_task_id,
+                tool_call_id=tool_call_id,
+                session_id=agent.session_id or "",
+                enabled_tools=list(agent.valid_tool_names) if agent.valid_tool_names else None,
+                skip_pre_tool_call_hook=True,
+            )
+        finally:
+            _co_duration = (__import__('time').time() - _co_start) * 1000 if _co_start else 0
+            try:
+                _orch = getattr(agent, 'cognitive_orchestrator', None)
+                if _orch and hasattr(_orch, 'after_action'):
+                    _orch.after_action(function_name, function_args, _tool_result, _co_duration)
+            except Exception:
+                pass
+        return _tool_result
 
 
 
