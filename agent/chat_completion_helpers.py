@@ -935,6 +935,25 @@ def handle_max_iterations(agent, messages: list, api_call_count: int) -> str:
         effective_system = agent._cached_system_prompt or ""
         if agent.ephemeral_system_prompt:
             effective_system = (effective_system + "\n\n" + agent.ephemeral_system_prompt).strip()
+        
+        # ── Subconscious whisper injection ──────────────────────────────
+        # Inject relevant tips based on recent conversation context
+        try:
+            from agent.whisper_injector import WhisperInjector
+            whisper = WhisperInjector()
+            # Build context from last few messages
+            context_parts = []
+            for msg in messages[-6:]:
+                if isinstance(msg, dict) and msg.get("content"):
+                    content = msg.get("content", "")
+                    if isinstance(content, str):
+                        context_parts.append(content[:200])
+            context = " ".join(context_parts)
+            if context:
+                effective_system = whisper.inject(effective_system, context)
+        except Exception:
+            pass
+        
         if effective_system:
             api_messages = [{"role": "system", "content": effective_system}] + api_messages
         if agent.prefill_messages:
