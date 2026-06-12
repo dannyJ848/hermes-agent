@@ -658,36 +658,44 @@ def _wire_learning_system(agent_class):
     agent_class._invoke_tool = wrapped_invoke
     
     # Hook session end for reflection
-    if hasattr(agent_class, 'session_end') or hasattr(agent_class, 'cleanup'):
-        end_method = getattr(agent_class, 'session_end', None) or getattr(agent_class, 'cleanup', None)
-        if end_method:
-            original_end = end_method
-            @wraps(original_end)
-            def wrapped_end(self, *args, **kwargs):
-                try:
-                    session_id = getattr(self, 'session_id', 'unknown')
-                    # Run reflection
-                    cortex = _get_cortex()
-                    if cortex:
-                        reflection = cortex.run_reflection_cycle()
-                        logger.info("[MEGA] Reflection cycle: %s", reflection)
-                    # Run distillation
-                    distillation = _get_distillation()
-                    if distillation:
-                        tips = distillation.distill_last_24h()
-                        logger.info("[MEGA] Distilled %d tips", len(tips))
-                    # Cleanup old episodes
-                    cerebrum = _get_cerebrum()
-                    if cerebrum:
-                        deleted = cerebrum.cleanup_old_episodes(days=7)
-                        logger.info("[MEGA] Cleaned up %d old episodes", deleted)
-                except Exception as e:
-                    logger.debug("[MEGA] Learning end hook failed: %s", e)
-                return original_end(self, *args, **kwargs)
-            if hasattr(agent_class, 'session_end'):
-                agent_class.session_end = wrapped_end
-            else:
-                agent_class.cleanup = wrapped_end
+    # AIAgent uses shutdown_memory_provider() for actual session end
+    # and commit_memory_session() for session rotation (e.g. /new, compression)
+    end_methods = []
+    if hasattr(agent_class, 'shutdown_memory_provider'):
+        end_methods.append(('shutdown_memory_provider', agent_class.shutdown_memory_provider))
+    if hasattr(agent_class, 'commit_memory_session'):
+        end_methods.append(('commit_memory_session', agent_class.commit_memory_session))
+    if hasattr(agent_class, 'session_end'):
+        end_methods.append(('session_end', agent_class.session_end))
+    if hasattr(agent_class, 'cleanup'):
+        end_methods.append(('cleanup', agent_class.cleanup))
+    
+    for method_name, original_end in end_methods:
+        @wraps(original_end)
+        def wrapped_end(self, *args, **kwargs):
+            try:
+                session_id = getattr(self, 'session_id', 'unknown')
+                # Run reflection
+                cortex = _get_cortex()
+                if cortex:
+                    reflection = cortex.run_reflection_cycle()
+                    logger.info("[MEGA] Reflection cycle: %s", reflection)
+                # Run distillation
+                distillation = _get_distillation()
+                if distillation:
+                    tips = distillation.distill_last_24h()
+                    logger.info("[MEGA] Distilled %d tips", len(tips))
+                # Cleanup old episodes
+                cerebrum = _get_cerebrum()
+                if cerebrum:
+                    deleted = cerebrum.cleanup_old_episodes(days=7)
+                    logger.info("[MEGA] Cleaned up %d old episodes", deleted)
+            except Exception as e:
+                logger.debug("[MEGA] Learning end hook failed: %s", e)
+            return original_end(self, *args, **kwargs)
+        
+        setattr(agent_class, method_name, wrapped_end)
+        logger.info("[MEGA] Wired learning hook into %s", method_name)
     
     logger.info("[MEGA] Learning system wired into AIAgent lifecycle")
 
