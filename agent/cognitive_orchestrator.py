@@ -288,13 +288,18 @@ class CognitiveOrchestrator:
         return epm
     
     def _init_skill_tracker(self):
-        """Initialize skill effectiveness tracking."""
-        from agent.skill_effectiveness_tracker import SkillEffectivenessTracker
+        """Initialize skill effectiveness tracking.
+
+        Uses the real SkillTracker (agent.skill_tracker) with SQLite persistence
+        instead of the historical stub. Honors the orchestrator-supplied tracker_db
+        path (falls back to cerebrum_memory.db).
+        """
+        from agent.skill_tracker import SkillTracker
         from pathlib import Path
         skills_dir = Path.home() / '.hermes' / 'skills'
         experiences_db = self._db_path
         tracker_db = self._db_path.parent / 'skill_tracker.db'
-        tracker = SkillEffectivenessTracker(
+        tracker = SkillTracker(
             skills_dir=str(skills_dir),
             experiences_db=str(experiences_db),
             tracker_db=str(tracker_db),
