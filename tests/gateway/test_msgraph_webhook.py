@@ -1,16 +1,16 @@
 """Tests for the Microsoft Graph webhook adapter."""
 
 import asyncio
-import json
 
 import pytest
 
 from gateway.config import GatewayConfig, Platform, PlatformConfig, _apply_env_overrides
-from gateway.platforms.msgraph_webhook import MSGraphWebhookAdapter
+from gateway.platforms.msgraph_webhook import AIOHTTP_AVAILABLE, MSGraphWebhookAdapter
 
 
 def _make_adapter(**extra_overrides) -> MSGraphWebhookAdapter:
     extra = {
+        "host": "127.0.0.1",
         "client_state": "expected-client-state",
         "accepted_resources": ["communications/onlineMeetings"],
     }
@@ -71,6 +71,37 @@ class TestMSGraphWebhookConfig:
 
 class TestMSGraphValidationHandshake:
     @pytest.mark.anyio
+    async def test_connect_requires_client_state(self):
+        if not AIOHTTP_AVAILABLE:
+            pytest.skip("aiohttp not installed")
+        adapter = MSGraphWebhookAdapter(PlatformConfig(enabled=True, extra={}))
+        connected = await adapter.connect()
+        assert connected is False
+        # is_connected is a @property on the base adapter, not a method.
+        assert adapter.is_connected is False
+
+    @pytest.mark.anyio
+    async def test_connect_requires_source_allowlist_on_public_bind(self):
+        if not AIOHTTP_AVAILABLE:
+            pytest.skip("aiohttp not installed")
+        adapter = _make_adapter(host="0.0.0.0", port=0, allowed_source_cidrs=[])
+        connected = await adapter.connect()
+        assert connected is False
+        assert adapter.is_connected is False
+
+    @pytest.mark.anyio
+    async def test_connect_allows_loopback_without_source_allowlist(self):
+        if not AIOHTTP_AVAILABLE:
+            pytest.skip("aiohttp not installed")
+        adapter = _make_adapter(host="127.0.0.1", port=0, allowed_source_cidrs=[])
+        try:
+            connected = await adapter.connect()
+            assert connected is True
+            assert adapter.is_connected is True
+        finally:
+            await adapter.disconnect()
+
+    @pytest.mark.anyio
     async def test_validation_token_echo_on_get(self):
         adapter = _make_adapter()
         resp = await adapter._handle_validation(
@@ -100,7 +131,22 @@ class TestMSGraphValidationHandshake:
 
 class TestMSGraphNotifications:
     @pytest.mark.anyio
-    @pytest.mark.skip(reason="asyncio/trio event loop incompatibility — upstream issue")
+    async def test_missing_client_state_is_auth_rejected(self):
+        adapter = _make_adapter(client_state=None)
+        payload = {
+            "value": [
+                {
+                    "id": "notif-no-client-state",
+                    "subscriptionId": "sub-1",
+                    "changeType": "updated",
+                    "resource": "communications/onlineMeetings/meeting-1",
+                }
+            ]
+        }
+        resp = await adapter._handle_notification(_FakeRequest(json_payload=payload))
+        assert resp.status == 403
+
+    @pytest.mark.anyio
     async def test_valid_notification_accepted_and_scheduled(self):
         adapter = _make_adapter()
         scheduled: list[tuple[dict, object]] = []
@@ -138,7 +184,6 @@ class TestMSGraphNotifications:
         assert event.message_id == "id:notif-1"
 
     @pytest.mark.anyio
-    @pytest.mark.skip(reason="asyncio/trio event loop incompatibility — upstream issue")
     async def test_bad_client_state_rejected_as_auth_failure(self):
         """Every-item-bad-clientState batches return 403 so forged POSTs stop retrying."""
         adapter = _make_adapter()
@@ -203,7 +248,6 @@ class TestMSGraphNotifications:
         assert expected == "expected-client-state"
 
     @pytest.mark.anyio
-    @pytest.mark.skip(reason="asyncio/trio event loop incompatibility — upstream issue")
     async def test_duplicate_notification_deduped(self):
         adapter = _make_adapter()
         scheduled: list[tuple[dict, object]] = []
@@ -236,7 +280,6 @@ class TestMSGraphNotifications:
         assert len(scheduled) == 1
 
     @pytest.mark.anyio
-    @pytest.mark.skip(reason="asyncio/trio event loop incompatibility — upstream issue")
     async def test_notifications_without_id_are_not_deduped(self):
         adapter = _make_adapter()
         scheduled: list[tuple[dict, object]] = []
@@ -359,9 +402,9 @@ class TestMSGraphNotifications:
 
 class TestMSGraphSourceIPAllowlist:
     @pytest.mark.anyio
-    async def test_disabled_by_default_allows_all(self):
-        """Empty allowlist preserves pre-existing behavior (dev tunnels, localhost)."""
-        adapter = _make_adapter()  # no allowed_source_cidrs set
+    async def test_public_bind_without_allowlist_fails_closed(self):
+        """Public binds must not accept requests until a source allowlist is configured."""
+        adapter = _make_adapter(host="0.0.0.0", allowed_source_cidrs=[])
         payload = {
             "value": [
                 {
@@ -373,6 +416,24 @@ class TestMSGraphSourceIPAllowlist:
         }
         resp = await adapter._handle_notification(
             _FakeRequest(json_payload=payload, remote="203.0.113.99")
+        )
+        assert resp.status == 403
+
+    @pytest.mark.anyio
+    async def test_loopback_bind_without_allowlist_still_accepts_local_requests(self):
+        """Loopback-only listeners may rely on local proxying/tunnels instead of CIDRs."""
+        adapter = _make_adapter(host="127.0.0.1", allowed_source_cidrs=[])
+        payload = {
+            "value": [
+                {
+                    "id": "notif-ip-local",
+                    "resource": "communications/onlineMeetings/m",
+                    "clientState": "expected-client-state",
+                }
+            ]
+        }
+        resp = await adapter._handle_notification(
+            _FakeRequest(json_payload=payload, remote="127.0.0.1")
         )
         assert resp.status == 202
 
@@ -417,6 +478,13 @@ class TestMSGraphSourceIPAllowlist:
         resp = await adapter._handle_validation(
             _FakeRequest(query={"validationToken": "probe"}, remote="203.0.113.99")
         )
+        assert resp.status == 403
+
+    @pytest.mark.anyio
+    async def test_health_endpoint_also_respects_allowlist(self):
+        """The readiness endpoint should not leak counters to arbitrary sources."""
+        adapter = _make_adapter(allowed_source_cidrs=["10.0.0.0/8"])
+        resp = await adapter._handle_health(_FakeRequest(remote="203.0.113.99"))
         assert resp.status == 403
 
     @pytest.mark.anyio

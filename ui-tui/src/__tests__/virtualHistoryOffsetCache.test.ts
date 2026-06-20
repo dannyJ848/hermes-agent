@@ -8,6 +8,7 @@ import { useVirtualHistory, virtualHistorySnapshotKey } from '../hooks/useVirtua
 
 interface Item {
   height: number
+  heightAfterResize?: number
   key: string
 }
 
@@ -49,12 +50,17 @@ const viewportIsMounted = (items: readonly Item[], virtualHistory: ReturnType<ty
   return top >= span.top && bottom <= span.bottom
 }
 
+const itemHeightForColumns = (item: Item | undefined, columns: number) =>
+  columns >= 80 ? (item?.heightAfterResize ?? item?.height ?? 1) : (item?.height ?? 1)
+
 function Harness({
+  columns = 80,
   expose,
   height = 10,
   items,
   maxMounted = 16
 }: {
+  columns?: number
   expose: React.MutableRefObject<Exposed | null>
   height?: number
   items: readonly Item[]
@@ -62,9 +68,9 @@ function Harness({
 }) {
   const scrollRef = useRef<ScrollBoxHandle | null>(null)
 
-  const virtualHistory = useVirtualHistory(scrollRef, items, 80, {
+  const virtualHistory = useVirtualHistory(scrollRef, items, columns, {
     coldStartCount: 16,
-    estimateHeight: index => items[index]?.height ?? 1,
+    estimateHeight: index => itemHeightForColumns(items[index], columns),
     maxMounted,
     overscan: 2
   })
@@ -85,7 +91,11 @@ function Harness({
         .map(item =>
           React.createElement(
             Box,
-            { height: item.height, key: item.key, ref: virtualHistory.measureRef(item.key) },
+            {
+              height: itemHeightForColumns(item, columns),
+              key: item.key,
+              ref: virtualHistory.measureRef(item.key)
+            },
             React.createElement(Text, null, item.key)
           )
         ),
@@ -129,10 +139,73 @@ describe('useVirtualHistory offset cache reuse', () => {
 
     try {
       await delay(20)
-      instance.rerender(React.createElement(Harness, { expose, height: 24, items, maxMounted: 80 }))
+      instance.rerender(React.createElement(Harness, { expose, height: 9, items, maxMounted: 80 }))
       await delay(80)
 
       expect(viewportIsMounted(items, expose.current!.virtualHistory, expose.current!.scroll!)).toBe(true)
+    } finally {
+      instance.unmount()
+      instance.cleanup()
+    }
+  })
+
+  it('recomputes tail coverage when wrapped rows shrink after a width resize', async () => {
+    const items = Array.from({ length: 100 }, (_, index) => ({
+      height: 4,
+      heightAfterResize: 1,
+      key: `item-${index}`
+    }))
+
+    const expose = { current: null as Exposed | null }
+    const streams = makeStreams()
+
+    const instance = renderSync(
+      React.createElement(Harness, { columns: 40, expose, height: 10, items, maxMounted: 80 }),
+      {
+        patchConsole: false,
+        stderr: streams.stderr as NodeJS.WriteStream,
+        stdin: streams.stdin as NodeJS.ReadStream,
+        stdout: streams.stdout as NodeJS.WriteStream
+      }
+    )
+
+    try {
+      await delay(20)
+      instance.rerender(React.createElement(Harness, { columns: 80, expose, height: 10, items, maxMounted: 80 }))
+      await delay(80)
+
+      const resizedItems = items.map(item => ({ height: item.heightAfterResize!, key: item.key }))
+
+      expect(viewportIsMounted(resizedItems, expose.current!.virtualHistory, expose.current!.scroll!)).toBe(true)
+    } finally {
+      instance.unmount()
+      instance.cleanup()
+    }
+  })
+
+  it('keeps sticky scroll at the bottom when one tall tail row resizes', async () => {
+    const items = [{ height: 90, heightAfterResize: 50, key: 'tail' }]
+    const expose = { current: null as Exposed | null }
+    const streams = makeStreams()
+
+    const instance = renderSync(
+      React.createElement(Harness, { columns: 70, expose, height: 18, items, maxMounted: 80 }),
+      {
+        patchConsole: false,
+        stderr: streams.stderr as NodeJS.WriteStream,
+        stdin: streams.stdin as NodeJS.ReadStream,
+        stdout: streams.stdout as NodeJS.WriteStream
+      }
+    )
+
+    try {
+      await delay(20)
+      instance.rerender(React.createElement(Harness, { columns: 120, expose, height: 36, items, maxMounted: 80 }))
+      await delay(80)
+
+      const scroll = expose.current!.scroll!
+
+      expect(scroll.getScrollTop()).toBe(scroll.getScrollHeight() - scroll.getViewportHeight())
     } finally {
       instance.unmount()
       instance.cleanup()

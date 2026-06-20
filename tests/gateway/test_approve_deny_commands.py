@@ -8,7 +8,6 @@ Supports multiple concurrent approvals (parallel subagents, execute_code)
 via a per-session queue.
 """
 
-import asyncio
 import os
 import threading
 import time
@@ -19,7 +18,7 @@ import pytest
 
 from gateway.config import GatewayConfig, Platform, PlatformConfig
 from gateway.platforms.base import MessageEvent
-from gateway.session import SessionEntry, SessionSource, build_session_key
+from gateway.session import SessionSource
 
 
 def _make_source() -> SessionSource:
@@ -75,7 +74,6 @@ def _clear_approval_state():
     mod._session_approved.clear()
     mod._permanent_approved.clear()
     mod._pending.clear()
-    mod._session_yolo.clear()
 
 
 # ------------------------------------------------------------------
@@ -368,10 +366,6 @@ class TestBlockingApprovalE2E:
         os.environ.pop("HERMES_GATEWAY_SESSION", None)
         os.environ.pop("HERMES_EXEC_ASK", None)
         os.environ.pop("HERMES_SESSION_KEY", None)
-        # Also clear any cached config that might leak from other tests
-        from tools.approval import _get_approval_mode
-        import hermes_cli.config
-        hermes_cli.config._config_cache = None
 
     def test_blocking_approval_approve_once(self):
         """check_all_command_guards blocks until resolve_gateway_approval is called."""
@@ -380,48 +374,46 @@ class TestBlockingApprovalE2E:
             resolve_gateway_approval, check_all_command_guards,
         )
 
-        # Force approval mode to manual so the test actually blocks
-        with patch("tools.approval._get_approval_mode", return_value="manual"):
-            session_key = "e2e-test"
-            notified = []
+        session_key = "e2e-test"
+        notified = []
 
-            register_gateway_notify(session_key, lambda d: notified.append(d))
+        register_gateway_notify(session_key, lambda d: notified.append(d))
 
-            result_holder = [None]
+        result_holder = [None]
 
-            def agent_thread():
-                from tools.approval import reset_current_session_key, set_current_session_key
+        def agent_thread():
+            from tools.approval import reset_current_session_key, set_current_session_key
 
-                token = set_current_session_key(session_key)
-                os.environ["HERMES_GATEWAY_SESSION"] = "1"
-                os.environ["HERMES_EXEC_ASK"] = "1"
-                os.environ["HERMES_SESSION_KEY"] = session_key
-                try:
-                    result_holder[0] = check_all_command_guards(
-                        "rm -rf /important", "local"
-                    )
-                finally:
-                    os.environ.pop("HERMES_GATEWAY_SESSION", None)
-                    os.environ.pop("HERMES_EXEC_ASK", None)
-                    os.environ.pop("HERMES_SESSION_KEY", None)
-                    reset_current_session_key(token)
+            token = set_current_session_key(session_key)
+            os.environ["HERMES_GATEWAY_SESSION"] = "1"
+            os.environ["HERMES_EXEC_ASK"] = "1"
+            os.environ["HERMES_SESSION_KEY"] = session_key
+            try:
+                result_holder[0] = check_all_command_guards(
+                    "rm -rf /important", "local"
+                )
+            finally:
+                os.environ.pop("HERMES_GATEWAY_SESSION", None)
+                os.environ.pop("HERMES_EXEC_ASK", None)
+                os.environ.pop("HERMES_SESSION_KEY", None)
+                reset_current_session_key(token)
 
-            t = threading.Thread(target=agent_thread)
-            t.start()
+        t = threading.Thread(target=agent_thread)
+        t.start()
 
-            for _ in range(200):
-                if notified:
-                    break
-                time.sleep(0.05)
+        for _ in range(50):
+            if notified:
+                break
+            time.sleep(0.05)
 
-            assert len(notified) == 1
-            assert "rm -rf /important" in notified[0]["command"]
+        assert len(notified) == 1
+        assert "rm -rf /important" in notified[0]["command"]
 
-            resolve_gateway_approval(session_key, "once")
-            t.join(timeout=5)
+        resolve_gateway_approval(session_key, "once")
+        t.join(timeout=5)
 
-            assert result_holder[0] is not None
-            assert result_holder[0]["approved"] is True
+        assert result_holder[0] is not None
+        assert result_holder[0]["approved"] is True
         unregister_gateway_notify(session_key)
 
     def test_blocking_approval_deny(self):
@@ -431,44 +423,42 @@ class TestBlockingApprovalE2E:
             resolve_gateway_approval, check_all_command_guards,
         )
 
-        # Force approval mode to manual so the test actually blocks
-        with patch("tools.approval._get_approval_mode", return_value="manual"):
-            session_key = "e2e-deny"
-            notified = []
-            register_gateway_notify(session_key, lambda d: notified.append(d))
+        session_key = "e2e-deny"
+        notified = []
+        register_gateway_notify(session_key, lambda d: notified.append(d))
 
-            result_holder = [None]
+        result_holder = [None]
 
-            def agent_thread():
-                from tools.approval import reset_current_session_key, set_current_session_key
+        def agent_thread():
+            from tools.approval import reset_current_session_key, set_current_session_key
 
-                token = set_current_session_key(session_key)
-                os.environ["HERMES_GATEWAY_SESSION"] = "1"
-                os.environ["HERMES_EXEC_ASK"] = "1"
-                os.environ["HERMES_SESSION_KEY"] = session_key
-                try:
-                    result_holder[0] = check_all_command_guards(
-                        "rm -rf /important", "local"
-                    )
-                finally:
-                    os.environ.pop("HERMES_GATEWAY_SESSION", None)
-                    os.environ.pop("HERMES_EXEC_ASK", None)
-                    os.environ.pop("HERMES_SESSION_KEY", None)
-                    reset_current_session_key(token)
+            token = set_current_session_key(session_key)
+            os.environ["HERMES_GATEWAY_SESSION"] = "1"
+            os.environ["HERMES_EXEC_ASK"] = "1"
+            os.environ["HERMES_SESSION_KEY"] = session_key
+            try:
+                result_holder[0] = check_all_command_guards(
+                    "rm -rf /important", "local"
+                )
+            finally:
+                os.environ.pop("HERMES_GATEWAY_SESSION", None)
+                os.environ.pop("HERMES_EXEC_ASK", None)
+                os.environ.pop("HERMES_SESSION_KEY", None)
+                reset_current_session_key(token)
 
-            t = threading.Thread(target=agent_thread)
-            t.start()
-            for _ in range(200):
-                if notified:
-                    break
-                time.sleep(0.05)
+        t = threading.Thread(target=agent_thread)
+        t.start()
+        for _ in range(50):
+            if notified:
+                break
+            time.sleep(0.05)
 
-            resolve_gateway_approval(session_key, "deny")
-            t.join(timeout=5)
+        resolve_gateway_approval(session_key, "deny")
+        t.join(timeout=5)
 
-            assert result_holder[0]["approved"] is False
-            assert "BLOCKED" in result_holder[0]["message"]
-            unregister_gateway_notify(session_key)
+        assert result_holder[0]["approved"] is False
+        assert "BLOCKED" in result_holder[0]["message"]
+        unregister_gateway_notify(session_key)
 
     def test_blocking_approval_timeout(self):
         """check_all_command_guards returns BLOCKED on timeout."""
@@ -638,8 +628,13 @@ class TestFallbackNoCallback:
         _clear_approval_state()
 
     def test_no_callback_returns_approval_required(self):
-        """Without a registered callback, the old approval_required path is used."""
-        from tools.approval import check_all_command_guards, _pending
+        """Without a registered callback, the fallback returns pending_approval.
+
+        PR #6d495d9e7 renamed the LLM-visible status from ``approval_required``
+        to ``pending_approval`` to make the state distinguishable from a
+        failed tool call.
+        """
+        from tools.approval import check_all_command_guards
 
         os.environ["HERMES_EXEC_ASK"] = "1"
         os.environ["HERMES_SESSION_KEY"] = "no-callback-test"
@@ -651,3 +646,4 @@ class TestFallbackNoCallback:
 
         assert result["approved"] is False
         assert result.get("status") == "pending_approval"
+        assert result.get("approval_pending") is True

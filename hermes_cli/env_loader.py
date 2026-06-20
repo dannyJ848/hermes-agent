@@ -29,6 +29,15 @@ _WARNED_KEYS: set[str] = set()
 # the .env case and they don't know Bitwarden is wired up).
 _SECRET_SOURCES: dict[str, str] = {}
 
+# HERMES_HOME paths we've already pulled external secrets for during this
+# process.  ``load_hermes_dotenv()`` is called at module-import time from
+# several hot modules (cli.py, hermes_cli/main.py, run_agent.py,
+# trajectory_compressor.py, gateway/run.py, ...), so without this guard the
+# Bitwarden status line gets printed 3-5x per startup.  Bitwarden's own
+# in-process cache prevents redundant network calls, but the print, the
+# config re-parse, and the ASCII sanitization sweep still ran every time.
+_APPLIED_HOMES: set[str] = set()
+
 
 def get_secret_source(env_var: str) -> str | None:
     """Return the label of the secret source that supplied ``env_var``, if any.
@@ -41,6 +50,19 @@ def get_secret_source(env_var: str) -> str | None:
     must never treat it as authorization to persist the raw value.
     """
     return _SECRET_SOURCES.get(env_var)
+
+
+def reset_secret_source_cache() -> None:
+    """Forget which HERMES_HOME paths have already had external secrets applied.
+
+    The first call to ``_apply_external_secret_sources(home_path)`` in a
+    process pulls from Bitwarden (or other configured backend), records the
+    applied keys in ``_SECRET_SOURCES``, and remembers ``home_path`` so
+    subsequent calls in the same process are no-ops.  Call this to force the
+    next call to re-pull — useful for tests, and for long-running processes
+    that want to refresh after a config change.
+    """
+    _APPLIED_HOMES.clear()
 
 
 def format_secret_source_suffix(env_var: str) -> str:
@@ -142,6 +164,10 @@ def _sanitize_env_file_if_needed(path: Path) -> None:
     This produces mangled values — e.g. a bot token duplicated 8×
     (see #8908).
 
+    Also strips embedded null bytes which crash ``os.environ[k] = v``
+    with ``ValueError: embedded null byte`` — typically introduced by
+    copy-pasting API keys from terminals or rich-text editors.
+
     We delegate to ``hermes_cli.config._sanitize_env_lines`` which
     already knows all valid Hermes env-var names and can split
     concatenated lines correctly.
@@ -217,8 +243,41 @@ def load_hermes_dotenv(
         loaded.append(project_env_path)
 
     _apply_external_secret_sources(home_path)
+    _apply_managed_env()
 
     return loaded
+
+
+def _apply_managed_env() -> None:
+    """Apply the managed-scope .env last, with override, so it beats user/shell.
+
+    Managed scope is machine-global (independent of HERMES_HOME / profile). v1
+    enforcement is "applied last with override=True" — at the end of startup load
+    ``os.environ`` holds the managed value for every managed key, beating both the
+    user ``.env`` and any pre-existing shell export. This deliberately inverts the
+    usual env-over-config precedence for the pinned keys (see
+    ``docs/design/managed-scope.md`` §4.1).
+
+    This does NOT prevent the agent from later mutating ``os.environ`` in-process
+    or ``export``-ing in a subprocess shell; that hard boundary is a documented
+    v2 item (design §8.1). v1 relies on filesystem permissions only.
+
+    Fail-open: a missing managed dir or .env is the common case and a no-op; any
+    error here is swallowed so managed scope can never block startup.
+    """
+    try:
+        from hermes_cli import managed_scope
+
+        managed_dir = managed_scope.get_managed_dir()
+    except Exception:  # noqa: BLE001 — managed scope must never block startup
+        return
+    if managed_dir is None:
+        return
+    managed_env = managed_dir / ".env"
+    if not managed_env.exists():
+        return
+    _sanitize_env_file_if_needed(managed_env)
+    _load_dotenv_with_fallback(managed_env, override=True)
 
 
 def _apply_external_secret_sources(home_path: Path) -> None:
@@ -228,7 +287,21 @@ def _apply_external_secret_sources(home_path: Path) -> None:
     locate the access token) but BEFORE the rest of Hermes reads
     ``os.environ`` for credentials.  Any failure here is logged and
     swallowed — external secret sources must never block startup.
+
+    Idempotent within a process: subsequent calls for the same
+    ``home_path`` are no-ops.  ``load_hermes_dotenv()`` runs at import
+    time from several hot modules (cli.py, hermes_cli/main.py,
+    run_agent.py, trajectory_compressor.py, ...), so without this guard
+    the Bitwarden status line would print 3-5x per CLI startup.  Use
+    ``reset_secret_source_cache()`` if you need to force a re-pull
+    (tests, future ``hermes secrets bitwarden sync`` from a long-running
+    process).
     """
+    home_key = str(Path(home_path).resolve())
+    if home_key in _APPLIED_HOMES:
+        return
+    _APPLIED_HOMES.add(home_key)
+
     try:
         cfg = _load_secrets_config(home_path)
     except Exception:  # noqa: BLE001 — config errors must not block startup
@@ -238,52 +311,67 @@ def _apply_external_secret_sources(home_path: Path) -> None:
     if not bw_cfg.get("enabled"):
         return
 
-    # Bitwarden integration — fetch secrets from BWS and inject into os.environ
     try:
-        _fetch_bitwarden_secrets(bw_cfg, home_path)
-    except Exception:  # noqa: BLE001
+        from agent.secret_sources.bitwarden import apply_bitwarden_secrets
+    except ImportError:
         return
+
+    result = apply_bitwarden_secrets(
+        enabled=True,
+        access_token_env=bw_cfg.get("access_token_env", "BWS_ACCESS_TOKEN"),
+        project_id=bw_cfg.get("project_id", ""),
+        override_existing=bool(bw_cfg.get("override_existing", False)),
+        cache_ttl_seconds=float(bw_cfg.get("cache_ttl_seconds", 300)),
+        auto_install=bool(bw_cfg.get("auto_install", True)),
+        server_url=str(bw_cfg.get("server_url", "") or "").strip(),
+        home_path=home_path,
+    )
+
+    if result.applied:
+        # Re-run the ASCII sanitization pass: BSM values are user-supplied
+        # and might have the same copy-paste corruption as a manually
+        # edited .env (see #6843).
+        _sanitize_loaded_credentials()
+        # Remember where these came from so the setup / `hermes model`
+        # flows can label detected credentials with "(from Bitwarden)" —
+        # otherwise users see "credentials ✓" with no hint that the value
+        # came from BSM rather than .env.
+        for name in result.applied:
+            _SECRET_SOURCES[name] = "bitwarden"
+        print(
+            f"  Bitwarden Secrets Manager: applied {len(result.applied)} "
+            f"secret{'s' if len(result.applied) != 1 else ''} "
+            f"({', '.join(sorted(result.applied))})",
+            file=sys.stderr,
+        )
+    if result.error:
+        print(
+            f"  Bitwarden Secrets Manager: {result.error}",
+            file=sys.stderr,
+        )
+    for warn in result.warnings:
+        print(
+            f"  Bitwarden Secrets Manager: {warn}",
+            file=sys.stderr,
+        )
 
 
 def _load_secrets_config(home_path: Path) -> dict:
-    """Load secrets configuration from ~/.hermes/secrets.yaml if present."""
-    secrets_path = home_path / "secrets.yaml"
-    if not secrets_path.exists():
+    """Read just the ``secrets:`` section out of config.yaml.
+
+    Imported lazily and isolated from the main config loader so a
+    malformed config can't take down dotenv loading entirely.
+    """
+    config_path = home_path / "config.yaml"
+    if not config_path.exists():
         return {}
     try:
-        import yaml
-        with open(secrets_path, "r", encoding="utf-8") as f:
-            return yaml.safe_load(f) or {}
-    except Exception:
+        import yaml  # type: ignore
+    except ImportError:
         return {}
-
-
-def _fetch_bitwarden_secrets(bw_cfg: dict, home_path: Path) -> None:
-    """Fetch secrets from Bitwarden Secrets Manager and inject into os.environ."""
-    import subprocess
-    import json
-
-    access_token = bw_cfg.get("access_token") or os.environ.get("BWS_ACCESS_TOKEN")
-    if not access_token:
-        return
-
-    # Build bws command
-    bws_cmd = bw_cfg.get("bws_path", "bws")
     try:
-        result = subprocess.run(
-            [bws_cmd, "secret", "list", "--output", "json", "--access-token", access_token],
-            capture_output=True, text=True, timeout=30
-        )
-        if result.returncode != 0:
-            return
-        secrets = json.loads(result.stdout)
-    except Exception:
-        return
-
-    # Inject secrets into os.environ and track their source
-    for secret in secrets:
-        key = secret.get("key", "")
-        value = secret.get("value", "")
-        if key and value:
-            os.environ[key] = value
-            _SECRET_SOURCES[key] = "bitwarden"
+        with open(config_path, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+    except Exception:  # noqa: BLE001
+        return {}
+    return data.get("secrets") or {}
