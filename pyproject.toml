@@ -42,16 +42,16 @@ dependencies = [
   # extra and gets lazy-installed via `tools/lazy_deps.py` when the
   # user picks that backend. Smaller `dependencies` = smaller blast
   # radius for the next supply-chain attack.
-  "openai==2.24.0",
+  "openai>=2.24.0",
   "certifi==2026.5.20",
   "python-dotenv==1.2.2",
   "fire==0.7.1",
   "httpx[socks]==0.28.1",
-  "rich==14.3.3",
+  "rich>=14.3.3",
   "tenacity==9.1.4",
   "pyyaml==6.0.3",
-  "ruamel.yaml==0.18.17",
-  "requests==2.33.0",  # CVE-2026-25645
+  "ruamel.yaml>=0.18.17",
+  "requests>=2.33.0",  # CVE-2026-25645
   "jinja2==3.1.6",
   # Bumped from 2.12.5 to 2.13.4 to pull in pydantic-core 2.46.4.
   # pydantic-core 2.41.5 (pulled by 2.12.5) segfaults when the OpenAI SDK's
@@ -61,7 +61,7 @@ dependencies = [
   # Interactive CLI (prompt_toolkit is used directly by cli.py)
   "prompt_toolkit==3.0.52",
   # Cron scheduler (built-in feature — scheduled cron/interval jobs use croniter).
-  "croniter==6.0.0",
+  "croniter>=6.0.0",
   # ``packaging`` is imported directly on three production paths but was never
   # declared, so it only reached users transitively (pip/uv pull it for other
   # tools). The slim official Docker image ships without it, where the
@@ -101,7 +101,7 @@ dependencies = [
   "psutil==7.2.2",
   # Browser CDP supervisor + browser_dialog import this directly. Keep core
   # so browser tool discovery doesn't fail on lean installs.
-  "websockets==15.0.1",
+  "websockets>=15.0.1",
   # .gitignore-aware file matching for desktop build stamp.
   "pathspec==1.1.1",
   "fastapi>=0.104.0,<1",
