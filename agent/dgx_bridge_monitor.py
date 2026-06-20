@@ -107,7 +107,7 @@ class DGXBridgeMonitor:
         try:
             result = subprocess.run(
                 ["ssh", f"{DGX_USER}@{DGX_IP}", "echo ok"],
-                capture_output=True, text=True, timeout=10
+                capture_output=True, text=True, timeout=15
             )
             latency = (time.time() - start) * 1000
             
@@ -118,7 +118,7 @@ class DGXBridgeMonitor:
                 self._record("ssh", "critical", f"SSH failed: {result.stderr[:100]}", latency)
                 return {"status": "critical", "detail": "SSH unreachable"}
         except subprocess.TimeoutExpired:
-            self._record("ssh", "critical", "SSH timeout", 10000)
+            self._record("ssh", "critical", "SSH timeout", 15000)
             return {"status": "critical", "detail": "SSH timeout"}
         except Exception as e:
             self._record("ssh", "critical", str(e)[:100], 0)
