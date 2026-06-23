@@ -219,8 +219,8 @@ def cortex_health_check() -> Dict[str, Any]:
     result = {
         "connected": False,
         "latency_ms": 0,
-        "document_count": 0,
-        "kv_count": 0,
+        "node_count": 0,
+        "flywheel_count": 0,
         "last_success": _last_successful_connect,
         "failures": _connect_failures,
         "circuit_breaker_open": _connect_failures >= _MAX_FAILURES,
@@ -229,10 +229,10 @@ def cortex_health_check() -> Dict[str, Any]:
     start = time.time()
     try:
         with cortex_cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM cortex_documents")
-            result["document_count"] = cur.fetchone()[0]
-            cur.execute("SELECT COUNT(*) FROM cortex_kv_store")
-            result["kv_count"] = cur.fetchone()[0]
+            cur.execute("SELECT COUNT(*) FROM cortex_nodes")
+            result["node_count"] = cur.fetchone()[0]
+            cur.execute("SELECT COUNT(*) FROM cortex_flywheel")
+            result["flywheel_count"] = cur.fetchone()[0]
         result["connected"] = True
         result["latency_ms"] = (time.time() - start) * 1000
     except Exception as e:

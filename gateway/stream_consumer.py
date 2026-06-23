@@ -261,7 +261,14 @@ class GatewayStreamConsumer:
 
         if self.metadata:
             try:
-                params = inspect.signature(self.adapter.edit_message).parameters
+                # Cache the signature per adapter class — inspect.signature is
+                # not free and this runs once per edit_interval during streaming.
+                # The signature is stable for a given class, so we memoize it.
+                adapter_cls = type(self.adapter)
+                params = getattr(adapter_cls, '_edit_message_params_cache', None)
+                if params is None:
+                    params = inspect.signature(self.adapter.edit_message).parameters
+                    adapter_cls._edit_message_params_cache = params
                 if "metadata" in params or any(
                     param.kind is inspect.Parameter.VAR_KEYWORD
                     for param in params.values()

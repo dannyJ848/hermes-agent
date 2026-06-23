@@ -54,6 +54,12 @@ BRIDGE_TOOL_NAMES = frozenset({TOOL_SEARCH_NAME, TOOL_DESCRIBE_NAME, TOOL_CALL_N
 # underestimating, which is the safer default.
 CHARS_PER_TOKEN = 4.0
 
+# Process-level cache for the ToolSearchConfig used by is_deferrable_tool_name.
+# Refreshed every 5s so config changes are picked up without a restart, but
+# we don't hit the config loader on every classification call.
+_CONFIG_CACHE: "ToolSearchConfig | None" = None
+_CONFIG_CACHE_TS: float = 0.0
+
 
 # ---------------------------------------------------------------------------
 # Configuration plumbing
@@ -68,6 +74,11 @@ class ToolSearchConfig:
     threshold_pct: float  # 0..100 — only used when enabled == "auto"
     search_default_limit: int
     max_search_limit: int
+    # When non-empty, ONLY these core-tool names stay in the model-facing
+    # array; every other core tool becomes eligible for deferral (the same
+    # status MCP/plugin tools already have). When empty/None, the legacy
+    # behavior applies: all _HERMES_CORE_TOOLS are never deferred.
+    always_visible: "frozenset[str] | None" = None
 
     @classmethod
     def from_raw(cls, raw: Any) -> "ToolSearchConfig":
@@ -106,11 +117,22 @@ class ToolSearchConfig:
         search_default_limit = max(1, min(max_search_limit,
                                           _safe_int(raw.get("search_default_limit"), 5)))
 
+        # always_visible: accept a list of tool names. None/missing → legacy
+        # behavior (all core tools non-deferrable). Empty list → all core
+        # tools become deferrable (aggressive). Normal usage: a curated list
+        # of the ~10-15 highest-frequency tools.
+        av_raw = raw.get("always_visible")
+        always_visible: "frozenset[str] | None" = None
+        if isinstance(av_raw, (list, tuple)):
+            names = {str(n).strip() for n in av_raw if str(n).strip()}
+            always_visible = frozenset(names) if names else frozenset()
+
         return cls(
             enabled=enabled,
             threshold_pct=threshold_pct,
             search_default_limit=search_default_limit,
             max_search_limit=max_search_limit,
+            always_visible=always_visible,
         )
 
 
@@ -160,19 +182,32 @@ def _core_tool_names() -> frozenset[str]:
         return frozenset()
 
 
-def is_deferrable_tool_name(name: str) -> bool:
+def is_deferrable_tool_name(name: str, *, config: "ToolSearchConfig | None" = None) -> bool:
     """Return True if a tool with this name is *eligible* for deferral.
 
     A tool is deferrable iff it is registered with an MCP toolset prefix
-    OR it is not in ``_HERMES_CORE_TOOLS``. Core tools are never deferred
-    even when their toolset is technically plugin-provided (this protects
-    against accidental shadowing).
+    OR it is not in the configured "always-visible" set.
+
+    The always-visible set is normally the full ``_HERMES_CORE_TOOLS`` list
+    (legacy behavior). When ``tools.tool_search.always_visible`` is set in
+    config, ONLY those tool names (plus the bridge tools) are kept visible;
+    every other core tool becomes deferrable. This lets users shrink the
+    model-facing tool array to just the high-frequency tools, with the rest
+    reachable on-demand via the bridge tools.
     """
     if name in BRIDGE_TOOL_NAMES:
         return False
-    if name in _core_tool_names():
-        return False
-    # Check registry toolset for MCP prefix.
+    # Determine the non-deferrable set based on config.
+    cfg = config if config is not None else _cached_config()
+    if cfg is not None and cfg.always_visible is not None:
+        # Explicit always_visible config: only listed tools stay visible.
+        if name in cfg.always_visible:
+            return False
+    else:
+        # Legacy behavior: all core tools are non-deferrable.
+        if name in _core_tool_names():
+            return False
+    # Check registry toolset for MCP prefix (MCP tools always deferrable).
     try:
         from tools.registry import registry
         entry = registry.get_entry(name)
@@ -180,10 +215,30 @@ def is_deferrable_tool_name(name: str) -> bool:
             return False
         if entry.toolset.startswith("mcp-"):
             return True
-        # Non-MCP, non-core → plugin tool, eligible.
+        # Non-MCP, non-always-visible → eligible for deferral.
         return True
     except Exception:
         return False
+
+
+def _cached_config() -> "ToolSearchConfig | None":
+    """Return the process-cached ToolSearchConfig, or None on failure.
+
+    Used by is_deferrable_tool_name when no explicit config is passed (the
+    common case — classification happens in many places). Resolves the same
+    load_config() the assembler uses, cached at module level.
+    """
+    global _CONFIG_CACHE, _CONFIG_CACHE_TS
+    import time as _time
+    now = _time.time()
+    if _CONFIG_CACHE is not None and (now - _CONFIG_CACHE_TS) < 5.0:
+        return _CONFIG_CACHE
+    try:
+        _CONFIG_CACHE = load_config()
+        _CONFIG_CACHE_TS = now
+        return _CONFIG_CACHE
+    except Exception:
+        return None
 
 
 def classify_tools(tool_defs: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:

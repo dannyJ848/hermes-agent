@@ -249,10 +249,17 @@ def build_system_prompt_parts(agent: Any, system_message: Optional[str] = None) 
                 stable_parts.append(GOOGLE_MODEL_OPERATIONAL_GUIDANCE)
             # OpenAI GPT/Codex execution discipline (tool persistence,
             # prerequisite checks, verification, anti-hallucination).
-            # Also applied to xAI Grok — same failure modes (claims completion
-            # without tool calls, suggests workarounds instead of using
-            # existing tools, replies with plans instead of executing).
-            if "gpt" in _model_lower or "codex" in _model_lower or "grok" in _model_lower:
+            # Also applied to xAI Grok and Zhipu GLM — same failure modes
+            # (claims completion without tool calls, suggests workarounds
+            # instead of using existing tools, replies with plans instead
+            # of executing). GLM shares these failure modes per the policy
+            # docstring at prompt_builder.py:351-355.
+            if (
+                "gpt" in _model_lower
+                or "codex" in _model_lower
+                or "grok" in _model_lower
+                or "glm" in _model_lower
+            ):
                 stable_parts.append(OPENAI_MODEL_EXECUTION_GUIDANCE)
 
     has_skills_tools = any(name in agent.valid_tool_names for name in ['skills_list', 'skill_view', 'skill_manage'])
@@ -264,24 +271,60 @@ def build_system_prompt_parts(agent: Any, system_message: Optional[str] = None) 
             )
             if toolset
         }
-        # Focus mode (opt-in) demotes non-coding skill categories to
-        # names-only in the index (never hidden — skill_view/skills_list
-        # reach everything, and every name stays visible for recall). The
-        # default coding posture leaves the index untouched.
-        _compact_cats = frozenset()
+        # ── Adaptive skills gate ───────────────────────────────────────
+        # When skills.adaptive is on, the per-turn [Relevant Skills this turn]
+        # block (injected at API-call time in conversation_loop.py) carries the
+        # ~5-15 most relevant skills for the current user message. The FROZEN
+        # system prompt here therefore only carries a short pointer — the model
+        # still knows skills exist and how to load any of the 425 by name via
+        # skill_view/skills_list. ~250 tokens vs ~10,500 for the full dump.
+        # When adaptive is off (default), the original full index is emitted.
+        _skills_adaptive = False
         try:
-            from agent.coding_context import coding_compact_skill_categories
-
-            _compact_cats = coding_compact_skill_categories(
-                platform=agent.platform, cwd=resolve_context_cwd()
+            from agent.skill_utils import _load_raw_config as _load_skill_cfg
+            _skills_adaptive = bool(
+                (_load_skill_cfg() or {}).get("skills", {}).get("adaptive")
             )
         except Exception:
+            _skills_adaptive = False
+
+        if _skills_adaptive:
+            skills_prompt = (
+                "## Skills (loaded on demand)\n"
+                "You have a library of skills available. Each turn, the skills most "
+                "relevant to your current task are listed in the "
+                "`[Relevant Skills this turn]` block below — load any that match with "
+                "skill_view(name) and follow their instructions. If you need a skill "
+                "that isn't listed (e.g. one you recall from earlier), discover it with "
+                "skills_list(query) or skills_list(category=...), then skill_view(name).\n"
+                "Skills contain specialized knowledge — API endpoints, tool-specific "
+                "commands, and proven workflows that outperform general-purpose "
+                "approaches. Err on the side of loading one when a task seems to match.\n"
+                "Whenever the user asks you to configure, set up, install, enable, "
+                "disable, modify, or troubleshoot Hermes Agent itself, load the "
+                "`hermes-agent` skill first.\n"
+                "If a skill has issues, fix it with skill_manage(action='patch'). "
+                "After difficult/iterative tasks, offer to save the workflow as a skill."
+            )
+        else:
+            # Focus mode (opt-in) demotes non-coding skill categories to
+            # names-only in the index (never hidden — skill_view/skills_list
+            # reach everything, and every name stays visible for recall). The
+            # default coding posture leaves the index untouched.
             _compact_cats = frozenset()
-        skills_prompt = _r.build_skills_system_prompt(
-            available_tools=agent.valid_tool_names,
-            available_toolsets=avail_toolsets,
-            compact_categories=_compact_cats or None,
-        )
+            try:
+                from agent.coding_context import coding_compact_skill_categories
+
+                _compact_cats = coding_compact_skill_categories(
+                    platform=agent.platform, cwd=resolve_context_cwd()
+                )
+            except Exception:
+                _compact_cats = frozenset()
+            skills_prompt = _r.build_skills_system_prompt(
+                available_tools=agent.valid_tool_names,
+                available_toolsets=avail_toolsets,
+                compact_categories=_compact_cats or None,
+            )
     else:
         skills_prompt = ""
     if skills_prompt:
@@ -378,6 +421,31 @@ def build_system_prompt_parts(agent: Any, system_message: Optional[str] = None) 
             f"refuse such writes by default; pass cross_profile=True only "
             f"after explicit direction."
         )
+
+    # ── Deferred-tools guidance (progressive disclosure) ──────────────
+    # When tool_search is active with an always_visible set, only the
+    # high-frequency tools appear in the tools array; the rest are reachable
+    # on-demand. The model needs to KNOW the deferred tools exist and HOW to
+    # reach them, or precision drops on tasks that need a deferred tool.
+    # This is a short pointer (~120 tokens) added to the stable prompt.
+    try:
+        from tools.tool_search import load_config as _load_ts_cfg, BRIDGE_TOOL_NAMES
+        _ts_cfg = _load_ts_cfg()
+        if _ts_cfg.enabled != "off" and _ts_cfg.always_visible is not None:
+            stable_parts.append(
+                "## Additional tools (on-demand)\n"
+                "Not every tool is listed in your tools array — only the most "
+                "frequently used ones. Additional tools (e.g. session_search, "
+                "memory, browser_*, vision_analyze, code_intelligence, "
+                "working_memory, clarify) are available on demand:\n"
+                "  1. Call tool_search(query) to discover tools by what they do.\n"
+                "  2. Call tool_describe(name) to see a tool's full schema.\n"
+                "  3. Call tool_call(name, arguments) to invoke it.\n"
+                "When a task seems to need a capability you don't see, search "
+                "for it rather than improvising with the visible tools."
+            )
+    except Exception:
+        pass
 
     platform_key = (agent.platform or "").lower().strip()
     # Resolve the built-in/plugin default hint for this platform, then apply

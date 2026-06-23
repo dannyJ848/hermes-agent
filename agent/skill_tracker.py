@@ -22,9 +22,14 @@ def _cursor():
 
 
 def _cursor_for(db_path):
-    """SQLite cursor context manager for an explicit DB path."""
-    conn = sqlite3.connect(str(db_path))
-    conn.row_factory = sqlite3.Row
+    """SQLite cursor context manager for an explicit DB path.
+
+    Uses the process-level connection pool (agent.db_pool) so the connection
+    is reused across calls rather than opened/closed per query. The context
+    manager still commits/rolls back per use — only the connection persists.
+    """
+    from agent.db_pool import get_connection
+    conn = get_connection(db_path)
     return _Ctx(conn)
 
 
@@ -40,8 +45,14 @@ class _Ctx:
             self.conn.commit()
         else:
             self.conn.rollback()
-        self.cur.close()
-        self.conn.close()
+        if self.cur is not None:
+            try:
+                self.cur.close()
+            except Exception:
+                pass
+        # NOTE: connection is NOT closed — it's pooled and reused by the
+        # next call. Closing here would defeat the pool and reintroduce the
+        # ~0.5-2ms connect/close cost per query.
         return False
 
 

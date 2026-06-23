@@ -71,6 +71,11 @@ _HERMES_CORE_TOOLS = [
     "kanban_unblock",
     # Computer use (macOS, gated on cua-driver being installed via check_fn)
     "computer_use",
+    # Cognitive enhancement tools — per-session state, code intelligence,
+    # context offloading, change tracking. Always available.
+    "working_memory", "code_intelligence", "context_stash", "session_changes",
+    # Enhanced terminal tools — parallel execution, SSH resilience, smart summaries
+    "parallel_terminal", "remote_terminal", "background_check",
 ]
 
 # Webhook events may originate from untrusted third-party content (for example,
@@ -86,6 +91,10 @@ _HERMES_WEBHOOK_SAFE_TOOLS = [
 
 # Core toolset definitions
 # These can include individual tools or reference other toolsets
+# Cache for get_all_toolsets() — invalidated when registry generation changes
+_all_toolsets_cache: Optional[Dict[str, Dict[str, Any]]] = None
+_all_toolsets_gen: int = -1
+
 TOOLSETS = {
     # Basic toolsets - individual tool categories
     "web": {
@@ -152,7 +161,7 @@ TOOLSETS = {
 
     "terminal": {
         "description": "Terminal/command execution and process management tools",
-        "tools": ["terminal", "process"],
+        "tools": ["terminal", "process", "parallel_terminal", "remote_terminal", "background_check"],
         "includes": []
     },
     
@@ -208,6 +217,17 @@ TOOLSETS = {
     "memory": {
         "description": "Persistent memory across sessions (personal notes + user profile)",
         "tools": ["memory"],
+        "includes": []
+    },
+
+    "cognitive": {
+        "description": (
+            "Cognitive enhancement tools — per-session working memory, AST-based code "
+            "intelligence, context offloading, and session change tracking. These tools "
+            "amplify reasoning by providing external persistent state that survives "
+            "context compression."
+        ),
+        "tools": ["working_memory", "code_intelligence", "context_stash", "session_changes"],
         "includes": []
     },
 
@@ -751,10 +771,22 @@ def get_all_toolsets() -> Dict[str, Dict[str, Any]]:
     Get all available toolsets with their definitions.
 
     Includes both statically-defined toolsets and plugin-registered ones.
-    
+
+    Result is cached against the registry generation — re-computed only when
+    tools are registered/unregistered, not on every call.
+
     Returns:
         Dict: All toolset definitions
     """
+    global _all_toolsets_cache, _all_toolsets_gen
+    try:
+        from tools.registry import registry
+        gen = registry._generation
+    except Exception:
+        gen = 0
+    if _all_toolsets_cache is not None and _all_toolsets_gen == gen:
+        return dict(_all_toolsets_cache)  # shallow copy so callers can't mutate cache
+
     result = dict(TOOLSETS)
     aliases = _get_registry_toolset_aliases()
     for ts_name in _get_plugin_toolset_names():
@@ -768,7 +800,10 @@ def get_all_toolsets() -> Dict[str, Dict[str, Any]]:
         toolset = get_toolset(display_name)
         if toolset:
             result[display_name] = toolset
-    return result
+
+    _all_toolsets_cache = result
+    _all_toolsets_gen = gen
+    return dict(result)
 
 
 def get_toolset_names() -> List[str]:

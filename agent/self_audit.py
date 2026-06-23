@@ -16,8 +16,14 @@ DB_PATH = Path.home() / ".hermes" / "cerebrum_memory.db"
 
 
 def _cursor():
-    conn = sqlite3.connect(str(DB_PATH))
-    conn.row_factory = sqlite3.Row
+    """SQLite cursor context manager using the process-level connection pool.
+
+    Avoids 'Cannot operate on a closed cursor' errors that occur when the
+    non-pooled sqlite3.connect() connection is closed by another thread
+    accessing the same DB during session-end parallel execution.
+    """
+    from agent.db_pool import get_connection
+    conn = get_connection(DB_PATH)
     return _Ctx(conn)
 
 
@@ -33,8 +39,12 @@ class _Ctx:
             self.conn.commit()
         else:
             self.conn.rollback()
-        self.cur.close()
-        self.conn.close()
+        if self.cur is not None:
+            try:
+                self.cur.close()
+            except Exception:
+                pass
+        # Connection is pooled — not closed here.
         return False
 
 
@@ -63,33 +73,33 @@ class SelfAudit:
             # Gather metrics from other tables
             score = 0.5
             findings = []
-            
+
             with _cursor() as cur:
                 cur.execute("SELECT COUNT(*) FROM error_patterns WHERE occurrence_count >= 3")
                 frequent_errors = cur.fetchone()[0]
                 if frequent_errors > 0:
                     findings.append(f"{frequent_errors} frequent error patterns detected")
                     score -= 0.1 * frequent_errors
-                
+
                 cur.execute("SELECT COUNT(*) FROM distilled_tips")
                 tips = cur.fetchone()[0]
                 if tips > 0:
                     findings.append(f"{tips} distilled tips available")
                     score += 0.1
-                
+
                 cur.execute("SELECT COUNT(*) FROM experiences WHERE lesson = ''")
-            missing_lessons = cur.fetchone()[0]
-            if missing_lessons > 0:
-                findings.append(f"{missing_lessons} experiences missing lessons")
-                score -= 0.05
-            
-            score = max(0.0, min(1.0, score))
-            
-            cur.execute("""
-                INSERT INTO self_audits (audit_type, score, findings, recommendations)
-                VALUES (?, ?, ?, ?)
-            """, (audit_type, score, json.dumps(findings), json.dumps(["Run learning loop"])))
-            
+                missing_lessons = cur.fetchone()[0]
+                if missing_lessons > 0:
+                    findings.append(f"{missing_lessons} experiences missing lessons")
+                    score -= 0.05
+
+                score = max(0.0, min(1.0, score))
+
+                cur.execute("""
+                    INSERT INTO self_audits (audit_type, score, findings, recommendations)
+                    VALUES (?, ?, ?, ?)
+                """, (audit_type, score, json.dumps(findings), json.dumps(["Run learning loop"])))
+
             return {
                 "score": score,
                 "findings": findings,

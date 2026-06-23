@@ -315,6 +315,15 @@ class ChatCompletionsTransport(ProviderTransport):
             if is_moonshot_model(model):
                 tools = sanitize_moonshot_tools(tools)
             api_kwargs["tools"] = tools
+            # Parallel tool calling: let the model emit multiple tool_calls in
+            # a single assistant turn so the runtime's concurrent executor
+            # (ThreadPoolExecutor max_workers=8) can batch independent calls.
+            # z.ai/GLM and most OpenAI-compatible endpoints tolerate this flag
+            # on /v1/chat/completions. Gated on the tools list being non-empty
+            # and not explicitly disabled via agent.parallel_tool_calls=false.
+            # Codex transport sets this separately; this covers chat_completions.
+            if params.get("parallel_tool_calls", True):
+                api_kwargs["parallel_tool_calls"] = True
 
         # max_tokens resolution — priority: ephemeral > user > provider default
         max_tokens_fn = params.get("max_tokens_param_fn")
@@ -503,6 +512,11 @@ class ChatCompletionsTransport(ProviderTransport):
             if is_moonshot_model(model):
                 tools = sanitize_moonshot_tools(tools)
             api_kwargs["tools"] = tools
+            # Parallel tool calling (see build_kwargs for rationale). Applies
+            # to the profile path too — z.ai/GLM and most OpenAI-compatible
+            # providers tolerate this flag.
+            if params.get("parallel_tool_calls", True):
+                api_kwargs["parallel_tool_calls"] = True
 
         # max_tokens resolution — priority: ephemeral > user > profile default
         max_tokens_fn = params.get("max_tokens_param_fn")

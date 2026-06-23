@@ -601,32 +601,11 @@ def quick_before(action_type: str, detail: str = "") -> str:
     """
     One-liner for before-action check. Returns lessons as a string
     ready to inject into any context/prompt.
-    Includes tool health warnings from tool_misuse_prevention module.
     """
     engine = get_engine()
     ctx = engine.before_action(action_type, detail)
 
     parts = []
-    
-    # Tool health check (added Cycle 8)
-    try:
-        import importlib.util
-        spec = importlib.util.spec_from_file_location(
-            "tool_misuse_prevention",
-            str(Path.home() / "hermes-agent" / "tool_misuse_prevention.py")
-        )
-        if spec and spec.loader:
-            tmp = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(tmp)
-            proceed, warnings, alt = tmp.validate_tool_call(action_type)
-            if not proceed:
-                parts.append("TOOL DANGER: %s is unreliable right now!" % action_type)
-            for w in warnings:
-                parts.append("TOOL WARNING: %s" % w)
-            if alt:
-                parts.append("TOOL ALTERNATIVE: Use %s instead" % alt)
-    except Exception:
-        pass  # Non-critical, don't break the flow
 
     if not ctx["has_history"] and not parts:
         return ""

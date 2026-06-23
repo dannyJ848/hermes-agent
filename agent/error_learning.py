@@ -22,25 +22,30 @@ class _SQLiteCursorContext:
     def __init__(self, conn):
         self.conn = conn
         self.cur = None
-    
+
     def __enter__(self):
         self.cur = self.conn.cursor()
         return self.cur
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is None:
             self.conn.commit()
         else:
             self.conn.rollback()
-        self.cur.close()
-        self.conn.close()
+        if self.cur is not None:
+            try:
+                self.cur.close()
+            except Exception:
+                pass
+        # Connection is pooled (agent.db_pool) — not closed here. Closing
+        # would reintroduce the per-query connect/close cost.
         return False
 
 
 def _cortex_cursor():
     """SQLite backend — uses ? placeholders, CURRENT_TIMESTAMP, INTEGER PRIMARY KEY AUTOINCREMENT."""
-    conn = sqlite3.connect(str(DB_PATH))
-    conn.row_factory = sqlite3.Row
+    from agent.db_pool import get_connection
+    conn = get_connection(DB_PATH)
     return _SQLiteCursorContext(conn)
 
 

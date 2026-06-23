@@ -26,6 +26,24 @@ import time
 from collections import Counter
 from typing import Any, Dict, List, Optional, Set, Tuple
 
+# Optional heavy deps — imported once at module load (not per-call). These
+# are gated in try/except so the module degrades gracefully to TF-IDF when
+# sentence_transformers or numpy is absent. Hoisting here avoids ~850
+# redundant sys.modules dict lookups per turn (score_relevance is called
+# once per skill in the 425-entry index).
+_SENTENCE_TRANSFORMERS = None
+_NUMPY = None
+try:
+    import numpy as _np_mod  # noqa: F401
+    _NUMPY = _np_mod
+except Exception:
+    pass
+try:
+    from sentence_transformers import SentenceTransformer as _STClass  # noqa: F401
+    _SENTENCE_TRANSFORMERS = _STClass
+except Exception:
+    pass
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -169,19 +187,27 @@ def _cosine_similarity(vec1: Counter, vec2: Counter) -> float:
 def score_relevance(query: str, candidate: str) -> float:
     """
     Score how relevant `candidate` is to `query`.
-    
+
     Uses semantic embeddings (sentence-transformers) when available,
     falls back to TF-IDF cosine similarity.
     """
+    # Empty inputs are never relevant — guard before embedding. Empty
+    # strings embed as near-zero vectors whose normalized dot product is
+    # numerically unstable (can return ~1.0 for two empty inputs, which
+    # would make an empty query spuriously match every candidate).
+    if not query or not candidate:
+        return 0.0
+
     # Try semantic embeddings first
     try:
-        from sentence_transformers import SentenceTransformer
-        import numpy as np
-        
+        if _SENTENCE_TRANSFORMERS is None or _NUMPY is None:
+            raise ImportError("optional deps not available")
+        np = _NUMPY
+
         # Lazy-load model (cached)
         if not hasattr(score_relevance, '_model'):
             # Use lightweight model: 22MB, fast inference
-            score_relevance._model = SentenceTransformer('all-MiniLM-L6-v2')
+            score_relevance._model = _SENTENCE_TRANSFORMERS('all-MiniLM-L6-v2')
             score_relevance._cache = {}  # Embedding cache
         
         model = score_relevance._model
@@ -239,22 +265,32 @@ def filter_memory_entries(
         return entries, {"total": len(entries), "kept": len(entries), "dropped": 0, "reason": "no_query"}
     
     # Score each entry
+    # Hoist cortex_learning engine lookup out of the loop (same pattern as
+    # filter_skills above).
+    _cortex_engine = None
+    try:
+        from agent.cortex_learning import get_learning_engine as _gle
+        _cortex_engine = _gle()
+        if not hasattr(_cortex_engine, 'store'):
+            _cortex_engine = None
+    except Exception:
+        _cortex_engine = None
+
     scored = []
     for entry in entries:
         score = score_relevance(query, entry)
-        
-        # Cortex learned score boost
-        try:
-            from agent.cortex_learning import get_learning_engine
-            engine = get_learning_engine()
-            entry_hash = str(hash(entry) % 10000000)
-            stats = engine.store.get_usage_stats(entry_hash) if hasattr(engine, 'store') else None
-            if stats and stats.get('found'):
-                learned_boost = (stats.get('effective_score', 0.5) - 0.5) * 0.3
-                score += learned_boost
-        except Exception:
-            pass
-        
+
+        # Cortex learned score boost (engine resolved above the loop)
+        if _cortex_engine is not None:
+            try:
+                entry_hash = str(hash(entry) % 10000000)
+                stats = _cortex_engine.store.get_usage_stats(entry_hash)
+                if stats and stats.get('found'):
+                    learned_boost = (stats.get('effective_score', 0.5) - 0.5) * 0.3
+                    score += learned_boost
+            except Exception:
+                pass
+
         scored.append((score, entry))
     
     # Sort by relevance descending
@@ -298,6 +334,64 @@ def filter_memory_entries(
 # Skills filtering
 # ---------------------------------------------------------------------------
 
+def warm_skill_embeddings(skills_by_category: Dict[str, List[Tuple[str, str]]]) -> int:
+    """Batch-encode every skill candidate so filter_skills pays no per-call encode cost.
+
+    The default score_relevance() path encodes each candidate lazily on first
+    match. With 400+ skills that means ~400 sequential encode() calls on the
+    first turn — visible latency. This warms the cache up front in a single
+    batched model.encode() call (batch_size=64).
+
+    Safe to call when sentence_transformers is unavailable or the model fails
+    to load: returns 0 and score_relevance() will fall back to TF-IDF.
+
+    Returns the number of candidates cached.
+    """
+    if not skills_by_category:
+        return 0
+    try:
+        from sentence_transformers import SentenceTransformer
+        import numpy as np  # noqa: F401  (consistency with score_relevance)
+
+        # Lazy-load model (cached on the function attr, same singleton as score_relevance)
+        if not hasattr(score_relevance, '_model'):
+            score_relevance._model = SentenceTransformer('all-MiniLM-L6-v2')
+            score_relevance._cache = {}
+        model = score_relevance._model
+        cache = score_relevance._cache
+
+        # Collect every unique candidate text (name + description + category,
+        # matching the text built inside filter_skills).
+        seen: set[str] = set()
+        to_encode: list[str] = []
+        for category, skills in skills_by_category.items():
+            for name, desc in skills:
+                text = f"{name} {desc} {category}"
+                if text and text not in seen and text not in cache:
+                    seen.add(text)
+                    to_encode.append(text)
+
+        if not to_encode:
+            return 0
+
+        # Single batched encode pass — far cheaper than N individual calls.
+        embs = model.encode(
+            to_encode,
+            batch_size=64,
+            convert_to_numpy=True,
+            normalize_embeddings=True,
+            show_progress_bar=False,
+        )
+        for text, emb in zip(to_encode, embs):
+            cache[text] = emb
+        return len(to_encode)
+    except Exception as exc:
+        # Networking failure, missing model, OOM, etc. — silently degrade.
+        # score_relevance() will use the TF-IDF fallback for each candidate.
+        logger.debug("warm_skill_embeddings failed, will use TF-IDF fallback: %s", exc)
+        return 0
+
+
 def filter_skills(
     skills_by_category: Dict[str, List[Tuple[str, str]]],
     query: str,
@@ -311,26 +405,47 @@ def filter_skills(
     """
     if not skills_by_category or not query:
         return skills_by_category, {"total": 0, "kept": 0, "dropped": 0, "reason": "no_query"}
-    
+
+    # Pre-warm embeddings in one batched pass so per-candidate score_relevance()
+    # calls are just dict lookups + a dot product. Idempotent — the warm
+    # function skips candidates already in the cache. No-op if the model
+    # can't load (TF-IDF fallback handles scoring per-call).
+    try:
+        warm_skill_embeddings(skills_by_category)
+    except Exception:
+        pass
+
     # Score each skill
+    # Hoist the cortex_learning engine lookup OUT of the per-skill loop —
+    # get_learning_engine() constructs/returns a singleton, so calling it
+    # 425×/turn is pure waste. Resolve once; skip the boost entirely if the
+    # import or construction fails (graceful degradation).
+    _cortex_engine = None
+    try:
+        from agent.cortex_learning import get_learning_engine as _gle
+        _cortex_engine = _gle()
+        if not hasattr(_cortex_engine, 'store'):
+            _cortex_engine = None
+    except Exception:
+        _cortex_engine = None
+
     all_skills = []
     for category, skills in skills_by_category.items():
         for name, desc in skills:
             # Score based on name + description + category
             text = f"{name} {desc} {category}"
             score = score_relevance(query, text)
-            
-            # Cortex learned score boost
-            try:
-                from agent.cortex_learning import get_learning_engine
-                engine = get_learning_engine()
-                stats = engine.store.get_usage_stats(f"skill:{name}") if hasattr(engine, 'store') else None
-                if stats and stats.get('found'):
-                    learned_boost = (stats.get('effective_score', 0.5) - 0.5) * 0.3
-                    score += learned_boost
-            except Exception:
-                pass
-            
+
+            # Cortex learned score boost (engine resolved above the loop)
+            if _cortex_engine is not None:
+                try:
+                    stats = _cortex_engine.store.get_usage_stats(f"skill:{name}")
+                    if stats and stats.get('found'):
+                        learned_boost = (stats.get('effective_score', 0.5) - 0.5) * 0.3
+                        score += learned_boost
+                except Exception:
+                    pass
+
             all_skills.append((score, category, name, desc))
     
     # Sort by relevance
@@ -525,15 +640,21 @@ def build_adaptive_skills_prompt(
     query: str,
     budget_tokens: Optional[int] = None,
     pressure_level: str = "low",
+    max_skills: int = MAX_SKILLS_SHOWN,
+    min_score: float = MIN_RELEVANCE_SCORE,
 ) -> Tuple[str, Dict[str, Any]]:
     """
     Build skills prompt with only relevant skills.
     Pressure-aware: reduces budget when context window is under pressure.
     Returns (prompt_text, metadata).
+
+    ``max_skills`` and ``min_score`` override the module defaults so callers
+    (e.g. config-driven injection) can tighten or loosen the filter without
+    editing this module.
     """
     if budget_tokens is None:
         budget_tokens = int(DEFAULT_INJECTION_BUDGET_TOKENS * SKILLS_BUDGET_RATIO)
-    
+
     # Adjust budget based on pressure
     if pressure_level == "critical":
         budget_tokens = int(budget_tokens * 0.3)
@@ -541,8 +662,11 @@ def build_adaptive_skills_prompt(
         budget_tokens = int(budget_tokens * 0.5)
     elif pressure_level == "medium":
         budget_tokens = int(budget_tokens * 0.8)
-    
-    filtered, meta = filter_skills(skills_by_category, query, budget_tokens)
+
+    filtered, meta = filter_skills(
+        skills_by_category, query, budget_tokens,
+        max_skills=max_skills, min_score=min_score,
+    )
     
     if not filtered:
         return "", meta

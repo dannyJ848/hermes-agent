@@ -124,11 +124,18 @@ class AutoMemoryExtractor:
             tool_results = []
 
             for msg in messages:
+                # Guard against non-dict entries (session telemetry may pass
+                # strings or other formats that don't match the message schema).
+                if not isinstance(msg, dict):
+                    continue
                 if msg.get("role") == "assistant" and "tool_calls" in msg:
                     for tc in msg["tool_calls"]:
+                        if not isinstance(tc, dict):
+                            continue
+                        fn = tc.get("function") or {}
                         tool_calls.append({
-                            "name": tc.get("function", {}).get("name", ""),
-                            "args": tc.get("function", {}).get("arguments", {}),
+                            "name": fn.get("name", "") if isinstance(fn, dict) else "",
+                            "args": fn.get("arguments", {}) if isinstance(fn, dict) else {},
                         })
                 elif msg.get("role") == "tool":
                     tool_results.append({
@@ -170,6 +177,8 @@ class AutoMemoryExtractor:
         patterns = []
         try:
             for msg in messages:
+                if not isinstance(msg, dict):
+                    continue
                 content = str(msg.get("content", ""))
                 if "error" in content.lower() or "exception" in content.lower() or "traceback" in content.lower():
                     # Extract error type and context
@@ -202,6 +211,8 @@ class AutoMemoryExtractor:
             ]
 
             for msg in messages:
+                if not isinstance(msg, dict):
+                    continue
                 if msg.get("role") == "user":
                     content = str(msg.get("content", "")).lower()
                     for keyword, category in preference_keywords:

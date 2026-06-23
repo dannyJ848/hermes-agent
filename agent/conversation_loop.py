@@ -420,6 +420,60 @@ def run_conversation(
 
     active_system_prompt = agent._cached_system_prompt
 
+    # ── Per-turn tool-output pruning ──
+    # Lightweight pass that replaces STALE tool outputs (old ls dumps,
+    # read_file contents, search results) with 1-line summaries, protecting
+    # only the most recent messages. Fires at a much lower threshold than
+    # full compression (default 15% vs 50% of context) so it catches the
+    # gradual accumulation of tool output that never triggers full
+    # compression on large-context models. Reuses the existing
+    # _prune_old_tool_results machinery — idempotent (skips already-summarized
+    # content), so calling every turn is cheap after the first pass. Runs
+    # BEFORE full compression: if pruning alone gets under the compression
+    # threshold, the expensive LLM-summary pass is skipped entirely.
+    _prune_threshold = getattr(agent, "tool_prune_threshold_tokens", None)
+    if (
+        agent.compression_enabled
+        and _prune_threshold is not None
+        and getattr(agent.context_compressor, "_prune_old_tool_results", None)
+        and len(messages) > getattr(agent, "tool_prune_protect_last", 12) + 4
+    ):
+        try:
+            _prune_preflight_tokens = estimate_request_tokens_rough(
+                messages,
+                system_prompt=active_system_prompt or "",
+                tools=agent.tools or None,
+            )
+            if _prune_preflight_tokens >= _prune_threshold:
+                _protect_last = getattr(agent, "tool_prune_protect_last", 12)
+                _before_chars = sum(
+                    len(str(m.get("content") or "")) for m in messages
+                )
+                messages, _pruned_n = agent.context_compressor._prune_old_tool_results(
+                    messages, protect_tail_count=_protect_last,
+                )
+                if _pruned_n > 0:
+                    _after_chars = sum(
+                        len(str(m.get("content") or "")) for m in messages
+                    )
+                    _saved_tokens = max(0, _before_chars - _after_chars) // 4
+                    logger.info(
+                        "tool-output prune: summarized %s old tool results, "
+                        "~%sk chars -> ~%sk chars (saved ~%s tokens)",
+                        _pruned_n,
+                        f"{_before_chars//1000:,}",
+                        f"{_after_chars//1000:,}",
+                        f"{_saved_tokens:,}",
+                    )
+                    agent._emit_status(
+                        f"✂️ Pruned {_pruned_n} old tool outputs "
+                        f"(saved ~{_saved_tokens:,} tokens)"
+                    )
+                    # The prune mutated `messages` in place; the session-DB
+                    # flush below will persist the summarized versions.
+        except Exception as _prune_exc:
+            logger.debug("per-turn tool-output prune skipped: %s", _prune_exc)
+
     # ── Preflight context compression ──
     # Before entering the main loop, check if the loaded conversation
     # history already exceeds the model's context threshold.  This handles
@@ -853,31 +907,118 @@ def run_conversation(
         
         # ── COGNITIVE: Adaptive context injection ──
         # Inject learned lessons and relevant memories into system prompt
-        # WITHOUT breaking prompt cache — we append to ephemeral only
+        # WITHOUT breaking prompt cache — we append to ephemeral only.
+        # Gated on cognitive_orchestrator.enhanced_context_enabled (default
+        # True) — disable to skip the 3-subsystem DB queries per turn when
+        # the [Adaptive Context] block isn't producing useful results.
         _cognitive_context = ""
         try:
-            from agent.cognitive_orchestrator import get_orchestrator
-            _orch = get_orchestrator()
-            # Auto-initialize if needed
-            if _orch and not getattr(_orch, '_initialized', False):
-                try:
-                    _orch.initialize(agent)
-                except Exception:
-                    pass
-            if _orch and hasattr(_orch, 'get_enhanced_context'):
-                _ctx_items = _orch.get_enhanced_context(
-                    query=original_user_message if isinstance(original_user_message, str) else "",
-                    limit=5
-                )
-                if _ctx_items:
-                    _cognitive_context = "\n\n".join(str(item) for item in _ctx_items[:3])
+            from agent.skill_utils import _load_raw_config as _load_cfg
+            _enh_ctx_enabled = bool(
+                (_load_cfg() or {}).get("cognitive_orchestrator", {}).get("enhanced_context_enabled", True)
+            )
         except Exception:
-            pass
+            _enh_ctx_enabled = True
+        if _enh_ctx_enabled:
+            try:
+                from agent.cognitive_orchestrator import get_orchestrator
+                _orch = get_orchestrator()
+                # Auto-initialize if needed
+                if _orch and not getattr(_orch, '_initialized', False):
+                    try:
+                        _orch.initialize(agent)
+                    except Exception:
+                        pass
+                if _orch and hasattr(_orch, 'get_enhanced_context'):
+                    _ctx_items = _orch.get_enhanced_context(
+                        query=original_user_message if isinstance(original_user_message, str) else "",
+                        limit=5
+                    )
+                    if _ctx_items:
+                        _cognitive_context = "\n\n".join(str(item) for item in _ctx_items[:3])
+            except Exception:
+                pass
         
         if _cognitive_context:
             # Append to ephemeral so it doesn't break the prefix cache
             effective_system = (effective_system + "\n\n[Adaptive Context]\n" + _cognitive_context).strip()
-        
+
+        # ── ADAPTIVE SKILLS: per-turn relevance filtering ───────────────
+        # When skills.adaptive is enabled in config.yaml, the frozen system
+        # prompt carries only a short pointer to skill_view/skills_list, and
+        # THIS block injects the ~5-15 skills most relevant to the current
+        # user message (scored via semantic embeddings). Same ephemeral-append
+        # pattern as [Adaptive Context] above — keeps the cached system prefix
+        # byte-stable, only the tail varies per turn.
+        # Disabling the flag (or any failure here) leaves effective_system
+        # unchanged; the frozen block from build_skills_system_prompt still
+        # runs if it was emitted.
+        _adaptive_skills_block = ""
+        try:
+            from agent.skill_utils import _load_raw_config as _load_skill_cfg
+            from agent.prompt_builder import build_skills_index_dict
+            from agent.adaptive_injection import build_adaptive_skills_prompt
+            from model_tools import get_toolset_for_tool
+
+            _skills_cfg = (_load_skill_cfg() or {}).get("skills", {}) or {}
+            if _skills_cfg.get("adaptive"):
+                _max_adaptive = int(_skills_cfg.get("max_adaptive") or 15)
+                _min_relevance = float(_skills_cfg.get("min_relevance") or 0.15)
+                # Recompute toolsets locally (same logic as system_prompt.py:260-266).
+                _avail_toolsets = {
+                    ts for ts in (get_toolset_for_tool(t) for t in agent.valid_tool_names) if ts
+                }
+                _skills_by_cat, _ = build_skills_index_dict(
+                    available_tools=agent.valid_tool_names,
+                    available_toolsets=_avail_toolsets,
+                )
+                _query = original_user_message if isinstance(original_user_message, str) else ""
+                _budget = _max_adaptive * 120  # ~120 tokens/skill incl. name+desc
+                _block, _meta = build_adaptive_skills_prompt(
+                    _skills_by_cat, _query, budget_tokens=_budget,
+                    max_skills=_max_adaptive, min_score=_min_relevance,
+                )
+                if _block:
+                    _adaptive_skills_block = _block
+                    logger.debug(
+                        "adaptive skills: kept %s/%s (%s tokens) for query=%.60s",
+                        _meta.get("kept"), _meta.get("total"),
+                        _meta.get("used_tokens"), _query,
+                    )
+        except Exception as _exc:
+            logger.debug("adaptive skills injection skipped: %s", _exc)
+
+        if _adaptive_skills_block:
+            effective_system = (
+                effective_system + "\n\n[Relevant Skills this turn]\n" + _adaptive_skills_block
+            ).strip()
+
+        # ── LEARNED LESSONS: per-turn injection of past experience ──────
+        # Pulls from iteration_engine, error_learning, distilled_tips,
+        # skill_tracker, and behavior_adjustments. Same cache-safe ephemeral
+        # pattern as [Relevant Skills]. Config-gated on
+        # cognitive_orchestrator.learned_lessons_enabled (default True).
+        _learned_lessons_block = ""
+        try:
+            from agent.skill_utils import _load_raw_config as _load_ll_cfg
+            _ll_cfg = (_load_ll_cfg() or {}).get("cognitive_orchestrator", {}) or {}
+            if _ll_cfg.get("learned_lessons_enabled", True):
+                from agent.learned_lessons import build_learned_lessons_prompt
+                _query = original_user_message if isinstance(original_user_message, str) else ""
+                _learned_lessons_block = build_learned_lessons_prompt(_query)
+                if _learned_lessons_block:
+                    logger.debug(
+                        "learned lessons: %d chars for query=%.60s",
+                        len(_learned_lessons_block), _query,
+                    )
+        except Exception as _ll_exc:
+            logger.debug("learned lessons injection skipped: %s", _ll_exc)
+
+        if _learned_lessons_block:
+            effective_system = (
+                effective_system + "\n\n[Learned Lessons]\n" + _learned_lessons_block
+            ).strip()
+
         if effective_system:
             api_messages = [{"role": "system", "content": effective_system}] + api_messages
 
@@ -4082,12 +4223,12 @@ def run_conversation(
             _cf = _orch._subsystems.get("cortex_flywheel")
             if _cf and hasattr(_cf, 'record_event'):
                 try:
-                    _cf.record_event("turn_complete", {
-                        "session_id": agent.session_id,
-                        "api_calls": api_call_count,
-                        "quality_score": _quality_score or 0,
-                        "task_type": _task_type if '_task_type' in dir() else "general",
-                    })
+                    _cf.record_event(
+                        "turn_complete",
+                        subsystem="conversation",
+                        detail=f"api_calls={api_call_count},quality={_quality_score or 0:.2f}",
+                        value=float(_quality_score or 0),
+                    )
                 except Exception:
                     pass
     except Exception as _cog_err:

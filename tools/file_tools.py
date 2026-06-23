@@ -1618,6 +1618,44 @@ def _handle_read_file(args, **kw):
     return read_file_tool(path=args.get("path", ""), offset=args.get("offset", 1), limit=args.get("limit", 500), task_id=tid)
 
 
+def _auto_track_change(filepath: str, operation: str, session_id: str, description: str = "") -> None:
+    """Best-effort auto-tracking of file modifications via session_changes.
+
+    Called after successful write_file/patch operations. Also invalidates the
+    code intelligence cache for the affected project so the index stays fresh.
+    Never raises — tracking failures must not affect the actual file operation.
+    """
+    try:
+        from tools.session_changes import session_changes_handler
+        session_changes_handler(
+            args={"action": "track", "file": filepath, "operation": operation, "description": description},
+            session_id=session_id or "default",
+        )
+    except Exception:
+        pass  # Tracking is best-effort; never break the write
+
+    # Invalidate code intelligence cache for this file's project
+    try:
+        import os
+        from pathlib import Path
+        fp = Path(filepath)
+        if fp.suffix in {".py", ".pyi", ".js", ".ts", ".jsx", ".tsx"}:
+            # Find the cache file and bump its timestamp backwards so staleness
+            # check triggers a re-index on next query.
+            from hermes_constants import get_hermes_home
+            ws = get_hermes_home() / "workspace"
+            if ws.exists():
+                import time
+                old_time = time.time() - 7200  # 2 hours ago → definitely stale
+                for cache in ws.glob("code_index_*.json"):
+                    try:
+                        os.utime(cache, (old_time, old_time))
+                    except OSError:
+                        pass
+    except Exception:
+        pass  # Cache invalidation is best-effort
+
+
 def _handle_write_file(args, **kw):
     tid = kw.get("task_id") or "default"
     if not args.get("path") or not isinstance(args.get("path"), str):
@@ -1638,20 +1676,28 @@ def _handle_write_file(args, **kw):
             f"write_file: 'content' must be a string, got "
             f"{type(args['content']).__name__}."
         )
-    return write_file_tool(
+    result = write_file_tool(
         path=args["path"], content=args["content"], task_id=tid,
         cross_profile=bool(args.get("cross_profile", False)),
     )
+    # Auto-track successful writes
+    if '"resolved_path"' in result:
+        _auto_track_change(args["path"], "modified", kw.get("session_id", "default"), "write_file")
+    return result
 
 
 def _handle_patch(args, **kw):
     tid = kw.get("task_id") or "default"
-    return patch_tool(
+    result = patch_tool(
         mode=args.get("mode", "replace"), path=args.get("path"),
         old_string=args.get("old_string"), new_string=args.get("new_string"),
         replace_all=args.get("replace_all", False), patch=args.get("patch"), task_id=tid,
         cross_profile=bool(args.get("cross_profile", False)),
     )
+    # Auto-track successful patches
+    if '"success": true' in result and args.get("path"):
+        _auto_track_change(args["path"], "modified", kw.get("session_id", "default"), "patch")
+    return result
 
 
 def _handle_search_files(args, **kw):

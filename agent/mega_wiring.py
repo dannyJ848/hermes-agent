@@ -149,6 +149,24 @@ def _get_cognitive_orch():
         _cognitive_orch = False
     return _cognitive_orch if _cognitive_orch is not False else None
 
+
+def _before_action_enabled() -> bool:
+    """Whether to call cognitive_orchestrator.before_action() per tool call.
+
+    before_action builds a rich lesson string whose return value is
+    currently discarded (the injection path was never wired). It opens 2
+    SQLite connections and runs 6 subsystem aggregations per tool call for
+    no model-facing benefit. Defaults to True for backward compatibility;
+    set ``cognitive_orchestrator.before_action_enabled: false`` in config
+    to skip the dead work and save ~3-15ms + 2 DB connects per tool call.
+    after_action (which persists real learning) is unaffected.
+    """
+    try:
+        cfg = _load_config().get("cognitive_orchestrator", {})
+        return bool(cfg.get("before_action_enabled", True))
+    except Exception:
+        return True
+
 def _get_cerebrum():
     global _cerebrum
     if _cerebrum is not None:
@@ -306,9 +324,15 @@ def _patch_tool_execution(agent_class):
     @wraps(original)
     def wrapped(self, function_name: str, function_args: dict, effective_task_id: str, *args, **kwargs):
         # ── Cognitive Orchestrator: BEFORE action ──
+        # before_action builds a ~150-line lesson string from 6 subsystems
+        # (2 SQLite connects, error_learning scan, skill_tracker write) whose
+        # return value is DISCARDED below — it never reaches the model. Gate
+        # it behind cognitive_orchestrator.before_action_enabled (default
+        # True for backward compat; set false to skip the dead work).
+        # after_action below is NOT affected — its DB writes persist.
         try:
             orch = _get_cognitive_orch()
-            if orch:
+            if orch and _before_action_enabled():
                 try:
                     orch.before_action(function_name, str(function_args)[:500])
                 except Exception:
@@ -385,6 +409,15 @@ def _patch_run_conversation(agent_class):
             try:
                 orch = _get_cognitive_orch()
                 if orch:
+                    # Flush batched per-tool DB writes (skill_tracker +
+                    # cognitive_actions) accumulated during this turn.
+                    # In gateway mode session_end fires per-turn, so this
+                    # is the batch boundary. Saves ~5-15ms mid-turn.
+                    try:
+                        if hasattr(orch, 'flush_pending_writes'):
+                            orch.flush_pending_writes()
+                    except Exception:
+                        pass
                     try:
                         orch.session_end(self.session_id)
                     except Exception:

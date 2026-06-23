@@ -355,62 +355,31 @@ PARALLEL_TOOL_CALL_GUIDANCE = (
 # family-agnostic; the OPENAI_ prefix reflects origin, not exclusivity.
 OPENAI_MODEL_EXECUTION_GUIDANCE = (
     "# Execution discipline\n"
-    "<tool_persistence>\n"
-    "- Use tools whenever they improve correctness, completeness, or grounding.\n"
-    "- Do not stop early when another tool call would materially improve the result.\n"
-    "- If a tool returns empty or partial results, retry with a different query or "
-    "strategy before giving up.\n"
-    "- Keep calling tools until: (1) the task is complete, AND (2) you have verified "
-    "the result.\n"
-    "</tool_persistence>\n"
-    "\n"
     "<mandatory_tool_use>\n"
-    "NEVER answer these from memory or mental computation — ALWAYS use a tool:\n"
-    "- Arithmetic, math, calculations → use terminal or execute_code\n"
-    "- Hashes, encodings, checksums → use terminal (e.g. sha256sum, base64)\n"
-    "- Current time, date, timezone → use terminal (e.g. date)\n"
-    "- System state: OS, CPU, memory, disk, ports, processes → use terminal\n"
-    "- File contents, sizes, line counts → use read_file, search_files, or terminal\n"
-    "- Git history, branches, diffs → use terminal\n"
-    "- Current facts (weather, news, versions) → use web_search\n"
-    "Your memory and user profile describe the USER, not the system you are "
-    "running on. The execution environment may differ from what the user profile "
-    "says about their personal setup.\n"
+    "NEVER answer these from memory — ALWAYS use a tool:\n"
+    "- Arithmetic, math, hashes, encodings, checksums → terminal or execute_code\n"
+    "- Current time/date, system state (OS/CPU/disk/ports/processes) → terminal\n"
+    "- File contents, sizes, line counts → read_file, search_files, or terminal\n"
+    "- Git history/branches/diffs → terminal\n"
+    "- Current facts (weather, news, versions) → web_search\n"
+    "Your user profile describes the USER, not this execution environment.\n"
     "</mandatory_tool_use>\n"
     "\n"
-    "<act_dont_ask>\n"
-    "When a question has an obvious default interpretation, act on it immediately "
-    "instead of asking for clarification. Examples:\n"
-    "- 'Is port 443 open?' → check THIS machine (don't ask 'open where?')\n"
-    "- 'What OS am I running?' → check the live system (don't use user profile)\n"
-    "- 'What time is it?' → run `date` (don't guess)\n"
-    "Only ask for clarification when the ambiguity genuinely changes what tool "
-    "you would call.\n"
-    "</act_dont_ask>\n"
-    "\n"
-    "<prerequisite_checks>\n"
-    "- Before taking an action, check whether prerequisite discovery, lookup, or "
-    "context-gathering steps are needed.\n"
-    "- Do not skip prerequisite steps just because the final action seems obvious.\n"
-    "- If a task depends on output from a prior step, resolve that dependency first.\n"
-    "</prerequisite_checks>\n"
+    "<act_and_persist>\n"
+    "- Act on obvious defaults immediately; only ask for clarification when "
+    "ambiguity changes which tool you'd call.\n"
+    "- Keep calling tools until the task is complete AND verified — don't stop "
+    "early if another call would materially improve the result.\n"
+    "- If a tool returns empty/partial results, retry with a different strategy.\n"
+    "</act_and_persist>\n"
     "\n"
     "<verification>\n"
-    "Before finalizing your response:\n"
-    "- Correctness: does the output satisfy every stated requirement?\n"
-    "- Grounding: are factual claims backed by tool outputs or provided context?\n"
-    "- Formatting: does the output match the requested format or schema?\n"
-    "- Safety: if the next step has side effects (file writes, commands, API calls), "
-    "confirm scope before executing.\n"
-    "</verification>\n"
-    "\n"
-    "<missing_context>\n"
-    "- If required context is missing, do NOT guess or hallucinate an answer.\n"
-    "- Use the appropriate lookup tool when missing information is retrievable "
-    "(search_files, web_search, read_file, etc.).\n"
-    "- Ask a clarifying question only when the information cannot be retrieved by tools.\n"
-    "- If you must proceed with incomplete information, label assumptions explicitly.\n"
-    "</missing_context>"
+    "Before finalizing: is every requirement satisfied? Are factual claims "
+    "backed by tool outputs? If the next step has side effects (writes, "
+    "commands, API calls), confirm scope first. If context is missing, use "
+    "the right lookup tool rather than guessing; label assumptions explicitly "
+    "if you must proceed with incomplete information.\n"
+    "</verification>"
 )
 
 # Gemini/Gemma-specific operational guidance, adapted from OpenCode's gemini.txt.
@@ -1240,40 +1209,34 @@ def _skill_should_show(
     return True
 
 
-def build_skills_system_prompt(
+def build_skills_index_dict(
     available_tools: "set[str] | None" = None,
     available_toolsets: "set[str] | None" = None,
-    compact_categories: "frozenset[str] | None" = None,
-) -> str:
-    """Build a compact skill index for the system prompt.
+) -> "tuple[dict[str, list[tuple[str, str]]], dict[str, str]]":
+    """Build the structured skills index as a dict, without rendering.
 
-    Two-layer cache:
-      1. In-process LRU dict keyed by (skills_dir, tools, toolsets, hidden)
-      2. Disk snapshot (``.skills_prompt_snapshot.json``) validated by
-         mtime/size manifest — survives process restarts
+    Returns ``(skills_by_category, category_descriptions)`` where
+    ``skills_by_category`` maps ``category -> [(name, description), ...]``
+    (the exact shape :func:`adaptive_injection.filter_skills` expects).
 
-    Falls back to a full filesystem scan when both layers miss.
+    Shares the same two-layer cache (LRU + disk snapshot) and the same
+    platform/disabled/conditions filtering as
+    :func:`build_skills_system_prompt`. Call this instead of re-parsing the
+    rendered prompt string when you need the structured data — e.g. for
+    per-turn adaptive skill filtering.
 
-    External skill directories (``skills.external_dirs`` in config.yaml) are
-    scanned alongside the local ``~/.hermes/skills/`` directory.  External dirs
-    are read-only — they appear in the index but new skills are always created
-    in the local dir.  Local skills take precedence when names collide.
-
-    ``compact_categories`` (e.g. from the coding posture — see
-    agent/coding_context.py) demotes whole categories to a names-only line in
-    the rendered index. Nothing is ever hidden: every skill name stays
-    visible and loadable via ``skill_view`` / ``skills_list``; only the
-    descriptions are dropped, and a footer note explains the demotion.
+    No ``compact_categories`` param: demotion is a render-time concern and
+    doesn't apply to the raw index.
     """
     skills_dir = get_skills_dir()
     external_dirs = get_all_skills_dirs()[1:]  # skip local (index 0)
 
     if not skills_dir.exists() and not external_dirs:
-        return ""
+        return {}, {}
 
-    # ── Layer 1: in-process LRU cache ─────────────────────────────────
-    # Include the resolved platform so per-platform disabled-skill lists
-    # produce distinct cache entries (gateway serves multiple platforms).
+    # ── In-process LRU cache ──────────────────────────────────────────
+    # Separate cache from the rendered-prompt cache: different key shape
+    # (no compact_categories) and different value type (dict, not str).
     from gateway.session_context import get_session_env
     _platform_hint = (
         os.environ.get("HERMES_PLATFORM")
@@ -1282,13 +1245,13 @@ def build_skills_system_prompt(
     )
     disabled = get_disabled_skill_names(_platform_hint or None)
     cache_key = (
+        "dict",
         str(skills_dir.resolve()),
         tuple(str(d) for d in external_dirs),
         tuple(sorted(str(t) for t in (available_tools or set()))),
         tuple(sorted(str(ts) for ts in (available_toolsets or set()))),
         _platform_hint,
         tuple(sorted(disabled)),
-        tuple(sorted(compact_categories or ())),
     )
     with _SKILLS_PROMPT_CACHE_LOCK:
         cached = _SKILLS_PROMPT_CACHE.get(cache_key)
@@ -1296,7 +1259,7 @@ def build_skills_system_prompt(
             _SKILLS_PROMPT_CACHE.move_to_end(cache_key)
             return cached
 
-    # ── Layer 2: disk snapshot ────────────────────────────────────────
+    # ── Disk snapshot ─────────────────────────────────────────────────
     snapshot = _load_skills_snapshot(skills_dir)
 
     skills_by_category: dict[str, list[tuple[str, str]]] = {}
@@ -1372,9 +1335,6 @@ def build_skills_system_prompt(
         )
 
     # ── External skill directories ─────────────────────────────────────
-    # Scan external dirs directly (no snapshot caching — they're read-only
-    # and typically small).  Local skills already in skills_by_category take
-    # precedence: we track seen names and skip duplicates from external dirs.
     seen_skill_names: set[str] = set()
     for cat_skills in skills_by_category.values():
         for name, _desc in cat_skills:
@@ -1408,7 +1368,6 @@ def build_skills_system_prompt(
             except Exception as e:
                 logger.debug("Error reading external skill %s: %s", skill_file, e)
 
-        # External category descriptions
         for desc_file in iter_skill_index_files(ext_dir, "DESCRIPTION.md"):
             try:
                 content = desc_file.read_text(encoding="utf-8")
@@ -1421,6 +1380,77 @@ def build_skills_system_prompt(
                 category_descriptions.setdefault(cat, str(cat_desc).strip().strip("'\""))
             except Exception as e:
                 logger.debug("Could not read external skill description %s: %s", desc_file, e)
+
+    result = (skills_by_category, category_descriptions)
+
+    # ── Store in LRU cache ────────────────────────────────────────────
+    with _SKILLS_PROMPT_CACHE_LOCK:
+        _SKILLS_PROMPT_CACHE[cache_key] = result
+        _SKILLS_PROMPT_CACHE.move_to_end(cache_key)
+        while len(_SKILLS_PROMPT_CACHE) > _SKILLS_PROMPT_CACHE_MAX:
+            _SKILLS_PROMPT_CACHE.popitem(last=False)
+
+    return result
+
+
+def build_skills_system_prompt(
+    available_tools: "set[str] | None" = None,
+    available_toolsets: "set[str] | None" = None,
+    compact_categories: "frozenset[str] | None" = None,
+) -> str:
+    """Build a compact skill index for the system prompt.
+
+    Two-layer cache:
+      1. In-process LRU dict keyed by (skills_dir, tools, toolsets, hidden)
+      2. Disk snapshot (``.skills_prompt_snapshot.json``) validated by
+         mtime/size manifest — survives process restarts
+
+    Falls back to a full filesystem scan when both layers miss.
+
+    External skill directories (``skills.external_dirs`` in config.yaml) are
+    scanned alongside the local ``~/.hermes/skills/`` directory.  External dirs
+    are read-only — they appear in the index but new skills are always created
+    in the local dir.  Local skills take precedence when names collide.
+
+    ``compact_categories`` (e.g. from the coding posture — see
+    agent/coding_context.py) demotes whole categories to a names-only line in
+    the rendered index. Nothing is ever hidden: every skill name stays
+    visible and loadable via ``skill_view`` / ``skills_list``; only the
+    descriptions are dropped, and a footer note explains the demotion.
+    """
+    # Delegate the data-gathering to build_skills_index_dict (shares its
+    # snapshot + LRU cache) and handle only the render/format layer here.
+    skills_by_category, category_descriptions = build_skills_index_dict(
+        available_tools=available_tools,
+        available_toolsets=available_toolsets,
+    )
+
+    # ── Layer 1: in-process LRU cache (rendered string) ───────────────
+    # Cache key mirrors the one in build_skills_index_dict but adds
+    # compact_categories (demotion is a render-time concern).
+    skills_dir = get_skills_dir()
+    external_dirs = get_all_skills_dirs()[1:]
+    from gateway.session_context import get_session_env
+    _platform_hint = (
+        os.environ.get("HERMES_PLATFORM")
+        or get_session_env("HERMES_SESSION_PLATFORM")
+        or ""
+    )
+    disabled = get_disabled_skill_names(_platform_hint or None)
+    cache_key = (
+        str(skills_dir.resolve()),
+        tuple(str(d) for d in external_dirs),
+        tuple(sorted(str(t) for t in (available_tools or set()))),
+        tuple(sorted(str(ts) for ts in (available_toolsets or set()))),
+        _platform_hint,
+        tuple(sorted(disabled)),
+        tuple(sorted(compact_categories or ())),
+    )
+    with _SKILLS_PROMPT_CACHE_LOCK:
+        cached = _SKILLS_PROMPT_CACHE.get(cache_key)
+        if cached is not None:
+            _SKILLS_PROMPT_CACHE.move_to_end(cache_key)
+            return cached
 
     # Posture-driven category demotion (e.g. non-coding skills while pairing
     # on code). Demoted categories stay in the index as a single names-only

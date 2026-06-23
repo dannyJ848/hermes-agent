@@ -1438,6 +1438,16 @@ def init_agent(
     compression_abort_on_summary_failure = str(
         _compression_cfg.get("abort_on_summary_failure", False)
     ).lower() in {"true", "1", "yes"}
+    # ── Lightweight per-turn tool-output pruning ───────────────────────
+    # Fires at a much lower threshold than full compression (default 15%
+    # vs 50%) and replaces old tool outputs with 1-line summaries via the
+    # existing _prune_old_tool_results machinery. Prevents stale tool
+    # output (ls dumps, read_file contents) from accumulating across turns
+    # on large-context models where the 50% compression gate never fires.
+    # Set tool_prune_threshold >= compression.threshold to effectively
+    # disable (full compression becomes the only pruning path).
+    tool_prune_threshold = float(_compression_cfg.get("tool_prune_threshold", 0.15))
+    tool_prune_protect_last = int(_compression_cfg.get("tool_prune_protect_last", 12))
 
     # Read optional explicit context_length override for the auxiliary
     # compression model. Custom endpoints often cannot report this via
@@ -1657,6 +1667,17 @@ def init_agent(
             abort_on_summary_failure=compression_abort_on_summary_failure,
         )
     agent.compression_enabled = compression_enabled
+
+    # Precompute the per-turn tool-pruning threshold (in tokens) from the
+    # configured percentage of the model's context window. Read by the
+    # per-turn preflight in conversation_loop.py to decide when to prune
+    # stale tool outputs. Clamped to at least 8k tokens so tiny-context
+    # models still get a usable window before pruning kicks in.
+    _prune_ctx = getattr(agent.context_compressor, "context_length", 0) or 0
+    agent.tool_prune_threshold_tokens = max(
+        8000, int(_prune_ctx * tool_prune_threshold)
+    ) if _prune_ctx else None
+    agent.tool_prune_protect_last = max(4, tool_prune_protect_last)
 
     # Reject models whose context window is below the minimum required
     # for reliable tool-calling workflows (64K tokens).

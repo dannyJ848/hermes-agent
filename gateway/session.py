@@ -750,6 +750,9 @@ class SessionStore:
         self._loaded = False
         self._lock = threading.Lock()
         self._has_active_processes_fn = has_active_processes_fn
+        # Debounced-save state — coalesces rapid update_session calls
+        self._dirty = False
+        self._save_timer = None
         
         # Initialize SQLite session database
         self._db = None
@@ -809,6 +812,31 @@ class SessionStore:
             except OSError as e:
                 logger.debug("Could not remove temp file %s: %s", tmp_path, e)
             raise
+
+    def _save_debounced(self, max_delay_seconds: float = 5.0) -> None:
+        """Debounced save — coalesces rapid update_session calls into one write.
+
+        Multiple update_session calls within max_delay_seconds result in a
+        single _save() + fsync, instead of one per call. Critical writes
+        (suspend, reset, shutdown) should call _save() directly for immediacy.
+        """
+        import threading
+        with self._lock:
+            self._dirty = True
+            if getattr(self, '_save_timer', None) is not None:
+                return  # timer already pending — will pick up the dirty flag
+            def _flush():
+                with self._lock:
+                    if self._dirty:
+                        self._dirty = False
+                        try:
+                            self._save()
+                        except Exception:
+                            pass
+                    self._save_timer = None
+            self._save_timer = threading.Timer(max_delay_seconds, _flush)
+            self._save_timer.daemon = True
+            self._save_timer.start()
     
     def _resolve_profile_for_key(self, source: Optional[SessionSource] = None) -> Optional[str]:
         """Return the profile namespace for session keys, or None when off.
@@ -1048,7 +1076,12 @@ class SessionStore:
         session_key: str,
         last_prompt_tokens: int = None,
     ) -> None:
-        """Update lightweight session metadata after an interaction."""
+        """Update lightweight session metadata after an interaction.
+
+        Uses _save_debounced instead of _save — coalesces multiple updates
+        within 5s into a single fsync. Critical operations (suspend, reset)
+        call _save() directly for immediacy.
+        """
         with self._lock:
             self._ensure_loaded_locked()
 
@@ -1057,7 +1090,7 @@ class SessionStore:
                 entry.updated_at = _now()
                 if last_prompt_tokens is not None:
                     entry.last_prompt_tokens = last_prompt_tokens
-                self._save()
+                self._save_debounced()
 
     def suspend_session(self, session_key: str) -> bool:
         """Mark a session as suspended so it auto-resets on next access.

@@ -2091,5 +2091,27 @@ def estimate_request_tokens_rough(
     if messages:
         total += estimate_messages_tokens_rough(messages)
     if tools:
-        total += (len(str(tools)) + 3) // 4
+        total += _tools_token_estimate(tools)
     return total
+
+
+# Memoize the str(tools) serialization — it walks the entire tool schema
+# list (~12-60K chars) and is called 2-3× per turn (tool-prune preflight,
+# compression preflight, retry loop). The tool list is immutable for the
+# agent's lifetime, so caching on id() + len() eliminates redundant work.
+# A length change catches the rare case where tools is mutated in place.
+_tools_cache: Dict[tuple, int] = {}
+
+
+def _tools_token_estimate(tools: List[Dict[str, Any]]) -> int:
+    """Token cost of the tool schemas, memoized on object identity."""
+    key = (id(tools), len(tools))
+    cached = _tools_cache.get(key)
+    if cached is not None:
+        return cached
+    est = (len(str(tools)) + 3) // 4
+    # Bound the cache so a churning tool list can't grow it unboundedly.
+    if len(_tools_cache) > 16:
+        _tools_cache.clear()
+    _tools_cache[key] = est
+    return est
