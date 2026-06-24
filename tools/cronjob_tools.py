@@ -140,6 +140,63 @@ def _scan_cron_prompt(prompt: str) -> str:
     return ""
 
 
+def _scan_cron_skill_assembled(prompt: str) -> tuple:
+    """Looser injection scanner for assembled cron prompts that include
+    runtime-loaded content (vetted skill markdown or data from operator-
+    authored scripts). Returns ``(cleaned_prompt, error_string)``.
+
+    Unlike the strict ``_scan_cron_prompt``, this:
+      - Sanitizes invisible unicode (strips + logs) instead of blocking,
+        so a stray zero-width space in a vetted skill body cannot
+        permanently kill a job.
+      - Still blocks unambiguous prompt-injection *directives* (the
+        ``_CRON_THREAT_PATTERNS`` directive subset), after sanitizing.
+      - Drops the command-shape / exfiltration command patterns, since
+        security runbooks and postmortems legitimately quote dangerous
+        commands. Exfil via secret-bearing URLs is still caught by the
+        URL-only exfil pattern below.
+    """
+    import logging
+    _log = logging.getLogger("cronjob_tools")
+
+    # 1. Sanitize invisible unicode (strip + log), do not block.
+    cleaned = _strip_legitimate_emoji_zwj(prompt)
+    removed = []
+    for char in _CRON_INVISIBLE_CHARS:
+        if char in cleaned:
+            cleaned = cleaned.replace(char, "")
+            removed.append(f"U+{ord(char):04X}")
+    if removed:
+        _log.warning(
+            "cron skill-assembled scanner: stripped invisible unicode %s from prompt",
+            ", ".join(sorted(set(removed))),
+        )
+
+    # 2. Block unambiguous prompt-injection directives only (strict subset).
+    #    These are the directive patterns from _CRON_THREAT_PATTERNS that
+    #    indicate injection regardless of context.
+    _DIRECTIVE_INJECTION_PATTERNS = [
+        (r'ignore\s+(?:\w+\s+)*(?:previous|all|above|prior)\s+(?:\w+\s+)*instructions', "prompt_injection"),
+        (r'do\s+not\s+tell\s+the\s+user', "deception_hide"),
+        (r'system\s+prompt\s+override', "sys_prompt_override"),
+        (r'disregard\s+(?:your|all|any)\s+(?:instructions|rules|guidelines)', "disregard_rules"),
+    ]
+    for pattern, pid in _DIRECTIVE_INJECTION_PATTERNS:
+        if re.search(pattern, cleaned, re.IGNORECASE):
+            return cleaned, f"Blocked: prompt matches threat pattern '{pid}'. Cron prompts must not contain injection directives."
+
+    # 3. Exfiltration via secret-bearing URLs is always blocked, even in
+    #    assembled prompts, because a vetted skill quoting a secret-bearing
+    #    curl URL is still a leak path.
+    for pattern, pid in _CRON_EXFIL_COMMAND_PATTERNS:
+        # Only the URL-embedding exfil patterns (not data-payload variants),
+        # since data payloads may legitimately appear in vetted skill content.
+        if "url" in pid and re.search(pattern, cleaned, re.IGNORECASE):
+            return cleaned, f"Blocked: prompt matches threat pattern '{pid}'. Cron prompts must not exfiltrate secrets."
+
+    return cleaned, ""
+
+
 def _origin_from_env() -> Optional[Dict[str, str]]:
     from gateway.session_context import get_session_env
     origin_platform = get_session_env("HERMES_SESSION_PLATFORM")

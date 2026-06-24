@@ -16974,7 +16974,12 @@ def _start_cron_ticker(stop_event: threading.Event, adapters=None, loop=None, in
     image/audio/document cache + expired ``hermes debug share`` pastes
     once per hour.
     """
-    from cron.scheduler import tick as cron_tick
+    import importlib.util as _ilu, os as _os
+    _sched_path = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), 'cron', 'scheduler.py')
+    _spec = _ilu.spec_from_file_location('cron.scheduler', _sched_path)
+    _mod = _ilu.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+    cron_tick = _mod.tick
     from gateway.platforms.base import cleanup_image_cache, cleanup_document_cache
     from hermes_cli.debug import _sweep_expired_pastes
 
