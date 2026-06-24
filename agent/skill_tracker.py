@@ -209,6 +209,61 @@ class SkillTracker:
             logger.warning("recalculate_scores failed: %s", e)
             return {"skills_scored": 0, "status": "error", "error": str(e)}
 
+    # ---- Tool preference tracking ----
+    def record_preference(self, tool_name, preference_type="prefer", category="", scope="global", weight=1.5, source="stated", reason=""):
+        """Record or reinforce a tool preference.
+        preference_type: default|prefer|avoid|fallback
+        source: stated (conversation) | explicit (set_preference tool) | observed (inferred)
+        """
+        type_weights = {"default": 2.0, "prefer": 1.5, "fallback": 0.7, "avoid": 0.3}
+        if weight == 1.5 and preference_type in type_weights:
+            weight = type_weights[preference_type]
+        try:
+            with _cursor_for(self._db_path) as cur:
+                cur.execute(
+                    """INSERT INTO tool_preferences
+                       (tool_name, category, preference_type, weight, source, scope,
+                        reason, created_at, last_reinforced, times_reinforced)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 1)
+                       ON CONFLICT(tool_name, category, scope) DO UPDATE SET
+                         preference_type = excluded.preference_type,
+                         weight = excluded.weight,
+                         reason = excluded.reason,
+                         last_reinforced = datetime('now'),
+                         times_reinforced = tool_preferences.times_reinforced + 1""",
+                    (tool_name, category, preference_type, weight, source, scope, reason))
+        except Exception as e:
+            logger.warning("record_preference failed: %s", e)
+
+    def get_preferences(self, scope="global"):
+        """Return all preferences matching a scope (global + the scope)."""
+        try:
+            with _cursor_for(self._db_path) as cur:
+                cur.execute(
+                    """SELECT tool_name, category, preference_type, weight, scope, times_reinforced, reason
+                       FROM tool_preferences WHERE scope = ? OR scope = 'global'
+                       ORDER BY weight DESC, times_reinforced DESC""", (scope,))
+                return [{"tool_name": r[0], "category": r[1], "preference_type": r[2],
+                         "weight": r[3], "scope": r[4], "times_reinforced": r[5], "reason": r[6]}
+                        for r in cur.fetchall()]
+        except Exception as e:
+            logger.warning("get_preferences failed: %s", e)
+            return []
+
+    def preference_multiplier(self, tool_name, scope="global"):
+        """Return the preference weight for a tool (1.0 if none). Explicit > stated > observed."""
+        try:
+            with _cursor_for(self._db_path) as cur:
+                cur.execute(
+                    """SELECT weight FROM tool_preferences
+                       WHERE tool_name = ? AND (scope = ? OR scope = 'global')
+                       ORDER BY CASE source WHEN 'explicit' THEN 0 WHEN 'stated' THEN 1 ELSE 2 END,
+                                weight DESC LIMIT 1""", (tool_name, scope))
+                row = cur.fetchone()
+                return row[0] if row else 1.0
+        except Exception:
+            return 1.0
+
     def get_stats(self) -> Dict[str, Any]:
         return self.get_skill_stats()
 

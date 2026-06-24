@@ -1029,9 +1029,10 @@ def init_agent(
             # Register the discover_tools meta-tool so the model can load
             # any tool the oracle missed.
             try:
-                from agent.adaptive_tools import register_discover_tools
+                from agent.adaptive_tools import register_discover_tools, register_set_preference
                 from tools.registry import registry
                 register_discover_tools(registry)
+                register_set_preference(registry)
             except Exception:
                 pass
             # Use get_status() for in-memory state (faster, always current)

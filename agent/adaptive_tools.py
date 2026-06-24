@@ -320,5 +320,118 @@ def inject_discover_schema(tools: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     names = {t.get("function", t).get("name") for t in tools}
     if "discover_tools" not in names:
-        return tools + [DISCOVER_TOOLS_SCHEMA]
+        tools = tools + [DISCOVER_TOOLS_SCHEMA]
+    if "set_preference" not in names:
+        tools = tools + [SET_PREFERENCE_SCHEMA]
     return tools
+
+
+# --------------------------------------------------------------------------
+# set_preference — lets the model record explicit tool preferences.
+# The preference feeds the learning loop: the oracle boosts/suppresses tools
+# based on these records, independent of raw usage frequency.
+# --------------------------------------------------------------------------
+
+SET_PREFERENCE_SCHEMA = {
+    "type": "function",
+    "function": {
+        "name": "set_preference",
+        "description": (
+            "Record a tool preference so future tool selection favors or avoids "
+            "the specified tool. Use this when the user states a clear preference "
+            "(e.g. 'always use kimi-bridge instead of firecrawl', 'never use the "
+            "browser tool, prefer web_extract'). Preferences persist across sessions "
+            "and influence the adaptive tool selector. The preference_type controls "
+            "the strength: default (strongest, use first), prefer (mild boost), "
+            "avoid (suppress), fallback (use only if preferred fails)."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tool_name": {
+                    "type": "string",
+                    "description": "The tool name to set a preference for (e.g. 'kimi-webbridge', 'firecrawl', 'execute_code').",
+                },
+                "preference_type": {
+                    "type": "string",
+                    "enum": ["default", "prefer", "avoid", "fallback"],
+                    "description": "default=use this first for the category (2.0x), prefer=mild boost (1.5x), avoid=suppress (0.3x), fallback=use only if preferred fails (0.7x).",
+                    "default": "prefer",
+                },
+                "category": {
+                    "type": "string",
+                    "description": "The tool category this applies to (e.g. 'browser', 'search', 'code_exec', 'extraction'). Empty = applies to the tool generally.",
+                    "default": "",
+                },
+                "scope": {
+                    "type": "string",
+                    "description": "Where the preference applies: 'global' (all tasks) or a specific category like 'research', 'coding', 'writing'.",
+                    "default": "global",
+                },
+                "reason": {
+                    "type": "string",
+                    "description": "Why this preference was set (e.g. 'user prefers kimi-bridge for browsing').",
+                    "default": "",
+                },
+            },
+            "required": ["tool_name"],
+        },
+    },
+}
+
+
+def handle_set_preference(
+    agent: Any,
+    tool_name: str,
+    preference_type: str = "prefer",
+    category: str = "",
+    scope: str = "global",
+    reason: str = "",
+) -> str:
+    """Handler for the set_preference tool call.
+
+    Records the preference via the SkillTracker, which the ToolOracle reads
+    to boost/suppress tools in future predictions.
+    """
+    try:
+        from agent.skill_tracker import SkillTracker
+        st = getattr(agent, "_skill_tracker", None) or SkillTracker()
+        st.record_preference(
+            tool_name=tool_name,
+            preference_type=preference_type,
+            category=category,
+            scope=scope,
+            source="explicit",
+            reason=reason or f"set via set_preference tool ({preference_type})",
+        )
+        # Also refresh the oracle's cache so it picks up the change next call.
+        oracle = getattr(agent, "tool_oracle", None)
+        if oracle is not None:
+            oracle._cache_ts = 0  # force re-read on next predict_tools
+        return (
+            f"Recorded preference: {tool_name} = {preference_type} "
+            f"(category={category or 'any'}, scope={scope}). "
+            f"This will influence tool selection in future turns. "
+            f"Stating it again reinforces the preference."
+        )
+    except Exception as e:
+        return f"Failed to record preference: {e}"
+
+
+def register_set_preference(registry: Any) -> None:
+    """Register the set_preference meta-tool in the tool registry."""
+    try:
+        registry.register(
+            name="set_preference",
+            toolset="cognitive",
+            schema=SET_PREFERENCE_SCHEMA["function"],
+            handler=lambda agent, **kw: handle_set_preference(agent, **kw),
+            check_fn=lambda: True,
+            requires_env=None,
+            is_async=False,
+            description=SET_PREFERENCE_SCHEMA["function"]["description"],
+            emoji="⚙️",
+        )
+        logger.debug("adaptive_tools: registered set_preference meta-tool")
+    except Exception as e:
+        logger.debug("adaptive_tools: set_preference registration (%s)", e)
