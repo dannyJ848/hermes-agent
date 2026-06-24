@@ -15,7 +15,7 @@ from xml.etree import ElementTree as ET
 
 __all__ = ["EXTRACTABLE_EXTENSIONS", "ExtractionError", "extract_document_text", "is_extractable_document"]
 
-EXTRACTABLE_EXTENSIONS = frozenset({".ipynb", ".docx", ".xlsx"})
+EXTRACTABLE_EXTENSIONS = frozenset({".ipynb", ".docx", ".xlsx", ".pdf"})
 MAX_XLSX_BYTES = 50 * 1024 * 1024
 _MAX_XLSX_ROWS_PER_SHEET = 5000
 _MAX_XLSX_COLS = 256
@@ -47,7 +47,48 @@ def extract_document_text(path: str) -> str:
         return _extract_docx(path)
     if ext == ".xlsx":
         return _extract_xlsx(path)
+    if ext == ".pdf":
+        return _extract_pdf_text(path)
     raise ExtractionError(f"Unsupported document type: {path!r}")
+
+
+def _extract_pdf_text(path: str, max_chars: int = 100000) -> str:
+    """Extract text from a PDF using pdfplumber.
+
+    Returns the first max_chars of extracted text. For large PDFs or
+    page-specific extraction, the model should use the pdf skill directly:
+    pdf.py extract.text <path> [-p pages]
+    """
+    try:
+        import pdfplumber
+    except ImportError:
+        raise ExtractionError(
+            "PDF extraction requires pdfplumber. Use the pdf skill: "
+            "/data/SpecForge/venv/bin/python "
+            "/home/djg6228/.hermes/skills/productivity/pdf/scripts/pdf.py "
+            f"extract.text {path}"
+        )
+    try:
+        text_parts = []
+        total_chars = 0
+        with pdfplumber.open(path) as pdf:
+            for page in pdf.pages:
+                if total_chars >= max_chars:
+                    break
+                page_text = page.extract_text() or ""
+                text_parts.append(page_text)
+                total_chars += len(page_text)
+        result = "\n\n".join(text_parts)
+        if not result.strip():
+            raise ExtractionError(
+                "No text extracted from PDF (may be image-based/scanned). "
+                "Use vision_analyze on extracted page images instead."
+            )
+        return result[:max_chars]
+    except ExtractionError:
+        raise
+    except Exception as e:
+        raise ExtractionError(f"PDF extraction failed: {e}")
 
 
 def _source_text(source) -> str:
