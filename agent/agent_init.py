@@ -1016,6 +1016,24 @@ def init_agent(
             agent.cognitive_orchestrator = get_orchestrator()
             if hasattr(agent.cognitive_orchestrator, 'initialize'):
                 agent.cognitive_orchestrator.initialize(agent)
+
+            # Adaptive tools: expose the tool_oracle subsystem so
+            # select_tools_for_turn() can predict relevant tools per turn.
+            try:
+                _co = agent.cognitive_orchestrator
+                _oracle = _co._subsystems.get("tool_oracle") if hasattr(_co, "_subsystems") else None
+                if _oracle is not None:
+                    agent.tool_oracle = _oracle
+            except Exception:
+                pass
+            # Register the discover_tools meta-tool so the model can load
+            # any tool the oracle missed.
+            try:
+                from agent.adaptive_tools import register_discover_tools
+                from tools.registry import registry
+                register_discover_tools(registry)
+            except Exception:
+                pass
             # Use get_status() for in-memory state (faster, always current)
             # get_stats() queries SQLite which may lag behind
             status = agent.cognitive_orchestrator.get_status() if hasattr(agent.cognitive_orchestrator, 'get_status') else {}

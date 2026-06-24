@@ -554,7 +554,25 @@ def interruptible_api_call(agent, api_kwargs: dict):
 
 def build_api_kwargs(agent, api_messages: list) -> dict:
     """Build the keyword arguments dict for the active API mode."""
-    tools_for_api = agent.tools
+    # Adaptive tool selection: for local models, load only the relevant subset
+    # instead of all 40 tools (saves ~10k tokens per request). Falls back to
+    # the full agent.tools list if adaptive loading is disabled or fails.
+    try:
+        from agent.adaptive_tools import select_tools_for_turn, inject_discover_schema
+        _user_msg = ""
+        for _m in reversed(api_messages):
+            if isinstance(_m, dict) and _m.get("role") == "user":
+                _c = _m.get("content", "")
+                if isinstance(_c, list):
+                    _c = " ".join(str(x) for x in _c)
+                _user_msg = str(_c)
+                break
+        _selected = select_tools_for_turn(agent, _user_msg)
+        if _selected is not None:
+            _selected = inject_discover_schema(_selected)
+        tools_for_api = _selected if _selected is not None else agent.tools
+    except Exception:
+        tools_for_api = agent.tools
 
     if agent.api_mode == "anthropic_messages":
         _transport = agent._get_transport()
