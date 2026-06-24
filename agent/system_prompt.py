@@ -320,6 +320,22 @@ def build_system_prompt_parts(agent: Any, system_message: Optional[str] = None) 
                 )
             except Exception:
                 _compact_cats = frozenset()
+
+            # Adaptive skills compaction: for local models (where context
+            # budget is tight), compact ALL categories to names-only. The
+            # model can still load any skill via skill_view(name) — only the
+            # inline descriptions are dropped, saving ~6.5k tokens.
+            # Cloud models keep full descriptions (they have context to spare).
+            try:
+                _base_url = getattr(agent, "base_url", "") or ""
+                _is_local = any(x in _base_url for x in ("localhost", "127.0.0.1", "0.0.0.0", "spark-85e8"))
+                if _is_local:
+                    from agent.prompt_builder import build_skills_index_dict
+                    _sbc, _ = build_skills_index_dict()
+                    _compact_cats = frozenset(_sbc.keys())
+            except Exception:
+                pass
+
             skills_prompt = _r.build_skills_system_prompt(
                 available_tools=agent.valid_tool_names,
                 available_toolsets=avail_toolsets,
