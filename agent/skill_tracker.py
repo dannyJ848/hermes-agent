@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 logger = logging.getLogger(__name__)
-DEFAULT_DB_PATH = Path.home() / ".hermes" / "cerebrum_memory.db"
+DEFAULT_DB_PATH = Path.home() / ".hermes" / "skill_tracker.db"
 DB_PATH = DEFAULT_DB_PATH  # backwards-compat module-level reference
 
 
@@ -198,7 +198,11 @@ class SkillTracker:
                     GROUP BY skill_name
                     HAVING COUNT(*) >= ?
                 """, (self._min_samples,))
-                cur.execute("SELECT COUNT(*) FROM skill_scores")
+                # Count the skills that now have a positive score (the scored
+                # subset). cur.rowcount is unreliable for INSERT...SELECT and
+                # returns 0 when REPLACE hits identical rows, so we count
+                # explicitly instead.
+                cur.execute("SELECT COUNT(*) FROM skill_scores WHERE score > 0")
                 n = cur.fetchone()[0]
                 return {"skills_scored": n, "status": "ok"}
         except Exception as e:
