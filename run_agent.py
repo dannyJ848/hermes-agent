@@ -5187,12 +5187,46 @@ class AIAgent:
             if not hasattr(self, "_recent_tool_calls"):
                 self._recent_tool_calls = []
             MAX_RECENT = 10  # track last 10 tool calls
-            MAX_IDENTICAL = 2  # allow 2 identical, block on 3rd
+            MAX_IDENTICAL = 2  # allow 2 similar, block on 3rd
+
+            def _normalize_tool_sig(name, args_str):
+                """Normalize a tool signature so trivial variations collapse.
+                - Strips whitespace, lowercases
+                - For terminal: extracts the shell command, normalizes flags
+                - For JSON args: sorts keys, strips whitespace
+                - Collapses repeated spaces
+                """
+                import json as _j
+                import re as _re
+                # Normalize JSON args
+                try:
+                    parsed = _j.loads(args_str) if args_str else {}
+                    if isinstance(parsed, dict):
+                        # For terminal, extract the command string
+                        if name == "terminal" and "command" in parsed:
+                            cmd = str(parsed["command"]).strip().lower()
+                            # Collapse repeated whitespace
+                            cmd = _re.sub(r'\s+', ' ', cmd)
+                            # Strip common no-op suffixes the model varies on
+                            cmd = cmd.rstrip(' &')
+                            # Remove trailing comments
+                            cmd = _re.sub(r'\s*#.*$', '', cmd)
+                            return f"terminal:{cmd}"
+                        # Generic: sorted JSON keys, no whitespace
+                        return f"{name}:{_j.dumps(parsed, sort_keys=True, separators=(',', ':'))}"
+                    return f"{name}:{str(parsed).strip().lower()}"
+                except Exception:
+                    return f"{name}:{(args_str or '').strip().lower()}"
 
             blocked = []
             for tc in tool_calls:
-                sig = f"{tc.function.name}:{tc.function.arguments}"
-                identical_count = sum(1 for s in self._recent_tool_calls if s == sig)
+                sig = _normalize_tool_sig(tc.function.name, tc.function.arguments)
+                # Check both exact and normalized match
+                raw_sig = f"{tc.function.name}:{tc.function.arguments}"
+                identical_count = sum(
+                    1 for s in self._recent_tool_calls
+                    if s == sig or s == raw_sig
+                )
                 if identical_count >= MAX_IDENTICAL:
                     blocked.append((tc, identical_count))
 
