@@ -5176,6 +5176,62 @@ class AIAgent:
         """
         tool_calls = assistant_message.tool_calls
 
+        # ── Cross-turn duplicate tool guard ────────────────────────
+        # Local models (Qwopus) can get stuck repeating the exact same
+        # successful tool call across turns. The existing guardrails only
+        # catch failures, so we add a hard check here: if the same tool
+        # with the same arguments was called recently, block it and inject
+        # a corrective message instead.
+        if tool_calls:
+            import json as _json
+            if not hasattr(self, "_recent_tool_calls"):
+                self._recent_tool_calls = []
+            MAX_RECENT = 10  # track last 10 tool calls
+            MAX_IDENTICAL = 2  # allow 2 identical, block on 3rd
+
+            blocked = []
+            for tc in tool_calls:
+                sig = f"{tc.function.name}:{tc.function.arguments}"
+                identical_count = sum(1 for s in self._recent_tool_calls if s == sig)
+                if identical_count >= MAX_IDENTICAL:
+                    blocked.append((tc, identical_count))
+
+            if blocked:
+                self._vprint(
+                    f"{self.log_prefix}🛑 Tool loop detected — blocking {len(blocked)} "
+                    f"repeated call(s). Telling model to stop repeating.",
+                    force=True,
+                )
+                # Append the assistant message (so role alternation holds)
+                assistant_msg = self._build_assistant_message(assistant_message, "")
+                messages.append(assistant_msg)
+                for tc, count in blocked:
+                    messages.append({
+                        "role": "tool",
+                        "name": tc.function.name,
+                        "tool_call_id": tc.id,
+                        "content": (
+                            f"BLOCKED: You have already called {tc.function.name} "
+                            f"with these exact arguments {count} times. It already "
+                            f"succeeded. Do NOT call it again. Move on to the next "
+                            f"step or respond to the user."
+                        ),
+                    })
+                # Still track the (blocked) calls so the count keeps rising
+                for tc in tool_calls:
+                    sig = f"{tc.function.name}:{tc.function.arguments}"
+                    self._recent_tool_calls.append(sig)
+                    if len(self._recent_tool_calls) > MAX_RECENT:
+                        self._recent_tool_calls.pop(0)
+                return
+
+            # Track calls for next iteration's duplicate check
+            for tc in tool_calls:
+                sig = f"{tc.function.name}:{tc.function.arguments}"
+                self._recent_tool_calls.append(sig)
+                if len(self._recent_tool_calls) > MAX_RECENT:
+                    self._recent_tool_calls.pop(0)
+
         # Allow _vprint during tool execution even with stream consumers
         self._executing_tools = True
         try:
