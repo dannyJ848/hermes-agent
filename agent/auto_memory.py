@@ -26,6 +26,21 @@ HERMES_HOME = Path.home() / ".hermes"
 CEREBRUM_DB = HERMES_HOME / "cerebrum_memory.db"
 
 
+import re as _think_re
+
+_THINK_TAG_RE = _think_re.compile(r'<think>.*?</think>', _think_re.DOTALL | _think_re.IGNORECASE)
+_THINK_OPEN_RE = _think_re.compile(r'<think>.*', _think_re.DOTALL | _think_re.IGNORECASE)
+
+
+def _strip_think_tags(text: str) -> str:
+    """Remove <think> reasoning blocks from content."""
+    if not text or "<think" not in text.lower():
+        return text
+    text = _THINK_TAG_RE.sub("", text)
+    text = _THINK_OPEN_RE.sub("", text)
+    return text.strip()
+
+
 @dataclass
 class ExtractedTip:
     """A distilled tip extracted from session content."""
@@ -339,7 +354,7 @@ Tips to extract:
         lines = []
         for msg in messages:
             role = msg.get("role", "unknown")
-            content = str(msg.get("content", ""))[:200]
+            content = _strip_think_tags(str(msg.get("content", "")))[:200]
             if role in ("user", "assistant"):
                 lines.append(f"{role}: {content}")
             elif role == "tool":
