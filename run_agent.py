@@ -5231,9 +5231,45 @@ class AIAgent:
                     blocked.append((tc, identical_count))
 
             if blocked:
+                # Track how many times we've blocked in this session
+                if not hasattr(self, "_loop_block_count"):
+                    self._loop_block_count = 0
+                self._loop_block_count += 1
+                MAX_LOOP_BLOCKS = 3  # after 3 blocks, hard-stop the turn
+
+                if self._loop_block_count >= MAX_LOOP_BLOCKS:
+                    # HARD STOP: terminate the turn entirely.
+                    # Inject a final message and return to the user.
+                    self._vprint(
+                        f"{self.log_prefix}❌ Tool loop limit reached "
+                        f"({self._loop_block_count} blocks). Stopping turn.",
+                        force=True,
+                    )
+                    self._loop_block_count = 0  # reset for next user message
+                    self._recent_tool_calls = []  # clear the history
+                    # Append assistant msg + tool error so the loop exits cleanly
+                    assistant_msg = self._build_assistant_message(assistant_message, "")
+                    messages.append(assistant_msg)
+                    for tc, count in blocked:
+                        messages.append({
+                            "role": "tool",
+                            "name": tc.function.name,
+                            "tool_call_id": tc.id,
+                            "content": "HARD STOP: Repeated tool calls blocked too many times.",
+                        })
+                    # Return with the last content as response (if any)
+                    fallback = getattr(self, "_last_content_with_tools", None) or ""
+                    return {
+                        "final_response": fallback or "I got stuck in a tool loop. Please rephrase or start a new task.",
+                        "messages": messages,
+                        "completed": True,
+                        "tool_loop_stopped": True,
+                    }
+
                 self._vprint(
                     f"{self.log_prefix}🛑 Tool loop detected — blocking {len(blocked)} "
-                    f"repeated call(s). Telling model to stop repeating.",
+                    f"repeated call(s) [{self._loop_block_count}/{MAX_LOOP_BLOCKS}]. "
+                    f"Telling model to stop repeating.",
                     force=True,
                 )
                 # Append the assistant message (so role alternation holds)
@@ -5253,7 +5289,7 @@ class AIAgent:
                     })
                 # Still track the (blocked) calls so the count keeps rising
                 for tc in tool_calls:
-                    sig = f"{tc.function.name}:{tc.function.arguments}"
+                    sig = _normalize_tool_sig(tc.function.name, tc.function.arguments)
                     self._recent_tool_calls.append(sig)
                     if len(self._recent_tool_calls) > MAX_RECENT:
                         self._recent_tool_calls.pop(0)
