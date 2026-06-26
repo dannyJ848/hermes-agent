@@ -360,6 +360,30 @@ def build_system_prompt_parts(agent: Any, system_message: Optional[str] = None) 
             f"not on any model name returned by the API."
         )
 
+    # Native vision capability notice — tell the model it can see images.
+    # Local models (Qwopus) with --mmproj loaded often don't realize they
+    # have vision and try to bypass vision_analyze by calling external APIs.
+    # This explicit notice makes them use the vision_analyze tool directly.
+    try:
+        from agent.image_routing import decide_image_input_mode
+        _vision_mode = decide_image_input_mode(
+            getattr(agent, "provider", ""),
+            getattr(agent, "model", ""),
+            getattr(agent, "config", None),
+        )
+        if _vision_mode == "native":
+            stable_parts.append(
+                "IMPORTANT: You have NATIVE VISION capability. You can see and "
+                "analyze images directly — no external API needed. When the user "
+                "asks you to look at an image, screenshot, photo, chart, or diagram, "
+                "use the vision_analyze tool. It attaches the image to YOUR context "
+                "and you read the pixels yourself. Do NOT use execute_code to call "
+                "external vision APIs (kimi, gemini, openrouter). Do NOT say you "
+                "cannot see images. You CAN see images. Use vision_analyze."
+            )
+    except Exception:
+        pass
+
     # Environment hints (WSL, Termux, etc.) — tell the agent about the
     # execution environment so it can translate paths and adapt behavior.
     # Stable for the lifetime of the process.
