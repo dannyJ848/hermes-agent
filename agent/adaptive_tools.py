@@ -232,6 +232,7 @@ def handle_discover_tools(
     agent: Any,
     query: str,
     limit: int = 5,
+    **kwargs,
 ) -> str:
     """Handler for the discover_tools tool call.
 
@@ -387,6 +388,7 @@ def handle_set_preference(
     category: str = "",
     scope: str = "global",
     reason: str = "",
+    **kwargs,
 ) -> str:
     """Handler for the set_preference tool call.
 
