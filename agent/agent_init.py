@@ -968,6 +968,17 @@ def init_agent(
         agent._tool_snapshot_generation = _snapshot_registry._generation
     except Exception:
         agent._tool_snapshot_generation = 0
+    # Register adaptive meta-tools (discover_tools, set_preference)
+    # BEFORE the tool snapshot so they appear in agent.tools.
+    try:
+        from agent.adaptive_tools import register_discover_tools, register_set_preference
+        from tools.registry import registry as _tool_registry
+        register_discover_tools(_tool_registry)
+        register_set_preference(_tool_registry)
+    except Exception as _reg_err:
+        import logging as _log
+        _log.getLogger("agent_init").warning("adaptive meta-tool registration failed: %s", _reg_err)
+
     agent.tools = _ra().get_tool_definitions(
         enabled_toolsets=enabled_toolsets,
         disabled_toolsets=disabled_toolsets,
@@ -1029,10 +1040,9 @@ def init_agent(
             # Register the discover_tools meta-tool so the model can load
             # any tool the oracle missed.
             try:
-                from agent.adaptive_tools import register_discover_tools, register_set_preference
+                from agent.adaptive_tools import register_discover_tools
                 from tools.registry import registry
                 register_discover_tools(registry)
-                register_set_preference(registry)
             except Exception:
                 pass
             # Use get_status() for in-memory state (faster, always current)
