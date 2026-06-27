@@ -971,10 +971,11 @@ def init_agent(
     # Register adaptive meta-tools (discover_tools, set_preference)
     # BEFORE the tool snapshot so they appear in agent.tools.
     try:
-        from agent.adaptive_tools import register_discover_tools, register_set_preference
+        from agent.adaptive_tools import register_discover_tools, register_set_preference, set_active_agent
         from tools.registry import registry as _tool_registry
         register_discover_tools(_tool_registry)
         register_set_preference(_tool_registry)
+        set_active_agent(agent)
     except Exception as _reg_err:
         import logging as _log
         _log.getLogger("agent_init").warning("adaptive meta-tool registration failed: %s", _reg_err)

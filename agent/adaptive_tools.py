@@ -21,6 +21,17 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
+# Module-level reference to the active agent, set by agent_init.
+# Tool handlers can't receive the agent via dispatch (which passes args
+# dict + kwargs), so we store it here for the meta-tool handlers to access.
+_active_agent: Any = None
+
+
+def set_active_agent(agent: Any) -> None:
+    """Called by agent_init to make the agent available to meta-tool handlers."""
+    global _active_agent
+    _active_agent = agent
+
 # --------------------------------------------------------------------------
 # Core tier — always loaded regardless of oracle prediction.
 # These cover basic capability so the agent never loses file/shell/code/web
@@ -145,6 +156,8 @@ def _select_adaptive(
 
     # Session-persisted set: tools that have been loaded this session.
     # Starts empty, grows as oracle/discover add tools.
+    if agent is None:
+        return "Error: agent not initialized"
     if not hasattr(agent, "_adaptive_active_names"):
         agent._adaptive_active_names = set()
     active_names: set = agent._adaptive_active_names
@@ -229,7 +242,6 @@ DISCOVER_TOOLS_SCHEMA = {
 
 
 def handle_discover_tools(
-    agent: Any,
     query: str,
     limit: int = 5,
     **kwargs,
@@ -240,7 +252,8 @@ def handle_discover_tools(
     session's active set, and returns their names + descriptions so the model
     knows what just became available.
     """
-    full_tools = getattr(agent, "tools", []) or []
+    agent = _active_agent
+    full_tools = getattr(agent, "tools", []) if agent else []
     index = _build_index(full_tools)
 
     q = (query or "").lower()
@@ -299,7 +312,7 @@ def register_discover_tools(registry: Any) -> None:
             name="discover_tools",
             toolset="cognitive",
             schema=DISCOVER_TOOLS_SCHEMA["function"],
-            handler=lambda agent, **kw: handle_discover_tools(agent, **kw),
+            handler=lambda args, **kw: handle_discover_tools(args.get("query", ""), args.get("limit", 5), **kw),
             check_fn=lambda: True,
             requires_env=None,
             is_async=False,
@@ -382,7 +395,6 @@ SET_PREFERENCE_SCHEMA = {
 
 
 def handle_set_preference(
-    agent: Any,
     tool_name: str,
     preference_type: str = "prefer",
     category: str = "",
@@ -395,9 +407,12 @@ def handle_set_preference(
     Records the preference via the SkillTracker, which the ToolOracle reads
     to boost/suppress tools in future predictions.
     """
+    agent = _active_agent
     try:
         from agent.skill_tracker import SkillTracker
-        st = getattr(agent, "_skill_tracker", None) or SkillTracker()
+        st = getattr(agent, "_skill_tracker", None) if agent else None
+        if st is None:
+            st = SkillTracker()
         st.record_preference(
             tool_name=tool_name,
             preference_type=preference_type,
@@ -427,7 +442,7 @@ def register_set_preference(registry: Any) -> None:
             name="set_preference",
             toolset="cognitive",
             schema=SET_PREFERENCE_SCHEMA["function"],
-            handler=lambda agent, **kw: handle_set_preference(agent, **kw),
+            handler=lambda args, **kw: handle_set_preference(args.get("tool_name", ""), args.get("preference_type", "prefer"), args.get("category", ""), args.get("scope", "global"), args.get("reason", ""), **kw),
             check_fn=lambda: True,
             requires_env=None,
             is_async=False,
