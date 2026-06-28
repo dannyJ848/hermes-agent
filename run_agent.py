@@ -5247,16 +5247,26 @@ class AIAgent:
                     )
                     self._loop_block_count = 0  # reset for next user message
                     self._recent_tool_calls = []  # clear the history
-                    # Append assistant msg + tool error so the loop exits cleanly
+                    # Append assistant msg + tool response for EVERY tool_call
+                    # so the message sequence is valid for the API.
                     assistant_msg = self._build_assistant_message(assistant_message, "")
                     messages.append(assistant_msg)
-                    for tc, count in blocked:
-                        messages.append({
-                            "role": "tool",
-                            "name": tc.function.name,
-                            "tool_call_id": tc.id,
-                            "content": "HARD STOP: Repeated tool calls blocked too many times.",
-                        })
+                    blocked_ids = {tc.id for tc, _ in blocked}
+                    for tc in tool_calls:
+                        if tc.id in blocked_ids:
+                            messages.append({
+                                "role": "tool",
+                                "name": tc.function.name,
+                                "tool_call_id": tc.id,
+                                "content": "HARD STOP: Repeated tool calls blocked too many times.",
+                            })
+                        else:
+                            messages.append({
+                                "role": "tool",
+                                "name": tc.function.name,
+                                "tool_call_id": tc.id,
+                                "content": "SKIPPED: Loop guard hard-stop triggered.",
+                            })
                     # Return with the last content as response (if any)
                     fallback = getattr(self, "_last_content_with_tools", None) or ""
                     return {
@@ -5275,18 +5285,30 @@ class AIAgent:
                 # Append the assistant message (so role alternation holds)
                 assistant_msg = self._build_assistant_message(assistant_message, "")
                 messages.append(assistant_msg)
-                for tc, count in blocked:
-                    messages.append({
-                        "role": "tool",
-                        "name": tc.function.name,
-                        "tool_call_id": tc.id,
-                        "content": (
-                            f"BLOCKED: You have already called {tc.function.name} "
-                            f"with these exact arguments {count} times. It already "
-                            f"succeeded. Do NOT call it again. Move on to the next "
-                            f"step or respond to the user."
-                        ),
-                    })
+                # Provide a tool response for EVERY tool_call in the message —
+                # blocked ones get BLOCKED, non-blocked ones get SKIPPED.
+                # Without this, the API rejects the message sequence (400:
+                # "tool_calls must be followed by tool messages").
+                blocked_ids = {tc.id for tc, _ in blocked}
+                for tc in tool_calls:
+                    if tc.id in blocked_ids:
+                        messages.append({
+                            "role": "tool",
+                            "name": tc.function.name,
+                            "tool_call_id": tc.id,
+                            "content": (
+                                f"BLOCKED: You have already called {tc.function.name} "
+                                f"with these exact arguments. Do NOT call it again. "
+                                f"Move on to the next step or respond to the user."
+                            ),
+                        })
+                    else:
+                        messages.append({
+                            "role": "tool",
+                            "name": tc.function.name,
+                            "tool_call_id": tc.id,
+                            "content": "SKIPPED: Another tool in this batch was blocked for repetition. Please retry if needed.",
+                        })
                 # Still track the (blocked) calls so the count keeps rising
                 for tc in tool_calls:
                     sig = _normalize_tool_sig(tc.function.name, tc.function.arguments)
