@@ -5247,15 +5247,8 @@ class AIAgent:
                     )
                     self._loop_block_count = 0  # reset for next user message
                     self._recent_tool_calls = []  # clear the history
-                    # Append assistant msg WITH tool_calls + response for EVERY tool_call
-                    assistant_msg = self._build_assistant_message(assistant_message, "tool_calls")
-                    if not assistant_msg.get("tool_calls"):
-                        assistant_msg["tool_calls"] = [
-                            {"id": tc.id, "type": "function",
-                             "function": {"name": tc.function.name, "arguments": tc.function.arguments}}
-                            for tc in tool_calls
-                        ]
-                    messages.append(assistant_msg)
+                    # The conversation loop already appended the assistant message.
+                    # Just provide tool responses for every tool_call.
                     blocked_ids = {tc.id for tc, _ in blocked}
                     for tc in tool_calls:
                         if tc.id in blocked_ids:
@@ -5287,20 +5280,12 @@ class AIAgent:
                     f"Telling model to stop repeating.",
                     force=True,
                 )
-                # Build the assistant message WITH its original tool_calls so the
-                # tool response messages have matching IDs. Then provide a
-                # response for EVERY tool_call — blocked ones get BLOCKED,
-                # non-blocked ones get SKIPPED. Using the original IDs from
-                # the raw assistant_message avoids ID-mismatch 400 errors.
-                assistant_msg = self._build_assistant_message(assistant_message, "tool_calls")
-                # Ensure tool_calls are present (build may strip them)
-                if not assistant_msg.get("tool_calls"):
-                    assistant_msg["tool_calls"] = [
-                        {"id": tc.id, "type": "function",
-                         "function": {"name": tc.function.name, "arguments": tc.function.arguments}}
-                        for tc in tool_calls
-                    ]
-                messages.append(assistant_msg)
+                # The conversation loop already appended the assistant message
+                # (with its tool_calls) to `messages` before calling us.
+                # We just need to provide a tool response for EVERY tool_call.
+                # DON'T append a duplicate assistant message — that causes
+                # two assistant messages with the same tool_call IDs, and
+                # the first one gets no response (400 error).
                 blocked_ids = {tc.id for tc, _ in blocked}
                 for tc in tool_calls:
                     if tc.id in blocked_ids:
