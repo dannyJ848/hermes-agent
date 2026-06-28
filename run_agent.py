@@ -5247,9 +5247,14 @@ class AIAgent:
                     )
                     self._loop_block_count = 0  # reset for next user message
                     self._recent_tool_calls = []  # clear the history
-                    # Append assistant msg + tool response for EVERY tool_call
-                    # so the message sequence is valid for the API.
-                    assistant_msg = self._build_assistant_message(assistant_message, "")
+                    # Append assistant msg WITH tool_calls + response for EVERY tool_call
+                    assistant_msg = self._build_assistant_message(assistant_message, "tool_calls")
+                    if not assistant_msg.get("tool_calls"):
+                        assistant_msg["tool_calls"] = [
+                            {"id": tc.id, "type": "function",
+                             "function": {"name": tc.function.name, "arguments": tc.function.arguments}}
+                            for tc in tool_calls
+                        ]
                     messages.append(assistant_msg)
                     blocked_ids = {tc.id for tc, _ in blocked}
                     for tc in tool_calls:
@@ -5282,13 +5287,20 @@ class AIAgent:
                     f"Telling model to stop repeating.",
                     force=True,
                 )
-                # Append the assistant message (so role alternation holds)
-                assistant_msg = self._build_assistant_message(assistant_message, "")
+                # Build the assistant message WITH its original tool_calls so the
+                # tool response messages have matching IDs. Then provide a
+                # response for EVERY tool_call — blocked ones get BLOCKED,
+                # non-blocked ones get SKIPPED. Using the original IDs from
+                # the raw assistant_message avoids ID-mismatch 400 errors.
+                assistant_msg = self._build_assistant_message(assistant_message, "tool_calls")
+                # Ensure tool_calls are present (build may strip them)
+                if not assistant_msg.get("tool_calls"):
+                    assistant_msg["tool_calls"] = [
+                        {"id": tc.id, "type": "function",
+                         "function": {"name": tc.function.name, "arguments": tc.function.arguments}}
+                        for tc in tool_calls
+                    ]
                 messages.append(assistant_msg)
-                # Provide a tool response for EVERY tool_call in the message —
-                # blocked ones get BLOCKED, non-blocked ones get SKIPPED.
-                # Without this, the API rejects the message sequence (400:
-                # "tool_calls must be followed by tool messages").
                 blocked_ids = {tc.id for tc, _ in blocked}
                 for tc in tool_calls:
                     if tc.id in blocked_ids:
